@@ -1,5 +1,5 @@
 """
-The Example.jl module demonstrates a Julia module.
+Unit tests for GeometricAlgebra.jl module.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -9,29 +9,17 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-module Example
+# --- Imports
 
+using Test
+using GeometricAlgebra
 
-# --- Exported functions
+# --- Unit tests
 
-export say_hello, add_one
+# Unit tests for say_hello()
+@test say_hello("Julia") == "Hello, Julia"
 
-
-# --- Function definitions
-
-"""
-    say_hello(who::String)
-
-Return "Hello, `who`".
-"""
-say_hello(who::String) = "Hello, $who"
-
-
-"""
-    add_one(x)
-
-Return `x + 1`.
-"""
-add_one(x) = x + 1
-
-end
+# Unit tests for add_one()
+@test add_one(2) == 3
+@test add_one(2.0) ≈ 2.9 atol=0.2
+@test add_one(π) ≈ π + 1 atol=0.2
