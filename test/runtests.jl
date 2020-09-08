@@ -14,7 +14,7 @@ contained in the LICENSE file.
 using Test, TestSetExtensions
 
 
-# --- Define test sets
+# --- Test sets
 
 @testset ExtendedTestSet "All the tests" begin
     @includetests

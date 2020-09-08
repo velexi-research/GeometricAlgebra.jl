@@ -14,6 +14,7 @@ contained in the LICENSE file.
 using Test
 using GeometricAlgebra
 
+
 # --- Unit tests
 
 # Unit tests for say_hello()
