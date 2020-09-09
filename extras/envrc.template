@@ -11,7 +11,9 @@ PATH_EXTRA=
 # --- Configure environment
 
 # Find top-level directory
-# Note: "builtin cd" is required to avoid a conflict when using autoenv
+#
+# Note: "builtin cd" is used to avoid conflicts with other packages
+#       (e.g., autoenv)
 TOP_DIR=`builtin cd $(dirname "${BASH_SOURCE[0]}") && pwd`
 
 # Set PATH
