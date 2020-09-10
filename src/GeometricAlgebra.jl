@@ -34,6 +34,16 @@ The Blade type represents a blade that is stored with the floating-point
 precision of type `T`.
 """
 struct Blade{T<:AbstractFloat}
+    # Implementation Notes:
+    # --------------------
+    #
+    # * The space spanned by the blade is represented by an orthonormal
+    #   basis stored in the `basis` field.
+    #
+    # * The norm of the blade is pre-computed and stored in the `norm` field.
+    #
+    # * The orientation of the blade is implicit in the order of the columns
+    #   in the `basis` matrix.
     basis::Matrix{T}
     norm::T
 
