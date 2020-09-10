@@ -38,7 +38,7 @@ using GeometricAlgebra
     # multiple column vectors. number of vectors > dimension of column space
     vectors = [1. 2. 3.; 4. 5. 6.]
     B = Blade(vectors)
-    @test B === NullBlade
+    @test B == ZeroBlade(0)
 
     # single column vector
     vector = [3.; 4.; 12.]
@@ -57,6 +57,11 @@ using GeometricAlgebra
     @test B.basis ≈ Array{Float64}(permutedims(vector/13))
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
+
+    # vectors are linearly dependent ==> blade is zero
+    vectors = [1. 2. 1.; 1. 2. 4; 1. 2. 9]
+    B = Blade(vectors)
+    @test B == ZeroBlade(0)
 end
 
 @testset "Blade constructor tests: typeof(vectors) = Array{AbstractFloat}" begin
@@ -74,7 +79,7 @@ end
     # multiple column vectors. number of vectors > dimension of column space
     vectors = Array{Float16}([1. 2. 3.; 4. 5. 6.])
     B = Blade(vectors)
-    @test B === NullBlade
+    @test B == ZeroBlade{Float16}(0)
 
     # single column vector
     vector = Array{Float32}([3.; 4.; 12.])
@@ -110,7 +115,7 @@ end
     # multiple column vectors. number of vectors > dimension of column space
     vectors = [1 2 3; 4 5 6]
     B = Blade(vectors)
-    @test B === NullBlade
+    @test B == ZeroBlade(0)
 
     # single column vector
     vector = [3; 4; 12]
