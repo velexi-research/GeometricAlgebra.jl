@@ -3,5 +3,8 @@ uuid = "7adf08e9-5ce8-4ef7-b490-37ded1c6a328"
 authors = ["Kevin Chu <kevin@velexi.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+
 [compat]
 julia = "1.4"
