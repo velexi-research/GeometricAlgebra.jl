@@ -93,6 +93,7 @@ Display coverage results.
 """
 function display_results(coverage::Array)
 
+    # Line formats
     header_line_format = "%-35s %15s %10s %10s\n"
     results_line_format = "%-35s %15d %10d %10s\n"
     horizontal_rule = "-"^79
@@ -103,6 +104,10 @@ function display_results(coverage::Array)
                     "File", "Lines of Code", "Missed", "Coverage")
     println(horizontal_rule)
 
+    # Initialize line counters
+    total_lines_of_code = 0
+    total_covered_lines_of_code = 0
+
     # Print coverage for individual files
     for file_coverage in coverage
         filename = file_coverage.filename[
@@ -111,25 +116,29 @@ function display_results(coverage::Array)
         covered_lines_of_code, lines_of_code =
             get_summary(process_file(file_coverage.filename))
         missed_lines_of_code = lines_of_code - covered_lines_of_code
-        coverage_pct = lines_of_code > 0 ?
-            (@sprintf "%9.1f%%" (covered_lines_of_code / lines_of_code * 100)) :
-            "N/A"
+        coverage_pct = 100 * covered_lines_of_code / lines_of_code
+        coverage_pct_str =
+            isnan(coverage_pct) ? "N/A" : @sprintf "%9.1f%%" coverage_pct
 
         print_formatted(results_line_format, filename,
-                        lines_of_code, missed_lines_of_code, coverage_pct)
+                        lines_of_code, missed_lines_of_code, coverage_pct_str)
+
+        # Increment line counteres
+        total_lines_of_code += lines_of_code
+        total_covered_lines_of_code += covered_lines_of_code
     end
 
     # Print coverage summary
-    covered_lines_of_code, lines_of_code = get_summary(coverage)
-    missed_lines_of_code = lines_of_code - covered_lines_of_code
-    coverage_pct = lines_of_code > 0 ?
-        (@sprintf "%9.1f%%" (covered_lines_of_code / lines_of_code * 100)) :
-        "N/A"
+    total_missed_lines_of_code =
+        total_lines_of_code - total_covered_lines_of_code
+    coverage_pct = 100 * total_covered_lines_of_code / total_lines_of_code
+    coverage_pct_str =
+        isnan(coverage_pct) ? "N/A" : @sprintf "%9.1f%%" coverage_pct
 
     println(horizontal_rule)
     print_formatted(results_line_format, "TOTAL",
-                    lines_of_code, lines_of_code - covered_lines_of_code,
-                    covered_lines_of_code / lines_of_code * 100)
+                    total_lines_of_code, total_missed_lines_of_code,
+                    coverage_pct_str)
 
     # TODO: add count of tests passed, skipped, failed.
     # TODO: add test runtime
