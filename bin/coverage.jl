@@ -94,7 +94,7 @@ Display coverage results.
 function display_results(coverage::Array)
 
     header_line_format = "%-35s %15s %10s %10s\n"
-    results_line_format = "%-35s %15d %10d %9.1f%%\n"
+    results_line_format = "%-35s %15d %10d %10s\n"
     horizontal_rule = "-"^79
 
     # Print header line
@@ -105,23 +105,31 @@ function display_results(coverage::Array)
 
     # Print coverage for individual files
     for file_coverage in coverage
-        covered_lines, total_lines =
-            get_summary(process_file(file_coverage.filename))
-
         filename = file_coverage.filename[
             findlast("src/", file_coverage.filename)[1]+4:end]
 
+        covered_lines_of_code, lines_of_code =
+            get_summary(process_file(file_coverage.filename))
+        missed_lines_of_code = lines_of_code - covered_lines_of_code
+        coverage_pct = lines_of_code > 0 ?
+            (@sprintf "%9.1f%%" (covered_lines_of_code / lines_of_code * 100)) :
+            "N/A"
+
         print_formatted(results_line_format, filename,
-                        total_lines, total_lines - covered_lines,
-                        covered_lines / total_lines * 100)
+                        lines_of_code, missed_lines_of_code, coverage_pct)
     end
 
     # Print coverage summary
-    covered_lines, total_lines = get_summary(coverage)
+    covered_lines_of_code, lines_of_code = get_summary(coverage)
+    missed_lines_of_code = lines_of_code - covered_lines_of_code
+    coverage_pct = lines_of_code > 0 ?
+        (@sprintf "%9.1f%%" (covered_lines_of_code / lines_of_code * 100)) :
+        "N/A"
+
     println(horizontal_rule)
     print_formatted(results_line_format, "TOTAL",
-                    total_lines, total_lines - covered_lines,
-                    covered_lines / total_lines * 100)
+                    lines_of_code, lines_of_code - covered_lines_of_code,
+                    covered_lines_of_code / lines_of_code * 100)
 
     # TODO: add count of tests passed, skipped, failed.
     # TODO: add test runtime
