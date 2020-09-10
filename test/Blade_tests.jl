@@ -1,5 +1,5 @@
 """
-Unit tests for GeometricAlgebra.jl module.
+Unit tests for the Blade type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -21,12 +21,14 @@ using GeometricAlgebra
 
 # --- Unit tests
 
-# ------ Blade constructor tests
+# ------ Constructor tests
 
-@testset "Blade constructor tests: vectors = Array{Float64}" begin
+@testset "Blade constructor tests: typeof(vectors) = Array{Float64}" begin
     # multiple column vectors. number of vectors <= dimension of column space
     vectors = [3. 3.; 4. 4; 0. 1.]
     B = Blade(vectors)
+    @test B.dim == 3
+    @test B.grade == 2
     @test size(B.basis) == (3, 2)
     for i in size(B.basis, 2)
         @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
@@ -36,12 +38,13 @@ using GeometricAlgebra
     # multiple column vectors. number of vectors > dimension of column space
     vectors = [1. 2. 3.; 4. 5. 6.]
     B = Blade(vectors)
-    @test B.basis == Array{Float64}(undef, 0, 2)
-    @test B.norm == 0
+    @test B === NullBlade
 
     # single column vector
     vector = [3.; 4.; 12.]
     B = Blade(vector)
+    @test B.dim == 3
+    @test B.grade == 1
     @test B.basis ≈ Array{Float64}(vector/13)
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
@@ -49,15 +52,19 @@ using GeometricAlgebra
     # single row vector
     vector = [3. 4. 12.]
     B = Blade(vector)
+    @test B.dim == 3
+    @test B.grade == 1
     @test B.basis ≈ Array{Float64}(permutedims(vector/13))
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
 end
 
-@testset "Blade constructor tests: vectors = Array{AbstractFloat}" begin
+@testset "Blade constructor tests: typeof(vectors) = Array{AbstractFloat}" begin
     # multiple column vectors. number of vectors <= dimension of column space
     vectors = Array{Float32}([3. 3.; 4. 4; 0. 1.])
     B = Blade(vectors)
+    @test B.dim == 3
+    @test B.grade == 2
     @test size(B.basis) == (3, 2)
     for i in size(B.basis, 2)
         @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
@@ -67,12 +74,13 @@ end
     # multiple column vectors. number of vectors > dimension of column space
     vectors = Array{Float16}([1. 2. 3.; 4. 5. 6.])
     B = Blade(vectors)
-    @test B.basis == Array{Float16}(undef, 0, 2)
-    @test B.norm == 0
+    @test B === NullBlade
 
     # single column vector
     vector = Array{Float32}([3.; 4.; 12.])
     B = Blade(vector)
+    @test B.dim == 3
+    @test B.grade == 1
     @test B.basis ≈ Array{Float32}(vector/13)
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
@@ -80,15 +88,19 @@ end
     # single row vector
     vector = Array{Float16}([3. 4. 12.])
     B = Blade(vector)
+    @test B.dim == 3
+    @test B.grade == 1
     @test B.basis ≈ Array{Float16}(permutedims(vector/13))
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
 end
 
-@testset "Blade constructor tests: vectors = Array{Int}" begin
+@testset "Blade constructor tests: typeof(vectors) = Array{Int}" begin
     # multiple column vectors. number of vectors <= dimension of column space
     vectors = [3 3; 4 4; 0 1]
     B = Blade(vectors)
+    @test B.dim == 3
+    @test B.grade == 2
     @test size(B.basis) == (3, 2)
     for i in size(B.basis, 2)
         @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
@@ -98,12 +110,13 @@ end
     # multiple column vectors. number of vectors > dimension of column space
     vectors = [1 2 3; 4 5 6]
     B = Blade(vectors)
-    @test B.basis == Array{Float64}(undef, 0, 2)
-    @test B.norm == 0
+    @test B === NullBlade
 
     # single column vector
     vector = [3; 4; 12]
     B = Blade{Float32}(vector)
+    @test B.dim == 3
+    @test B.grade == 1
     @test B.basis ≈ Array{Float32}(vector/13)
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
@@ -111,9 +124,11 @@ end
     # single row vector
     vector = [3 4 12]
     B = Blade{Float16}(vector)
+    @test B.dim == 3
+    @test B.grade == 1
     @test B.basis ≈ Array{Float16}(permutedims(vector/13))
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
 end
 
-# ------ Blade function tests
+# ------ Function tests
