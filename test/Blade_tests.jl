@@ -74,7 +74,7 @@ end
 
 @testset "Blade constructor tests: typeof(vectors) = Array{AbstractFloat}" begin
     # multiple column vectors. number of vectors <= dimension of column space
-    vectors = Array{Float32}([3. 3.; 4. 4; 0. 1.])
+    vectors = Array{Float32}([3. 3.; 4. 4.; 0. 1.])
     B = Blade(vectors)
     @test B.dim == 3
     @test B.grade == 2
@@ -106,11 +106,26 @@ end
     @test B.basis ≈ Array{Float16}(permutedims(vectors / 13))
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
+
+    # multiple column vectors with norm less than atol
+    vectors = Array{Float32}([3. 3.; 4. 4; 0. 1.])
+    B = Blade(vectors, atol=6)
+    @test B === Zero
+
+    # vectors are linearly dependent ==> blade is zero
+    vectors = Array{Float16}([1. 2. 1.; 1. 2. 4; 1. 2. 9])
+    B = Blade(vectors)
+    @test B === Zero
+
+    # vectors is a single zero vector
+    vectors = Vector{Float32}([0.; 0.; 0.])
+    B = Blade(vectors)
+    @test B === Zero
 end
 
-@testset "Blade constructor tests: typeof(vectors) = Array{Int}" begin
+@testset "Blade constructor tests: typeof(vectors) = Array{Integer}" begin
     # multiple column vectors. number of vectors <= dimension of column space
-    vectors = [3 3; 4 4; 0 1]
+    vectors = Array{Int64}([3 3; 4 4; 0 1])
     B = Blade(vectors)
     @test B.dim == 3
     @test B.grade == 2
@@ -121,12 +136,12 @@ end
     @test B.norm ≈ 5
 
     # multiple column vectors. number of vectors > dimension of column space
-    vectors = [1 2 3; 4 5 6]
+    vectors = Array{Int32}([1 2 3; 4 5 6])
     B = Blade(vectors)
     @test B === Zero
 
     # single column vector
-    vectors = [3; 4; 12]
+    vectors = Array{Int16}([3; 4; 12])
     B = Blade{Float32}(vectors)
     @test B.dim == 3
     @test B.grade == 1
@@ -135,13 +150,28 @@ end
     @test B.norm ≈ 13
 
     # single row vector
-    vectors = [3 4 12]
+    vectors = Vector{Int64}([3; 4; 12])
     B = Blade{Float16}(vectors)
     @test B.dim == 3
     @test B.grade == 1
-    @test B.basis ≈ Array{Float16}(permutedims(vectors / 13))
+    @test B.basis ≈ Array{Float16}(vectors / 13)
     @test LinearAlgebra.norm(B.basis) ≈ 1
     @test B.norm ≈ 13
+
+    # multiple column vectors with norm less than atol
+    vectors = Array{Int32}([3 3; 4 4; 0 1])
+    B = Blade{Float32}(vectors, atol=6)
+    @test B === Zero
+
+    # vectors are linearly dependent ==> blade is zero
+    vectors = Array{Int16}([1 2 1; 1 2 4; 1 2 9])
+    B = Blade{Float16}(vectors)
+    @test B === Zero
+
+    # vectors is a single zero vector
+    vectors = Vector{Int64}([0; 0; 0])
+    B = Blade{Float32}(vectors)
+    @test B === Zero
 end
 
 # --- Function tests
