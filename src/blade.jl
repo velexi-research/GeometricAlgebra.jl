@@ -17,22 +17,38 @@ import LinearAlgebra
 # --- Types
 
 # Exports
-export Blade, Scalar
+export AbstractBlade, AbstractScalar, Blade, Scalar
 export Zero, One
 
 
-# AbstractBlade type
-abstract type AbstractBlade end
-
-
-# Blade type
+# AbstractBlade
 """
-    struct Blade{T<:AbstractFloat}
+    abstract type AbstractBlade{T<:AbstractFloat}
 
-The Blade type represents a blade that is stored with the floating-point
+Supertype for all blade types. Blades are represented with the floating-point
 precision of type `T`.
 """
-struct Blade{T<:AbstractFloat} <: AbstractBlade
+abstract type AbstractBlade{T<:AbstractFloat} end
+
+
+# AbstractScalar
+"""
+    abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T}
+
+Supertype for all scalar types (i.e., 0-blades). Scalars are represented with
+the floating-point precision of type `T`.
+"""
+abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
+
+
+# Blade
+"""
+    struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
+
+Blade (having nonzero grade) represented with the floating-point precision of
+type `T`.
+"""
+struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     # Fields
     # ------
     # * `dim`: the dimension of the space that the blade is embedded in
@@ -54,12 +70,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     norm::T
 
     """
-        Blade{T}(vectors::Matrix{T}
+        Blade{T}(vectors::Matrix{T};
                  atol::Real=eps(T)) where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns
-    of a matrix. Blades with norm less than `atol` are returned as Zero
-    (i.e., the additive identity).
+    of a matrix. Blades with norm less than `atol` are returned as Zero.
     """
     function Blade{T}(vectors::Matrix{T};
                       atol::Real=eps(T)) where {T<:AbstractFloat}
@@ -115,7 +130,7 @@ of a matrix or (2) a single vector. Blades with norm less than `atol` are
 returned as Zero.
 
 The precision of the Blade is inferred precision from the precision of the
-`vectors` Array.
+elements of `vectors`.
 """
 Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat} =
     Blade{T}(vectors, atol=atol=atol)
@@ -126,9 +141,9 @@ Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat} =
     Blade{T}(vectors::Array{<:Integer};
              atol::Real=eps(T)) where {T<:AbstractFloat}
 
-Construct a Blade from a collection of vectors stored as the columns of a
-2-dimensional array of integer values. Blades with norm less than `atol` are
-returned as Zero.
+Construct a Blade from a collection of vectors with integer components
+represented as (1) the columns of a matrix or (2) a single vector. Blades with
+norm less than `atol` are returned as Zero.
 
 When the precision of the Blade is not explicitly specified, it defaults to
 Float64.
@@ -141,21 +156,20 @@ Blade{T}(vectors::Array{<:Integer};
     Blade(vectors, atol=atol)
 
 
-# Scalar type
+# Scalar
 """
-    struct Scalar{T<:AbstractFloat} <: AbstractBlade
+    struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
 
-The Scalar type represents a scalar (i.e., 0-blade) with a value that is
-stored with the floating-point precision of type `T`.
+Scalar (0-blade) represented with the floating-point precision of type `T`.
 """
-struct Scalar{T<:AbstractFloat} <: AbstractBlade
+struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
     value::T
 
     """
         Scalar{T}(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
 
-    Construct a Blade from a single vector (1-dimensional Array). Scalars with
-    absolute value less than `atol` are returned as Zero.
+    Construct a Scalar with the specified value. Scalars with absolute value
+    less than `atol` are returned as Zero.
     """
     function Scalar{T}(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
 
@@ -170,11 +184,10 @@ end
 """
     Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
 
-Construct a Scalar from a value. Scalars with absolute value less than `atol`
-are returned as Zero.
+Construct a Scalar with the specified value. Scalars with absolute value less
+than `atol` are returned as Zero.
 
-The precision of the Blade is inferred precision from the precision of the
-`vectors` Array.
+The precision of the Blade is inferred precision from the precision of `value`.
 """
 Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
     Scalar{T}(value, atol=atol)
@@ -184,10 +197,10 @@ Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
 
     Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
-Construct a Scalar from a scalar value that is an Integer type. When `value`
-is equal to zero, Zero is returned.
+Construct a Scalar with the specified value that is an Integer. When `value`
+is equal to zero, Zero is return.
 
-When the precision of the Blade is not explicitly specified, it defaults to
+When the precision of the Scalar is not explicitly specified, it defaults to
 Float64.
 """
 Scalar(value::Integer) =
@@ -197,22 +210,23 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} =
     (abs(value) == 0) ? Zero : Scalar{T}(convert(T, value))
 
 
-# Zero type
+# Zero
 """
-    struct Zero <: AbstractBlade end
+    struct Zero{T<:AbstractFloat} <: AbstractScalar{T}
 
-The Zero type represents the scalar the additive identity 0.
+The additive identity 0.
 """
-struct Zero <: AbstractBlade end
+struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
+Zero() = Zero{Float64}()
 
-
-# One type
+# One
 """
-    struct One <: AbstractBlade end
+    struct One{T<:AbstractFloat} <: AbstractScalar{T}
 
-The One type represents the scalar the multiplicative identity 1.
+The multiplicative identity 1.
 """
-struct One <: AbstractBlade end
+struct One{T<:AbstractFloat} <: AbstractScalar{T} end
+One() = One{Float64}()
 
 
 # --- Functions
@@ -223,34 +237,28 @@ export dim, grade, norm, basis, inverse
 
 # dim()
 dim(B::Blade{T}) where {T<:AbstractFloat} = B.dim
-dim(B::Zero) = 0
-dim(B::One) = 0
+dim(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
 
 
 # grade()
 grade(B::Blade{T}) where {T<:AbstractFloat} = B.grade
-grade(B::Scalar{T}) where {T<:AbstractFloat} = 1
-grade(B::Zero) = 0
-grade(B::One) = 0
+grade(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
 
 
 # norm()
 norm(B::Blade{T}) where {T<:AbstractFloat} = B.norm
-norm(B::Scalar{T}) where {T<:AbstractFloat} = B.value
-norm(B::Zero) = 0
-norm(B::One) = 1
+norm(B::Scalar{T}) where {T<:AbstractFloat} = abs(B.value)
+norm(B::Zero{T}) where {T<:AbstractFloat} = 0
+norm(B::One{T}) where {T<:AbstractFloat} = 1
 
 
 # basis()
 basis(B::Blade{T}) where {T<:AbstractFloat} = B.basis
-basis(B::Scalar{T}) where {T<:AbstractFloat} = nothing
-basis(B::Zero) = nothing
-basis(B::One) = nothing
+basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = nothing
 
 
 # inverse()
 # inverse(B::Blade{T}) = Blade  # TODO
-inverse(B::Scalar{T}) where {T<:AbstractFloat} =
-    B.value != 0 ? 1 / B.value : NaN
-inverse(B::Zero) = NaN  # TODO: replace with subtype of AbstractBlade
-inverse(B::One) = One
+inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
+inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
+inverse(B::One{T}) where {T<:AbstractFloat} = One
