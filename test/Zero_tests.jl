@@ -64,7 +64,6 @@ using GeometricAlgebra
     @test Zero(Scalar) === Zero{Float64}()
 end
 
-
 @testset "Zero type: function tests" begin
     # dim()
     for type in subtypes(AbstractFloat)
@@ -91,7 +90,6 @@ end
         @test inverse(Zero(type)) == Scalar(Inf)
     end
 end
-
 
 @testset "Zero type: comparison operation tests" begin
     # :(==)

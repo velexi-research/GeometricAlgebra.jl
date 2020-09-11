@@ -64,7 +64,6 @@ using GeometricAlgebra
     @test One(Scalar) === One{Float64}()
 end
 
-
 @testset "One type: function tests" begin
     # dim()
     for type in subtypes(AbstractFloat)
@@ -91,7 +90,6 @@ end
         @test inverse(One(type)) === One(type)
     end
 end
-
 
 @testset "One type: comparison operation tests" begin
     # :(==)
