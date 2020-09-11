@@ -11,6 +11,7 @@ contained in the LICENSE file.
 """
 # --- Imports
 
+import Base.:(==)
 import LinearAlgebra
 
 
@@ -123,6 +124,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 end
 
 """
+TODO: Polish docstring
+
     Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
@@ -131,11 +134,7 @@ returned as Zero.
 
 The precision of the Blade is inferred precision from the precision of the
 elements of `vectors`.
-"""
-Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat} =
-    Blade{T}(vectors, atol=atol=atol)
 
-"""
     Blade(vectors::Array{<:Integer}; atol::Real=eps(Float64))
 
     Blade{T}(vectors::Array{<:Integer};
@@ -148,12 +147,19 @@ norm less than `atol` are returned as Zero.
 When the precision of the Blade is not explicitly specified, it defaults to
 Float64.
 """
+Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat} =
+    Blade{T}(vectors, atol=atol=atol)
+
+Blade{T}(vectors::Array{S};
+         atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat} =
+    Blade{T}(convert(Array{T}, vectors), atol=atol)
+
 Blade(vectors::Array{<:Integer}; atol::Real=eps(Float64)) =
     Blade(convert(Array{Float64}, vectors), atol=atol)
 
 Blade{T}(vectors::Array{<:Integer};
          atol::Real=eps(T)) where {T<:AbstractFloat} =
-    Blade(vectors, atol=atol)
+    Blade(convert(Array{T}, vectors), atol=atol)
 
 
 # Scalar
@@ -171,43 +177,45 @@ struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
     Construct a Scalar with the specified value. Scalars with absolute value
     less than `atol` are returned as Zero.
     """
-    function Scalar{T}(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
-
-        if abs(value) < atol
-            return Zero
-        end
-
-        new(value)
-    end
+    Scalar{T}(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
+        abs(value) < atol ? Zero{T}() : new(value)
 end
 
 """
     Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
 
-Construct a Scalar with the specified value. Scalars with absolute value less
-than `atol` are returned as Zero.
+    Scalar{T}(value::S;
+              atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat}
 
-The precision of the Blade is inferred precision from the precision of `value`.
-"""
-Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
-    Scalar{T}(value, atol=atol)
-
-"""
     Scalar(value::Integer)
 
     Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
-Construct a Scalar with the specified value that is an Integer. When `value`
-is equal to zero, Zero is return.
+Construct a Scalar with the specified value. Zero{T}() is returned when the
+absolute value of `value` is (1) less than `atol` or (2) exactly equal to
+zero.
 
-When the precision of the Scalar is not explicitly specified, it defaults to
-Float64.
+When the precision is not specified, the following rules are applied to set
+the precision of the Scalar.
+
+* If `value` is a floating-point value, the precision of the constructed
+  Scalar is inferred from the precision of `value`.
+
+* If `value` is an integer, the precision of the constructed Scalar defaults
+  to `Float64`.
 """
-Scalar(value::Integer) =
-    (abs(value) == 0) ? Zero : Scalar{Float64}(convert(Float64, value))
+Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
+    Scalar{T}(value, atol=atol)
+
+Scalar{T}(value::S;
+          atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat} =
+    Scalar(convert(T, value), atol=atol)
+
+Scalar(value::Integer) = (abs(value) == 0) ?
+    Zero{Float64}() : Scalar{Float64}(convert(Float64, value))
 
 Scalar{T}(value::Integer) where {T<:AbstractFloat} =
-    (abs(value) == 0) ? Zero : Scalar{T}(convert(T, value))
+    (abs(value) == 0) ? Zero{T}() : Scalar{T}(convert(T, value))
 
 
 # Zero
@@ -217,7 +225,25 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} =
 The additive identity 0.
 """
 struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
+
+"""
+    Zero()
+    Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
+    Zero(::Type{T}) where {T<:AbstractFloat}
+    Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    Zero(::Type{Blade})
+    Zero(::Type{Scalar})
+
+Return the additive identity 0. When the precision is not specified, it
+defaults to `Float64`.
+"""
 Zero() = Zero{Float64}()
+Zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Zero{T}()
+Zero(::Type{T}) where {T<:AbstractFloat} = Zero{T}()
+Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = Zero{T}()
+Zero(::Type{Blade}) = Zero{Float64}()
+Zero(::Type{Scalar}) = Zero{Float64}()
+
 
 # One
 """
@@ -226,7 +252,24 @@ Zero() = Zero{Float64}()
 The multiplicative identity 1.
 """
 struct One{T<:AbstractFloat} <: AbstractScalar{T} end
+
+"""
+    One()
+    One(B::AbstractBlade{T}) where {T<:AbstractFloat}
+    One(::Type{T}) where {T<:AbstractFloat}
+    One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    One(::Type{Blade})
+    One(::Type{Scalar})
+
+Return the multiplicative identity 1. When the precision is not specified, it
+defaults to `Float64`.
+"""
 One() = One{Float64}()
+One(B::AbstractBlade{T}) where {T<:AbstractFloat} = One{T}()
+One(::Type{T}) where {T<:AbstractFloat} = One{T}()
+One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = One{T}()
+One(::Type{Blade}) = One{Float64}()
+One(::Type{Scalar}) = One{Float64}()
 
 
 # --- Functions
@@ -258,7 +301,16 @@ basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = nothing
 
 
 # inverse()
-# inverse(B::Blade{T}) = Blade  # TODO
+#inverse(B::Blade{T}) = Blade{T}
 inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
 inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
-inverse(B::One{T}) where {T<:AbstractFloat} = One
+inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
+
+
+# ------ Comparison functions
+
+==(B::Scalar{T}, A::Scalar{S}) where {T<:AbstractFloat, S<:AbstractFloat} =
+    B.value == A.value
+
+==(B::One{T}, x::Number) where {T<:AbstractFloat} = (x == 1)
+==(B::Zero{T}, x::Number) where {T<:AbstractFloat} = (x == 0)
