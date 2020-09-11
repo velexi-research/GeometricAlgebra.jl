@@ -28,17 +28,33 @@ export zero, one
 
 
 """
-    zero(B::AbstractBlade)
+    zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
+    zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    zero(::Type{Blade})
+    zero(::Type{Scalar})
 
-Return Zero (the additive identity).
+Return Zero (the additive identity). When the precision is not explicitly
+specified, it defaults to Float64.
 """
-zero(B::AbstractBlade) = Zero
+zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Zero{T}()
+zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = Zero{T}()
+zero(::Type{Blade}) = Zero{Float64}()
+zero(::Type{Scalar}) = Zero{Float64}()
+
 
 """
-    one(B::AbstractBlade)
+    one(B::AbstractBlade{T}) where {T<:AbstractFloat}
+    one(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    one(::Type{Blade})
+    one(::Type{Scalar})
 
-Return One (the multiplicative identity).
+Return One (the multiplicative identity). When the precision of the is not
+explicitly specified, it defaults to Float64.
 """
-one(B::AbstractBlade) = One
+one(B::AbstractBlade{T}) where {T<:AbstractFloat} = One{T}()
+one(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = One{T}()
+one(::Type{Blade}) = One{Float64}()
+one(::Type{Scalar}) = One{Float64}()
+
 
 end  # End of GeometricAlgebra.jl module
