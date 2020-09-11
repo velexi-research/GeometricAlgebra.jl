@@ -102,3 +102,34 @@ end
     B = Scalar{Float16}(value)
     @test B === Zero
 end
+
+# --- Function tests
+
+@testset "Scalar function tests" begin
+    # Nonzero value
+    value = 10
+    B = Scalar(value)
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == value
+    @test basis(B) === nothing
+    @test inverse(B) == Scalar(1 / value)
+
+    # Inf
+    value = Inf
+    B = Scalar(value)
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == Inf
+    @test basis(B) === nothing
+    @test inverse(B) === Zero
+
+    # -Inf
+    value = -Inf
+    B = Scalar(value)
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == Inf
+    @test basis(B) === nothing
+    @test inverse(B) === Zero
+end
