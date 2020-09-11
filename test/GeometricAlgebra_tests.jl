@@ -18,6 +18,8 @@ using Test
 import GeometricAlgebra.Blade
 import GeometricAlgebra.Zero
 import GeometricAlgebra.zero
+import GeometricAlgebra.One
+import GeometricAlgebra.one
 
 
 # --- Function tests
@@ -25,4 +27,10 @@ import GeometricAlgebra.zero
 @testset "zero() tests" begin
     B = Blade([1 2 3])
     @test zero(B) === Zero
+end
+
+
+@testset "one() tests" begin
+    B = Blade([1 2 3])
+    @test one(B) === One
 end
