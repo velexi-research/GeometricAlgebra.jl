@@ -53,44 +53,47 @@ import GeometricAlgebra.zero, GeometricAlgebra.one
     @test inverse(B) === Scalar(Inf16)
 end
 
-@testset "zero() function tests" begin
+@testset "Zero type constructor tests" begin
+    # No argument
+    @test Zero() === Zero{Float64}()
+
     # Argument: instance::Blade{T}
-    @test zero(Blade{Float64}([1 2 3])) === Zero{Float64}()
-    @test zero(Blade{Float32}([1 2 3])) === Zero{Float32}()
-    @test zero(Blade{Float16}([1 2 3])) === Zero{Float16}()
+    @test Zero(Blade{Float64}([1 2 3])) === Zero{Float64}()
+    @test Zero(Blade{Float32}([1 2 3])) === Zero{Float32}()
+    @test Zero(Blade{Float16}([1 2 3])) === Zero{Float16}()
 
     # Argument: instance::Scalar{T}
-    @test zero(Scalar{Float64}(1)) === Zero{Float64}()
-    @test zero(Scalar{Float32}(1)) === Zero{Float32}()
-    @test zero(Scalar{Float16}(1)) === Zero{Float16}()
+    @test Zero(Scalar{Float64}(1)) === Zero{Float64}()
+    @test Zero(Scalar{Float32}(1)) === Zero{Float32}()
+    @test Zero(Scalar{Float16}(1)) === Zero{Float16}()
 
     # Argument: instance::Zero{T}
-    @test zero(Zero{Float64}()) === Zero{Float64}()
-    @test zero(Zero{Float32}()) === Zero{Float32}()
-    @test zero(Zero{Float16}()) === Zero{Float16}()
+    @test Zero(Zero{Float64}()) === Zero{Float64}()
+    @test Zero(Zero{Float32}()) === Zero{Float32}()
+    @test Zero(Zero{Float16}()) === Zero{Float16}()
 
     # Argument: instance::One{T}
-    @test zero(One{Float64}()) === Zero{Float64}()
-    @test zero(One{Float32}()) === Zero{Float32}()
-    @test zero(One{Float16}()) === Zero{Float16}()
+    @test Zero(One{Float64}()) === Zero{Float64}()
+    @test Zero(One{Float32}()) === Zero{Float32}()
+    @test Zero(One{Float16}()) === Zero{Float16}()
 
     # Argument: concrete type
-    @test zero(Blade{Float64}) === Zero{Float64}()
-    @test zero(Blade{Float32}) === Zero{Float32}()
-    @test zero(Blade{Float16}) === Zero{Float16}()
-    @test zero(Scalar{Float64}) === Zero{Float64}()
-    @test zero(Scalar{Float32}) === Zero{Float32}()
-    @test zero(Scalar{Float16}) === Zero{Float16}()
-    @test zero(Zero{Float64}) === Zero{Float64}()
-    @test zero(Zero{Float32}) === Zero{Float32}()
-    @test zero(Zero{Float16}) === Zero{Float16}()
-    @test zero(One{Float64}) === Zero{Float64}()
-    @test zero(One{Float32}) === Zero{Float32}()
-    @test zero(One{Float16}) === Zero{Float16}()
+    @test Zero(Blade{Float64}) === Zero{Float64}()
+    @test Zero(Blade{Float32}) === Zero{Float32}()
+    @test Zero(Blade{Float16}) === Zero{Float16}()
+    @test Zero(Scalar{Float64}) === Zero{Float64}()
+    @test Zero(Scalar{Float32}) === Zero{Float32}()
+    @test Zero(Scalar{Float16}) === Zero{Float16}()
+    @test Zero(Zero{Float64}) === Zero{Float64}()
+    @test Zero(Zero{Float32}) === Zero{Float32}()
+    @test Zero(Zero{Float16}) === Zero{Float16}()
+    @test Zero(One{Float64}) === Zero{Float64}()
+    @test Zero(One{Float32}) === Zero{Float32}()
+    @test Zero(One{Float16}) === Zero{Float16}()
 
     # Argument: parameter type
-    @test zero(Blade) === Zero{Float64}()
-    @test zero(Scalar) === Zero{Float64}()
+    @test Zero(Blade) === Zero{Float64}()
+    @test Zero(Scalar) === Zero{Float64}()
 end
 
 
@@ -111,42 +114,45 @@ end
     @test inverse(B) === One{Float32}()
 end
 
-@testset "one() function tests" begin
+@testset "One type constructor tests" begin
+    # No argument
+    @test One() === One{Float64}()
+
     # Argument: instance::Blade{T}
-    @test one(Blade{Float64}([1 2 3])) === One{Float64}()
-    @test one(Blade{Float32}([1 2 3])) === One{Float32}()
-    @test one(Blade{Float16}([1 2 3])) === One{Float16}()
+    @test One(Blade{Float64}([1 2 3])) === One{Float64}()
+    @test One(Blade{Float32}([1 2 3])) === One{Float32}()
+    @test One(Blade{Float16}([1 2 3])) === One{Float16}()
 
     # Argument: instance::Scalar{T}
-    @test one(Scalar{Float64}(1)) === One{Float64}()
-    @test one(Scalar{Float32}(1)) === One{Float32}()
-    @test one(Scalar{Float16}(1)) === One{Float16}()
+    @test One(Scalar{Float64}(1)) === One{Float64}()
+    @test One(Scalar{Float32}(1)) === One{Float32}()
+    @test One(Scalar{Float16}(1)) === One{Float16}()
 
     # Argument: instance::Zero{T}
-    @test one(Zero{Float64}()) === One{Float64}()
-    @test one(Zero{Float32}()) === One{Float32}()
-    @test one(Zero{Float16}()) === One{Float16}()
+    @test One(Zero{Float64}()) === One{Float64}()
+    @test One(Zero{Float32}()) === One{Float32}()
+    @test One(Zero{Float16}()) === One{Float16}()
 
     # Argument: instance::One{T}
-    @test one(One{Float64}()) === One{Float64}()
-    @test one(One{Float32}()) === One{Float32}()
-    @test one(One{Float16}()) === One{Float16}()
+    @test One(One{Float64}()) === One{Float64}()
+    @test One(One{Float32}()) === One{Float32}()
+    @test One(One{Float16}()) === One{Float16}()
 
     # Argument: concrete type
-    @test one(Blade{Float64}) === One{Float64}()
-    @test one(Blade{Float32}) === One{Float32}()
-    @test one(Blade{Float16}) === One{Float16}()
-    @test one(Scalar{Float64}) === One{Float64}()
-    @test one(Scalar{Float32}) === One{Float32}()
-    @test one(Scalar{Float16}) === One{Float16}()
-    @test one(Zero{Float64}) === One{Float64}()
-    @test one(Zero{Float32}) === One{Float32}()
-    @test one(Zero{Float16}) === One{Float16}()
-    @test one(One{Float64}) === One{Float64}()
-    @test one(One{Float32}) === One{Float32}()
-    @test one(One{Float16}) === One{Float16}()
+    @test One(Blade{Float64}) === One{Float64}()
+    @test One(Blade{Float32}) === One{Float32}()
+    @test One(Blade{Float16}) === One{Float16}()
+    @test One(Scalar{Float64}) === One{Float64}()
+    @test One(Scalar{Float32}) === One{Float32}()
+    @test One(Scalar{Float16}) === One{Float16}()
+    @test One(Zero{Float64}) === One{Float64}()
+    @test One(Zero{Float32}) === One{Float32}()
+    @test One(Zero{Float16}) === One{Float16}()
+    @test One(One{Float64}) === One{Float64}()
+    @test One(One{Float32}) === One{Float32}()
+    @test One(One{Float16}) === One{Float16}()
 
     # Argument: parameter type
-    @test one(Blade) === One{Float64}()
-    @test one(Scalar) === One{Float64}()
+    @test One(Blade) === One{Float64}()
+    @test One(Scalar) === One{Float64}()
 end
