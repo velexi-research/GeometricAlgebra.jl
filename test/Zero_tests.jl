@@ -93,7 +93,7 @@ end
 end
 
 
-@testset "Zero type: comparator tests" begin
+@testset "Zero type: comparison operation tests" begin
     # :(==)
     for type in subtypes(AbstractFloat)
         @test Zero(type) == 0
