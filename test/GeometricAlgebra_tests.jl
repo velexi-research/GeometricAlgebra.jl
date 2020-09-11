@@ -21,38 +21,6 @@ import GeometricAlgebra.zero, GeometricAlgebra.one
 
 # --- Zero type tests
 
-@testset "Zero type tests" begin
-    # Property tests
-    @test Zero() == 0
-    @test Zero{Float32}() == 0
-    @test Zero{Float16}() == 0
-
-    # Basic blade functions
-    B = Zero()
-    @test dim(B) == 0
-    @test grade(B) == 0
-    @test norm(B) == 0
-    @test basis(B) === nothing
-    @test inverse(B) == Scalar(Inf)
-
-    # Float32 tests
-    B = Zero{Float32}()
-    @test dim(B) == 0
-    @test grade(B) == 0
-    @test norm(B) == 0
-    @test basis(B) === nothing
-    @test inverse(B) === Scalar(Inf32)
-    @test inverse(B) == Scalar(Inf)
-
-    # Float16 tests
-    B = Zero{Float16}()
-    @test dim(B) == 0
-    @test grade(B) == 0
-    @test norm(B) == 0
-    @test basis(B) === nothing
-    @test inverse(B) === Scalar(Inf16)
-end
-
 @testset "Zero type constructor tests" begin
     # No argument
     @test Zero() === Zero{Float64}()
@@ -96,23 +64,40 @@ end
     @test Zero(Scalar) === Zero{Float64}()
 end
 
+@testset "Zero type tests" begin
+    # Property tests
+    @test Zero() == 0
+    @test Zero{Float32}() == 0
+    @test Zero{Float16}() == 0
 
-# ---  One type tests
-
-@testset "One type tests" begin
     # Basic blade functions
-    B = One()
+    B = Zero()
     @test dim(B) == 0
     @test grade(B) == 0
-    @test norm(B) == 1
+    @test norm(B) == 0
     @test basis(B) === nothing
-    @test inverse(B) === One()
+    @test inverse(B) == Scalar(Inf)
 
-    # Parameterization tests
-    B = One{Float32}()
-    @test inverse(B) !== One()
-    @test inverse(B) === One{Float32}()
+    # Float32 tests
+    B = Zero{Float32}()
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == 0
+    @test basis(B) === nothing
+    @test inverse(B) === Scalar(Inf32)
+    @test inverse(B) == Scalar(Inf)
+
+    # Float16 tests
+    B = Zero{Float16}()
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == 0
+    @test basis(B) === nothing
+    @test inverse(B) === Scalar(Inf16)
 end
+
+
+# ---  One type tests
 
 @testset "One type constructor tests" begin
     # No argument
@@ -155,4 +140,19 @@ end
     # Argument: parameter type
     @test One(Blade) === One{Float64}()
     @test One(Scalar) === One{Float64}()
+end
+
+@testset "One type tests" begin
+    # Basic blade functions
+    B = One()
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == 1
+    @test basis(B) === nothing
+    @test inverse(B) === One()
+
+    # Parameterization tests
+    B = One{Float32}()
+    @test inverse(B) !== One()
+    @test inverse(B) === One{Float32}()
 end
