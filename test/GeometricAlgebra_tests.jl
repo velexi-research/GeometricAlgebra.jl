@@ -17,20 +17,48 @@ using Test
 # GeometricAlgebra.jl
 import GeometricAlgebra.Blade
 import GeometricAlgebra.Zero
-import GeometricAlgebra.zero
 import GeometricAlgebra.One
+
+import GeometricAlgebra.zero
 import GeometricAlgebra.one
 
+import GeometricAlgebra.dim
+import GeometricAlgebra.grade
+import GeometricAlgebra.norm
+import GeometricAlgebra.basis
+import GeometricAlgebra.inverse
 
-# --- Function tests
+using GeometricAlgebra
 
-@testset "zero() tests" begin
+# --- Zero type tests
+
+@testset "Zero type tests" begin
+    # zero() test
     B = Blade([1 2 3])
     @test zero(B) === Zero
+
+    # Basic blade functions
+    B = Zero()
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == 0
+    @test basis(B) === nothing
+    @test inverse(B) === NaN
 end
 
 
-@testset "one() tests" begin
+# ---  One type tests
+
+@testset "One type tests" begin
+    # one() test
     B = Blade([1 2 3])
     @test one(B) === One
+
+    # Basic blade functions
+    B = One()
+    @test dim(B) == 0
+    @test grade(B) == 0
+    @test norm(B) == 1
+    @test basis(B) === nothing
+    @test inverse(B) === One
 end
