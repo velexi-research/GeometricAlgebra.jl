@@ -48,13 +48,12 @@ zero(::Type{Scalar}) = Zero{Float64}()
     one(::Type{Blade})
     one(::Type{Scalar})
 
-Return One (the multiplicative identity). When the precision of the is not
-explicitly specified, it defaults to Float64.
+Return One (the multiplicative identity). When the precision is not explicitly
+specified, it defaults to Float64.
 """
 one(B::AbstractBlade{T}) where {T<:AbstractFloat} = One{T}()
 one(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = One{T}()
 one(::Type{Blade}) = One{Float64}()
 one(::Type{Scalar}) = One{Float64}()
-
 
 end  # End of GeometricAlgebra.jl module
