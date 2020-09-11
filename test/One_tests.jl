@@ -22,46 +22,33 @@ using GeometricAlgebra
 # ---  Tests
 
 @testset "One type: constructor tests" begin
-    # No argument
+    # One()
     @test One() === One{Float64}()
 
-    # Argument: instance of Blade{T}
-    @test One(Blade{Float64}([1 2 3])) === One{Float64}()
-    @test One(Blade{Float32}([1 2 3])) === One{Float32}()
-    @test One(Blade{Float16}([1 2 3])) === One{Float16}()
+    # One(B::AbstractBlade{T}) where {T<:AbstractFloat}
+    for type in subtypes(AbstractFloat)
+        @test One(Blade{type}([1 2 3])) === One{type}()
+        @test One(Scalar{type}(1)) === One{type}()
+        @test One(One{type}()) === One{type}()
+        @test One(One{type}()) === One{type}()
+    end
 
-    # Argument: instance of Scalar{T}
-    @test One(Scalar{Float64}(1)) === One{Float64}()
-    @test One(Scalar{Float32}(1)) === One{Float32}()
-    @test One(Scalar{Float16}(1)) === One{Float16}()
+    # One(::Type{T}) where {T<:AbstractFloat}
+    for type in subtypes(AbstractFloat)
+        @test One(type) === One{type}()
+    end
 
-    # Argument: instance of Zero{T}
-    @test One(Zero{Float64}()) === One{Float64}()
-    @test One(Zero{Float32}()) === One{Float32}()
-    @test One(Zero{Float16}()) === One{Float16}()
+    # One(::Type{T}) where {T<:AbstractBlade}
+    for blade_type in (Blade, Scalar, Zero, One)
+        @test One(blade_type) === One{Float64}()
+    end
 
-    # Argument: instance of One{T}
-    @test One(One{Float64}()) === One{Float64}()
-    @test One(One{Float32}()) === One{Float32}()
-    @test One(One{Float16}()) === One{Float16}()
-
-    # Argument: concrete type
-    @test One(Blade{Float64}) === One{Float64}()
-    @test One(Blade{Float32}) === One{Float32}()
-    @test One(Blade{Float16}) === One{Float16}()
-    @test One(Scalar{Float64}) === One{Float64}()
-    @test One(Scalar{Float32}) === One{Float32}()
-    @test One(Scalar{Float16}) === One{Float16}()
-    @test One(Zero{Float64}) === One{Float64}()
-    @test One(Zero{Float32}) === One{Float32}()
-    @test One(Zero{Float16}) === One{Float16}()
-    @test One(One{Float64}) === One{Float64}()
-    @test One(One{Float32}) === One{Float32}()
-    @test One(One{Float16}) === One{Float16}()
-
-    # Argument: parameter type
-    @test One(Blade) === One{Float64}()
-    @test One(Scalar) === One{Float64}()
+    # One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    for blade_type in (Blade, Scalar, Zero, One)
+        for type in subtypes(AbstractFloat)
+            @test One(blade_type{type}) === One{type}()
+        end
+    end
 end
 
 @testset "One type: function tests" begin

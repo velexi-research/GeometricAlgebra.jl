@@ -22,46 +22,33 @@ using GeometricAlgebra
 # --- Tests
 
 @testset "Zero type: constructor tests" begin
-    # No argument
+    # Zero()
     @test Zero() === Zero{Float64}()
 
-    # Argument: instance of Blade{T}
-    @test Zero(Blade{Float64}([1 2 3])) === Zero{Float64}()
-    @test Zero(Blade{Float32}([1 2 3])) === Zero{Float32}()
-    @test Zero(Blade{Float16}([1 2 3])) === Zero{Float16}()
+    # Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
+    for type in subtypes(AbstractFloat)
+        @test Zero(Blade{type}([1 2 3])) === Zero{type}()
+        @test Zero(Scalar{type}(1)) === Zero{type}()
+        @test Zero(Zero{type}()) === Zero{type}()
+        @test Zero(One{type}()) === Zero{type}()
+    end
 
-    # Argument: instance of Scalar{T}
-    @test Zero(Scalar{Float64}(1)) === Zero{Float64}()
-    @test Zero(Scalar{Float32}(1)) === Zero{Float32}()
-    @test Zero(Scalar{Float16}(1)) === Zero{Float16}()
+    # Zero(::Type{T}) where {T<:AbstractFloat}
+    for type in subtypes(AbstractFloat)
+        @test Zero(type) === Zero{type}()
+    end
 
-    # Argument: instance of Zero{T}
-    @test Zero(Zero{Float64}()) === Zero{Float64}()
-    @test Zero(Zero{Float32}()) === Zero{Float32}()
-    @test Zero(Zero{Float16}()) === Zero{Float16}()
+    # Zero(::Type{T}) where {T<:AbstractBlade}
+    for blade_type in (Blade, Scalar, Zero, One)
+        @test Zero(blade_type) === Zero{Float64}()
+    end
 
-    # Argument: instance of One{T}
-    @test Zero(One{Float64}()) === Zero{Float64}()
-    @test Zero(One{Float32}()) === Zero{Float32}()
-    @test Zero(One{Float16}()) === Zero{Float16}()
-
-    # Argument: concrete type
-    @test Zero(Blade{Float64}) === Zero{Float64}()
-    @test Zero(Blade{Float32}) === Zero{Float32}()
-    @test Zero(Blade{Float16}) === Zero{Float16}()
-    @test Zero(Scalar{Float64}) === Zero{Float64}()
-    @test Zero(Scalar{Float32}) === Zero{Float32}()
-    @test Zero(Scalar{Float16}) === Zero{Float16}()
-    @test Zero(Zero{Float64}) === Zero{Float64}()
-    @test Zero(Zero{Float32}) === Zero{Float32}()
-    @test Zero(Zero{Float16}) === Zero{Float16}()
-    @test Zero(One{Float64}) === Zero{Float64}()
-    @test Zero(One{Float32}) === Zero{Float32}()
-    @test Zero(One{Float16}) === Zero{Float16}()
-
-    # Argument: parameter type
-    @test Zero(Blade) === Zero{Float64}()
-    @test Zero(Scalar) === Zero{Float64}()
+    # Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    for blade_type in (Blade, Scalar, Zero, One)
+        for type in subtypes(AbstractFloat)
+            @test Zero(blade_type{type}) === Zero{type}()
+        end
+    end
 end
 
 @testset "Zero type: function tests" begin

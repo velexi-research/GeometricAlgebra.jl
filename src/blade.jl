@@ -230,9 +230,8 @@ struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
     Zero()
     Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
     Zero(::Type{T}) where {T<:AbstractFloat}
+    Zero(::Type{T}) where {T<:AbstractBlade}
     Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
-    Zero(::Type{Blade})
-    Zero(::Type{Scalar})
 
 Return the additive identity 0. When the precision is not specified, it
 defaults to `Float64`.
@@ -240,9 +239,8 @@ defaults to `Float64`.
 Zero() = Zero{Float64}()
 Zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Zero{T}()
 Zero(::Type{T}) where {T<:AbstractFloat} = Zero{T}()
+Zero(::Type{T}) where {T<:AbstractBlade} = Zero{Float64}()
 Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = Zero{T}()
-Zero(::Type{Blade}) = Zero{Float64}()
-Zero(::Type{Scalar}) = Zero{Float64}()
 
 
 # One
@@ -257,9 +255,8 @@ struct One{T<:AbstractFloat} <: AbstractScalar{T} end
     One()
     One(B::AbstractBlade{T}) where {T<:AbstractFloat}
     One(::Type{T}) where {T<:AbstractFloat}
+    One(::Type{T}) where {T<:AbstractBlade}
     One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
-    One(::Type{Blade})
-    One(::Type{Scalar})
 
 Return the multiplicative identity 1. When the precision is not specified, it
 defaults to `Float64`.
@@ -267,9 +264,8 @@ defaults to `Float64`.
 One() = One{Float64}()
 One(B::AbstractBlade{T}) where {T<:AbstractFloat} = One{T}()
 One(::Type{T}) where {T<:AbstractFloat} = One{T}()
+One(::Type{T}) where {T<:AbstractBlade} = One{Float64}()
 One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = One{T}()
-One(::Type{Blade}) = One{Float64}()
-One(::Type{Scalar}) = One{Float64}()
 
 
 # --- Functions
@@ -309,8 +305,18 @@ inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
 # ------ Comparison functions
 
-==(B::Scalar{T}, A::Scalar{S}) where {T<:AbstractFloat, S<:AbstractFloat} =
-    B.value == A.value
+# .(==)
+==(B1::Scalar{T1}, B2::Scalar{T2}) where {T1<:AbstractFloat,
+                                          T2<:AbstractFloat} =
+    B1.value == B2.value
+==(B::Scalar{T}, x) where {T<:AbstractFloat} = (x == B.value)
+==(x, B::Scalar{T}) where {T<:AbstractFloat} = (B == x)
 
-==(B::One{T}, x::Number) where {T<:AbstractFloat} = (x == 1)
-==(B::Zero{T}, x::Number) where {T<:AbstractFloat} = (x == 0)
+==(B::Zero{T}, x) where {T<:AbstractFloat} = (x == 0)
+==(x, B::Zero{T}) where {T<:AbstractFloat} = (B == 0)
+==(B1::Zero{T1}, B2::Zero{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} =
+    true
+
+==(B::One{T}, x) where {T<:AbstractFloat} = (x == 1)
+==(x, B::One{T}) where {T<:AbstractFloat} = (B == 1)
+==(B1::One{T1}, B2::One{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} = true
