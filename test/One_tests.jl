@@ -25,22 +25,22 @@ using GeometricAlgebra
     # No argument
     @test One() === One{Float64}()
 
-    # Argument: instance::Blade{T}
+    # Argument: instance of Blade{T}
     @test One(Blade{Float64}([1 2 3])) === One{Float64}()
     @test One(Blade{Float32}([1 2 3])) === One{Float32}()
     @test One(Blade{Float16}([1 2 3])) === One{Float16}()
 
-    # Argument: instance::Scalar{T}
+    # Argument: instance of Scalar{T}
     @test One(Scalar{Float64}(1)) === One{Float64}()
     @test One(Scalar{Float32}(1)) === One{Float32}()
     @test One(Scalar{Float16}(1)) === One{Float16}()
 
-    # Argument: instance::Zero{T}
+    # Argument: instance of Zero{T}
     @test One(Zero{Float64}()) === One{Float64}()
     @test One(Zero{Float32}()) === One{Float32}()
     @test One(Zero{Float16}()) === One{Float16}()
 
-    # Argument: instance::One{T}
+    # Argument: instance of One{T}
     @test One(One{Float64}()) === One{Float64}()
     @test One(One{Float32}()) === One{Float32}()
     @test One(One{Float16}()) === One{Float16}()
