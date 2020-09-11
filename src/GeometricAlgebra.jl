@@ -16,17 +16,29 @@ module GeometricAlgebra
 import LinearAlgebra
 
 
-# --- Exports
-
-# Types
-export Blade
-
-# Functions
-export norm
-
-
 # --- Submodules
 
 include("blade.jl")
+
+
+# --- Functions
+
+# Exports
+export zero, one
+
+
+"""
+    zero(B::AbstractBlade)
+
+Return Zero (the additive identity).
+"""
+zero(B::AbstractBlade) = Zero
+
+"""
+    one(B::AbstractBlade)
+
+Return One (the multiplicative identity).
+"""
+one(B::AbstractBlade) = One
 
 end  # End of GeometricAlgebra.jl module

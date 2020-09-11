@@ -1,5 +1,5 @@
 """
-Unit tests for the ZeroBlade type.
+Unit tests for the Scalar type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -19,94 +19,86 @@ import LinearAlgebra
 using GeometricAlgebra
 
 
-# --- Unit tests
+# --- Constructor tests
 
-# ------ Constructor tests
-
-@testset "ZeroBlade constructor tests: typeof(value) = AbstractFloat" begin
+@testset "Scalar constructor tests: typeof(value) = AbstractFloat" begin
     # --- Float64
 
     # nonzero value
     value = Float64(10.)
-    B = ZeroBlade(value)
+    B = Scalar(value)
     @test B.value == value
     @test typeof(B.value) == Float64
 
     # zero value
     value = Float64(0.)
-    B = ZeroBlade(value)
-    @test B.value == 0
-    @test typeof(B.value) == Float64
+    B = Scalar(value)
+    @test B === Zero
 
     # --- Float32
 
     # nonzero value
     value = Float32(10.)
-    B = ZeroBlade(value)
+    B = Scalar(value)
     @test B.value == value
     @test typeof(B.value) == Float32
 
     # zero value
     value = Float32(0.)
-    B = ZeroBlade(value)
-    @test B.value == 0
-    @test typeof(B.value) == Float32
+    B = Scalar(value)
+    @test B === Zero
 
     # --- Float16
 
     # nonzero value
     value = Float16(10.)
-    B = ZeroBlade(value)
+    B = Scalar(value)
     @test B.value == value
     @test typeof(B.value) == Float16
 
     # zero value
     value = Float16(0.)
-    B = ZeroBlade(value)
-    @test B.value == 0
-    @test typeof(B.value) == Float16
+    B = Scalar(value)
+    @test B === Zero
 end
 
-@testset "ZeroBlade constructor tests: typeof(value) = Integer" begin
+@testset "Scalar constructor tests: typeof(value) = Integer" begin
     # --- Int64
 
     # nonzero value
-    value = Int64(10.)
-    B = ZeroBlade(value)
+    value = Int64(10)
+    B = Scalar(value)
     @test B.value == value
     @test typeof(B.value) == Float64
 
     # zero value
-    value = Int64(0.)
-    B = ZeroBlade{Float32}(value)
-    @test B.value == 0
-    @test typeof(B.value) == Float32
+    value = Int64(0)
+    B = Scalar{Float32}(value)
+    @test B === Zero
 
     # --- Int32
 
     # nonzero value
-    value = Int32(10.)
-    B = ZeroBlade{Float16}(value)
+    value = Int32(10)
+    B = Scalar{Float16}(value)
     @test B.value == value
     @test typeof(B.value) == Float16
 
     # zero value
-    value = Int32(0.)
-    B = ZeroBlade(value)
-    @test B.value == 0
-    @test typeof(B.value) == Float64
+    value = Int32(0)
+    B = Scalar(value)
+    @test B === Zero
 
     # --- Int16
 
     # nonzero value
-    value = Int16(10.)
-    B = ZeroBlade{Float32}(value)
+    value = Int16(10)
+    B = Scalar{Float32}(value)
     @test B.value == value
     @test typeof(B.value) == Float32
 
     # zero value
-    value = Int16(0.)
-    B = ZeroBlade{Float16}(value)
-    @test B.value == 0
-    @test typeof(B.value) == Float16
+    value = Int16(0)
+    B = Scalar{Float16}(value)
+    @test B === Zero
 end
