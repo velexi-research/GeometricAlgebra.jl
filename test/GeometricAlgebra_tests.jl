@@ -43,7 +43,7 @@ using GeometricAlgebra
     @test grade(B) == 0
     @test norm(B) == 0
     @test basis(B) === nothing
-    @test inverse(B) === NaN
+    @test inverse(B) == Scalar(Inf)
 end
 
 
