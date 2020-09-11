@@ -26,16 +26,16 @@ using GeometricAlgebra
     @test One() === One{Float64}()
 
     # One(B::AbstractBlade{T}) where {T<:AbstractFloat}
-    for type in subtypes(AbstractFloat)
-        @test One(Blade{type}([1 2 3])) === One{type}()
-        @test One(Scalar{type}(1)) === One{type}()
-        @test One(One{type}()) === One{type}()
-        @test One(One{type}()) === One{type}()
+    for precision_type in subtypes(AbstractFloat)
+        @test One(Blade{precision_type}([1 2 3])) === One{precision_type}()
+        @test One(Scalar{precision_type}(1)) === One{precision_type}()
+        @test One(One{precision_type}()) === One{precision_type}()
+        @test One(One{precision_type}()) === One{precision_type}()
     end
 
     # One(::Type{T}) where {T<:AbstractFloat}
-    for type in subtypes(AbstractFloat)
-        @test One(type) === One{type}()
+    for precision_type in subtypes(AbstractFloat)
+        @test One(precision_type) === One{precision_type}()
     end
 
     # One(::Type{T}) where {T<:AbstractBlade}
@@ -45,48 +45,48 @@ using GeometricAlgebra
 
     # One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
     for blade_type in (Blade, Scalar, Zero, One)
-        for type in subtypes(AbstractFloat)
-            @test One(blade_type{type}) === One{type}()
+        for precision_type in subtypes(AbstractFloat)
+            @test One(blade_type{precision_type}) === One{precision_type}()
         end
     end
 end
 
 @testset "One type: function tests" begin
     # dim()
-    for type in subtypes(AbstractFloat)
-        @test dim(One(type)) == 0
+    for precision_type in subtypes(AbstractFloat)
+        @test dim(One(precision_type)) == 0
     end
 
     # grade()
-    for type in subtypes(AbstractFloat)
-        @test grade(One(type)) == 0
+    for precision_type in subtypes(AbstractFloat)
+        @test grade(One(precision_type)) == 0
     end
 
     # norm()
-    for type in subtypes(AbstractFloat)
-        @test norm(One(type)) == 1
+    for precision_type in subtypes(AbstractFloat)
+        @test norm(One(precision_type)) == 1
     end
 
     # basis()
-    for type in subtypes(AbstractFloat)
-        @test basis(One(type)) === nothing
+    for precision_type in subtypes(AbstractFloat)
+        @test basis(One(precision_type)) === nothing
     end
 
     # inverse()
-    for type in subtypes(AbstractFloat)
-        @test inverse(One(type)) === One(type)
+    for precision_type in subtypes(AbstractFloat)
+        @test inverse(One(precision_type)) === One(precision_type)
     end
 end
 
 @testset "One type: comparison operation tests" begin
     # :(==)
-    for type in subtypes(AbstractFloat)
-        @test One(type) == 1
-        @test 1 == One(type)
+    for precision_type in subtypes(AbstractFloat)
+        @test One(precision_type) == 1
+        @test 1 == One(precision_type)
     end
-    for type1 in subtypes(AbstractFloat)
-        for type2 in subtypes(AbstractFloat)
-            @test One(type1) == One(type2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            @test One(precision_type1) == One(precision_type2)
         end
     end
 end

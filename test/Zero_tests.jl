@@ -26,16 +26,16 @@ using GeometricAlgebra
     @test Zero() === Zero{Float64}()
 
     # Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
-    for type in subtypes(AbstractFloat)
-        @test Zero(Blade{type}([1 2 3])) === Zero{type}()
-        @test Zero(Scalar{type}(1)) === Zero{type}()
-        @test Zero(Zero{type}()) === Zero{type}()
-        @test Zero(One{type}()) === Zero{type}()
+    for precision_type in subtypes(AbstractFloat)
+        @test Zero(Blade{precision_type}([1 2 3])) === Zero{precision_type}()
+        @test Zero(Scalar{precision_type}(1)) === Zero{precision_type}()
+        @test Zero(Zero{precision_type}()) === Zero{precision_type}()
+        @test Zero(One{precision_type}()) === Zero{precision_type}()
     end
 
     # Zero(::Type{T}) where {T<:AbstractFloat}
-    for type in subtypes(AbstractFloat)
-        @test Zero(type) === Zero{type}()
+    for precision_type in subtypes(AbstractFloat)
+        @test Zero(precision_type) === Zero{precision_type}()
     end
 
     # Zero(::Type{T}) where {T<:AbstractBlade}
@@ -45,48 +45,48 @@ using GeometricAlgebra
 
     # Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
     for blade_type in (Blade, Scalar, Zero, One)
-        for type in subtypes(AbstractFloat)
-            @test Zero(blade_type{type}) === Zero{type}()
+        for precision_type in subtypes(AbstractFloat)
+            @test Zero(blade_type{precision_type}) === Zero{precision_type}()
         end
     end
 end
 
 @testset "Zero type: function tests" begin
     # dim()
-    for type in subtypes(AbstractFloat)
-        @test dim(Zero(type)) == 0
+    for precision_type in subtypes(AbstractFloat)
+        @test dim(Zero(precision_type)) == 0
     end
 
     # grade()
-    for type in subtypes(AbstractFloat)
-        @test grade(Zero(type)) == 0
+    for precision_type in subtypes(AbstractFloat)
+        @test grade(Zero(precision_type)) == 0
     end
 
     # norm()
-    for type in subtypes(AbstractFloat)
-        @test norm(Zero(type)) == 0
+    for precision_type in subtypes(AbstractFloat)
+        @test norm(Zero(precision_type)) == 0
     end
 
     # basis()
-    for type in subtypes(AbstractFloat)
-        @test basis(Zero(type)) === nothing
+    for precision_type in subtypes(AbstractFloat)
+        @test basis(Zero(precision_type)) === nothing
     end
 
     # inverse()
-    for type in subtypes(AbstractFloat)
-        @test inverse(Zero(type)) == Scalar(Inf)
+    for precision_type in subtypes(AbstractFloat)
+        @test inverse(Zero(precision_type)) == Scalar(Inf)
     end
 end
 
 @testset "Zero type: comparison operation tests" begin
     # :(==)
-    for type in subtypes(AbstractFloat)
-        @test Zero(type) == 0
-        @test 0 == Zero(type)
+    for precision_type in subtypes(AbstractFloat)
+        @test Zero(precision_type) == 0
+        @test 0 == Zero(precision_type)
     end
-    for type1 in subtypes(AbstractFloat)
-        for type2 in subtypes(AbstractFloat)
-            @test Zero(type1) == Zero(type2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            @test Zero(precision_type1) == Zero(precision_type2)
         end
     end
 end
