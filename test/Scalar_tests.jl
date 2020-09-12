@@ -15,9 +15,11 @@ contained in the LICENSE file.
 import InteractiveUtils.subtypes
 using Test
 import LinearAlgebra
+import Random.rand
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
+import GeometricAlgebra.≈
 
 
 # --- Constructor tests
@@ -123,33 +125,94 @@ end
 # --- Function tests
 
 @testset "Scalar: function tests" begin
-    # Nonzero value
-    value = 10
-    B = Scalar(value)
-    @test dim(B) == 0
-    @test grade(B) == 0
-    @test norm(B) == value
-    @test basis(B) === nothing
-    @test inverse(B) == Scalar(1 / value)
+    for precision_type in subtypes(AbstractFloat)
+        # value > 0
+        value = rand(precision_type) + 1  # avoid 0
+        B = Scalar(value)
+        @test dim(B) == 0
+        @test grade(B) == 0
+        @test norm(B) == value
+        @test basis(B) === nothing
+        @test inverse(B) == Scalar{precision_type}(1 / value)
 
-    # Inf
-    value = Inf
-    B = Scalar(value)
-    @test dim(B) == 0
-    @test grade(B) == 0
-    @test norm(B) == Inf
-    @test basis(B) === nothing
-    @test inverse(B) === Zero()
+        # value < 0
+        value = -(rand(precision_type) + 1)  # avoid 0
+        B = Scalar(precision_type(value))
+        @test dim(B) == 0
+        @test grade(B) == 0
+        @test norm(B) == abs(value)
+        @test basis(B) === nothing
+        @test inverse(B) == Scalar{precision_type}(1 / precision_type(value))
 
-    # -Inf
-    value = -Inf
-    B = Scalar(value)
-    @test dim(B) == 0
-    @test grade(B) == 0
-    @test norm(B) == Inf
-    @test basis(B) === nothing
-    @test inverse(B) === Zero()
+        # value = 0
+        value = precision_type(0)
+        B = Scalar(value)
+        @test B === Zero(precision_type)
+        @test dim(B) == 0
+        @test grade(B) == 0
+        @test norm(B) == 0
+        @test basis(B) === nothing
+        @test inverse(B) == Scalar{precision_type}(Inf)
+
+        # value = Inf
+        value = precision_type(Inf)
+        B = Scalar(value)
+        @test dim(B) == 0
+        @test grade(B) == 0
+        @test norm(B) == Inf
+        @test basis(B) === nothing
+        @test inverse(B) === Zero(precision_type)
+
+        # value = -Inf
+        value = -precision_type(Inf)
+        B = Scalar(value)
+        @test dim(B) == 0
+        @test grade(B) == 0
+        @test norm(B) == Inf
+        @test basis(B) === nothing
+        @test inverse(B) === Zero(precision_type)
+    end
 end
 
 @testset "Scalar: comparison operation tests" begin
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # :(==)
+    for precision_type in subtypes(AbstractFloat)
+        value = rand(precision_type) + 1  # avoid 0
+        B = Scalar(value)
+        @test B == value
+        @test value == B
+    end
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            value = rand() + 1  # avoid 0
+            B1 = Scalar(precision_type1(value))
+            B2 = Scalar(precision_type2(value))
+            if precision_type1 == precision_type2
+                @test B1 == B2
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B1 == B2
+            else
+                @test B1 != B2
+            end
+        end
+    end
+
+    # isapprox()
+    for precision_type in subtypes(AbstractFloat)
+        value = rand(precision_type) + 1  # avoid 0
+        B = Scalar(value)
+        @test B ≈ value
+        @test value ≈ B
+    end
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            value = rand() + 1  # avoid 0
+            B1 = Scalar(precision_type1(value))
+            B2 = Scalar(precision_type2(value))
+            @test B1 ≈ B2
+        end
+    end
 end

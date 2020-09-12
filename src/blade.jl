@@ -11,7 +11,7 @@ contained in the LICENSE file.
 """
 # --- Imports
 
-import Base.:(==)
+import Base.:(==), Base.:(≈)
 import LinearAlgebra
 
 
@@ -305,6 +305,9 @@ inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
 # ------ Comparison functions
 
+# Exports
+export ==, ≈
+
 # .(==)
 ==(B1::Scalar{T1}, B2::Scalar{T2}) where {T1<:AbstractFloat,
                                           T2<:AbstractFloat} =
@@ -312,11 +315,27 @@ inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 ==(B::Scalar{T}, x) where {T<:AbstractFloat} = (x == B.value)
 ==(x, B::Scalar{T}) where {T<:AbstractFloat} = (B == x)
 
-==(B::Zero{T}, x) where {T<:AbstractFloat} = (x == 0)
-==(x, B::Zero{T}) where {T<:AbstractFloat} = (B == 0)
-==(B1::Zero{T1}, B2::Zero{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} =
-    true
+==(B::Zero{T}, x::Real) where {T<:AbstractFloat} = (x == 0)
+==(x::Real, B::Zero{T}) where {T<:AbstractFloat} = (B == 0)
+==(B1::Zero{T1},
+   B2::Zero{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} = true
 
 ==(B::One{T}, x) where {T<:AbstractFloat} = (x == 1)
 ==(x, B::One{T}) where {T<:AbstractFloat} = (B == 1)
-==(B1::One{T1}, B2::One{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} = true
+==(B1::One{T1},
+   B2::One{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} = true
+
+
+# .(≈)
+≈(B1::Scalar{T1}, B2::Scalar{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    ≈(B1.value, B2.value, atol=atol, rtol=rtol)
+
+≈(B::Scalar{T}, x::Real;
+  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
+    ≈(x, B.value, rtol=rtol, atol=atol)
+≈(x::Real, B::Scalar{T};
+  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
+    ≈(B, x, rtol=rtol, atol=atol)
