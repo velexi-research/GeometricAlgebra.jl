@@ -13,8 +13,8 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
-using Test
 import LinearAlgebra
+using Test
 import Random.rand
 
 # GeometricAlgebra.jl
@@ -35,7 +35,7 @@ using GeometricAlgebra
         @test S == value
         @test value == S
 
-        # atol < abs(value)
+        # abs(value) > atol
         value = -3
         S = Scalar(convert(precision_type, value), atol=abs(value)-1)
 
@@ -44,7 +44,16 @@ using GeometricAlgebra
         @test S == value
         @test value == S
 
-        # atol > abs(value)
+        # abs(value) == atol
+        value = -2
+        S = Scalar(convert(precision_type, value), atol=abs(value))
+
+        @test S.value == value
+        @test typeof(S.value) === precision_type
+        @test S == value
+        @test value == S
+
+        # abs(value) < atol
         value = -3
         S = Scalar(convert(precision_type, value), atol=abs(value)+1)
         @test S == Zero(precision_type)
@@ -63,7 +72,7 @@ using GeometricAlgebra
             @test S == value
             @test value == S
 
-            # atol < abs(value)
+            # abs(value) > atol
             value = -3
             S = Scalar{precision_type}(convert(value_precision_type, value),
                                        atol=abs(value)-1)
@@ -73,7 +82,16 @@ using GeometricAlgebra
             @test S == value
             @test value == S
 
-            # atol > abs(value)
+            # abs(value) == atol
+            value = -2
+            S = Scalar(convert(precision_type, value), atol=abs(value))
+
+            @test S.value == value
+            @test typeof(S.value) === precision_type
+            @test S == value
+            @test value == S
+
+            # abs(value) < atol
             value = -3
             S = Scalar{precision_type}(convert(value_precision_type, value),
                                        atol=abs(value)+1)
