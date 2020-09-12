@@ -56,7 +56,7 @@ using GeometricAlgebra
         # abs(value) < atol
         S = Scalar{precision_type}(converted_value,
                                    atol=abs(converted_value)+1)
-        @test S == Zero(precision_type)
+        @test S === Zero{precision_type}()
     end
 end
 
@@ -91,7 +91,7 @@ end
 
         # abs(value) < atol
         S = Scalar(converted_value, atol=abs(value)+1)
-        @test S === Zero(precision_type)
+        @test S === Zero{precision_type}()
     end
 
     # --- Scalar{T}(value::S;
@@ -117,7 +117,7 @@ end
 
             # abs(value) < atol
             S = Scalar{precision_type}(converted_value, atol=abs(value)+1)
-            @test S === Zero(precision_type)
+            @test S === Zero{precision_type}()
         end
     end
 
@@ -131,7 +131,7 @@ end
 
         # value is zero
         S = Scalar(convert(value_type, 0))
-        @test S === Zero(Float64)
+        @test S === Zero{Float64}()
     end
 
     # subtypes(Unsigned)
@@ -142,7 +142,7 @@ end
 
         # value is zero
         S = Scalar(convert(value_type, 0))
-        @test S === Zero(Float64)
+        @test S === Zero{Float64}()
     end
 
     # Bool
@@ -150,7 +150,7 @@ end
     @test typeof(S) === Scalar{Float64}
 
     S = Scalar(false)
-    @test S === Zero(Float64)
+    @test S === Zero{Float64}()
 
     # --- Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
@@ -163,7 +163,7 @@ end
 
             # value is zero
             S = Scalar{precision_type}(convert(value_type, 0))
-            @test S === Zero(precision_type)
+            @test S === Zero{precision_type}()
         end
     end
 
@@ -176,7 +176,7 @@ end
 
             # value is zero
             S = Scalar{precision_type}(convert(value_type, 0))
-            @test S === Zero(precision_type)
+            @test S === Zero{precision_type}()
         end
     end
 
@@ -189,7 +189,7 @@ end
         # value is zero
         value = 0
         S = Scalar{precision_type}(false)
-        @test S === Zero(precision_type)
+        @test S === Zero{precision_type}()
     end
 end
 
@@ -206,46 +206,46 @@ end
         converted_value = precision_type(value)
 
         # value > 0
-        B = Scalar(converted_value)
-        @test dim(B) == 0
-        @test grade(B) == 0
-        @test norm(B) == abs(converted_value)
-        @test basis(B) === nothing
-        @test inverse(B) == Scalar{precision_type}(1 / converted_value)
+        S = Scalar(converted_value)
+        @test dim(S) == 0
+        @test grade(S) == 0
+        @test norm(S) == abs(converted_value)
+        @test basis(S) === nothing
+        @test inverse(S) == Scalar{precision_type}(1 / converted_value)
 
         # value < 0
         negative_value = -(abs(converted_value))
-        B = Scalar(negative_value)
-        @test dim(B) == 0
-        @test grade(B) == 0
-        @test norm(B) == abs(negative_value)
-        @test basis(B) === nothing
-        @test inverse(B) == Scalar{precision_type}(1 / negative_value)
+        S = Scalar(negative_value)
+        @test dim(S) == 0
+        @test grade(S) == 0
+        @test norm(S) == abs(negative_value)
+        @test basis(S) === nothing
+        @test inverse(S) == Scalar{precision_type}(1 / negative_value)
 
         # value = 0
-        B = Scalar(precision_type(0))
-        @test B === Zero(precision_type)
-        @test dim(B) == 0
-        @test grade(B) == 0
-        @test norm(B) == 0
-        @test basis(B) === nothing
-        @test inverse(B) == Scalar{precision_type}(Inf)
+        S = Scalar(precision_type(0))
+        @test S === Zero{precision_type}()
+        @test dim(S) == 0
+        @test grade(S) == 0
+        @test norm(S) == 0
+        @test basis(S) === nothing
+        @test inverse(S) == Scalar{precision_type}(Inf)
 
         # value = Inf
-        B = Scalar(precision_type(Inf))
-        @test dim(B) == 0
-        @test grade(B) == 0
-        @test norm(B) == Inf
-        @test basis(B) === nothing
-        @test inverse(B) === Zero(precision_type)
+        S = Scalar(precision_type(Inf))
+        @test dim(S) == 0
+        @test grade(S) == 0
+        @test norm(S) == Inf
+        @test basis(S) === nothing
+        @test inverse(S) === Zero{precision_type}()
 
         # value = -Inf
-        B = Scalar(precision_type(-Inf))
-        @test dim(B) == 0
-        @test grade(B) == 0
-        @test norm(B) == Inf
-        @test basis(B) === nothing
-        @test inverse(B) === Zero(precision_type)
+        S = Scalar(precision_type(-Inf))
+        @test dim(S) == 0
+        @test grade(S) == 0
+        @test norm(S) == Inf
+        @test basis(S) === nothing
+        @test inverse(S) === Zero{precision_type}()
     end
 end
 
@@ -259,21 +259,21 @@ end
     # :(==)
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(value)
-        B = Scalar(converted_value)
-        @test B == converted_value
-        @test converted_value == B
+        S = Scalar(converted_value)
+        @test S == converted_value
+        @test converted_value == S
     end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            B1 = Scalar(precision_type1(value))
-            B2 = Scalar(precision_type2(value))
+            S1 = Scalar(precision_type1(value))
+            S2 = Scalar(precision_type2(value))
             if precision_type1 == precision_type2
-                @test B1 == B2
+                @test S1 == S2
             elseif precision_type1 in float64_or_bigfloat &&
                    precision_type2 in float64_or_bigfloat
-                @test B1 == B2
+                @test S1 == S2
             else
-                @test B1 != B2
+                @test S1 != S2
             end
         end
     end
@@ -281,15 +281,15 @@ end
     # :(≈)
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(value)
-        B = Scalar(converted_value)
-        @test B ≈ converted_value
-        @test converted_value ≈ B
+        S = Scalar(converted_value)
+        @test S ≈ converted_value
+        @test converted_value ≈ S
     end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            B1 = Scalar(precision_type1(value))
-            B2 = Scalar(precision_type2(value))
-            @test B1 ≈ B2
+            S1 = Scalar(precision_type1(value))
+            S2 = Scalar(precision_type2(value))
+            @test S1 ≈ S2
         end
     end
 end
