@@ -305,9 +305,6 @@ inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
 # ------ Comparison functions
 
-# Exports
-export ==, ≈
-
 # .(==)
 ==(B1::Scalar{T1}, B2::Scalar{T2}) where {T1<:AbstractFloat,
                                           T2<:AbstractFloat} =
