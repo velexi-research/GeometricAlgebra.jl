@@ -19,7 +19,6 @@ import Random.rand
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
-import GeometricAlgebra.≈
 
 
 # --- Constructor tests
