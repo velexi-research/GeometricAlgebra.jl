@@ -230,8 +230,8 @@ struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
     Zero()
     Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
     Zero(::Type{T}) where {T<:AbstractFloat}
+    Zero(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}}
     Zero(::Type{T}) where {T<:AbstractBlade}
-    Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
 
 Return the additive identity 0. When the precision is not specified, it
 defaults to `Float64`.
@@ -239,8 +239,8 @@ defaults to `Float64`.
 Zero() = Zero{Float64}()
 Zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Zero{T}()
 Zero(::Type{T}) where {T<:AbstractFloat} = Zero{T}()
+Zero(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}} = Zero{S}()
 Zero(::Type{T}) where {T<:AbstractBlade} = Zero{Float64}()
-Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = Zero{T}()
 
 
 # One
@@ -255,8 +255,8 @@ struct One{T<:AbstractFloat} <: AbstractScalar{T} end
     One()
     One(B::AbstractBlade{T}) where {T<:AbstractFloat}
     One(::Type{T}) where {T<:AbstractFloat}
+    One(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}}
     One(::Type{T}) where {T<:AbstractBlade}
-    One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
 
 Return the multiplicative identity 1. When the precision is not specified, it
 defaults to `Float64`.
@@ -264,8 +264,8 @@ defaults to `Float64`.
 One() = One{Float64}()
 One(B::AbstractBlade{T}) where {T<:AbstractFloat} = One{T}()
 One(::Type{T}) where {T<:AbstractFloat} = One{T}()
+One(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}} = One{S}()
 One(::Type{T}) where {T<:AbstractBlade} = One{Float64}()
-One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}} = One{T}()
 
 
 # --- Functions
