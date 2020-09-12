@@ -12,6 +12,7 @@ contained in the LICENSE file.
 # --- Imports
 
 # Standard library
+import InteractiveUtils.subtypes
 using Test
 import LinearAlgebra
 
@@ -21,91 +22,107 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Scalar constructor tests: typeof(value) = AbstractFloat" begin
-    # --- Float64
+@testset "Scalar: constructor tests" begin
+    # Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
+    for precision_type in subtypes(AbstractFloat)
+        # Default atol
+        value = 3
+        S = Scalar(convert(precision_type, value))
 
-    # nonzero value
-    value = Float64(10.)
-    B = Scalar(value)
-    @test B.value == value
-    @test typeof(B.value) == Float64
+        @test S.value == value
+        @test typeof(S.value) === precision_type
+        @test S == value
+        @test value == S
 
-    # zero value
-    value = Float64(0.)
-    B = Scalar(value)
-    @test B === Zero
+        # atol < abs(value)
+        value = -3
+        S = Scalar(convert(precision_type, value), atol=abs(value)-1)
 
-    # --- Float32
+        @test S.value == value
+        @test typeof(S.value) === precision_type
+        @test S == value
+        @test value == S
 
-    # nonzero value
-    value = Float32(10.)
-    B = Scalar(value)
-    @test B.value == value
-    @test typeof(B.value) == Float32
+        # atol > abs(value)
+        value = -3
+        S = Scalar(convert(precision_type, value), atol=abs(value)+1)
+        @test S == Zero(precision_type)
+    end
 
-    # zero value
-    value = Float32(0.)
-    B = Scalar(value)
-    @test B === Zero
+    # Scalar{T}(value::S;
+    #           atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat}
+    for precision_type in subtypes(AbstractFloat)
+        for value_precision_type in subtypes(AbstractFloat)
+            # Default atol
+            value = 3
+            S = Scalar{precision_type}(convert(value_precision_type, value))
 
-    # --- Float16
+            @test S.value == value
+            @test typeof(S.value) === precision_type
+            @test S == value
+            @test value == S
 
-    # nonzero value
-    value = Float16(10.)
-    B = Scalar(value)
-    @test B.value == value
-    @test typeof(B.value) == Float16
+            # atol < abs(value)
+            value = -3
+            S = Scalar{precision_type}(convert(value_precision_type, value),
+                                       atol=abs(value)-1)
 
-    # zero value
-    value = Float16(0.)
-    B = Scalar(value)
-    @test B === Zero
+            @test S.value == value
+            @test typeof(S.value) === precision_type
+            @test S == value
+            @test value == S
+
+            # atol > abs(value)
+            value = -3
+            S = Scalar{precision_type}(convert(value_precision_type, value),
+                                       atol=abs(value)+1)
+            @test S == Zero(precision_type)
+        end
+    end
+
+    # Scalar(value::Integer)
+    for value_type in vcat(subtypes(Unsigned), subtypes(Signed), Bool)
+        # value is nonzero
+        value = (value_type != Bool) ? 3 : 1
+        S = Scalar(convert(value_type, value))
+
+        @test S.value == value
+        @test typeof(S.value) === Float64
+        @test S == value
+        @test value == S
+
+        # value is zero
+        value = 0
+        S = Scalar(convert(value_type, value))
+
+        @test S === Zero(Float64)
+    end
+
+    # Scalar{T}(value::Integer) where {T<:AbstractFloat}
+    for value_type in vcat(subtypes(Unsigned), subtypes(Signed), Bool)
+        for precision_type in subtypes(AbstractFloat)
+            # value is nonzero
+            value = (value_type != Bool) ? 3 : 1
+            S = Scalar{precision_type}(convert(value_type, value))
+
+            @test S.value == value
+            @test typeof(S.value) === precision_type
+            @test S == value
+            @test value == S
+
+            # value is zero
+            value = 0
+            S = Scalar{precision_type}(convert(value_type, value))
+
+            @test S === Zero(precision_type)
+        end
+    end
 end
 
-@testset "Scalar constructor tests: typeof(value) = Integer" begin
-    # --- Int64
-
-    # nonzero value
-    value = Int64(10)
-    B = Scalar(value)
-    @test B.value == value
-    @test typeof(B.value) == Float64
-
-    # zero value
-    value = Int64(0)
-    B = Scalar{Float32}(value)
-    @test B === Zero
-
-    # --- Int32
-
-    # nonzero value
-    value = Int32(10)
-    B = Scalar{Float16}(value)
-    @test B.value == value
-    @test typeof(B.value) == Float16
-
-    # zero value
-    value = Int32(0)
-    B = Scalar(value)
-    @test B === Zero
-
-    # --- Int16
-
-    # nonzero value
-    value = Int16(10)
-    B = Scalar{Float32}(value)
-    @test B.value == value
-    @test typeof(B.value) == Float32
-
-    # zero value
-    value = Int16(0)
-    B = Scalar{Float16}(value)
-    @test B === Zero
-end
 
 # --- Function tests
 
-@testset "Scalar function tests" begin
+@testset "Scalar: function tests" begin
     # Nonzero value
     value = 10
     B = Scalar(value)
@@ -122,7 +139,7 @@ end
     @test grade(B) == 0
     @test norm(B) == Inf
     @test basis(B) === nothing
-    @test inverse(B) === Zero
+    @test inverse(B) === Zero()
 
     # -Inf
     value = -Inf
@@ -131,5 +148,8 @@ end
     @test grade(B) == 0
     @test norm(B) == Inf
     @test basis(B) === nothing
-    @test inverse(B) === Zero
+    @test inverse(B) === Zero()
+end
+
+@testset "Scalar: comparison operation tests" begin
 end
