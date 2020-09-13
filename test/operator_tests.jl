@@ -1,0 +1,151 @@
+"""
+Unit tests for Blade operators.
+
+------------------------------------------------------------------------------
+COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
+is subject to the license terms in the LICENSE file found in the top-level
+directory of this distribution. No part of the GeometricAlgebra.jl package,
+including this file, may be copied, modified, propagated, or distributed
+except according to the terms contained in the LICENSE file.
+------------------------------------------------------------------------------
+"""
+# --- Imports
+
+# Standard library
+import InteractiveUtils.subtypes
+import LinearAlgebra
+using Test
+
+# GeometricAlgebra.jl
+using GeometricAlgebra
+
+
+@testset "Comparison tests: Blade" begin
+    # --- Preparations
+
+    vectors = [3 3; 4 4; 0 1]
+    B = Blade(vectors)
+
+    # --- Test functionality
+
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors))
+            @test B1 ≈ B2
+        end
+    end
+end
+
+@testset "Comparison tests: Scalar" begin
+    # Preparations
+    value = rand() + 1  # add 1 to avoid 0
+    value = rand() > 0.5 ? value : -value
+
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # :(==)
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(value)
+        S = Scalar(converted_value)
+        @test S == converted_value
+        @test converted_value == S
+    end
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            S1 = Scalar(precision_type1(value))
+            S2 = Scalar(precision_type2(value))
+            if precision_type1 == precision_type2
+                @test S1 == S2
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test S1 == S2
+            else
+                @test S1 != S2
+            end
+        end
+    end
+
+    # :(≈)
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(value)
+        S = Scalar(converted_value)
+        @test S ≈ converted_value
+        @test converted_value ≈ S
+    end
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            S1 = Scalar(precision_type1(value))
+            S2 = Scalar(precision_type2(value))
+            @test S1 ≈ S2
+        end
+    end
+end
+
+@testset "Comparison tests: Zero" begin
+    # :(==)
+    for precision_type in subtypes(AbstractFloat)
+        @test Zero(precision_type) == 0
+        @test 0 == Zero(precision_type)
+    end
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            @test Zero(precision_type1) == Zero(precision_type2)
+        end
+    end
+end
+
+@testset "Comparison tests: One" begin
+    # :(==)
+    for precision_type in subtypes(AbstractFloat)
+        @test One(precision_type) == 1
+        @test 1 == One(precision_type)
+    end
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            @test One(precision_type1) == One(precision_type2)
+        end
+    end
+end
+
+@testset "-() tests: Blade" begin
+    # mod(grade, 4) == 0
+    vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    expected_result = Blade(B, sign=-1)
+    @test -B == expected_result
+end
+
+@testset "inverse() tests: Blade" begin
+    # mod(grade, 4) == 1
+    vectors = Vector{BigFloat}([3; 4; 0; 0; 0])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / BigFloat(25)
+    expected_inverse = Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+
+    # mod(grade, 4) == 2
+    vectors = Matrix{Float64}([3 3; 4 4; 0 1; 0 0; 0 0])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / Float64(25)
+    expected_inverse = -Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+
+    # mod(grade, 4) == 3
+    vectors = Matrix{Float32}([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / Float32(25)
+    expected_inverse = -Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+
+    # mod(grade, 4) == 0
+    vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / Float16(25)
+    expected_inverse = Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+end

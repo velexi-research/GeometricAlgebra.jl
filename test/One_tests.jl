@@ -77,16 +77,3 @@ end
         @test inverse(One(precision_type)) === One(precision_type)
     end
 end
-
-@testset "One type: comparison operation tests" begin
-    # :(==)
-    for precision_type in subtypes(AbstractFloat)
-        @test One(precision_type) == 1
-        @test 1 == One(precision_type)
-    end
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            @test One(precision_type1) == One(precision_type2)
-        end
-    end
-end

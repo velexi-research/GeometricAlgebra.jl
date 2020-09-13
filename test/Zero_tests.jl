@@ -77,16 +77,3 @@ end
         @test inverse(Zero(precision_type)) == Scalar(Inf)
     end
 end
-
-@testset "Zero type: comparison operation tests" begin
-    # :(==)
-    for precision_type in subtypes(AbstractFloat)
-        @test Zero(precision_type) == 0
-        @test 0 == Zero(precision_type)
-    end
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            @test Zero(precision_type1) == Zero(precision_type2)
-        end
-    end
-end
