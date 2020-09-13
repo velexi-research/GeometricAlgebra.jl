@@ -37,7 +37,7 @@ using GeometricAlgebra
         # Preparations
         converted_value = precision_type(value)
 
-        # Default atol
+        # abs(value) > default atol
         S = Scalar{precision_type}(converted_value)
         @test S.value == converted_value
         @test S.value isa precision_type
@@ -48,7 +48,7 @@ using GeometricAlgebra
 
         # abs(value) > atol
         S = Scalar{precision_type}(converted_value,
-                                   atol=abs(converted_value)-1)
+                                   atol=abs(converted_value) - 1)
         @test S.value == converted_value
         @test S.value isa precision_type
 
@@ -59,7 +59,7 @@ using GeometricAlgebra
 
         # abs(value) < atol
         S = Scalar{precision_type}(converted_value,
-                                   atol=abs(converted_value)+1)
+                                   atol=abs(converted_value) + 1)
         @test S === Zero{precision_type}()
     end
 end
@@ -74,7 +74,10 @@ end
 
     # --- Preparations
 
-    value = -3
+    value = rand() + 1  # add 1 to avoid 0
+    value = (rand() > 0.5) ? value : -value
+
+    int_value = (rand() > 0.5) ? 10 : -10
 
     # --- Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
 
@@ -82,20 +85,24 @@ end
         # Preparations
         converted_value = precision_type(value)
 
-        # Default atol
+        # abs(value) > default atol
         S = Scalar(converted_value)
         @test S isa Scalar{precision_type}
 
+        # abs(value) < default atol
+        S = Scalar(precision_type(blade_atol(precision_type) / 2))
+        @test S === Zero{precision_type}()
+
         # abs(value) > atol
-        S = Scalar(converted_value, atol=abs(value)-1)
+        S = Scalar(converted_value, atol=abs(converted_value) - 1)
         @test S isa Scalar{precision_type}
 
         # abs(value) == atol
-        S = Scalar(converted_value, atol=abs(value))
+        S = Scalar(converted_value, atol=abs(converted_value))
         @test S isa Scalar{precision_type}
 
         # abs(value) < atol
-        S = Scalar(converted_value, atol=abs(value)+1)
+        S = Scalar(converted_value, atol=abs(converted_value) + 1)
         @test S === Zero{precision_type}()
     end
 
@@ -108,20 +115,28 @@ end
             # Preparations
             converted_value = value_precision_type(value)
 
-            # Default atol
+            # abs(value) > default atol
             S = Scalar{precision_type}(converted_value)
             @test S isa Scalar{precision_type}
 
+            # abs(value) < default atol
+            S = Scalar{precision_type}(
+                value_precision_type(blade_atol(precision_type) / 2))
+            @test S === Zero{precision_type}()
+
             # abs(value) > atol
-            S = Scalar{precision_type}(converted_value, atol=abs(value)-1)
+            S = Scalar{precision_type}(
+                converted_value, atol=abs(precision_type(converted_value)) - 1)
             @test S isa Scalar{precision_type}
 
             # abs(value) == atol
-            S = Scalar{precision_type}(converted_value, atol=abs(value))
+            S = Scalar{precision_type}(
+                converted_value, atol=abs(precision_type(converted_value)))
             @test S isa Scalar{precision_type}
 
             # abs(value) < atol
-            S = Scalar{precision_type}(converted_value, atol=abs(value)+1)
+            S = Scalar{precision_type}(
+                converted_value, atol=abs(precision_type(converted_value)) + 1)
             @test S === Zero{precision_type}()
         end
     end
@@ -131,7 +146,7 @@ end
     # subtypes(Signed)
     for value_type in subtypes(Signed)
         # value is nonzero
-        S = Scalar(convert(value_type, value))
+        S = Scalar(convert(value_type, int_value))
         @test S isa Scalar{Float64}
 
         # value is zero
@@ -142,7 +157,7 @@ end
     # subtypes(Unsigned)
     for value_type in subtypes(Unsigned)
         # value is nonzero
-        S = Scalar(convert(value_type, abs(value)))
+        S = Scalar(convert(value_type, abs(int_value)))
         @test S isa Scalar{Float64}
 
         # value is zero
@@ -163,7 +178,7 @@ end
     for value_type in subtypes(Signed)
         for precision_type in subtypes(AbstractFloat)
             # value is nonzero
-            S = Scalar{precision_type}(convert(value_type, value))
+            S = Scalar{precision_type}(convert(value_type, int_value))
             @test S isa Scalar{precision_type}
 
             # value is zero
@@ -176,7 +191,7 @@ end
     for value_type in subtypes(Unsigned)
         for precision_type in subtypes(AbstractFloat)
             # value is nonzero
-            S = Scalar{precision_type}(convert(value_type, abs(value)))
+            S = Scalar{precision_type}(convert(value_type, abs(int_value)))
             @test S isa Scalar{precision_type}
 
             # value is zero
