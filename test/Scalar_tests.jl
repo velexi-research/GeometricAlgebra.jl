@@ -42,6 +42,10 @@ using GeometricAlgebra
         @test S.value == converted_value
         @test typeof(S.value) === precision_type
 
+        # abs(value) < default atol
+        S = Scalar{precision_type}(blade_atol(precision_type) / 2)
+        @test S === Zero{precision_type}()
+
         # abs(value) > atol
         S = Scalar{precision_type}(converted_value,
                                    atol=abs(converted_value)-1)
