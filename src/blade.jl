@@ -2,11 +2,11 @@
 The blade.jl submodule defines Blade types.
 
 ------------------------------------------------------------------------------
-COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
-the license terms in the LICENSE file found in the top-level directory of
-this distribution. No part of the XYZ package, including this file, may be
-copied, modified, propagated, or distributed except according to the terms
-contained in the LICENSE file.
+COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
+is subject to the license terms in the LICENSE file found in the top-level
+directory of this distribution. No part of the GeometricAlgebra.jl package,
+including this file, may be copied, modified, propagated, or distributed
+except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
 # --- Imports
@@ -20,7 +20,6 @@ import LinearAlgebra
 # Exports
 export AbstractBlade, AbstractScalar, Blade, Scalar
 export Zero, One
-
 
 # AbstractBlade
 """
@@ -71,14 +70,14 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     norm::T
 
     """
-        Blade{T}(vectors::Matrix{T};
-                 atol::Real=eps(T)) where {T<:AbstractFloat}
+        Blade{T}(vectors::Matrix{T}; atol::Real=blade_atol(T))
+            where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns
-    of a matrix. Blades with norm less than `atol` are returned as Zero.
+    of a matrix. Blades with norm less than `atol` are returned as Zero{T}().
     """
     function Blade{T}(vectors::Matrix{T};
-                      atol::Real=eps(T)) where {T<:AbstractFloat}
+                      atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
         dims = size(vectors)
         if dims[1] < dims[2]
@@ -87,7 +86,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
                 # vector and call constructor for single column vector.
                 return Blade{T}(reshape(vectors, dims[2]))
             else
-                return Zero
+                return Zero{T}()
             end
         else
             F = LinearAlgebra.qr(vectors)
@@ -95,7 +94,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             norm::T = abs(prod(LinearAlgebra.diag(F.R)))
 
             if norm < atol
-                return Zero
+                return Zero{T}()
             end
 
             new(dims[1], dims[2], basis, norm)
@@ -103,19 +102,19 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     end
 
     """
-        Blade{T}(vector::Vector{T};
-                 atol::Real=eps(T)) where {T<:AbstractFloat}
+        Blade{T}(vector::Vector{T}; atol::Real=blade_atol(T))
+            where {T<:AbstractFloat}
 
     Construct a Blade from a single vector. Vectors with norm less than `atol`
-    are returned as Zero.
+    are returned as Zero{T}().
     """
     function Blade{T}(vector::Vector{T};
-                      atol::Real=eps(T)) where {T<:AbstractFloat}
+                      atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
         norm::T = LinearAlgebra.norm(vector)
 
         if norm < atol
-            return Zero
+            return Zero{T}()
         end
 
         basis::Matrix{T} = reshape(vector, length(vector), 1) / norm
@@ -124,41 +123,41 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 end
 
 """
-TODO: Polish docstring
+    Blade(vectors::Array{T}; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
-    Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat}
+    Blade{T}(vectors::Array{S}; atol::Real=blade_atol(T))
+        where {T<:AbstractFloat, S<:AbstractFloat}
+
+    Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64))
+
+    Blade{T}(vectors::Array{<:Integer}; atol::Real=blade_atol(T))
+        where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
-of a matrix or (2) a single vector. Blades with norm less than `atol` are
-returned as Zero.
+of a matrix or (2) a single vector. Zero{T}() is returned when the norm of the
+blade is less than `atol`.
 
-The precision of the Blade is inferred precision from the precision of the
-elements of `vectors`.
+When the precision is not specified, the following rules are applied to set
+the precision of the Blade.
 
-    Blade(vectors::Array{<:Integer}; atol::Real=eps(Float64))
+* If `vectors` is an Array of floating-point values, the precision of the
+  constructed Blade is inferred from the precision of the elements of `vector`.
 
-    Blade{T}(vectors::Array{<:Integer};
-             atol::Real=eps(T)) where {T<:AbstractFloat}
-
-Construct a Blade from a collection of vectors with integer components
-represented as (1) the columns of a matrix or (2) a single vector. Blades with
-norm less than `atol` are returned as Zero.
-
-When the precision of the Blade is not explicitly specified, it defaults to
-Float64.
+* If `vectors` is an Array of integers, the precision of the constructed Blade
+  defaults to `Float64`.
 """
-Blade(vectors::Array{T}; atol::Real=eps(T)) where {T<:AbstractFloat} =
-    Blade{T}(vectors, atol=atol=atol)
+Blade(vectors::Array{T}; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
+    Blade{T}(vectors, atol=atol)
 
 Blade{T}(vectors::Array{S};
-         atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat} =
-    Blade{T}(convert(Array{T}, vectors), atol=atol)
+         atol::Real=blade_atol(T)) where {T<:AbstractFloat, S<:AbstractFloat} =
+    Blade(convert(Array{T}, vectors), atol=atol)
 
-Blade(vectors::Array{<:Integer}; atol::Real=eps(Float64)) =
+Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64)) =
     Blade(convert(Array{Float64}, vectors), atol=atol)
 
 Blade{T}(vectors::Array{<:Integer};
-         atol::Real=eps(T)) where {T<:AbstractFloat} =
+         atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Blade(convert(Array{T}, vectors), atol=atol)
 
 
@@ -169,23 +168,26 @@ Blade{T}(vectors::Array{<:Integer};
 Scalar (0-blade) represented with the floating-point precision of type `T`.
 """
 struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
+    # Fields
+    # ------
+    # * `value`: the value of the scalar
     value::T
 
     """
-        Scalar{T}(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
+        Scalar{T}(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Construct a Scalar with the specified value. Scalars with absolute value
-    less than `atol` are returned as Zero.
+    less than `atol` are returned as Zero{T}().
     """
-    Scalar{T}(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
+    Scalar{T}(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
         abs(value) < atol ? Zero{T}() : new(value)
 end
 
 """
-    Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
+    Scalar(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
-    Scalar{T}(value::S;
-              atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat}
+    Scalar{T}(value::S; atol::Real=blade_atol(T))
+        where {T<:AbstractFloat, S<:AbstractFloat}
 
     Scalar(value::Integer)
 
@@ -204,11 +206,12 @@ the precision of the Scalar.
 * If `value` is an integer, the precision of the constructed Scalar defaults
   to `Float64`.
 """
-Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat} =
+Scalar(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Scalar{T}(value, atol=atol)
 
 Scalar{T}(value::S;
-          atol::Real=eps(T)) where {T<:AbstractFloat, S<:AbstractFloat} =
+          atol::Real=blade_atol(T)) where {T<:AbstractFloat,
+                                           S<:AbstractFloat} =
     Scalar(convert(T, value), atol=atol)
 
 Scalar(value::Integer) = (abs(value) == 0) ?
@@ -336,3 +339,18 @@ inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 ≈(x::Real, B::Scalar{T};
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(B, x, rtol=rtol, atol=atol)
+
+
+# --- Helper functions
+
+# Exports
+export blade_atol
+
+# TODO: review numerical error in factorizations to see if a different
+#       tolerance would be better.
+"""
+    blade_atol(::Type{T}) where {T<:AbstractFloat}
+
+Return the minimum value of a nonzero blade's norm.
+"""
+blade_atol(::Type{T}) where {T<:AbstractFloat} = 100*eps(T)
