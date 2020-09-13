@@ -111,9 +111,9 @@ end
     #                                         S<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
-        for value_precision_type in subtypes(AbstractFloat)
+        for value_type in subtypes(AbstractFloat)
             # Preparations
-            converted_value = value_precision_type(value)
+            converted_value = value_type(value)
 
             # abs(value) > default atol
             S = Scalar{precision_type}(converted_value)
@@ -121,7 +121,7 @@ end
 
             # abs(value) < default atol
             S = Scalar{precision_type}(
-                value_precision_type(blade_atol(precision_type) / 2))
+                value_type(blade_atol(precision_type) / 2))
             @test S === Zero{precision_type}()
 
             # abs(value) > atol
