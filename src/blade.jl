@@ -342,8 +342,7 @@ norm(B::One) = 1
 # --- Comparison functions
 
 # .(==)
-==(B1::Scalar{<:AbstractFloat}, B2::Scalar{<:AbstractFloat}) =
-    B1.value == B2.value
+==(B1::Scalar, B2::Scalar) = B1.value == B2.value
 ==(B::Scalar, x) = (x == B.value)
 ==(x, B::Scalar) = (B == x)
 
@@ -351,8 +350,8 @@ norm(B::One) = 1
 ==(x::Real, B::Zero) = (B == 0)
 ==(B1::Zero, B2::Zero) = true
 
-==(B::One, x) = (x == 1)
-==(x, B::One) = (B == 1)
+==(B::One, x::Real) = (x == 1)
+==(x::Real, B::One) = (B == 1)
 ==(B1::One, B2::One) = true
 
 
