@@ -41,6 +41,7 @@ using GeometricAlgebra
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
         @test B.norm ≈ 5
+        @test B.sign == 1
 
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
@@ -73,6 +74,7 @@ using GeometricAlgebra
         @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
         @test LinearAlgebra.norm(B.basis) ≈ 1
         @test B.norm ≈ 13
+        @test B.sign == 1
 
         # vector is a row vector
         row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
@@ -82,6 +84,7 @@ using GeometricAlgebra
         @test B.basis ≈ permutedims(row_vector / 13)
         @test LinearAlgebra.norm(B.basis) ≈ 1
         @test B.norm ≈ 13
+        @test B.sign == 1
 
         # vector is a zero vector
         zero_vector = Array{precision_type}([0. 0. 0.])
@@ -103,46 +106,51 @@ using GeometricAlgebra
     end
 
     # --- Blade{T}(B::AbstractBlade{T};
-    #              norm=1, copy_basis=false) where {T<:AbstractFloat}
+    #              norm=B.norm, sign=B.sign, copy_basis=false)
+    #              where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
         B = Blade{precision_type}(vectors)
 
-        # Construct a unit Blade representing the same space as `B`
+        # Construct a Blade representing the same blade as `B`
         B_copy = Blade{precision_type}(B)
         @test B_copy.dim == B.dim
         @test B_copy.grade == B.grade
-        @test B_copy.basis ≈ B.basis
-        @test B_copy.norm ≈ 1
+        @test B_copy.basis === B.basis
+        @test B_copy.norm == B.norm
+        @test B_copy.sign == B.sign
 
-        # Verify that the basis of the new Blade is a reference to the basis
-        # of the original Blade
-        B.basis[1] += 1
-        @test B_copy.basis ≈ B.basis
-
-        # Construct a Blade with specified norm representing the same space
-        # as `B`
+        # Construct a Blade representing the same space as `B` with specified
+        # norm
         new_norm = 20
         B_copy = Blade{precision_type}(B, norm=new_norm)
         @test B_copy.dim == B.dim
         @test B_copy.grade == B.grade
-        @test B_copy.basis ≈ B.basis
-        @test B_copy.norm ≈ new_norm
+        @test B_copy.basis === B.basis
+        @test B_copy.norm == new_norm
+        @test B_copy.sign == B.sign
 
-        # Construct a unit Blade representing the same space as `B` containing
+        # Construct a Blade representing the same space as `B` with specified
+        # orientation relative to `B.basis`
+        new_sign = -1
+        B_copy = Blade{precision_type}(B, sign=new_sign)
+        @test B_copy.dim == B.dim
+        @test B_copy.grade == B.grade
+        @test B_copy.basis === B.basis
+        @test B_copy.norm == B.norm
+        @test B_copy.sign == new_sign
+
+        # Construct a Blade representing the blade as `B` containing
         # a copy of the basis (instead of a reference).
         B_copy = Blade{precision_type}(B, copy_basis=true)
         @test B_copy.dim == B.dim
         @test B_copy.grade == B.grade
-        @test B_copy.basis ≈ B.basis
-        @test B_copy.norm ≈ 1
-
-        # Verify that modifying the basis of the `B` does not modify the basis
-        # of the copy
-        B.basis[1] += 1
-        @test B_copy.basis ≉ B.basis
+        @test B_copy.basis == B.basis
+        @test B_copy.basis !== B.basis
+        @test B_copy.norm == B.norm
+        @test B_copy.sign == B.sign
     end
 end
 
@@ -284,48 +292,114 @@ end
     end
 
     # --- Blade(B::AbstractBlade{T};
-    #           norm=1, copy_basis=false) where {T<:AbstractFloat}
+    #           norm=B.norm, sign=B.sign, copy_basis=false)
+    #           where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         converted_vectors = Matrix{precision_type}(vectors)
         B = Blade(converted_vectors)
 
-        # Construct a unit Blade representing the same space as `B`
+        # Construct a Blade representing the blade as `B`
         B_copy = Blade(B)
         @test B_copy isa Blade{precision_type}
+        @test B_copy.basis === B.basis
 
-        # Verify that the basis of the new Blade is a reference to the basis
-        # of the original Blade
-        B.basis[1] += 1
-        @test B_copy.basis ≈ B.basis
-
-        # Construct a Blade with specified norm representing the same space
-        # as `B`
+        # Construct a Blade representing the blade as `B` with specified
+        # norm
         new_norm = 20
         B_copy = Blade(B, norm=new_norm)
         @test B_copy isa Blade{precision_type}
 
-        # Construct a unit Blade representing the same space as `B` containing
+        # Construct a Blade representing the blade as `B` with specified
+        # sign
+        new_sign = -1
+        B_copy = Blade(B, sign=new_sign)
+        @test B_copy isa Blade{precision_type}
+
+        # Construct Blade representing the blade as `B` containing
         # a copy of the basis (instead of a reference).
         B_copy = Blade(B, copy_basis=true)
         @test B_copy isa Blade{precision_type}
-
-        # Verify that the basis of the new Blade is a reference to the basis
-        # of the original Blade
-        B.basis[1] += 1
-        @test B_copy.basis ≉ B.basis
+        @test B_copy.basis == B.basis
+        @test B_copy.basis !== B.basis
     end
 end
 
 # --- Function tests
 
-@testset "Blade function tests" begin
-    # Construct Blade
+@testset "Blade: basic function tests" begin
+    # --- Preparations
+
     vectors = [3 3; 4 4; 0 1]
     expected_dim, expected_grade = size(vectors)
     B = Blade(vectors)
 
+    # --- Test functionality
+
     @test dim(B) == expected_dim
     @test grade(B) == expected_grade
+    @test norm(B) ≈ 5
+
+    F = LinearAlgebra.qr(vectors)
+    @test basis(B) ≈ Matrix(F.Q)
+end
+
+@testset "Blade: comparison operation tests" begin
+    # --- Preparations
+
+    vectors = [3 3; 4 4; 0 1]
+    B = Blade(vectors)
+
+    # --- Test functionality
+
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors))
+            @test B1 ≈ B2
+        end
+    end
+end
+
+@testset "Blade: -(B::AbstractBlade) tests" begin
+    # mod(grade, 4) == 0
+    vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    expected_result = Blade(B, sign=-1)
+    @test -B == expected_result
+end
+
+@testset "Blade: inverse() tests" begin
+    # mod(grade, 4) == 1
+    vectors = Vector{BigFloat}([3; 4; 0; 0; 0])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / BigFloat(25)
+    expected_inverse = Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+
+    # mod(grade, 4) == 2
+    vectors = Matrix{Float64}([3 3; 4 4; 0 1; 0 0; 0 0])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / Float64(25)
+    expected_inverse = -Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+
+    # mod(grade, 4) == 3
+    vectors = Matrix{Float32}([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / Float32(25)
+    expected_inverse = -Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
+
+    # mod(grade, 4) == 0
+    vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    expected_inverse_norm = 1 / Float16(25)
+    expected_inverse = Blade(
+        [expected_inverse_norm; expected_inverse_norm; 1; 1; 1] .* vectors)
+    @test inverse(B) ≈ expected_inverse
 end

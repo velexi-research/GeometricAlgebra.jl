@@ -11,7 +11,7 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Imports
 
-import Base.:(==), Base.:(≈)
+import Base.:(==), Base.:(≈), Base.:(-)
 import LinearAlgebra
 
 
@@ -55,19 +55,23 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #
     # * `grade`: the dimension of the space spanned by the blade
     #
-    # * `basis`: an orthonormal for the space spanned by the blade
+    # * `basis`: an orthonormal for the space spanned by the blade. Note that
+    #   the order of the columns in `basis` defines the orientation for the
+    #   unit blade represented by `basis`.
     #
-    # * `norm`: the norm of the blade. It is pre-computed and cached for
-    #   efficiency.
+    # * `norm`: the norm (hypervolume) of the blade. It is pre-computed and
+    #   cached for efficiency.
     #
-    # Notes
-    # -----
-    # * The orientation of the blade is implicit in the order of the columns
-    #   in the `basis` matrix.
+    # * `sign`: the orientation of the blade relative to the unit blade
+    #   represented by `basis`. It is equal to +1 when the blade has the
+    #   same orientation as `basis` and is equal to -1 when the blade has
+    #   the opposite orientation.
+    #
     dim::Int
     grade::Int
     basis::Matrix{T}
     norm::T
+    sign::Int16
 
     """
         Blade{T}(vectors::Matrix{T}; atol::Real=blade_atol(T))
@@ -97,7 +101,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
                 return Zero{T}()
             end
 
-            new(dims[1], dims[2], basis, norm)
+            new(dims[1], dims[2], basis, norm, 1)
         end
     end
 
@@ -118,22 +122,25 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         end
 
         basis::Matrix{T} = reshape(vector, length(vector), 1) / norm
-        new(length(vector), 1, basis, norm)
+        new(length(vector), 1, basis, norm, 1)
     end
 
     """
-        Blade{T}(B::AbstractBlade{T}; norm=1, copy_basis=false)
-            where {T<:AbstractFloat}
+        Blade{T}(B::AbstractBlade{T};
+                 norm=B.norm, sign=B.sign, copy_basis=false)
+                 where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
-    norm. When `copy_basis` is true, the `basis` of the new Blade is a copy of
-    the `basis` of the original Blade; otherwise, the `basis` of the new Blade
-    is reference to the `basis` of the original Blade.
+    norm and orientation relative to `B`. When `copy_basis` is true, the
+    `basis` of the new Blade is a copy of the `basis` of the original Blade;
+    otherwise, the `basis` of the new Blade is reference to the `basis` of
+    the original Blade.
     """
     Blade{T}(B::AbstractBlade{T};
-             norm=1, copy_basis=false) where {T<:AbstractFloat} =
-        copy_basis ? new(dim(B), grade(B), copy(basis(B)), norm) :
-                     new(dim(B), grade(B), basis(B), norm)
+             norm=B.norm, sign=B.sign,
+             copy_basis=false) where {T<:AbstractFloat} =
+        copy_basis ? new(dim(B), grade(B), copy(basis(B)), norm, sign) :
+                     new(dim(B), grade(B), basis(B), norm, sign)
 end
 
 """
@@ -175,16 +182,17 @@ Blade{T}(vectors::Array{<:Integer};
     Blade(convert(Array{T}, vectors), atol=atol)
 
 """
-    Blade(B::AbstractBlade{T}; norm=1, copy_basis=false)
+    Blade(B::AbstractBlade{T}; norm=B.norm, sign=B.sign, copy_basis=false)
         where {T<:AbstractFloat}
 
-Construct a Blade representing the same space as `B` having a specified norm.
-When `copy_basis` is false, the `basis` of the new Blade is a copy of the
-`basis` of the original Blade; otherwise, the `basis` of the new Blade is
-reference to the `basis` of the original Blade.
+Construct a Blade representing the same space as `B` having a specified norm
+and orientation relative to `B`. When `copy_basis` is true, the `basis` of the
+new Blade is a copy of the `basis` of the original Blade; otherwise, the
+`basis` of the new Blade is reference to the `basis` of the original Blade.
 """
-Blade(B::AbstractBlade{T}; norm=1, copy_basis=false) where {T<:AbstractFloat} =
-    Blade{T}(B, norm=norm, copy_basis=copy_basis)
+Blade(B::AbstractBlade{T};
+      norm=B.norm, sign=B.sign, copy_basis=false) where {T<:AbstractFloat} =
+    Blade{T}(B, norm=norm, sign=sign, copy_basis=copy_basis)
 
 
 # Scalar
@@ -299,37 +307,34 @@ One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 # --- Basic functions
 
 # Exports
-export dim, grade, norm, basis
+export dim, grade, basis, norm
 
 """
-    dim(B::AbstractBlade)
+    dim(B::AbstractBlade{<:AbstractFloat})
 
 Return dimension of space that Blade blade is embedded in
 """
 dim(B::Blade) = B.dim
 dim(B::AbstractScalar) = 0
 
-
 """
-    grade(B::AbstractBlade)
+    grade(B::AbstractBlade{<:AbstractFloat})
 
 Return the grade of the dimension of the space spanned by the blade.
 """
 grade(B::Blade) = B.grade
 grade(B::AbstractScalar) = 0
 
-
 """
-    basis(B::AbstractBlade)
+    basis(B::AbstractBlade{<:AbstractFloat})
 
 Return an orthonormal for the space spanned by the blade.
 """
 basis(B::Blade) = B.basis
 basis(B::AbstractScalar) = nothing
 
-
 """
-    norm(B::AbstractBlade)
+    norm(B::AbstractBlade{<:AbstractFloat})
 
 Return the norm of the blade.
 """
@@ -341,10 +346,19 @@ norm(B::One) = 1
 
 # --- Comparison functions
 
-# .(==)
+"""
+    ==(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})
+
+Return true if B1 and B2 are equal; otherwise, return false.
+"""
+==(B1::Blade, B2::Blade) =  # TODO: fix basis and orientation comparison
+    B1.dim == B2.dim && B1.grade == B2.grade &&
+    B1.norm == B2.norm &&
+    B1.basis == B2.basis && B1.sign == B2.sign
+
 ==(B1::Scalar, B2::Scalar) = B1.value == B2.value
-==(B::Scalar, x) = (x == B.value)
-==(x, B::Scalar) = (B == x)
+==(B::Scalar, x::Real) = (x == B.value)
+==(x::Real, B::Scalar) = (B == x)
 
 ==(B::Zero, x::Real) = (x == 0)
 ==(x::Real, B::Zero) = (B == 0)
@@ -354,8 +368,19 @@ norm(B::One) = 1
 ==(x::Real, B::One) = (B == 1)
 ==(B1::One, B2::One) = true
 
+"""
+    ≈(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})
 
-# .(≈)
+Return true if B1 and B2 are approximatly equal; otherwise, return false.
+"""
+≈(B1::Blade{T1}, B2::Blade{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    B1.sign == B2.sign &&
+    ≈(B1.norm, B2.norm, atol=atol, rtol=rtol) &&
+    true  # TODO: add check that basis represent the same space
+
 ≈(B1::Scalar{T1}, B2::Scalar{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
@@ -369,13 +394,6 @@ norm(B::One) = 1
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(B, x, rtol=rtol, atol=atol)
 
-≈(B1::Blade{T1}, B2::Blade{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    ≈(B1.norm, B2.norm, atol=atol, rtol=rtol) &&
-    true  # TODO: add check that basis represent the same space
-
 
 # --- Basic operations
 
@@ -383,12 +401,23 @@ norm(B::One) = 1
 export inverse
 
 """
-    inverse(B::AbstractBlade)
+    -(B::AbstractBlade)
 
-Return the inverse of the blade.
+Return the additive inverse of `B`.
 """
-inverse(B::Blade{<:AbstractFloat}) = Blade(B, norm=1 / norm(B))
-inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
+-(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-1)
+-(B::Scalar) = Scalar(-B.value)
+
+"""
+    inverse(B::AbstractBlade{<:AbstractFloat})
+
+Return the multiplicative inverse of `B`.
+"""
+inverse(B::Blade{<:AbstractFloat}) =
+    mod(grade(B), 4) < 2 ?
+    Blade(B, norm=1 / norm(B), sign=1) : Blade(B, norm=1 / norm(B), sign=-1)
+
+inverse(B::Scalar{<:AbstractFloat}) = Scalar(1 / B.value)
 inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
 inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
