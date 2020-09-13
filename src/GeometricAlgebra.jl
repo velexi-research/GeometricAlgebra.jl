@@ -13,8 +13,6 @@ module GeometricAlgebra
 
 # --- Imports
 
-import LinearAlgebra
-
 
 # --- Submodules
 
