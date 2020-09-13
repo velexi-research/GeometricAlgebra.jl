@@ -26,17 +26,24 @@ Return true if B1 and B2 are equal; otherwise, return false.
     B1.norm == B2.norm &&
     B1.basis == B2.basis && B1.sign == B2.sign
 
-==(B1::Scalar, B2::Scalar) = B1.value == B2.value
+==(B1::Scalar, B2::Scalar) = (B1.value == B2.value)
+
 ==(B::Scalar, x::Real) = (x == B.value)
 ==(x::Real, B::Scalar) = (B == x)
 
+==(B1::Scalar, B2::Zero) = (B1.value == 0)
+==(B1::Zero, B2::Scalar) = (B2 == B1)
+
+==(B1::Scalar, B2::One) = (B1.value == 1)
+==(B1::One, B2::Scalar) = (B2 == B1)
+
+==(B1::Zero, B2::Zero) = true
 ==(B::Zero, x::Real) = (x == 0)
 ==(x::Real, B::Zero) = (B == 0)
-==(B1::Zero, B2::Zero) = true
 
+==(B1::One, B2::One) = true
 ==(B::One, x::Real) = (x == 1)
 ==(x::Real, B::One) = (B == 1)
-==(B1::One, B2::One) = true
 
 """
     ≈(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})
