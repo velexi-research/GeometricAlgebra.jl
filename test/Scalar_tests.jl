@@ -40,7 +40,7 @@ using GeometricAlgebra
         # Default atol
         S = Scalar{precision_type}(converted_value)
         @test S.value == converted_value
-        @test typeof(S.value) === precision_type
+        @test S.value isa precision_type
 
         # abs(value) < default atol
         S = Scalar{precision_type}(blade_atol(precision_type) / 2)
@@ -50,12 +50,12 @@ using GeometricAlgebra
         S = Scalar{precision_type}(converted_value,
                                    atol=abs(converted_value)-1)
         @test S.value == converted_value
-        @test typeof(S.value) === precision_type
+        @test S.value isa precision_type
 
         # abs(value) == atol
         S = Scalar{precision_type}(converted_value, atol=abs(converted_value))
         @test S.value == converted_value
-        @test typeof(S.value) === precision_type
+        @test S.value isa precision_type
 
         # abs(value) < atol
         S = Scalar{precision_type}(converted_value,
@@ -72,7 +72,8 @@ end
     #
     # * Test behavior of `atol` argument.
 
-    # Preparations
+    # --- Preparations
+
     value = -3
 
     # --- Scalar(value::T; atol::Real=eps(T)) where {T<:AbstractFloat}
@@ -83,15 +84,15 @@ end
 
         # Default atol
         S = Scalar(converted_value)
-        @test typeof(S) === Scalar{precision_type}
+        @test S isa Scalar{precision_type}
 
         # abs(value) > atol
         S = Scalar(converted_value, atol=abs(value)-1)
-        @test typeof(S) === Scalar{precision_type}
+        @test S isa Scalar{precision_type}
 
         # abs(value) == atol
         S = Scalar(converted_value, atol=abs(value))
-        @test typeof(S) === Scalar{precision_type}
+        @test S isa Scalar{precision_type}
 
         # abs(value) < atol
         S = Scalar(converted_value, atol=abs(value)+1)
@@ -109,15 +110,15 @@ end
 
             # Default atol
             S = Scalar{precision_type}(converted_value)
-            @test typeof(S) === Scalar{precision_type}
+            @test S isa Scalar{precision_type}
 
             # abs(value) > atol
             S = Scalar{precision_type}(converted_value, atol=abs(value)-1)
-            @test typeof(S) === Scalar{precision_type}
+            @test S isa Scalar{precision_type}
 
             # abs(value) == atol
             S = Scalar{precision_type}(converted_value, atol=abs(value))
-            @test typeof(S) === Scalar{precision_type}
+            @test S isa Scalar{precision_type}
 
             # abs(value) < atol
             S = Scalar{precision_type}(converted_value, atol=abs(value)+1)
@@ -131,7 +132,7 @@ end
     for value_type in subtypes(Signed)
         # value is nonzero
         S = Scalar(convert(value_type, value))
-        @test typeof(S) === Scalar{Float64}
+        @test S isa Scalar{Float64}
 
         # value is zero
         S = Scalar(convert(value_type, 0))
@@ -142,7 +143,7 @@ end
     for value_type in subtypes(Unsigned)
         # value is nonzero
         S = Scalar(convert(value_type, abs(value)))
-        @test typeof(S) === Scalar{Float64}
+        @test S isa Scalar{Float64}
 
         # value is zero
         S = Scalar(convert(value_type, 0))
@@ -151,7 +152,7 @@ end
 
     # Bool
     S = Scalar(true)
-    @test typeof(S) === Scalar{Float64}
+    @test S isa Scalar{Float64}
 
     S = Scalar(false)
     @test S === Zero{Float64}()
@@ -163,7 +164,7 @@ end
         for precision_type in subtypes(AbstractFloat)
             # value is nonzero
             S = Scalar{precision_type}(convert(value_type, value))
-            @test typeof(S) === Scalar{precision_type}
+            @test S isa Scalar{precision_type}
 
             # value is zero
             S = Scalar{precision_type}(convert(value_type, 0))
@@ -176,7 +177,7 @@ end
         for precision_type in subtypes(AbstractFloat)
             # value is nonzero
             S = Scalar{precision_type}(convert(value_type, abs(value)))
-            @test typeof(S) === Scalar{precision_type}
+            @test S isa Scalar{precision_type}
 
             # value is zero
             S = Scalar{precision_type}(convert(value_type, 0))
@@ -188,7 +189,7 @@ end
     for precision_type in subtypes(AbstractFloat)
         # value is nonzero
         S = Scalar{precision_type}(true)
-        @test typeof(S) === Scalar{precision_type}
+        @test S isa Scalar{precision_type}
 
         # value is zero
         value = 0
