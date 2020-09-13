@@ -299,16 +299,15 @@ One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 # --- Basic functions
 
 # Exports
-export dim, grade, norm, basis, inverse
-
+export dim, grade, norm, basis
 
 """
     dim(B::AbstractBlade)
 
 Return dimension of space that Blade blade is embedded in
 """
-dim(B::Blade{T}) where {T<:AbstractFloat} = B.dim
-dim(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
+dim(B::Blade) = B.dim
+dim(B::AbstractScalar) = 0
 
 
 """
@@ -316,8 +315,8 @@ dim(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
 
 Return the grade of the dimension of the space spanned by the blade.
 """
-grade(B::Blade{T}) where {T<:AbstractFloat} = B.grade
-grade(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
+grade(B::Blade) = B.grade
+grade(B::AbstractScalar) = 0
 
 
 """
@@ -325,8 +324,8 @@ grade(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
 
 Return an orthonormal for the space spanned by the blade.
 """
-basis(B::Blade{T}) where {T<:AbstractFloat} = B.basis
-basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = nothing
+basis(B::Blade) = B.basis
+basis(B::AbstractScalar) = nothing
 
 
 """
@@ -334,46 +333,27 @@ basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = nothing
 
 Return the norm of the blade.
 """
-norm(B::Blade{T}) where {T<:AbstractFloat} = B.norm
-norm(B::Scalar{T}) where {T<:AbstractFloat} = abs(B.value)
-norm(B::Zero{T}) where {T<:AbstractFloat} = 0
-norm(B::One{T}) where {T<:AbstractFloat} = 1
-
-
-"""
-    inverse(B::AbstractBlade)
-
-Return the inverse of the blade.
-"""
-# inverse(B::Blade{T}) = Blade{T}
-inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
-inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
-inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
-
-
-# --- Basic operations
-
-# TODO
+norm(B::Blade) = B.norm
+norm(B::Scalar) = abs(B.value)
+norm(B::Zero) = 0
+norm(B::One) = 1
 
 
 # --- Comparison functions
 
 # .(==)
-==(B1::Scalar{T1}, B2::Scalar{T2}) where {T1<:AbstractFloat,
-                                          T2<:AbstractFloat} =
+==(B1::Scalar{<:AbstractFloat}, B2::Scalar{<:AbstractFloat}) =
     B1.value == B2.value
-==(B::Scalar{T}, x) where {T<:AbstractFloat} = (x == B.value)
-==(x, B::Scalar{T}) where {T<:AbstractFloat} = (B == x)
+==(B::Scalar, x) = (x == B.value)
+==(x, B::Scalar) = (B == x)
 
-==(B::Zero{T}, x::Real) where {T<:AbstractFloat} = (x == 0)
-==(x::Real, B::Zero{T}) where {T<:AbstractFloat} = (B == 0)
-==(B1::Zero{T1},
-   B2::Zero{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} = true
+==(B::Zero, x::Real) = (x == 0)
+==(x::Real, B::Zero) = (B == 0)
+==(B1::Zero, B2::Zero) = true
 
-==(B::One{T}, x) where {T<:AbstractFloat} = (x == 1)
-==(x, B::One{T}) where {T<:AbstractFloat} = (B == 1)
-==(B1::One{T1},
-   B2::One{T2}) where {T1<:AbstractFloat, T2<:AbstractFloat} = true
+==(B::One, x) = (x == 1)
+==(x, B::One) = (B == 1)
+==(B1::One, B2::One) = true
 
 
 # .(≈)
@@ -389,6 +369,29 @@ inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 ≈(x::Real, B::Scalar{T};
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(B, x, rtol=rtol, atol=atol)
+
+≈(B1::Blade{T1}, B2::Blade{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    ≈(B1.norm, B2.norm, atol=atol, rtol=rtol) &&
+    true  # TODO: add check that basis represent the same space
+
+
+# --- Basic operations
+
+# Exports
+export inverse
+
+"""
+    inverse(B::AbstractBlade)
+
+Return the inverse of the blade.
+"""
+inverse(B::Blade{<:AbstractFloat}) = Blade(B, norm=1 / norm(B))
+inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
+inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
+inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
 
 # --- Helper functions
