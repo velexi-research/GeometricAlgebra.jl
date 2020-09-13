@@ -136,9 +136,8 @@ end
         @test B === Zero{precision_type}()
     end
 
-    # --- Blade{T}(vectors::Array{S};
-    #              atol::Real=blade_atol(T)) where {T<:AbstractFloat,
-    #                                               S<:AbstractFloat}
+    # --- Blade{T}(vectors::Array{<:AbstractFloat};
+    #              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
@@ -160,7 +159,7 @@ end
         end
     end
 
-    # --- Blade(vectors::Array{Integer}; atol::Real=blade_atol(Float64))
+    # --- Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64))
 
     # subtypes(Signed)
     for value_type in subtypes(Signed)
@@ -199,7 +198,7 @@ end
     B = Blade(converted_vectors, atol=2)
     @test B === Zero{Float64}()
 
-    # --- Blade{T}(vectors::Array{Integer};
+    # --- Blade{T}(vectors::Array{<:Integer};
     #              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)

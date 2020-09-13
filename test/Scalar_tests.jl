@@ -106,9 +106,8 @@ end
         @test S === Zero{precision_type}()
     end
 
-    # --- Scalar{T}(value::S;
-    #               atol::Real=eps(T)) where {T<:AbstractFloat,
-    #                                         S<:AbstractFloat}
+    # --- Scalar{T}(value::AbstractFloat;
+    #               atol::Real=eps(T)) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)

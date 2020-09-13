@@ -38,12 +38,12 @@ using GeometricAlgebra
         @test Zero(precision_type) === Zero{precision_type}()
     end
 
-    # Zero(::Type{T}) where {T<:AbstractBlade}
+    # Zero(::Type{<:AbstractBlade})
     for blade_type in (Blade, Scalar, Zero, One)
         @test Zero(blade_type) === Zero{Float64}()
     end
 
-    # Zero(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    # Zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
     for blade_type in (Blade, Scalar, Zero, One)
         for precision_type in subtypes(AbstractFloat)
             @test Zero(blade_type{precision_type}) === Zero{precision_type}()

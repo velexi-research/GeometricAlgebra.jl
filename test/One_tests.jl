@@ -19,7 +19,7 @@ using Test
 using GeometricAlgebra
 
 
-# ---  Tests
+# --- Tests
 
 @testset "One type: constructor tests" begin
     # One()
@@ -29,7 +29,7 @@ using GeometricAlgebra
     for precision_type in subtypes(AbstractFloat)
         @test One(Blade{precision_type}([1 2 3])) === One{precision_type}()
         @test One(Scalar{precision_type}(1)) === One{precision_type}()
-        @test One(One{precision_type}()) === One{precision_type}()
+        @test One(Zero{precision_type}()) === One{precision_type}()
         @test One(One{precision_type}()) === One{precision_type}()
     end
 
@@ -38,12 +38,12 @@ using GeometricAlgebra
         @test One(precision_type) === One{precision_type}()
     end
 
-    # One(::Type{T}) where {T<:AbstractBlade}
+    # One(::Type{<:AbstractBlade})
     for blade_type in (Blade, Scalar, Zero, One)
         @test One(blade_type) === One{Float64}()
     end
 
-    # One(::Type{S}) where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    # One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
     for blade_type in (Blade, Scalar, Zero, One)
         for precision_type in subtypes(AbstractFloat)
             @test One(blade_type{precision_type}) === One{precision_type}()

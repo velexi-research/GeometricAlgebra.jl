@@ -125,8 +125,8 @@ end
 """
     Blade(vectors::Array{T}; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
-    Blade{T}(vectors::Array{S}; atol::Real=blade_atol(T))
-        where {T<:AbstractFloat, S<:AbstractFloat}
+    Blade{T}(vectors::Array{<:AbstractFloat}; atol::Real=blade_atol(T))
+        where {T<:AbstractFloat}
 
     Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64))
 
@@ -149,8 +149,8 @@ the precision of the Blade.
 Blade(vectors::Array{T}; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Blade{T}(vectors, atol=atol)
 
-Blade{T}(vectors::Array{S};
-         atol::Real=blade_atol(T)) where {T<:AbstractFloat, S<:AbstractFloat} =
+Blade{T}(vectors::Array{<:AbstractFloat};
+         atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Blade(convert(Array{T}, vectors), atol=atol)
 
 Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64)) =
@@ -186,8 +186,8 @@ end
 """
     Scalar(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
-    Scalar{T}(value::S; atol::Real=blade_atol(T))
-        where {T<:AbstractFloat, S<:AbstractFloat}
+    Scalar{T}(value::AbstractFloat;
+              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Scalar(value::Integer)
 
@@ -209,9 +209,8 @@ the precision of the Scalar.
 Scalar(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Scalar{T}(value, atol=atol)
 
-Scalar{T}(value::S;
-          atol::Real=blade_atol(T)) where {T<:AbstractFloat,
-                                           S<:AbstractFloat} =
+Scalar{T}(value::AbstractFloat;
+          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Scalar(convert(T, value), atol=atol)
 
 Scalar(value::Integer) = (abs(value) == 0) ?
@@ -233,8 +232,8 @@ struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
     Zero()
     Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
     Zero(::Type{T}) where {T<:AbstractFloat}
-    Zero(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}}
-    Zero(::Type{T}) where {T<:AbstractBlade}
+    Zero(::Type{<:AbstractBlade})
+    Zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
 
 Return the additive identity 0. When the precision is not specified, it
 defaults to `Float64`.
@@ -242,8 +241,8 @@ defaults to `Float64`.
 Zero() = Zero{Float64}()
 Zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Zero{T}()
 Zero(::Type{T}) where {T<:AbstractFloat} = Zero{T}()
-Zero(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}} = Zero{S}()
-Zero(::Type{T}) where {T<:AbstractBlade} = Zero{Float64}()
+Zero(::Type{<:AbstractBlade}) = Zero{Float64}()
+Zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = Zero{T}()
 
 
 # One
@@ -258,8 +257,8 @@ struct One{T<:AbstractFloat} <: AbstractScalar{T} end
     One()
     One(B::AbstractBlade{T}) where {T<:AbstractFloat}
     One(::Type{T}) where {T<:AbstractFloat}
-    One(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}}
-    One(::Type{T}) where {T<:AbstractBlade}
+    One(::Type{<:AbstractBlade})
+    One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
 
 Return the multiplicative identity 1. When the precision is not specified, it
 defaults to `Float64`.
@@ -267,8 +266,8 @@ defaults to `Float64`.
 One() = One{Float64}()
 One(B::AbstractBlade{T}) where {T<:AbstractFloat} = One{T}()
 One(::Type{T}) where {T<:AbstractFloat} = One{T}()
-One(::Type{T}) where {S<:AbstractFloat, T<:AbstractBlade{S}} = One{S}()
-One(::Type{T}) where {T<:AbstractBlade} = One{Float64}()
+One(::Type{<:AbstractBlade}) = One{Float64}()
+One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 
 
 # --- Functions
@@ -277,29 +276,49 @@ One(::Type{T}) where {T<:AbstractBlade} = One{Float64}()
 export dim, grade, norm, basis, inverse
 
 
-# dim()
+"""
+    dim(B::AbstractBlade)
+
+Return dimension of space that Blade blade is embedded in
+"""
 dim(B::Blade{T}) where {T<:AbstractFloat} = B.dim
 dim(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
 
 
-# grade()
+"""
+    grade(B::AbstractBlade)
+
+Return the grade of the dimension of the space spanned by the blade.
+"""
 grade(B::Blade{T}) where {T<:AbstractFloat} = B.grade
 grade(B::AbstractScalar{T}) where {T<:AbstractFloat} = 0
 
 
-# norm()
+"""
+    basis(B::AbstractBlade)
+
+Return an orthonormal for the space spanned by the blade.
+"""
+basis(B::Blade{T}) where {T<:AbstractFloat} = B.basis
+basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = nothing
+
+
+"""
+    norm(B::AbstractBlade)
+
+Return the norm of the blade.
+"""
 norm(B::Blade{T}) where {T<:AbstractFloat} = B.norm
 norm(B::Scalar{T}) where {T<:AbstractFloat} = abs(B.value)
 norm(B::Zero{T}) where {T<:AbstractFloat} = 0
 norm(B::One{T}) where {T<:AbstractFloat} = 1
 
 
-# basis()
-basis(B::Blade{T}) where {T<:AbstractFloat} = B.basis
-basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = nothing
+"""
+    inverse(B::AbstractBlade)
 
-
-# inverse()
+Return the inverse of the blade.
+"""
 #inverse(B::Blade{T}) = Blade{T}
 inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
 inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
