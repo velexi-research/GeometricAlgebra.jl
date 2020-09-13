@@ -120,6 +120,20 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         basis::Matrix{T} = reshape(vector, length(vector), 1) / norm
         new(length(vector), 1, basis, norm)
     end
+
+    """
+        Blade{T}(B::AbstractBlade{T}; norm=1, copy_basis=false)
+            where {T<:AbstractFloat}
+
+    Construct a Blade representing the same space as `B` having a specified
+    norm. When `copy_basis` is true, the `basis` of the new Blade is a copy of
+    the `basis` of the original Blade; otherwise, the `basis` of the new Blade
+    is reference to the `basis` of the original Blade.
+    """
+    Blade{T}(B::AbstractBlade{T};
+             norm=1, copy_basis=false) where {T<:AbstractFloat} =
+        copy_basis ? new(dim(B), grade(B), copy(basis(B)), norm) :
+                     new(dim(B), grade(B), basis(B), norm)
 end
 
 """
@@ -159,6 +173,18 @@ Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64)) =
 Blade{T}(vectors::Array{<:Integer};
          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Blade(convert(Array{T}, vectors), atol=atol)
+
+"""
+    Blade(B::AbstractBlade{T}; norm=1, copy_basis=false)
+        where {T<:AbstractFloat}
+
+Construct a Blade representing the same space as `B` having a specified norm.
+When `copy_basis` is false, the `basis` of the new Blade is a copy of the
+`basis` of the original Blade; otherwise, the `basis` of the new Blade is
+reference to the `basis` of the original Blade.
+"""
+Blade(B::AbstractBlade{T}; norm=1, copy_basis=false) where {T<:AbstractFloat} =
+    Blade{T}(B, norm=norm, copy_basis=copy_basis)
 
 
 # Scalar
@@ -270,7 +296,7 @@ One(::Type{<:AbstractBlade}) = One{Float64}()
 One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 
 
-# --- Functions
+# --- Basic functions
 
 # Exports
 export dim, grade, norm, basis, inverse
@@ -319,13 +345,18 @@ norm(B::One{T}) where {T<:AbstractFloat} = 1
 
 Return the inverse of the blade.
 """
-#inverse(B::Blade{T}) = Blade{T}
+# inverse(B::Blade{T}) = Blade{T}
 inverse(B::Scalar{T}) where {T<:AbstractFloat} = Scalar{T}(1 / B.value)
 inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
 inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
 
-# ------ Comparison functions
+# --- Basic operations
+
+# TODO
+
+
+# --- Comparison functions
 
 # .(==)
 ==(B1::Scalar{T1}, B2::Scalar{T2}) where {T1<:AbstractFloat,

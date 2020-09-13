@@ -101,6 +101,49 @@ using GeometricAlgebra
                                   atol=LinearAlgebra.norm(col_vector) + 1)
         @test B === Zero{precision_type}()
     end
+
+    # --- Blade{T}(B::AbstractBlade{T};
+    #              norm=1, copy_basis=false) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
+        B = Blade{precision_type}(vectors)
+
+        # Construct a unit Blade representing the same space as `B`
+        B_copy = Blade{precision_type}(B)
+        @test B_copy.dim == B.dim
+        @test B_copy.grade == B.grade
+        @test B_copy.basis ≈ B.basis
+        @test B_copy.norm ≈ 1
+
+        # Verify that the basis of the new Blade is a reference to the basis
+        # of the original Blade
+        B.basis[1] += 1
+        @test B_copy.basis ≈ B.basis
+
+        # Construct a Blade with specified norm representing the same space
+        # as `B`
+        new_norm = 20
+        B_copy = Blade{precision_type}(B, norm=new_norm)
+        @test B_copy.dim == B.dim
+        @test B_copy.grade == B.grade
+        @test B_copy.basis ≈ B.basis
+        @test B_copy.norm ≈ new_norm
+
+        # Construct a unit Blade representing the same space as `B` containing
+        # a copy of the basis (instead of a reference).
+        B_copy = Blade{precision_type}(B, copy_basis=true)
+        @test B_copy.dim == B.dim
+        @test B_copy.grade == B.grade
+        @test B_copy.basis ≈ B.basis
+        @test B_copy.norm ≈ 1
+
+        # Verify that modifying the basis of the `B` does not modify the basis
+        # of the copy
+        B.basis[1] += 1
+        @test B_copy.basis ≉ B.basis
+    end
 end
 
 @testset "Blade: outer constructor tests" begin
@@ -109,7 +152,7 @@ end
     # * Test type of constructed instances. Correct construction of instances
     #   is tested by the inner constructor tests.
     #
-    # * Test behavior of `atol` argument.
+    # * Test behavior of keyword arguments: `atol`, `norm`, `copy_basis`.
 
     # --- Preparations
 
@@ -238,6 +281,40 @@ end
         # Bool: norm(blade) < atol
         B = Blade{precision_type}(converted_vectors, atol=2)
         @test B === Zero{precision_type}()
+    end
+
+    # --- Blade(B::AbstractBlade{T};
+    #           norm=1, copy_basis=false) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_vectors = Matrix{precision_type}(vectors)
+        B = Blade(converted_vectors)
+
+        # Construct a unit Blade representing the same space as `B`
+        B_copy = Blade(B)
+        @test B_copy isa Blade{precision_type}
+
+        # Verify that the basis of the new Blade is a reference to the basis
+        # of the original Blade
+        B.basis[1] += 1
+        @test B_copy.basis ≈ B.basis
+
+        # Construct a Blade with specified norm representing the same space
+        # as `B`
+        new_norm = 20
+        B_copy = Blade(B, norm=new_norm)
+        @test B_copy isa Blade{precision_type}
+
+        # Construct a unit Blade representing the same space as `B` containing
+        # a copy of the basis (instead of a reference).
+        B_copy = Blade(B, copy_basis=true)
+        @test B_copy isa Blade{precision_type}
+
+        # Verify that the basis of the new Blade is a reference to the basis
+        # of the original Blade
+        B.basis[1] += 1
+        @test B_copy.basis ≉ B.basis
     end
 end
 
