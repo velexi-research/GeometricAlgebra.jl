@@ -11,18 +11,11 @@ except according to the terms contained in the LICENSE file.
 """
 module GeometricAlgebra
 
-# --- Imports
-
 
 # --- Submodules
 
 include("blade.jl")
 include("operators.jl")
-
-
-# --- Functions
-
-# Exports
 
 
 end  # End of GeometricAlgebra.jl module
