@@ -268,6 +268,16 @@ end
         @test One(precision_type) != false
         @test false != One(precision_type)
     end
+
+    # x::Zero, y::One
+    # x::One, y::Zero
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            # !=(x, y)
+            @test One(precision_type1) != Zero(precision_type2)
+            @test Zero(precision_type1) != One(precision_type2)
+        end
+    end
 end
 
 # --- ≈(x, y)

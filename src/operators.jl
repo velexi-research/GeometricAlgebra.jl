@@ -31,9 +31,6 @@ Return true if B1 and B2 are equal; otherwise, return false.
 ==(B::Scalar, x::Real) = (x == B.value)
 ==(x::Real, B::Scalar) = (B == x)
 
-==(B1::Scalar, B2::Zero) = (B1.value == 0)
-==(B1::Zero, B2::Scalar) = (B2 == B1)
-
 ==(B1::Scalar, B2::One) = (B1.value == 1)
 ==(B1::One, B2::Scalar) = (B2 == B1)
 
