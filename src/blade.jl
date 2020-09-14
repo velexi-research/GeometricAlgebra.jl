@@ -70,7 +70,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     grade::Int
     basis::Matrix{T}
     norm::T
-    sign::Int16
+    sign::Int8
 
     """
         Blade{T}(vectors::Matrix{T}; atol::Real=blade_atol(T))
@@ -94,13 +94,14 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         else
             F = LinearAlgebra.qr(vectors)
             basis::Matrix{T} = F.Q
-            norm::T = abs(prod(LinearAlgebra.diag(F.R)))
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            norm::T = abs(signed_norm)
 
             if norm < atol
                 return Zero{T}()
             end
 
-            new(dims[1], dims[2], basis, norm, 1)
+            new(dims[1], dims[2], basis, norm, sign(signed_norm))
         end
     end
 

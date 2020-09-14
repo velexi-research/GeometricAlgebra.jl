@@ -69,7 +69,7 @@ Return true if B1 and B2 are approximatly equal; otherwise, return false.
     ≈(B, x, rtol=rtol, atol=atol)
 
 
-# --- Operations
+# --- Unary operations
 
 # Exports
 export negation, reciprocal
@@ -91,8 +91,51 @@ Return the multiplicative inverse of `B`.
 """
 reciprocal(B::Blade{<:AbstractFloat}) =
     mod(grade(B), 4) < 2 ?
-    Blade(B, norm=1 / norm(B), sign=1) : Blade(B, norm=1 / norm(B), sign=-1)
+    Blade(B, norm=1 / norm(B), sign=B.sign) :
+    Blade(B, norm=1 / norm(B), sign=-B.sign)
 
 reciprocal(B::Scalar{<:AbstractFloat}) = Scalar(1 / B.value)
 reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
 reciprocal(B::One{T}) where {T<:AbstractFloat} = One{T}()
+
+
+# --- Binary operations
+
+# Exports
+export ∧, outer
+
+"""
+    ∧(B::Blade, C::Blade)
+    ∧(B::Blade, C::Vector)
+    ∧(B::Vector, C::Blade)
+    ∧(v::Vector, w::Vector)
+
+Return the outer product of a combination of vectors and blades.
+"""
+function ∧(B::Blade{T}, C::Blade{T}) where {T<:AbstractFloat}
+    outer_product = Blade{T}(hcat(basis(B), basis(C)))
+    if outer_product == 0
+        return Zero(T)
+    else
+        return Blade{T}(outer_product,
+                        norm=B.norm * C.norm,
+                        sign=outer_product.sign * B.sign * C.sign)
+    end
+end
+
+∧(B::Blade{T}, C::Vector{T}) where {T<:AbstractFloat} = B ∧ Blade(C)
+∧(B::Vector{T}, C::Blade{T}) where {T<:AbstractFloat} = Blade(B) ∧ C
+∧(v::Vector{<:AbstractFloat}, w::Vector{<:AbstractFloat}) = Blade(v) ∧ Blade(w)
+const outer = ∧
+
+"""
+    ⋅(B::Blade, C::Blade)
+    ⋅(B::Vector, C::Blade)
+    ⋅(B::Blade, C::Vector)
+    ⋅(v::Vector, w::Vector)
+
+Return the inner product of a combination of vectors and blades.
+"""
+# TODO
+#⋅(v::Vector{<:AbstractFloat}, w::Vector{<:AbstractFloat}) = 3
+#⋅(v::Blade{<:AbstractFloat}, w::Blade{<:AbstractFloat}) = 4
