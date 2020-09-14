@@ -245,9 +245,12 @@ end
     B = Blade(vectors)
 
     # x::Blade
-    expected_result = Blade(B, sign=-1)
-    @test -B == expected_result
-    @test negation(B) == expected_result
+    negative_B = Blade(B, sign=-1)
+    @test -B == negative_B
+    @test negation(B) == negative_B
+
+    @test -negative_B == B
+    @test negation(negative_B) == B
 end
 
 @testset "-(x) tests: Scalar" begin

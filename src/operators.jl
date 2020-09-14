@@ -82,7 +82,7 @@ export negation, reciprocal
 
 Return the additive inverse of `B`.
 """
-negation(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-1)
+negation(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-B.sign)
 negation(B::Scalar) = Scalar(-B.value)
 
 -(B::AbstractBlade{<:AbstractFloat}) = negation(B)
