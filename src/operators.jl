@@ -91,8 +91,8 @@ Return the multiplicative inverse of `B`.
 """
 reciprocal(B::Blade{<:AbstractFloat}) =
     mod(grade(B), 4) < 2 ?
-    Blade(B, norm=1 / norm(B), sign=B.sign) :
-    Blade(B, norm=1 / norm(B), sign=-B.sign)
+        Blade(B, norm=1 / norm(B), sign=B.sign) :
+        Blade(B, norm=1 / norm(B), sign=-B.sign)
 
 reciprocal(B::Scalar{<:AbstractFloat}) = Scalar(1 / B.value)
 reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
