@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "One type: constructor tests" begin
+@testset "One: constructor tests" begin
     # One()
     @test One() === One{Float64}()
 
@@ -51,7 +51,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "One type: function tests" begin
+@testset "One: basic function tests" begin
     # dim()
     for precision_type in subtypes(AbstractFloat)
         @test dim(One(precision_type)) == 0

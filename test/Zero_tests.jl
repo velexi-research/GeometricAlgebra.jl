@@ -21,12 +21,13 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "Zero type: constructor tests" begin
+@testset "Zero: constructor tests" begin
     # Zero()
     @test Zero() === Zero{Float64}()
 
     # Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
+        B = Zero(Blade{precision_type}([1 2 3])) === Zero{precision_type}()
         @test Zero(Blade{precision_type}([1 2 3])) === Zero{precision_type}()
         @test Zero(Scalar{precision_type}(1)) === Zero{precision_type}()
         @test Zero(Zero{precision_type}()) === Zero{precision_type}()
@@ -51,7 +52,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Zero type: function tests" begin
+@testset "Zero: basic function tests" begin
     # dim()
     for precision_type in subtypes(AbstractFloat)
         @test dim(Zero(precision_type)) == 0
