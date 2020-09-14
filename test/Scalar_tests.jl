@@ -229,7 +229,7 @@ end
         converted_test_value = precision_type(test_value)
 
         # value > 0
-        positive_test_value = abs(converted_test_value) > 0 ?
+        positive_test_value = converted_test_value > 0 ?
             converted_test_value : -converted_test_value
         S = Scalar(positive_test_value)
         @test dim(S) == 0
@@ -240,7 +240,7 @@ end
         @test value(S) == positive_test_value
 
         # value < 0
-        negative_test_value = abs(converted_test_value) > 0 ?
+        negative_test_value = converted_test_value > 0 ?
             -converted_test_value : converted_test_value
         S = Scalar(negative_test_value)
         @test dim(S) == 0
