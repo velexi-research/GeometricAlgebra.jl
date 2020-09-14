@@ -75,25 +75,27 @@ Return true if B1 and B2 are approximatly equal; otherwise, return false.
 # --- Operations
 
 # Exports
-export inverse
+export negation, reciprocal
 
 """
-    -(B::AbstractBlade)
+    -(B::AbstractBlade), negation(B::AbstractBlade)
 
 Return the additive inverse of `B`.
 """
--(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-1)
--(B::Scalar) = Scalar(-B.value)
+negation(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-1)
+negation(B::Scalar) = Scalar(-B.value)
+
+-(B::AbstractBlade{<:AbstractFloat}) = negation(B)
 
 """
-    inverse(B::AbstractBlade{<:AbstractFloat})
+    reciprocal(B::AbstractBlade{<:AbstractFloat})
 
 Return the multiplicative inverse of `B`.
 """
-inverse(B::Blade{<:AbstractFloat}) =
+reciprocal(B::Blade{<:AbstractFloat}) =
     mod(grade(B), 4) < 2 ?
     Blade(B, norm=1 / norm(B), sign=1) : Blade(B, norm=1 / norm(B), sign=-1)
 
-inverse(B::Scalar{<:AbstractFloat}) = Scalar(1 / B.value)
-inverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
-inverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
+reciprocal(B::Scalar{<:AbstractFloat}) = Scalar(1 / B.value)
+reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
+reciprocal(B::One{T}) where {T<:AbstractFloat} = One{T}()
