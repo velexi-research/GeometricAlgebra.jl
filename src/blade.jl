@@ -11,7 +11,6 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Imports
 
-import Base.:(==), Base.:(≈), Base.:(-)
 import LinearAlgebra
 
 
