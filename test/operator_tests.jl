@@ -23,18 +23,20 @@ using GeometricAlgebra
 # --- ==(x, y)
 
 @testset "==(x, y): Blade" begin
-    # --- Preparations
-
+    # Preparations
     vectors = [3 3; 4 4; 0 1]
     B = Blade(vectors)
 
-    # --- Test functionality
-
+    # x::Blade, y::Blade
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             B1 = Blade(convert(Array{precision_type1}, vectors))
             B2 = Blade(convert(Array{precision_type2}, vectors))
-            @test B1 ≈ B2
+            if precision_type1 == precision_type2
+                @test B1 == B2
+            else
+                @test B1 != B2
+            end
         end
     end
 end
@@ -46,7 +48,7 @@ end
 
     float64_or_bigfloat = (Float64, BigFloat)
 
-    # S1::Scalar, S2::Scalar
+    # x::Scalar, y::Scalar
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(value)
         S = Scalar(converted_value)
@@ -68,11 +70,11 @@ end
         end
     end
 
-    # S1::Scalar, S2::Real
-    # S1::Real, S2::Scalar
+    # x::Scalar, y::Real
+    # x::Real, y::Scalar
     for precision_type in subtypes(AbstractFloat)
-        # S1::Scalar, S2::AbstractFloat
-        # S1::AbstractFloat, S2::Scalar
+        # x::Scalar, y::AbstractFloat
+        # x::AbstractFloat, y::Scalar
         for value_type in subtypes(AbstractFloat)
             if precision_type == value_type
                 @test Scalar(precision_type(value)) == value_type(value)
@@ -87,8 +89,8 @@ end
             end
         end
 
-        # S1::Scalar, S2::Integer
-        # S1::Integer, S2::Scalar
+        # x::Scalar, y::Integer
+        # x::Integer, y::Scalar
         int_value::Int = 3
         for value_type in subtypes(Signed)
             @test Scalar(precision_type(int_value)) == value_type(int_value)
@@ -100,14 +102,15 @@ end
             @test value_type(int_value) == Scalar(precision_type(int_value))
         end
 
+        # Bool
         @test Scalar(precision_type(true)) == true
         @test true == Scalar(precision_type(true))
         @test Scalar(precision_type(false)) == false
         @test false == Scalar(precision_type(false))
     end
 
-    # S1::Scalar, S2::Zero
-    # S1::Zero, S2::Scalar
+    # x::Scalar, y::Zero
+    # x::Zero, y::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             @test Scalar(precision_type1(0)) == Zero(precision_type2)
@@ -115,8 +118,8 @@ end
         end
     end
 
-    # S1::Scalar, S2::One
-    # S1::One, S2::Scalar
+    # x::Scalar, y::One
+    # x::One, y::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             @test Scalar(precision_type1(1)) == One(precision_type2)
@@ -124,54 +127,113 @@ end
         end
     end
 
-    # S1::Zero, S2::Zero
+    # x::Zero, y::Zero
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             @test Zero(precision_type1) == Zero(precision_type2)
         end
     end
 
-    # S1::Zero, S2::Real
-    # S1::Real, S2::Zero
+    # x::Zero, y::Real
+    # x::Real, y::Zero
     for precision_type in subtypes(AbstractFloat)
-        @test Zero(precision_type) == 0
-        @test 0 == Zero(precision_type)
+        # x::Zero, y::AbstractFloat
+        # x::AbstractFloat, y::Zero
+        for value_type in subtypes(AbstractFloat)
+            @test Zero(precision_type) == value_type(0)
+            @test value_type(0) == Zero(precision_type)
+        end
+
+        # x::Zero, y::Integer
+        # x::Integer, y::Zero
+        for value_type in subtypes(Signed)
+            @test Zero(precision_type) == value_type(0)
+            @test value_type(0) == Zero(precision_type)
+        end
+
+        for value_type in subtypes(Unsigned)
+            @test Zero(precision_type) == value_type(0)
+            @test value_type(0) == Zero(precision_type)
+        end
+
+        # Bool
+        @test Zero(precision_type) == false
+        @test false == Zero(precision_type)
     end
 
-    # S1::One, S2::One
+    # x::One, y::One
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             @test One(precision_type1) == One(precision_type2)
         end
     end
 
-    # S1::One, S2::Real
-    # S1::Real, S2::One
+    # x::One, y::Real
+    # x::Real, y::One
     for precision_type in subtypes(AbstractFloat)
-        @test One(precision_type) == 1
-        @test 1 == One(precision_type)
+        # x::One, y::AbstractFloat
+        # x::AbstractFloat, y::One
+        for value_type in subtypes(AbstractFloat)
+            @test One(precision_type) == value_type(1)
+            @test value_type(1) == One(precision_type)
+        end
+
+        # x::One, y::Integer
+        # x::Integer, y::One
+        for value_type in subtypes(Signed)
+            @test One(precision_type) == value_type(1)
+            @test value_type(1) == One(precision_type)
+        end
+
+        for value_type in subtypes(Unsigned)
+            @test One(precision_type) == value_type(1)
+            @test value_type(1) == One(precision_type)
+        end
+
+        # Bool
+        @test One(precision_type) == true
+        @test true == One(precision_type)
     end
 end
 
 # --- ≈(x, y)
 
-@testset "≈(x, y) Scalar" begin
+@testset "≈(x, y): Blade" begin
+    # Preparations
+    vectors = [3 3; 4 4; 0 1]
+    B = Blade(vectors)
+
+    # x::Blade, y::Blade
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors))
+            @test B1 ≈ B2
+        end
+    end
+end
+
+@testset "≈(x, y): Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
 
-    for precision_type in subtypes(AbstractFloat)
-        converted_value = precision_type(value)
-        S = Scalar(converted_value)
-        @test S ≈ converted_value
-        @test converted_value ≈ S
-    end
+    # x::Scalar, y::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             S1 = Scalar(precision_type1(value))
             S2 = Scalar(precision_type2(value))
             @test S1 ≈ S2
         end
+    end
+
+    # x::Scalar, y::Real
+    # x::Real, y::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(value)
+        S = Scalar(converted_value)
+        @test S ≈ converted_value
+        @test converted_value ≈ S
     end
 end
 
