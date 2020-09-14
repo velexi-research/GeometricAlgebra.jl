@@ -39,11 +39,11 @@ Return true if B1 and B2 are equal; otherwise, return false.
 
 ==(B1::Zero, B2::Zero) = true
 ==(B::Zero, x::Real) = (x == 0)
-==(x::Real, B::Zero) = (B == 0)
+==(x::Real, B::Zero) = (B == x)
 
 ==(B1::One, B2::One) = true
 ==(B::One, x::Real) = (x == 1)
-==(x::Real, B::One) = (B == 1)
+==(x::Real, B::One) = (B == x)
 
 """
     ≈(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})

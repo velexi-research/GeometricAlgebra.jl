@@ -41,7 +41,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "==(x, y): Scalar" begin
+@testset "==(x, y), !=(x, y): Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -52,11 +52,18 @@ end
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(value)
         B = Scalar(converted_value)
+
+        # ==(x, y)
         @test B == converted_value
         @test converted_value == B
+
+        # !=(x,y)
+        @test B != 2 * converted_value
+        @test 2 * converted_value != B
     end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
+            # ==(x, y)
             B1 = Scalar(precision_type1(value))
             B2 = Scalar(precision_type2(value))
             if precision_type1 == precision_type2
@@ -67,6 +74,11 @@ end
             else
                 @test B1 != B2
             end
+
+            # !=(x,y)
+            B1 = Scalar(precision_type1(value))
+            B2 = Scalar(precision_type2(2 * value))
+            @test B1 != B2
         end
     end
 
@@ -76,6 +88,7 @@ end
         # x::Scalar, y::AbstractFloat
         # x::AbstractFloat, y::Scalar
         for value_type in subtypes(AbstractFloat)
+            # ==(x, y)
             if precision_type == value_type
                 @test Scalar(precision_type(value)) == value_type(value)
                 @test value_type(value) == Scalar(precision_type(value))
@@ -87,34 +100,54 @@ end
                 @test Scalar(precision_type(value)) != value_type(value)
                 @test value_type(value) != Scalar(precision_type(value))
             end
+
+            # !=(x,y)
+            @test Scalar(precision_type(value)) != value_type(2 * value)
+            @test value_type(2 * value) != Scalar(precision_type(value))
         end
 
         # x::Scalar, y::Integer
         # x::Integer, y::Scalar
         int_value::Int = 3
         for value_type in subtypes(Signed)
+            # ==(x, y)
             @test Scalar(precision_type(int_value)) == value_type(int_value)
             @test value_type(int_value) == Scalar(precision_type(int_value))
+
+            # !=(x,y)
+            @test Scalar(precision_type(int_value)) != value_type(2 * int_value)
+            @test value_type(2 * int_value) != Scalar(precision_type(int_value))
         end
 
         for value_type in subtypes(Unsigned)
+            # ==(x, y)
             @test Scalar(precision_type(int_value)) == value_type(int_value)
             @test value_type(int_value) == Scalar(precision_type(int_value))
+
+            # !=(x,y)
+            @test Scalar(precision_type(int_value)) != value_type(2 * int_value)
+            @test value_type(2 * int_value) != Scalar(precision_type(int_value))
         end
 
         # Bool
         @test Scalar(precision_type(true)) == true
         @test true == Scalar(precision_type(true))
+        @test Scalar(precision_type(true)) != false
+        @test false != Scalar(precision_type(true))
+
         @test Scalar(precision_type(false)) == false
         @test false == Scalar(precision_type(false))
+        @test Scalar(precision_type(false)) != true
+        @test true != Scalar(precision_type(false))
     end
 
     # x::Scalar, y::Zero
     # x::Zero, y::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            @test Scalar(precision_type1(0)) == Zero(precision_type2)
-            @test Zero(precision_type2) == Scalar(precision_type1(0))
+            # !=(x,y)
+            @test Scalar(precision_type1(1)) != Zero(precision_type2)
+            @test Zero(precision_type2) != Scalar(precision_type1(1))
         end
     end
 
@@ -122,14 +155,20 @@ end
     # x::One, y::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
+            # ==(x, y)
             @test Scalar(precision_type1(1)) == One(precision_type2)
             @test One(precision_type2) == Scalar(precision_type1(1))
+
+            # ==(x, y)
+            @test Scalar(precision_type1(5)) != One(precision_type2)
+            @test One(precision_type2) != Scalar(precision_type1(5))
         end
     end
 
     # x::Zero, y::Zero
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
+            # ==(x, y)
             @test Zero(precision_type1) == Zero(precision_type2)
         end
     end
@@ -140,30 +179,48 @@ end
         # x::Zero, y::AbstractFloat
         # x::AbstractFloat, y::Zero
         for value_type in subtypes(AbstractFloat)
+            # ==(x, y)
             @test Zero(precision_type) == value_type(0)
             @test value_type(0) == Zero(precision_type)
+
+            # !=(x, y)
+            @test Zero(precision_type) != value_type(5)
+            @test value_type(5) != Zero(precision_type)
         end
 
         # x::Zero, y::Integer
         # x::Integer, y::Zero
         for value_type in subtypes(Signed)
+            # ==(x, y)
             @test Zero(precision_type) == value_type(0)
             @test value_type(0) == Zero(precision_type)
+
+            # !=(x, y)
+            @test Zero(precision_type) != value_type(5)
+            @test value_type(5) != Zero(precision_type)
         end
 
         for value_type in subtypes(Unsigned)
+            # ==(x, y)
             @test Zero(precision_type) == value_type(0)
             @test value_type(0) == Zero(precision_type)
+
+            # !=(x, y)
+            @test Zero(precision_type) != value_type(5)
+            @test value_type(5) != Zero(precision_type)
         end
 
         # Bool
         @test Zero(precision_type) == false
         @test false == Zero(precision_type)
+        @test Zero(precision_type) != true
+        @test true != Zero(precision_type)
     end
 
     # x::One, y::One
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
+            # ==(x, y)
             @test One(precision_type1) == One(precision_type2)
         end
     end
@@ -174,25 +231,42 @@ end
         # x::One, y::AbstractFloat
         # x::AbstractFloat, y::One
         for value_type in subtypes(AbstractFloat)
+            # ==(x, y)
             @test One(precision_type) == value_type(1)
             @test value_type(1) == One(precision_type)
+
+            # !=(x, y)
+            @test One(precision_type) != value_type(3)
+            @test value_type(3) != One(precision_type)
         end
 
         # x::One, y::Integer
         # x::Integer, y::One
         for value_type in subtypes(Signed)
+            # ==(x, y)
             @test One(precision_type) == value_type(1)
             @test value_type(1) == One(precision_type)
+
+            # !=(x, y)
+            @test One(precision_type) != value_type(5)
+            @test value_type(5) != One(precision_type)
         end
 
         for value_type in subtypes(Unsigned)
+            # ==(x, y)
             @test One(precision_type) == value_type(1)
             @test value_type(1) == One(precision_type)
+
+            # !=(x, y)
+            @test One(precision_type) != value_type(5)
+            @test value_type(5) != One(precision_type)
         end
 
         # Bool
         @test One(precision_type) == true
         @test true == One(precision_type)
+        @test One(precision_type) != false
+        @test false != One(precision_type)
     end
 end
 
