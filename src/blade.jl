@@ -304,7 +304,7 @@ One(::Type{<:AbstractBlade}) = One{Float64}()
 One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 
 
-# --- Basic functions
+# --- Basic Blade functions
 
 # Exports
 export dim, grade, basis, norm
@@ -342,6 +342,21 @@ norm(B::Blade) = B.norm
 norm(B::Scalar) = abs(B.value)
 norm(B::Zero) = 0
 norm(B::One) = 1
+
+
+# --- Basic Scalar functions
+
+# Exports
+export value
+
+"""
+    value(B::AbstractScalar{<:AbstractFloat})
+
+Return the value of a scalar.
+"""
+value(B::Scalar) = B.value
+value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
+value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 
 # --- Utility functions

@@ -71,4 +71,11 @@ end
     for precision_type in subtypes(AbstractFloat)
         @test basis(One(precision_type)) === nothing
     end
+
+    # value()
+    for precision_type in subtypes(AbstractFloat)
+        B = One(precision_type)
+        @test value(B) isa precision_type
+        @test value(B) == precision_type(1)
+    end
 end
