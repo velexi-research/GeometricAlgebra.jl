@@ -308,3 +308,42 @@ end
         [reciprocal_norm; reciprocal_norm; 1; 1; 1] .* vectors)
     @test reciprocal(B) ≈ expected_reciprocal
 end
+
+@testset "reciprocal(x) tests: Scalar" begin
+    # Preparations
+    value = rand() + 1  # add 1 to avoid 0
+    value = rand() > 0.5 ? value : -value
+
+    # x::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_value = precision_type(value)
+
+        # value > 0
+        S = Scalar(converted_value)
+        @test reciprocal(S) == Scalar{precision_type}(1 / converted_value)
+
+        # value < 0
+        negative_value = -(abs(converted_value))
+        S = Scalar(negative_value)
+        @test reciprocal(S) == Scalar{precision_type}(1 / negative_value)
+
+        # value = Inf
+        S = Scalar(precision_type(Inf))
+        @test reciprocal(S) === Zero{precision_type}()
+
+        # value = -Inf
+        S = Scalar(precision_type(-Inf))
+        @test reciprocal(S) === Zero{precision_type}()
+    end
+
+    # x::Zero
+    for precision_type in subtypes(AbstractFloat)
+        @test reciprocal(Zero(precision_type)) == Scalar(Inf)
+    end
+
+    # x::One
+    for precision_type in subtypes(AbstractFloat)
+        @test reciprocal(One(precision_type)) === One(precision_type)
+    end
+end

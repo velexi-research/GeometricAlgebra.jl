@@ -230,7 +230,6 @@ end
         @test grade(S) == 0
         @test norm(S) == abs(converted_value)
         @test basis(S) === nothing
-        @test inverse(S) == Scalar{precision_type}(1 / converted_value)
 
         # value < 0
         negative_value = -(abs(converted_value))
@@ -239,7 +238,6 @@ end
         @test grade(S) == 0
         @test norm(S) == abs(negative_value)
         @test basis(S) === nothing
-        @test inverse(S) == Scalar{precision_type}(1 / negative_value)
 
         # value = 0
         S = Scalar(precision_type(0))
@@ -248,7 +246,6 @@ end
         @test grade(S) == 0
         @test norm(S) == 0
         @test basis(S) === nothing
-        @test inverse(S) == Scalar{precision_type}(Inf)
 
         # value = Inf
         S = Scalar(precision_type(Inf))
@@ -256,7 +253,6 @@ end
         @test grade(S) == 0
         @test norm(S) == Inf
         @test basis(S) === nothing
-        @test inverse(S) === Zero{precision_type}()
 
         # value = -Inf
         S = Scalar(precision_type(-Inf))
@@ -264,6 +260,5 @@ end
         @test grade(S) == 0
         @test norm(S) == Inf
         @test basis(S) === nothing
-        @test inverse(S) === Zero{precision_type}()
     end
 end

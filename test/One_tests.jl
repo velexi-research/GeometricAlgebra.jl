@@ -71,9 +71,4 @@ end
     for precision_type in subtypes(AbstractFloat)
         @test basis(One(precision_type)) === nothing
     end
-
-    # inverse()
-    for precision_type in subtypes(AbstractFloat)
-        @test inverse(One(precision_type)) === One(precision_type)
-    end
 end

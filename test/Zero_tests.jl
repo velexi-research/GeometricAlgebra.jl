@@ -71,9 +71,4 @@ end
     for precision_type in subtypes(AbstractFloat)
         @test basis(Zero(precision_type)) === nothing
     end
-
-    # inverse()
-    for precision_type in subtypes(AbstractFloat)
-        @test inverse(Zero(precision_type)) == Scalar(Inf)
-    end
 end
