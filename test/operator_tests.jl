@@ -51,21 +51,21 @@ end
     # x::Scalar, y::Scalar
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(value)
-        S = Scalar(converted_value)
-        @test S == converted_value
-        @test converted_value == S
+        B = Scalar(converted_value)
+        @test B == converted_value
+        @test converted_value == B
     end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            S1 = Scalar(precision_type1(value))
-            S2 = Scalar(precision_type2(value))
+            B1 = Scalar(precision_type1(value))
+            B2 = Scalar(precision_type2(value))
             if precision_type1 == precision_type2
-                @test S1 == S2
+                @test B1 == B2
             elseif precision_type1 in float64_or_bigfloat &&
                    precision_type2 in float64_or_bigfloat
-                @test S1 == S2
+                @test B1 == B2
             else
-                @test S1 != S2
+                @test B1 != B2
             end
         end
     end
@@ -221,9 +221,9 @@ end
     # x::Scalar, y::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            S1 = Scalar(precision_type1(value))
-            S2 = Scalar(precision_type2(value))
-            @test S1 ≈ S2
+            B1 = Scalar(precision_type1(value))
+            B2 = Scalar(precision_type2(value))
+            @test B1 ≈ B2
         end
     end
 
@@ -231,21 +231,46 @@ end
     # x::Real, y::Scalar
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(value)
-        S = Scalar(converted_value)
-        @test S ≈ converted_value
-        @test converted_value ≈ S
+        B = Scalar(converted_value)
+        @test B ≈ converted_value
+        @test converted_value ≈ B
     end
 end
 
-@testset "-() tests: Blade" begin
-    # mod(grade, 4) == 0
+# --- -(x)
+
+@testset "-(x) tests: Blade" begin
+    # Preparations
     vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
+
+    # x::Blade
     expected_result = Blade(B, sign=-1)
     @test -B == expected_result
 end
 
-@testset "inverse() tests: Blade" begin
+@testset "-(x) tests: Scalar" begin
+    # Preparations
+    value = rand() + 1  # add 1 to avoid 0
+    value = rand() > 0.5 ? value : -value
+
+    # x::Scalar{<:AbstractFloat}
+    for value_type in subtypes(AbstractFloat)
+        B = Scalar(value_type(value))
+        @test -B == Scalar(-value_type(value))
+    end
+
+    # x::Scalar{<:Signed}
+    int_value::Int = 3
+    for value_type in subtypes(Signed)
+        B = Scalar(value_type(int_value))
+        @test -B == Scalar(-value_type(int_value))
+    end
+end
+
+# --- inverse(x)
+
+@testset "inverse(x) tests: Blade" begin
     # mod(grade, 4) == 1
     vectors = Vector{BigFloat}([3; 4; 0; 0; 0])
     B = Blade(vectors)
