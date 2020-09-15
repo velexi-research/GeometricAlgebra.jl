@@ -227,8 +227,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
     """
         Blade{T}(B::Blade{T};
-                 norm::Union{Real, Nothing}=B.norm,
-                 sign::Real=B.sign, copy_basis::Bool=false)
+                 norm::Union{Real, Nothing}=norm(B),
+                 sign::Real=sign(B), copy_basis::Bool=false)
                  where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
@@ -241,8 +241,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     orientation determined by `sign`.
     """
     function Blade{T}(B::Blade{T};
-             norm::Union{Real, Nothing}=B.norm, sign::Real=B.sign,
-             copy_basis::Bool=false) where {T<:AbstractFloat}
+                      norm::Union{Real, Nothing}=norm(B), sign::Real=sign(B),
+                      copy_basis::Bool=false) where {T<:AbstractFloat}
         # `norm` < 0, so reverse sign
         if norm < 0
             norm = abs(norm)
@@ -318,7 +318,7 @@ Blade{T}(vectors::Array{<:Integer};
     Blade(convert(Array{T}, vectors), norm=norm, sign=sign, atol=atol)
 
 """
-    Blade(B::Blade{T}; norm=B.norm, sign=B.sign, copy_basis=false)
+    Blade(B::Blade{T}; norm=norm(B), sign=sign(B), copy_basis=false)
         where {T<:AbstractFloat}
 
 Construct a Blade representing the same space as `B` having a specified norm
@@ -327,7 +327,7 @@ new Blade is a copy of the `basis` of the original Blade; otherwise, the
 `basis` of the new Blade is reference to the `basis` of the original Blade.
 """
 Blade(B::Blade{T};
-      norm=B.norm, sign=B.sign, copy_basis=false) where {T<:AbstractFloat} =
+      norm=norm(B), sign=sign(B), copy_basis=false) where {T<:AbstractFloat} =
     Blade{T}(B, norm=norm, sign=sign, copy_basis=copy_basis)
 
 # TODO Consider adding convenience functions Blade(x::Real)
