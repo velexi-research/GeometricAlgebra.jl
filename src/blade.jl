@@ -31,15 +31,10 @@ precision of type `T`.
 Methods
 -------
     dim(B::AbstractBlade{T})::Int
-
     grade(B::AbstractBlade{T})::Int
-
     basis(B::AbstractBlade{T})::Union{Matrix{T}, Real}
-
     value(B::AbstractBlade{T})::T
-
     norm(B::AbstractBlade{T})::T
-
     sign(B::AbstractBlade{T})::Int8
 
 Unary Operations
@@ -48,7 +43,12 @@ Unary Operations
 
 Binary Operations
 ------------------
+    +(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    -(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    *(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    /(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
     ∧(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    ⋅(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} end
 
