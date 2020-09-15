@@ -27,7 +27,6 @@ using GeometricAlgebra
 
     # Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
-        B = Zero(Blade{precision_type}([1 2 3])) === Zero{precision_type}()
         @test Zero(Blade{precision_type}([1 2 3])) === Zero{precision_type}()
         @test Zero(Scalar{precision_type}(1)) === Zero{precision_type}()
         @test Zero(Zero{precision_type}()) === Zero{precision_type}()
@@ -53,30 +52,29 @@ using GeometricAlgebra
 end
 
 @testset "Zero: basic function tests" begin
-    # dim()
     for precision_type in subtypes(AbstractFloat)
-        @test dim(Zero(precision_type)) == 0
-    end
-
-    # grade()
-    for precision_type in subtypes(AbstractFloat)
-        @test grade(Zero(precision_type)) == 0
-    end
-
-    # norm()
-    for precision_type in subtypes(AbstractFloat)
-        @test norm(Zero(precision_type)) == 0
-    end
-
-    # basis()
-    for precision_type in subtypes(AbstractFloat)
-        @test basis(Zero(precision_type)) === nothing
-    end
-
-    # value()
-    for precision_type in subtypes(AbstractFloat)
+        # Preparations
         B = Zero(precision_type)
+
+        # dim()
+        @test dim(B) == 0
+
+        # grade()
+        @test grade(B) == 0
+
+        # basis()
+        @test basis(B) isa precision_type
+        @test basis(B) == 1
+
+        # norm()
+        @test norm(B) isa precision_type
+        @test norm(B) == 0
+
+        # value()
         @test value(B) isa precision_type
-        @test value(B) == precision_type(0)
+        @test value(B) == 0
+
+        # sign()
+        @test sign(B) == 1
     end
 end
