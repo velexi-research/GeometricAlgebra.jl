@@ -40,7 +40,6 @@ using GeometricAlgebra
         # abs(value) > default atol
         S = Scalar{precision_type}(converted_test_value)
         @test S.value == converted_test_value
-        @test S.value isa precision_type
 
         # abs(value) < default atol
         S = Scalar{precision_type}(blade_atol(precision_type) / 2)
@@ -50,13 +49,11 @@ using GeometricAlgebra
         S = Scalar{precision_type}(converted_test_value,
                                    atol=abs(converted_test_value) - 1)
         @test S.value == converted_test_value
-        @test S.value isa precision_type
 
         # abs(value) == atol
         S = Scalar{precision_type}(converted_test_value,
                                    atol=abs(converted_test_value))
         @test S.value == converted_test_value
-        @test S.value isa precision_type
 
         # abs(value) < atol
         S = Scalar{precision_type}(converted_test_value,
