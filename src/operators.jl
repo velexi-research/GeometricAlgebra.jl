@@ -61,17 +61,17 @@ Return true if B1 and B2 are approximatly equal; otherwise, return false.
 # --- Unary operations
 
 # Exports
-export negation, reciprocal
+export opposite, reciprocal
 
 """
-    -(B::AbstractBlade), negation(B::AbstractBlade)
+    -(B::AbstractBlade), opposite(B::AbstractBlade)
 
 Return the additive inverse of `B`.
 """
-negation(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-sign(B))
-negation(B::Scalar) = Scalar(-value(B))
+opposite(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-sign(B))
+opposite(B::Scalar) = Scalar(-value(B))
 
--(B::AbstractBlade{<:AbstractFloat}) = negation(B)
+-(B::AbstractBlade{<:AbstractFloat}) = opposite(B)
 
 """
     reciprocal(B::AbstractBlade{<:AbstractFloat})

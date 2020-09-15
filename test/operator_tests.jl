@@ -321,7 +321,7 @@ end
     end
 end
 
-# --- -(x), negation(x)
+# --- -(x), opposite(x)
 
 @testset "-(x) tests: Blade" begin
     # Preparations
@@ -331,10 +331,10 @@ end
     # x::Blade
     negative_B = Blade(B, sign=-1)
     @test -B == negative_B
-    @test negation(B) == negative_B
+    @test opposite(B) == negative_B
 
     @test -negative_B == B
-    @test negation(negative_B) == B
+    @test opposite(negative_B) == B
 end
 
 @testset "-(x) tests: Scalar" begin
@@ -347,7 +347,7 @@ end
         B = Scalar(value_type(value))
         expected_result = Scalar(-value_type(value))
         @test -B == expected_result
-        @test negation(B) == expected_result
+        @test opposite(B) == expected_result
     end
 
     # x::Scalar{<:Signed}
@@ -356,7 +356,7 @@ end
         B = Scalar(value_type(int_value))
         expected_result = Scalar(-value_type(int_value))
         @test -B == expected_result
-        @test negation(B) == expected_result
+        @test opposite(B) == expected_result
     end
 end
 
