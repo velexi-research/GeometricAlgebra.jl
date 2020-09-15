@@ -130,15 +130,15 @@ end
         end
 
         # Bool
-        @test Scalar(precision_type(true)) == true
-        @test true == Scalar(precision_type(true))
-        @test Scalar(precision_type(true)) != false
+        @test Scalar(precision_type(true)) == 1
+        @test 1 == Scalar(precision_type(true))
+        @test Scalar(precision_type(true)) != 0
         @test false != Scalar(precision_type(true))
 
-        @test Scalar(precision_type(false)) == false
-        @test false == Scalar(precision_type(false))
-        @test Scalar(precision_type(false)) != true
-        @test true != Scalar(precision_type(false))
+        @test Scalar(precision_type(false)) == 0
+        @test 0 == Scalar(precision_type(false))
+        @test Scalar(precision_type(false)) != 1
+        @test 1 != Scalar(precision_type(false))
     end
 
     # x::Scalar, y::Zero
@@ -211,10 +211,10 @@ end
         end
 
         # Bool
-        @test Zero(precision_type) == false
-        @test false == Zero(precision_type)
-        @test Zero(precision_type) != true
-        @test true != Zero(precision_type)
+        @test Zero(precision_type) == 0
+        @test 0 == Zero(precision_type)
+        @test Zero(precision_type) != 1
+        @test 1 != Zero(precision_type)
     end
 
     # x::One, y::One
@@ -263,10 +263,10 @@ end
         end
 
         # Bool
-        @test One(precision_type) == true
-        @test true == One(precision_type)
-        @test One(precision_type) != false
-        @test false != One(precision_type)
+        @test One(precision_type) == 1
+        @test 1 == One(precision_type)
+        @test One(precision_type) != 0
+        @test 0 != One(precision_type)
     end
 
     # x::Zero, y::One
