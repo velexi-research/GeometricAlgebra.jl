@@ -66,13 +66,13 @@ end
         @test basis(B) isa precision_type
         @test basis(B) == 1
 
-        # norm()
-        @test norm(B) isa precision_type
-        @test norm(B) == 1
-
         # value()
         @test value(B) isa precision_type
         @test value(B) == 1
+
+        # norm()
+        @test norm(B) isa precision_type
+        @test norm(B) == 1
 
         # sign()
         @test sign(B) == 1

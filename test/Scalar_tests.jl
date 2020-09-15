@@ -234,10 +234,12 @@ end
         S = Scalar(positive_test_value)
         @test dim(S) == 0
         @test grade(S) == 0
-        @test norm(S) == positive_test_value
-        @test basis(S) === nothing
+        @test basis(S) == 1
         @test value(S) isa precision_type
         @test value(S) == positive_test_value
+        @test norm(S) isa precision_type
+        @test norm(S) == positive_test_value
+        @test sign(S) == 1
 
         # value < 0
         negative_test_value = converted_test_value > 0 ?
@@ -245,37 +247,45 @@ end
         S = Scalar(negative_test_value)
         @test dim(S) == 0
         @test grade(S) == 0
-        @test norm(S) == abs(negative_test_value)
-        @test basis(S) === nothing
+        @test basis(S) == 1
         @test value(S) isa precision_type
         @test value(S) == negative_test_value
+        @test norm(S) isa precision_type
+        @test norm(S) == abs(negative_test_value)
+        @test sign(S) == -1
 
         # value = 0
         S = Scalar(precision_type(0))
         @test S === Zero{precision_type}()
         @test dim(S) == 0
         @test grade(S) == 0
-        @test norm(S) == 0
-        @test basis(S) === nothing
+        @test basis(S) == 1
         @test value(S) isa precision_type
         @test value(S) == 0
+        @test norm(S) isa precision_type
+        @test norm(S) == 0
+        @test sign(S) == 0
 
         # value = Inf
         S = Scalar(precision_type(Inf))
         @test dim(S) == 0
         @test grade(S) == 0
-        @test norm(S) == Inf
-        @test basis(S) === nothing
+        @test basis(S) == 1
         @test value(S) isa precision_type
         @test value(S) == precision_type(Inf)
+        @test norm(S) isa precision_type
+        @test norm(S) == Inf
+        @test sign(S) == 1
 
         # value = -Inf
         S = Scalar(precision_type(-Inf))
         @test dim(S) == 0
         @test grade(S) == 0
-        @test norm(S) == Inf
-        @test basis(S) === nothing
+        @test basis(S) == 1
         @test value(S) isa precision_type
         @test value(S) == precision_type(-Inf)
+        @test norm(S) isa precision_type
+        @test norm(S) == Inf
+        @test sign(S) == -1
     end
 end

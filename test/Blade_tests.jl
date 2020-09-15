@@ -22,6 +22,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
+# TODO: add unit tests for cases where norm and sign are specified
 @testset "Blade: inner constructor tests" begin
     # Notes
     # -----
@@ -154,6 +155,7 @@ using GeometricAlgebra
     end
 end
 
+# TODO: add unit tests for Vector{} inputs
 @testset "Blade: outer constructor tests" begin
     # Notes
     # -----
@@ -333,14 +335,29 @@ end
 
     vectors = [3 3; 4 4; 0 1]
     expected_dim, expected_grade = size(vectors)
-    B = Blade(vectors)
 
-    # --- Test functionality
+    # --- Test basic functions
 
-    @test dim(B) == expected_dim
-    @test grade(B) == expected_grade
-    @test norm(B) ≈ 5
+    for precision_type in subtypes(AbstractFloat)
+        # Blade with sign > 0
+        B = Blade{precision_type}(vectors)
 
-    F = LinearAlgebra.qr(vectors)
-    @test basis(B) ≈ Matrix(F.Q)
+        @test dim(B) == expected_dim
+        @test grade(B) == expected_grade
+
+        F = LinearAlgebra.qr(vectors)
+        @test basis(B) ≈ Matrix(F.Q)
+
+        @test value(B) isa precision_type
+        @test value(B) ≈ 5
+
+        @test norm(B) isa precision_type
+        @test norm(B) ≈ 5
+
+        @test sign(B) == 1
+
+        # Blade with sign < 0
+        C = Blade(B, sign=-1)
+        @test sign(C) == -1
+    end
 end

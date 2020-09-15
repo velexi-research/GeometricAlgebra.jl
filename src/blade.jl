@@ -11,6 +11,7 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Imports
 
+import Base.sign
 import LinearAlgebra
 
 
@@ -26,6 +27,28 @@ export Zero, One
 
 Supertype for all blade types. Blades are represented with the floating-point
 precision of type `T`.
+
+Methods
+-------
+    dim(B::AbstractBlade{T})::Int
+
+    grade(B::AbstractBlade{T})::Int
+
+    basis(B::AbstractBlade{T})::Union{Matrix{T}, Real}
+
+    value(B::AbstractBlade{T})::T
+
+    norm(B::AbstractBlade{T})::T
+
+    sign(B::AbstractBlade{T})::Int8
+
+Unary Operations
+----------------
+    -(B::AbstractBlade{T})::AbstractBlade{T}
+
+Binary Operations
+------------------
+    ∧(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} end
 
@@ -422,12 +445,12 @@ One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 # --- Basic Blade functions
 
 # Exports
-export dim, grade, basis, norm
+export dim, grade, basis, value, norm, sign
 
 """
     dim(B::AbstractBlade{<:AbstractFloat})
 
-Return dimension of space that Blade blade is embedded in
+Return dimension of space that Blade blade is embedded in.
 """
 dim(B::Blade) = B.dim
 dim(B::AbstractScalar) = 0
@@ -443,10 +466,23 @@ grade(B::AbstractScalar) = 0
 """
     basis(B::AbstractBlade{<:AbstractFloat})
 
-Return an orthonormal for the space spanned by the blade.
+When `B` is a Blade, return an orthonormal basis for the space spanned by the
+blade. When `B` is a scalar (subtype of AbstractScalar), return 1.
 """
 basis(B::Blade) = B.basis
-basis(B::AbstractScalar) = nothing
+basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = T(1)
+
+"""
+    value(B::AbstractBlade)::Real
+
+Return the value of a blade. For Blades, `value(B)` is the signed norm of
+the blade relative to its unit basis. For Scalars, `value(B)` is the value
+of the scalar (note that the basis for Scalars is 1).
+"""
+value(B::Blade) = B.sign * B.norm
+value(B::Scalar) = B.value
+value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
+value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 """
     norm(B::AbstractBlade{<:AbstractFloat})
@@ -455,23 +491,18 @@ Return the norm of the blade.
 """
 norm(B::Blade) = B.norm
 norm(B::Scalar) = abs(B.value)
-norm(B::Zero) = 0
-norm(B::One) = 1
-
-
-# --- Basic Scalar functions
-
-# Exports
-export value
+norm(B::Zero) = value(B)
+norm(B::One) = value(B)
 
 """
-    value(B::AbstractScalar{<:AbstractFloat})
+    sign(B::AbstractBlade)::Int8
 
-Return the value of a scalar.
+Return the sign of a blade relative to its unit basis.
 """
-value(B::Scalar) = B.value
-value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
-value(B::One{T}) where {T<:AbstractFloat} = T(1)
+sign(B::Blade)::Int8 = B.sign
+sign(B::Scalar)::Int8 = sign(B.value)
+sign(B::Zero)::Int8 = 0
+sign(B::One)::Int8 = 1
 
 
 # --- Utility functions
