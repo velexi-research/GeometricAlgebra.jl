@@ -281,7 +281,7 @@ Blade{T}(vectors::Array{<:Integer};
     Blade(convert(Array{T}, vectors), value=value, atol=atol)
 
 """
-    Blade(B::Blade{T}; value=value(B), copy_basis=false)
+    Blade(B::Blade{T}; value::Real=value(B), copy_basis=false)
         where {T<:AbstractFloat}
 
 Construct a Blade representing the same space as `B` having a specified norm
@@ -290,7 +290,7 @@ new Blade is a copy of the `basis` of the original Blade; otherwise, the
 `basis` of the new Blade is reference to the `basis` of the original Blade.
 """
 Blade(B::Blade{T};
-      value=value(B), copy_basis=false) where {T<:AbstractFloat} =
+      value::Real=value(B), copy_basis=false) where {T<:AbstractFloat} =
     Blade{T}(B, value=value, copy_basis=copy_basis)
 
 # TODO Consider adding convenience functions Blade(x::Real)
