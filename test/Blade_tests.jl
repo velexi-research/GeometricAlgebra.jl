@@ -22,7 +22,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-# TODO: add unit tests for cases where norm and sign are specified
+# TODO: add unit tests for cases where `value` is specified
 @testset "Blade: inner constructor tests" begin
     # Notes
     # -----
@@ -41,8 +41,7 @@ using GeometricAlgebra
         for i in size(B.basis, 2)
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
-        @test B.norm ≈ 5
-        @test B.sign == 1
+        @test B.value ≈ 5
 
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
@@ -74,8 +73,7 @@ using GeometricAlgebra
         @test B.grade == 1
         @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
         @test LinearAlgebra.norm(B.basis) ≈ 1
-        @test B.norm ≈ 13
-        @test B.sign == 1
+        @test B.value ≈ 13
 
         # vector is a row vector
         row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
@@ -84,8 +82,7 @@ using GeometricAlgebra
         @test B.grade == 1
         @test B.basis ≈ permutedims(row_vector / 13)
         @test LinearAlgebra.norm(B.basis) ≈ 1
-        @test B.norm ≈ 13
-        @test B.sign == 1
+        @test B.value ≈ 13
 
         # vector is a zero vector
         zero_vector = Array{precision_type}([0. 0. 0.])
@@ -106,9 +103,8 @@ using GeometricAlgebra
         @test B === Zero{precision_type}()
     end
 
-    # --- Blade{T}(B::AbstractBlade{T};
-    #              norm=B.norm, sign=B.sign, copy_basis=false)
-    #              where {T<:AbstractFloat}
+    # --- Blade{T}(B::AbstractBlade{T}; value=value(B), copy_basis=false)
+    #         where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -120,28 +116,16 @@ using GeometricAlgebra
         @test B_copy.dim == B.dim
         @test B_copy.grade == B.grade
         @test B_copy.basis === B.basis
-        @test B_copy.norm == B.norm
-        @test B_copy.sign == B.sign
+        @test B_copy.value == B.value
 
         # Construct a Blade representing the same space as `B` with specified
-        # norm
-        new_norm = 20
-        B_copy = Blade{precision_type}(B, norm=new_norm)
+        # value
+        new_value = -20
+        B_copy = Blade{precision_type}(B, value=new_value)
         @test B_copy.dim == B.dim
         @test B_copy.grade == B.grade
         @test B_copy.basis === B.basis
-        @test B_copy.norm == new_norm
-        @test B_copy.sign == B.sign
-
-        # Construct a Blade representing the same space as `B` with specified
-        # orientation relative to `B.basis`
-        new_sign = -1
-        B_copy = Blade{precision_type}(B, sign=new_sign)
-        @test B_copy.dim == B.dim
-        @test B_copy.grade == B.grade
-        @test B_copy.basis === B.basis
-        @test B_copy.norm == B.norm
-        @test B_copy.sign == new_sign
+        @test B_copy.value == new_value
 
         # Construct a Blade representing the blade as `B` containing
         # a copy of the basis (instead of a reference).
@@ -150,8 +134,7 @@ using GeometricAlgebra
         @test B_copy.grade == B.grade
         @test B_copy.basis == B.basis
         @test B_copy.basis !== B.basis
-        @test B_copy.norm == B.norm
-        @test B_copy.sign == B.sign
+        @test B_copy.value == B.value
     end
 end
 
@@ -161,7 +144,7 @@ end
     # * Test type of constructed instances. Correct construction of instances
     #   is tested by the inner constructor tests.
     #
-    # * Test behavior of keyword arguments: `atol`, `norm`, `copy_basis`.
+    # * Test behavior of keyword arguments: `value`, `atol`, `copy_basis`.
 
     # --- Preparations
 
@@ -425,9 +408,8 @@ end
         @test B === Zero{precision_type}()
     end
 
-    # --- Blade(B::AbstractBlade{T};
-    #           norm=B.norm, sign=B.sign, copy_basis=false)
-    #           where {T<:AbstractFloat}
+    # --- Blade(B::AbstractBlade{T}; value=value(B), copy_basis=false)
+    #         where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -439,16 +421,9 @@ end
         @test B_copy isa Blade{precision_type}
         @test B_copy.basis === B.basis
 
-        # Construct a Blade representing the blade as `B` with specified
-        # norm
-        new_norm = 20
-        B_copy = Blade(B, norm=new_norm)
-        @test B_copy isa Blade{precision_type}
-
-        # Construct a Blade representing the blade as `B` with specified
-        # sign
-        new_sign = -1
-        B_copy = Blade(B, sign=new_sign)
+        # Construct a Blade representing the blade as `B` with specified value
+        new_value = 20
+        B_copy = Blade(B, value=new_value)
         @test B_copy isa Blade{precision_type}
 
         # Construct Blade representing the blade as `B` containing
@@ -489,7 +464,7 @@ end
         @test sign(B) == 1
 
         # Blade with sign < 0
-        C = Blade(B, sign=-1)
+        C = Blade(B, value=-1)
         @test sign(C) == -1
     end
 end

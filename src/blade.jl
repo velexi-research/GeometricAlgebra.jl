@@ -28,6 +28,12 @@ export Zero, One
 Supertype for all blade types. Blades are represented with the floating-point
 precision of type `T`.
 
+For the AbstractBlade type, the norm and orientation are encoded by the `value`
+of the blade. For Blades, the norm of the blade is equal to `abs(value)` and
+the orientation of the blade relative to its `basis` is equal `sign(value)`.
+For Scalars, the `basis` of the scalar is `1`, so the `value` of the scalar
+has its expected meaning.
+
 Methods
 -------
     dim(B::AbstractBlade{T})::Int
@@ -81,50 +87,42 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #   the order of the columns in `basis` defines the orientation for the
     #   unit blade represented by `basis`.
     #
-    # * `norm`: the norm (hypervolume) of the blade. It is pre-computed and
-    #   cached for efficiency.
-    #
-    # * `sign`: the orientation of the blade relative to the unit blade
-    #   represented by `basis`. It is equal to +1 when the blade has the
-    #   same orientation as `basis` and is equal to -1 when the blade has
-    #   the opposite orientation.
-    #
+    # * `value`: the signed-norm (hypervolume) of the blade. The sign
+    #    of `value` indicates the orientation of the blade relative to the
+    #    unit blade represented by `basis`. It is positive when the blade has
+    #    the same orientation as `basis` and negative when the blade has the
+    #    opposite orientation.
     dim::Int
     grade::Int
     basis::Matrix{T}
-    norm::T
-    sign::Int8
+    value::T
 
     """
         Blade{T}(vectors::Matrix{T};
-                 norm::Union{Real, Nothing}=nothing, sign::Real=1,
-                 atol::Real=blade_atol(T))
+                 value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
             where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
     matrix. Zero{T}() is returned when the norm of the blade is less than
     `atol`.
 
-    By default, `vectors` determines the norm and orientation of the blade.
-    However, if `norm` or `sign` are provided, `vectors` is only used to
-    define the subspace represented by the blade.
+    By default, `vectors` determines the value of the blade. However, if
+    `value` is specified, `vectors` is only used to define the subspace
+    represented by the blade.
 
-    When `sign` is +1, the orientation of the blade is the same as the
+    When `value` is positive, the orientation of the blade is the same as the
     orientation of the outer product of the columns of `vectors` (taken in
-    order). When `sign` is -1, the orientation of the blade is the opposite
-    of the orientation implied by the `vectors`.
-
-    When `norm` is negative, the orientation of the blade is opposite of the
-    orientation determined by `sign`.
+    order). When `value` is negative, the orientation of the blade is the
+    opposite of the orientation implied by the `vectors`.
     """
     function Blade{T}(vectors::Matrix{T};
-                      norm::Union{Real, Nothing}=nothing, sign::Real=1,
+                      value::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
         # --- Handle edge cases
 
-        # `norm` is effectively zero
-        if norm != nothing && abs(norm) < atol
+        # `value` is effectively zero
+        if value != nothing && abs(value) < atol
             return Zero{T}()
         end
 
@@ -149,144 +147,110 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         # Orthonormal basis for subspace
         basis::Matrix{T} = F.Q
 
-        # Compute norm
-        if norm == nothing
-            norm = abs(signed_norm)
+        # Compute value
+        value = (value == nothing) ? signed_norm : value * sign(signed_norm)
 
-            # blade is effectively zero
-            if norm < atol
-                return Zero{T}()
-            end
-        end
-
-        # Compute orientation
-        sign *= Base.sign(signed_norm)
-        if norm < 0
-            sign = -sign
+        # Return Zero if `value` is effectively zero
+        if abs(value) < atol
+            return Zero{T}()
         end
 
         # Return new Blade
-        new(dims[1], dims[2], basis, norm, sign)
+        new(dims[1], dims[2], basis, value)
     end
 
     """
         Blade{T}(vector::Vector{T};
-                 norm::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+                 value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
             where {T<:AbstractFloat}
 
     Construct a Blade from a single vector. Zero{T}() is returned when the
     norm of the blade is less than `atol`.
 
-    By default, `vector` determines the norm and orientation of the blade.
-    However, if `norm` is provided, `vector` is only used to define the
-    subspace represented by the blade.
+    By default, `vector` determines the value of the blade. However, if
+    `value` is specified, `vector` is only used to define the subspace
+    represented by the blade.
 
-    When `sign` is +1, the orientation of the blade is the same as the
-    direction of `vector`. When `sign` is -1, the orientation of the blade is
-    the opposite of the direction of `vector`.
-
-    When `norm` is negative, the orientation of the blade is opposite of the
-    orientation determined `vector`.
+    When `value` is positive, the orientation of the blade is the same as the
+    direction of `vector`. When `value` is negative, the orientation of the
+    blade is the opposite of the direction of `vector`.
     """
     function Blade{T}(vector::Vector{T};
-                      norm::Union{Real, Nothing}=nothing, sign::Real=1,
+                      value::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
         # --- Handle edge cases
 
-        # `norm` is effectively zero
-        if norm != nothing && abs(norm) < atol
+        # `value` is effectively zero
+        if value != nothing && abs(value) < atol
             return Zero{T}()
         end
 
         # --- Construct Blade
 
-        # Compute norm and orientation
-        sign::Int8 = 1
-        if norm == nothing
-            norm = LinearAlgebra.norm(vector)
+        # Compute value
+        value = (value == nothing) ? LinearAlgebra.norm(vector) : value
 
-            # blade is effectively zero
-            if norm < atol
-                return Zero{T}()
-            end
-        else
-            # Enforce convention that norm > 0
-            if norm < 0
-                sign = -1
-                norm = abs(norm)
-            end
+        # Return Zero if `value` is effectively zero
+        if abs(value) < atol
+            return Zero{T}()
         end
 
         # Compute basis
-        basis::Matrix{T} = reshape(vector, length(vector), 1) / norm
+        basis::Matrix{T} = reshape(vector, length(vector), 1) / abs(value)
 
         # Return new Blade
-        new(length(vector), 1, basis, norm, sign)
+        new(length(vector), 1, basis, value)
     end
 
     """
         Blade{T}(B::Blade{T};
-                 norm::Union{Real, Nothing}=norm(B),
+                 value::Union{Real, Nothing}=value(B),
                  sign::Real=sign(B), copy_basis::Bool=false)
                  where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
-    norm and orientation relative to `B`. When `copy_basis` is true, the
-    `basis` of the new Blade is a copy of the `basis` of the original Blade;
-    otherwise, the `basis` of the new Blade is reference to the `basis` of
-    the original Blade.
-
-    When `norm` is negative, the orientation of the blade is opposite of the
-    orientation determined by `sign`.
+    `value`. When `copy_basis` is true, the `basis` of the new Blade is a copy
+    of the `basis` of the original Blade; otherwise, the `basis` of the new
+    Blade is reference to the `basis` of the original Blade.
     """
     function Blade{T}(B::Blade{T};
-                      norm::Union{Real, Nothing}=norm(B), sign::Real=sign(B),
+                      value::Union{Real, Nothing}=value(B),
                       copy_basis::Bool=false) where {T<:AbstractFloat}
-        # `norm` < 0, so reverse sign
-        if norm < 0
-            norm = abs(norm)
-            sign = - sign
-        end
-
         # Return new Blade
-        copy_basis ? new(dim(B), grade(B), copy(basis(B)), norm, sign) :
-                     new(dim(B), grade(B), basis(B), norm, sign)
+        copy_basis ? new(dim(B), grade(B), copy(basis(B)), value) :
+                     new(dim(B), grade(B), basis(B), value)
      end
 end
 
 """
     Blade(vectors::Array{T};
-          norm::Union{Real, Nothing}=nothing, sign::Real=1,
-          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+          value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+        where {T<:AbstractFloat}
 
     Blade{T}(vectors::Array{<:AbstractFloat};
-             norm::Union{Real, Nothing}=nothing, sign::Real=1,
-             atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+             value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+        where {T<:AbstractFloat}
 
     Blade(vectors::Array{<:Integer};
-          norm::Union{Real, Nothing}=nothing, sign::Real=1,
-          atol::Real=blade_atol(Float64))
+          value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64))
 
     Blade{T}(vectors::Array{<:Integer};
-             norm::Union{Real, Nothing}=nothing, sign::Real=1,
-             atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+             value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+        where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
 of a matrix or (2) a single vector. Zero{T}() is returned when the norm of the
 blade is less than `atol`.
 
-By default, `vectors` determines the norm and orientation of the blade.
-However, if `norm` or `sign` are provided, `vectors` is only used to define
-the subspace represented by the blade.
+By default, `vectors` determines the value (i.e., norm and orientation) of the
+blade. However, if `value` is specified, `vectors` is only used to define the
+subspace represented by the blade.
 
-When `sign` is +1, the orientation of the blade is the same as the orientation
-of the outer product of the columns of `vectors` (taken in order). When `sign`
-is -1, the orientation of the blade is the opposite of the orientation implied
-by the `vectors`.
-
-When `norm` is negative, the orientation of the blade is opposite of the
-orientation determined by `sign`.
+When `value` is positive, the orientation of the blade is the same as the
+orientation of the outer product of the columns of `vectors` (taken in order).
+When `value` is negative, the orientation of the blade is the opposite of the
+orientation implied by the `vectors`.
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Blade.
@@ -298,27 +262,26 @@ the precision of the Blade.
   defaults to `Float64`.
 """
 Blade(vectors::Array{T};
-      norm::Union{Real, Nothing}=nothing, sign::Real=1,
+      value::Union{Real, Nothing}=nothing,
       atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade{T}(vectors, norm=norm, sign=sign, atol=atol)
+    Blade{T}(vectors, value=value, atol=atol)
 
 Blade{T}(vectors::Array{<:AbstractFloat};
-         norm::Union{Real, Nothing}=nothing, sign::Real=1,
+         value::Union{Real, Nothing}=nothing,
          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade(convert(Array{T}, vectors), norm=norm, sign=sign, atol=atol)
+    Blade(convert(Array{T}, vectors), value=value, atol=atol)
 
 Blade(vectors::Array{<:Integer};
-      norm::Union{Real, Nothing}=nothing, sign::Real=1,
-      atol::Real=blade_atol(Float64)) =
-    Blade(convert(Array{Float64}, vectors), norm=norm, sign=sign, atol=atol)
+      value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64)) =
+    Blade(convert(Array{Float64}, vectors), value=value, atol=atol)
 
 Blade{T}(vectors::Array{<:Integer};
-         norm::Union{Real, Nothing}=nothing, sign::Real=1,
+         value::Union{Real, Nothing}=nothing,
          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade(convert(Array{T}, vectors), norm=norm, sign=sign, atol=atol)
+    Blade(convert(Array{T}, vectors), value=value, atol=atol)
 
 """
-    Blade(B::Blade{T}; norm=norm(B), sign=sign(B), copy_basis=false)
+    Blade(B::Blade{T}; value=value(B), copy_basis=false)
         where {T<:AbstractFloat}
 
 Construct a Blade representing the same space as `B` having a specified norm
@@ -327,8 +290,8 @@ new Blade is a copy of the `basis` of the original Blade; otherwise, the
 `basis` of the new Blade is reference to the `basis` of the original Blade.
 """
 Blade(B::Blade{T};
-      norm=norm(B), sign=sign(B), copy_basis=false) where {T<:AbstractFloat} =
-    Blade{T}(B, norm=norm, sign=sign, copy_basis=copy_basis)
+      value=value(B), copy_basis=false) where {T<:AbstractFloat} =
+    Blade{T}(B, value=value, copy_basis=copy_basis)
 
 # TODO Consider adding convenience functions Blade(x::Real)
 
@@ -479,7 +442,7 @@ Return the value of a blade. For Blades, `value(B)` is the signed norm of
 the blade relative to its unit basis. For Scalars, `value(B)` is the value
 of the scalar (note that the basis for Scalars is 1).
 """
-value(B::Blade) = B.sign * B.norm
+value(B::Blade) = B.value
 value(B::Scalar) = B.value
 value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
 value(B::One{T}) where {T<:AbstractFloat} = T(1)
@@ -489,8 +452,8 @@ value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 Return the norm of the blade.
 """
-norm(B::Blade) = B.norm
-norm(B::Scalar) = abs(B.value)
+norm(B::Blade) = abs(value(B))
+norm(B::Scalar) = abs(value(B))
 norm(B::Zero) = value(B)
 norm(B::One) = value(B)
 
@@ -499,7 +462,7 @@ norm(B::One) = value(B)
 
 Return the sign of a blade relative to its unit basis.
 """
-sign(B::Blade)::Int8 = B.sign
+sign(B::Blade)::Int8 = sign(B.value)
 sign(B::Scalar)::Int8 = sign(B.value)
 sign(B::Zero)::Int8 = 0
 sign(B::One)::Int8 = 1
