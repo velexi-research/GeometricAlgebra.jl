@@ -49,12 +49,12 @@ Unary Operations
 
 Binary Operations
 ------------------
-    +(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-    -(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-    *(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-    /(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    +(B::AbstractBlade, C::AbstractBlade)::Multivector
+    -(B::AbstractBlade, C::AbstractBlade)::Multivector
+    *(B::AbstractBlade, C::AbstractBlade)::Multivector
+    /(B::AbstractBlade, C::AbstractBlade)::Multivector
     ∧(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-    ⋅(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    ⋅(B::AbstractBlade, C::AbstractBlade)::Multivector
 """
 abstract type AbstractBlade{T<:AbstractFloat} end
 
