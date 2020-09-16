@@ -68,7 +68,7 @@ export opposite, reciprocal
 
 Return the additive inverse of `B`.
 """
-opposite(B::Blade{<:AbstractFloat}) = Blade(B, norm=norm(B), sign=-sign(B))
+opposite(B::Blade{<:AbstractFloat}) = Blade(B, value=-value(B))
 opposite(B::Scalar) = Scalar(-value(B))
 
 -(B::AbstractBlade{<:AbstractFloat}) = opposite(B)
@@ -80,8 +80,8 @@ Return the multiplicative inverse of `B`.
 """
 reciprocal(B::Blade{<:AbstractFloat}) =
     mod(grade(B), 4) < 2 ?
-        Blade(B, norm=1 / norm(B), sign=sign(B)) :
-        Blade(B, norm=1 / norm(B), sign=-sign(B))
+        Blade(B, value=1 / norm(B)) :
+        Blade(B, value=-1 / norm(B))
 
 reciprocal(B::Scalar{<:AbstractFloat}) = Scalar(1 / value(B))
 reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
@@ -95,23 +95,30 @@ export ∧, outer
 
 """
     ∧(B::AbstractBlade, C::AbstractBlade)
-    ∧(B::AbstractBlade, C::Vector)
-    ∧(B::Vector, C::AbstractBlade)
+
+    ∧(v::Vector, C::AbstractBlade)
+    ∧(B::AbstractBlade, v::Vector)
+
     ∧(v::Vector, w::Vector)
+
+    ∧(x::Real, C::AbstractBlade)
+    ∧(B::AbstractBlade, x::Real)
 
 Return the outer product of a combination of blades and vectors.
 """
 ∧(B::Blade, C::Blade) =
-    Blade(hcat(basis(B), basis(C)),
-          norm=norm(B) * norm(C), sign=sign(B) * sign(C))
-∧(B::Blade, C::AbstractScalar) =
-    Blade(B, norm=norm(B) * norm(C), sign=sign(B) * sign(C))
-∧(B::AbstractScalar, C::Blade) =
-    Blade(C, norm=norm(B) * norm(C), sign=sign(B) * sign(C))
+    Blade(hcat(basis(B), basis(C)), value=value(B) * value(C))
 
-∧(B::Blade, v::Vector) = B ∧ Blade(v)
+∧(B::AbstractScalar, C::Blade) = Blade(C, value=value(B) * value(C))
+∧(B::Blade, C::AbstractScalar) = Blade(B, value=value(B) * value(C))
+
 ∧(v::Vector, B::Blade) = Blade(v) ∧ B
-∧(v::Vector{<:AbstractFloat}, w::Vector{<:AbstractFloat}) = Blade(v) ∧ Blade(w)
+∧(B::Blade, v::Vector) = B ∧ Blade(v)
+∧(v::Vector, w::Vector) = Blade(v) ∧ Blade(w)
+
+∧(x::Real, B::Blade) = Blade(B, value=x * value(B))
+∧(B::Blade, x::Real) = x ∧ B
+
 const outer = ∧
 
 """

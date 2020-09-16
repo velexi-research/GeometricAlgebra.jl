@@ -329,7 +329,7 @@ end
     B = Blade(vectors)
 
     # x::Blade
-    negative_B = Blade(B, sign=-1)
+    negative_B = Blade(B, value=-value(B))
     @test -B == negative_B
     @test opposite(B) == negative_B
 
@@ -363,37 +363,32 @@ end
 # --- reciprocal(x)
 
 @testset "reciprocal(x) tests: Blade" begin
-    # mod(grade, 4) == 1
-    vectors = Vector{BigFloat}([3; 4; 0; 0; 0])
-    B = Blade(vectors)
-    reciprocal_norm = 1 / BigFloat(25)
-    expected_reciprocal = Blade(
-        [reciprocal_norm; reciprocal_norm; 1; 1; 1] .* vectors)
-    @test reciprocal(B) ≈ expected_reciprocal
+    for precision_type in subtypes(AbstractFloat)
+        # mod(grade, 4) == 1
+        vectors = Vector{precision_type}([3; 4; 0; 0; 0])
+        B = Blade(vectors)
+        expected_reciprocal = Blade(B, value=1 / precision_type(5))
+        @test reciprocal(B) ≈ expected_reciprocal
 
-    # mod(grade, 4) == 2
-    vectors = Matrix{Float64}([3 3; 4 4; 0 1; 0 0; 0 0])
-    B = Blade(vectors)
-    reciprocal_norm = 1 / Float64(25)
-    expected_reciprocal = -Blade(
-        [reciprocal_norm; reciprocal_norm; 1; 1; 1] .* vectors)
-    @test reciprocal(B) ≈ expected_reciprocal
+        # mod(grade, 4) == 2
+        vectors = Matrix{precision_type}([3 3; 4 4; 0 1; 0 0; 0 0])
+        B = Blade(vectors)
+        expected_reciprocal = Blade(B, value=-1 / precision_type(5))
+        @test reciprocal(B) ≈ expected_reciprocal
 
-    # mod(grade, 4) == 3
-    vectors = Matrix{Float32}([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
-    B = Blade(vectors)
-    reciprocal_norm = 1 / Float32(25)
-    expected_reciprocal = -Blade(
-        [reciprocal_norm; reciprocal_norm; 1; 1; 1] .* vectors)
-    @test reciprocal(B) ≈ expected_reciprocal
+        # mod(grade, 4) == 3
+        vectors = Matrix{precision_type}([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+        B = Blade(vectors)
+        expected_reciprocal = Blade(B, value=-1 / precision_type(5))
+        @test reciprocal(B) ≈ expected_reciprocal
 
-    # mod(grade, 4) == 0
-    vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
-    B = Blade(vectors)
-    reciprocal_norm = 1 / Float16(25)
-    expected_reciprocal = Blade(
-        [reciprocal_norm; reciprocal_norm; 1; 1; 1] .* vectors)
-    @test reciprocal(B) ≈ expected_reciprocal
+        # mod(grade, 4) == 0
+        vectors = Matrix{precision_type}(
+            [3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+        B = Blade(vectors)
+        expected_reciprocal = Blade(B, value=1 / precision_type(5))
+        @test reciprocal(B) ≈ expected_reciprocal
+    end
 end
 
 @testset "reciprocal(x) tests: Scalar" begin
