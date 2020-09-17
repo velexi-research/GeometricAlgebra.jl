@@ -15,6 +15,7 @@ module GeometricAlgebra
 # --- Submodules
 
 include("blade.jl")
+include("multivector.jl")
 include("operators.jl")
 
 
