@@ -12,7 +12,7 @@ except according to the terms contained in the LICENSE file.
 # --- Imports
 
 # Standard library
-import Base.sign
+import Base.sign, Base.convert
 import LinearAlgebra
 
 
@@ -100,8 +100,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
     """
         Blade{T}(vectors::Matrix{T};
-                 value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
-            where {T<:AbstractFloat}
+                 value::Union{Real, Nothing}=nothing,
+                 atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
     matrix. Zero{T}() is returned when the norm of the blade is less than
@@ -162,8 +162,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
     """
         Blade{T}(vector::Vector{T};
-                 value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
-            where {T<:AbstractFloat}
+                 value::Union{Real, Nothing}=nothing,
+                 atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Construct a Blade from a single vector. Zero{T}() is returned when the
     norm of the blade is less than `atol`.
@@ -189,16 +189,17 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # --- Construct Blade
 
-        # Compute value
-        value = (value == nothing) ? LinearAlgebra.norm(vector) : value
+        # Compute basis
+        norm_vector = LinearAlgebra.norm(vector)
+        basis::Matrix{T} = reshape(vector, length(vector), 1) / norm_vector
+
+        # Set value
+        value = (value == nothing) ? norm_vector : value
 
         # Return Zero if `value` is effectively zero
         if abs(value) < atol
             return Zero{T}()
         end
-
-        # Compute basis
-        basis::Matrix{T} = reshape(vector, length(vector), 1) / abs(value)
 
         # Return new Blade
         new(length(vector), 1, basis, value)
@@ -206,9 +207,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
     """
         Blade{T}(B::Blade{T};
-                 value::Union{Real, Nothing}=value(B),
-                 sign::Real=sign(B), copy_basis::Bool=false)
-                 where {T<:AbstractFloat}
+                 value::Real=value(B),
+                 copy_basis::Bool=false) where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
     `value`. When `copy_basis` is true, the `basis` of the new Blade is a copy
@@ -216,12 +216,37 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     Blade is reference to the `basis` of the original Blade.
     """
     function Blade{T}(B::Blade{T};
-                      value::Union{Real, Nothing}=value(B),
+                      value::Real=value(B),
                       copy_basis::Bool=false) where {T<:AbstractFloat}
         # Return new Blade
         copy_basis ? new(dim(B), grade(B), copy(basis(B)), value) :
                      new(dim(B), grade(B), basis(B), value)
-     end
+    end
+
+    """
+        Blade{T}(B::Blade{S};
+                 value::Real=value(B),
+                 copy_basis::Bool=false) where {T<:AbstractFloat,
+                                                S<:AbstractFloat}
+
+    Convert the floating-point precision of a Blade. If `value` is specified,
+    the value of the blade of the new blade is set to `value`. When
+    `copy_basis` is true, the `basis` of the new Blade is a copy of the
+    `basis` of the original Blade; otherwise, the `basis` of the new Blade is
+    reference to the `basis` of the original Blade.
+    """
+    function Blade{T}(B::Blade{S};
+                      value::Real=value(B),
+                      copy_basis::Bool=false) where {T<:AbstractFloat,
+                                                     S<:AbstractFloat}
+        # Handle special cases
+        if T == S
+            return B{T}(B, value=value, copy_basis=copy_basis)
+        end
+
+        # Return new Blade
+        new(dim(B), grade(B), convert(Array{T}, basis(B)), value)
+    end
 end
 
 """
@@ -285,10 +310,11 @@ Blade{T}(vectors::Array{<:Integer};
     Blade(B::Blade{T}; value::Real=value(B), copy_basis=false)
         where {T<:AbstractFloat}
 
-Construct a Blade representing the same space as `B` having a specified norm
-and orientation relative to `B`. When `copy_basis` is true, the `basis` of the
-new Blade is a copy of the `basis` of the original Blade; otherwise, the
-`basis` of the new Blade is reference to the `basis` of the original Blade.
+Copy constructor. Construct a Blade representing the same space as `B` having
+a specified norm and orientation relative to `B`. When `copy_basis` is true,
+the `basis` of the new Blade is a copy of the `basis` of the original Blade;
+otherwise, the `basis` of the new Blade is reference to the `basis` of the
+original Blade.
 """
 Blade(B::Blade{T};
       value::Real=value(B), copy_basis=false) where {T<:AbstractFloat} =
@@ -473,6 +499,18 @@ sign(B::One)::Int8 = 1
 
 # Exports
 export blade_atol
+
+"""
+    convert(::Type{S}, B::AbstractBlade)
+        where {T<:AbstractFloat, S<:AbstractBlade{T}}
+
+Convert AbstractBlade to have the floating-point precision of type `T`.
+"""
+convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:AbstractBlade{T}} =
+    Blade{T}(B)
+convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat,
+                                             S<:AbstractScalar{T}} =
+    Scalar{T}(value(B))
 
 # TODO: review numerical error in factorizations to see if a different
 #       tolerance would be better.

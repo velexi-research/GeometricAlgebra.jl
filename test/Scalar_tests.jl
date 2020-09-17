@@ -286,3 +286,20 @@ end
         @test sign(S) == -1
     end
 end
+
+@testset "Scalar: convert() tests" begin
+    # Preparations
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            # Preparations
+            converted_test_value = precision_type_src(test_value)
+            S = Scalar{precision_type_src}(converted_test_value)
+
+            @test convert(Scalar{precision_type_converted}, S) isa
+                  Scalar{precision_type_converted}
+        end
+    end
+end

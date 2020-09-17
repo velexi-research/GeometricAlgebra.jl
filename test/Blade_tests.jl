@@ -669,3 +669,19 @@ end
         @test sign(C) == -1
     end
 end
+
+@testset "Blade: convert() tests" begin
+    # Preparations
+    vectors = [3 3; 4 4; 0 1]
+
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            # Preparations
+            converted_vectors = convert.(precision_type_src, vectors)
+            B = Blade{precision_type_src}(converted_vectors)
+
+            @test convert(Blade{precision_type_converted}, B) isa
+                  Blade{precision_type_converted}
+        end
+    end
+end
