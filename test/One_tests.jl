@@ -51,7 +51,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "One: basic function tests" begin
+@testset "One: AbstractBlade interface tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = One(precision_type)

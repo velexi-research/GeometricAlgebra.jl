@@ -216,7 +216,7 @@ end
 
 # --- Function tests
 
-@testset "Scalar: basic function tests" begin
+@testset "Scalar: AbstractBlade interface tests" begin
     # Preparations
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
