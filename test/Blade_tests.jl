@@ -27,6 +27,12 @@ using GeometricAlgebra
     # -----
     # * Test value of constructed instance
 
+    # --- Preparations
+
+    # Select random value for tests where `value` != 0
+    value_ = rand() + 1  # add 1 to avoid 0
+    value_ = rand() > 0.5 ? value_ : -value_
+
     # --- Basic constructor with multiple vectors
     #
     # Blade{T}(vectors::Matrix{T};
@@ -47,15 +53,17 @@ using GeometricAlgebra
 
         # number of vectors <= dimension of column space; value != nothing
         vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        new_value = -42
-        B = Blade{precision_type}(vectors, value=new_value)
+        B = Blade{precision_type}(vectors, value=value_)
         @test B.dim == 3
         @test B.grade == 2
         @test size(B.basis) == (3, 2)
         for i in size(B.basis, 2)
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
-        @test B.value ≈ new_value
+
+        F = LinearAlgebra.qr(vectors)
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+        @test B.value == sign(signed_norm) * precision_type(value_)
 
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
@@ -94,13 +102,15 @@ using GeometricAlgebra
 
         # vector is a column vector; value != nothing
         vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        new_value = -42
-        B = Blade{precision_type}(col_vector, value=new_value)
+        B = Blade{precision_type}(col_vector, value=value_)
         @test B.dim == 3
         @test B.grade == 1
         @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
         @test LinearAlgebra.norm(B.basis) ≈ 1
-        @test B.value ≈ new_value
+
+        F = LinearAlgebra.qr(vectors)
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+        @test B.value == sign(signed_norm) * precision_type(value_)
 
         # vector is a row vector
         row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
@@ -150,12 +160,11 @@ using GeometricAlgebra
 
         # Construct a Blade representing the same space as `B` with specified
         # value
-        new_value = -20
-        B_copy = Blade{precision_type}(B, value=new_value)
+        B_copy = Blade{precision_type}(B, value=value_)
         @test B_copy.dim == B.dim
         @test B_copy.grade == B.grade
         @test B_copy.basis === B.basis
-        @test B_copy.value == new_value
+        @test B_copy.value == precision_type(value_)
 
         # Construct a Blade representing the blade as `B` containing
         # a copy of the basis (instead of a reference).
@@ -193,8 +202,7 @@ using GeometricAlgebra
             @test B_converted.value == B.value
 
             # Convert precision of `B` with new `value`
-            new_value = -20
-            B_converted = Blade{precision_type_converted}(B, value=new_value)
+            B_converted = Blade{precision_type_converted}(B, value=value_)
             @test B_converted.dim == B.dim
             @test B_converted.grade == B.grade
             if precision_type_converted == precision_type_src
@@ -203,7 +211,7 @@ using GeometricAlgebra
                 @test B_converted.basis ≈ B.basis
                 @test B_converted.basis !== B.basis
             end
-            @test B_converted.value == new_value
+            @test B_converted.value ≈ value_
 
             # Convert precision of `B` using a copy of the basis (instead of
             # a reference).
@@ -235,8 +243,14 @@ end
     vectors = Matrix([3 3; -4 -4; 0 1])
     one_vector = Vector([3; 4; 0])
 
+    # Select random value for tests where `value` != 0
+    value_ = rand() + 1  # add 1 to avoid 0
+    value_ = rand() > 0.5 ? value_ : -value_
+
     # --- Blade(vectors::Array{T};
+    #           value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
     #           atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    #         where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # --- vectors isa Matrix
@@ -244,9 +258,17 @@ end
         # Preparations
         converted_vectors = Matrix{precision_type}(vectors)
 
-        # norm(blade) > default atol
+        # norm(blade) > default atol; value == nothing
         B = Blade(converted_vectors)
         @test B isa Blade{precision_type}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade(converted_vectors, value=value_)
+        @test B isa Blade{precision_type}
+
+        F = LinearAlgebra.qr(converted_vectors)
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+        @test value(B) == sign(signed_norm) * precision_type(value_)
 
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_vectors / 6
@@ -262,9 +284,14 @@ end
         # Preparations
         converted_one_vector = Vector{precision_type}(one_vector)
 
-        # norm(blade) > default atol
+        # norm(blade) > default atol; value == nothing
         B = Blade(converted_one_vector)
         @test B isa Blade{precision_type}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade(converted_one_vector, value=value_)
+        @test B isa Blade{precision_type}
+        @test value(B) == precision_type(value_)
 
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_one_vector / 6
@@ -277,7 +304,9 @@ end
     end
 
     # --- Blade{T}(vectors::Array{<:AbstractFloat};
-    #              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    #              value::Union{Real, Nothing}=nothing,
+    #              atol::Real=blade_atol(T))
+    #         where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
@@ -286,9 +315,17 @@ end
             # Preparations
             converted_vectors = Matrix{value_type}(vectors)
 
-            # norm(blade) > default atol
+            # norm(blade) > default atol; value == nothing
             B = Blade{precision_type}(converted_vectors)
             @test B isa Blade{precision_type}
+
+            # norm(blade) > default atol; value != nothing
+            B = Blade{precision_type}(converted_vectors, value=value_)
+            @test B isa Blade{precision_type}
+
+            F = LinearAlgebra.qr(converted_vectors)
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            @test value(B) == sign(signed_norm) * precision_type(value_)
 
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_vectors / 6
@@ -304,9 +341,14 @@ end
             # Preparations
             converted_one_vector = Vector{precision_type}(one_vector)
 
-            # norm(blade) > default atol
+            # norm(blade) > default atol; value == nothing
             B = Blade{precision_type}(converted_one_vector)
             @test B isa Blade{precision_type}
+
+            # norm(blade) > default atol; value != nothing
+            B = Blade{precision_type}(converted_one_vector, value=value_)
+            @test B isa Blade{precision_type}
+            @test value(B) == precision_type(value_)
 
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_one_vector / 6
@@ -319,7 +361,9 @@ end
         end
     end
 
-    # --- Blade(vectors::Array{<:Integer}; atol::Real=blade_atol(Float64))
+    # --- Blade(vectors::Array{<:Integer};
+    #           value::Union{Real, Nothing}=nothing,
+    #           atol::Real=blade_atol(Float64))
 
     # subtypes(Signed)
     for value_type in subtypes(Signed)
@@ -328,9 +372,14 @@ end
         # Preparations
         converted_vectors = Matrix{value_type}(vectors)
 
-        # norm(blade) > default atol
+        # norm(blade) > default atol; value == nothing
         B = Blade(converted_vectors)
         @test B isa Blade{Float64}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade(converted_vectors, value=value_)
+        @test B isa Blade{Float64}
+        @test value(B) == Float64(value_)
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
@@ -341,9 +390,14 @@ end
         # Preparations
         converted_one_vector = Vector{value_type}(one_vector)
 
-        # norm(blade) > default atol
+        # norm(blade) > default atol; value == nothing
         B = Blade(converted_one_vector)
         @test B isa Blade{Float64}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade(converted_one_vector, value=value_)
+        @test B isa Blade{Float64}
+        @test value(B) == Float64(value_)
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
@@ -357,9 +411,14 @@ end
         # Preparations
         converted_vectors = Matrix{value_type}(abs.(vectors))
 
-        # norm(blade) > default atol
+        # norm(blade) > default atol; value == nothing
         B = Blade(converted_vectors)
         @test B isa Blade{Float64}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade(converted_vectors, value=value_)
+        @test B isa Blade{Float64}
+        @test value(B) == Float64(value_)
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
@@ -370,9 +429,14 @@ end
         # Preparations
         converted_one_vector = Vector{value_type}(abs.(one_vector))
 
-        # norm(blade) > default atol
+        # norm(blade) > default atol; value == nothing
         B = Blade(converted_one_vector)
         @test B isa Blade{Float64}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade(converted_one_vector, value=value_)
+        @test B isa Blade{Float64}
+        @test value(B) == Float64(value_)
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
@@ -383,10 +447,15 @@ end
 
     # ------ vectors isa Matrix
 
-    # norm(blade) < atol
+    # norm(blade) > default atol; value == nothing
     converted_vectors = Matrix{Bool}(vectors .!= 0)
     B = Blade(converted_vectors)
     @test B isa Blade{Float64}
+
+    # norm(blade) > default atol; value != nothing
+    B = Blade(converted_vectors, value=value_)
+    @test B isa Blade{Float64}
+    @test value(B) == Float64(value_)
 
     # norm(blade) < atol
     B = Blade(converted_vectors, atol=2)
@@ -394,16 +463,23 @@ end
 
     # ------ vectors isa Vector
 
-    # norm(blade) < atol
+    # norm(blade) > atol; value == nothing
     converted_one_vector = Vector{Bool}(one_vector .!= 0)
     B = Blade(converted_one_vector)
     @test B isa Blade{Float64}
+
+    # norm(blade) > default atol; value != nothing
+    converted_one_vector = Vector{Bool}(one_vector .!= 0)
+    B = Blade(converted_one_vector, value=value_)
+    @test B isa Blade{Float64}
+    @test value(B) == Float64(value_)
 
     # norm(blade) < atol
     B = Blade(converted_one_vector, atol=2)
     @test B === Zero{Float64}()
 
     # --- Blade{T}(vectors::Array{<:Integer};
+    #              value::Union{Real, Nothing}=nothing,
     #              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
@@ -416,9 +492,17 @@ end
             # Preparations
             converted_vectors = Matrix{value_type}(vectors)
 
-            # norm(blade) > default atol
+            # norm(blade) > default atol; value == nothing
             B = Blade{precision_type}(converted_vectors)
             @test B isa Blade{precision_type}
+
+            # norm(blade) > default atol; value != nothing
+            B = Blade{precision_type}(converted_vectors, value=value_)
+            @test B isa Blade{precision_type}
+
+            F = LinearAlgebra.qr(converted_vectors)
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            @test value(B) == sign(signed_norm) * precision_type(value_)
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
@@ -429,9 +513,14 @@ end
             # Preparations
             converted_one_vector = Vector{value_type}(one_vector)
 
-            # norm(blade) > default atol
+            # norm(blade) > default atol; value == nothing
             B = Blade{precision_type}(converted_one_vector)
             @test B isa Blade{precision_type}
+
+            # norm(blade) > default atol; value != nothing
+            B = Blade{precision_type}(converted_one_vector, value=value_)
+            @test B isa Blade{precision_type}
+            @test value(B) == precision_type(value_)
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
@@ -445,9 +534,18 @@ end
             # Preparations
             converted_vectors = Matrix{value_type}(abs.(vectors))
 
-            # norm(blade) > default atol
+            # norm(blade) > default atol; value == nothing
             B = Blade{precision_type}(converted_vectors)
             @test B isa Blade{precision_type}
+
+            # norm(blade) > default atol; value != nothing
+            B = Blade{precision_type}(converted_vectors, value=value_)
+            @test B isa Blade{precision_type}
+            @test value(B) == precision_type(value_)
+
+            F = LinearAlgebra.qr(converted_vectors)
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            @test value(B) == sign(signed_norm) * precision_type(value_)
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
@@ -458,9 +556,14 @@ end
             # Preparations
             converted_one_vector = Vector{value_type}(one_vector)
 
-            # norm(blade) > default atol
+            # norm(blade) > default atol; value == nothing
             B = Blade{precision_type}(converted_one_vector)
             @test B isa Blade{precision_type}
+
+            # norm(blade) > default atol; value != nothing
+            B = Blade{precision_type}(converted_one_vector, value=value_)
+            @test B isa Blade{precision_type}
+            @test value(B) == precision_type(value_)
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
@@ -471,10 +574,18 @@ end
 
         # ------ vectors isa Matrix
 
-        # norm(blade) < atol
+        # norm(blade) > atol; value == nothing
         converted_vectors = Matrix{Bool}(vectors .!= 0)
         B = Blade{precision_type}(converted_vectors)
         @test B isa Blade{precision_type}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade{precision_type}(converted_vectors, value=value_)
+        @test B isa Blade{precision_type}
+
+        F = LinearAlgebra.qr(Matrix{precision_type}(converted_vectors))
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+        @test value(B) == sign(signed_norm) * precision_type(value_)
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_vectors, atol=2)
@@ -482,10 +593,15 @@ end
 
         # ------ vectors isa Vector
 
-        # norm(blade) < atol
+        # norm(blade) > atol; value == nothing
         converted_one_vector = Vector{Bool}(one_vector .!= 0)
         B = Blade{precision_type}(converted_one_vector)
         @test B isa Blade{precision_type}
+
+        # norm(blade) > default atol; value != nothing
+        B = Blade{precision_type}(converted_one_vector, value=value_)
+        @test B isa Blade{precision_type}
+        @test value(B) == precision_type(value_)
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_one_vector, atol=2)
@@ -506,9 +622,9 @@ end
         @test B_copy.basis === B.basis
 
         # Construct a Blade representing the blade as `B` with specified value
-        new_value = 20
-        B_copy = Blade(B, value=new_value)
+        B_copy = Blade(B, value=value_)
         @test B_copy isa Blade{precision_type}
+        @test value(B_copy) == precision_type(value_)
 
         # Construct Blade representing the blade as `B` containing
         # a copy of the basis (instead of a reference).
@@ -517,11 +633,12 @@ end
         @test B_copy.basis == B.basis
         @test B_copy.basis !== B.basis
     end
+
 end
 
 # --- Function tests
 
-@testset "Blade: basic function tests" begin
+@testset "Blade: AbstractBlade interface tests" begin
     # --- Preparations
 
     vectors = [3 3; 4 4; 0 1]
