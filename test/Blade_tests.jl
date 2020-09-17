@@ -22,17 +22,19 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-# TODO: add unit tests for cases where `value` is specified
 @testset "Blade: inner constructor tests" begin
     # Notes
     # -----
     # * Test value of constructed instance
 
-    # --- Blade{T}(vectors::Matrix{T};
-    #              atol::Real=blade_zero(T)) where {T<:AbstractFloat}
+    # --- Basic constructor with multiple vectors
+    #
+    # Blade{T}(vectors::Matrix{T};
+    #          value::Union{Real, Nothing}=nothing,
+    #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
-        # number of vectors <= dimension of column space
+        # number of vectors <= dimension of column space; value == nothing
         vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
         B = Blade{precision_type}(vectors)
         @test B.dim == 3
@@ -42,6 +44,18 @@ using GeometricAlgebra
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
         @test B.value ≈ 5
+
+        # number of vectors <= dimension of column space; value != nothing
+        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
+        new_value = -42
+        B = Blade{precision_type}(vectors, value=new_value)
+        @test B.dim == 3
+        @test B.grade == 2
+        @test size(B.basis) == (3, 2)
+        for i in size(B.basis, 2)
+            @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+        end
+        @test B.value ≈ new_value
 
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
@@ -59,14 +73,17 @@ using GeometricAlgebra
         @test B === Zero{precision_type}()
     end
 
-    # --- Blade{T}(vector::Vector{T};
-    #              atol::Real=blade_zero(T)) where {T<:AbstractFloat}
+    # --- Basic constructor with a single vector
+    #
+    # Blade{T}(vector::Vector{T};
+    #          value::Union{Real, Nothing}=nothing,
+    #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         vector = [3, 4, 12]
 
-        # vector is a column vector
+        # vector is a column vector; value == nothing
         col_vector = Vector{precision_type}(vector)
         B = Blade{precision_type}(col_vector)
         @test B.dim == 3
@@ -74,6 +91,16 @@ using GeometricAlgebra
         @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
         @test LinearAlgebra.norm(B.basis) ≈ 1
         @test B.value ≈ 13
+
+        # vector is a column vector; value != nothing
+        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
+        new_value = -42
+        B = Blade{precision_type}(col_vector, value=new_value)
+        @test B.dim == 3
+        @test B.grade == 1
+        @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
+        @test LinearAlgebra.norm(B.basis) ≈ 1
+        @test B.value ≈ new_value
 
         # vector is a row vector
         row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
@@ -103,8 +130,11 @@ using GeometricAlgebra
         @test B === Zero{precision_type}()
     end
 
-    # --- Blade{T}(B::AbstractBlade{T}; value=value(B), copy_basis=false)
-    #         where {T<:AbstractFloat}
+    # --- Copy constructor
+    #
+    # Blade{T}(B::Blade{T};
+    #          value::Real=value(B),
+    #          copy_basis::Bool=false) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -135,6 +165,60 @@ using GeometricAlgebra
         @test B_copy.basis == B.basis
         @test B_copy.basis !== B.basis
         @test B_copy.value == B.value
+    end
+
+    # --- Type conversion constructor
+    #
+    #   Blade{T}(B::Blade{S};
+    #            value::Real=value(B),
+    #            copy_basis::Bool=false) where {T<:AbstractFloat,
+    #                                           S<:AbstractFloat}
+
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            # Preparations
+            vectors = Matrix{precision_type_src}([3 -3; 4 -4; 0 1])
+            B = Blade{precision_type_src}(vectors)
+
+            # Convert precision of `B`
+            B_converted = Blade{precision_type_converted}(B)
+            @test B_converted.dim == B.dim
+            @test B_converted.grade == B.grade
+            if precision_type_converted == precision_type_src
+                @test B_converted.basis === B.basis
+            else
+                @test B_converted.basis ≈ B.basis
+                @test B_converted.basis !== B.basis
+            end
+            @test B_converted.value == B.value
+
+            # Convert precision of `B` with new `value`
+            new_value = -20
+            B_converted = Blade{precision_type_converted}(B, value=new_value)
+            @test B_converted.dim == B.dim
+            @test B_converted.grade == B.grade
+            if precision_type_converted == precision_type_src
+                @test B_converted.basis === B.basis
+            else
+                @test B_converted.basis ≈ B.basis
+                @test B_converted.basis !== B.basis
+            end
+            @test B_converted.value == new_value
+
+            # Convert precision of `B` using a copy of the basis (instead of
+            # a reference).
+            B_converted = Blade{precision_type_converted}(B, copy_basis=true)
+            @test B_converted.dim == B.dim
+            @test B_converted.grade == B.grade
+            if precision_type_converted == precision_type_src
+                @test B_converted.basis == B.basis
+                @test B_converted.basis !== B.basis
+            else
+                @test B_converted.basis ≈ B.basis
+                @test B_converted.basis !== B.basis
+            end
+            @test B_converted.value == B.value
+        end
     end
 end
 
