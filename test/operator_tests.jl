@@ -324,7 +324,7 @@ end
     end
 end
 
-@testset "==(x, y): Blade, AbstractScalar" begin
+@testset "!=(x, y): Blade, AbstractScalar" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
     test_value = rand() + 1  # add 1 to avoid 0
@@ -462,7 +462,7 @@ end
     end
 end
 
-@testset "≈(x, y): Blade, AbstractScalar" begin
+@testset "≉(x, y): Blade, AbstractScalar" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
     test_value = rand() + 1  # add 1 to avoid 0

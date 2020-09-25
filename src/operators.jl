@@ -31,9 +31,6 @@ Return true if B1 and B2 are equal; otherwise, return false.
 ==(B::AbstractScalar, x::Real) = (x == value(B))
 ==(x::Real, B::AbstractScalar) = (B == x)
 
-==(B1::Blade, B2::AbstractScalar) = false
-==(B1::AbstractScalar, B2::Blade) = false
-
 
 """
     ≈(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})
