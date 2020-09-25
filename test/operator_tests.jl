@@ -329,7 +329,7 @@ end
     B = Blade(vectors)
 
     # x::Blade
-    negative_B = Blade(B, value=-value(B))
+    negative_B = Blade(B, volume=-volume(B))
     @test -B == negative_B
     @test opposite(B) == negative_B
 
@@ -367,26 +367,26 @@ end
         # mod(grade, 4) == 1
         vectors = Vector{precision_type}([3; 4; 0; 0; 0])
         B = Blade(vectors)
-        expected_reciprocal = Blade(B, value=1 / precision_type(5))
+        expected_reciprocal = Blade(B, volume=1 / precision_type(5))
         @test reciprocal(B) ≈ expected_reciprocal
 
         # mod(grade, 4) == 2
         vectors = Matrix{precision_type}([3 3; 4 4; 0 1; 0 0; 0 0])
         B = Blade(vectors)
-        expected_reciprocal = Blade(B, value=-1 / precision_type(5))
+        expected_reciprocal = Blade(B, volume=-1 / precision_type(5))
         @test reciprocal(B) ≈ expected_reciprocal
 
         # mod(grade, 4) == 3
         vectors = Matrix{precision_type}([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
         B = Blade(vectors)
-        expected_reciprocal = Blade(B, value=-1 / precision_type(5))
+        expected_reciprocal = Blade(B, volume=-1 / precision_type(5))
         @test reciprocal(B) ≈ expected_reciprocal
 
         # mod(grade, 4) == 0
         vectors = Matrix{precision_type}(
             [3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
         B = Blade(vectors)
-        expected_reciprocal = Blade(B, value=1 / precision_type(5))
+        expected_reciprocal = Blade(B, volume=1 / precision_type(5))
         @test reciprocal(B) ≈ expected_reciprocal
     end
 end
