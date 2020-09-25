@@ -12,6 +12,7 @@ except according to the terms contained in the LICENSE file.
 # --- Imports
 
 import Base.:(==), Base.:(≈), Base.:(-)
+import LinearAlgebra
 
 
 # --- Comparison operators
@@ -21,7 +22,7 @@ import Base.:(==), Base.:(≈), Base.:(-)
 
 Return true if B1 and B2 are equal; otherwise, return false.
 """
-==(B1::Blade, B2::Blade) =  # TODO: fix basis and orientation comparison
+==(B1::Blade, B2::Blade) =
     dim(B1) == dim(B2) && grade(B1) == grade(B2) &&
     volume(B1) == volume(B2) && basis(B1) == basis(B2)
 
@@ -36,13 +37,26 @@ Return true if B1 and B2 are equal; otherwise, return false.
 
 Return true if B1 and B2 are approximatly equal; otherwise, return false.
 """
-≈(B1::Blade{T1}, B2::Blade{T2};
+function ≈(B1::Blade{T1}, B2::Blade{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    sign(B1) == sign(B2) &&
-    ≈(norm(B1), norm(B2), atol=atol, rtol=rtol) &&
-    true  # TODO: add check that basis represent the same space
+                                                          T2<:AbstractFloat}
+    # Check dim, grade, and norm
+    if dim(B1) != dim(B2) || grade(B1) != grade(B2) ||
+        ≉(norm(B1), norm(B2), atol=atol, rtol=rtol)
+
+        return false
+    end
+
+    # Check that B1 and B2 represent the same space
+    projection = LinearAlgebra.det(transpose(basis(B1)) * basis(B2))
+    if ≉(abs(projection), 1, atol=atol, rtol=rtol)
+        return false
+    end
+
+    # Check that B1 and B2 have the same orientation
+    return sign(B1) * sign(B2) * sign(projection) == 1
+end
 
 ≈(B1::Scalar{T1}, B2::Scalar{T2};
   atol::Real=0,
