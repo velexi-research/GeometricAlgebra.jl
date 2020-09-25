@@ -27,7 +27,8 @@ using GeometricAlgebra
     vectors = [3 3; 4 4; 0 1]
     B = Blade(vectors)
 
-    # x::Blade, y::Blade
+    # dim(B1) == dim(B2), grade(B1) == grade(B2), volume(B1) == volume(B2)
+    # basis(B1) == basis(B2)
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             B1 = Blade(convert(Array{precision_type1}, vectors))
@@ -37,6 +38,49 @@ using GeometricAlgebra
             else
                 @test B1 != B2
             end
+        end
+    end
+
+    # dim(B1) != dim(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 3; 4 4; 0 1; 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors2))
+            @test B1 != B2
+        end
+    end
+
+    # grade(B1) != grade(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 3 3; 4 4 4; 0 1 0; 0 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors2))
+            @test B1 != B2
+        end
+    end
+
+    # volume(B1) != volume(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors),
+                       volume=2*volume(B1))
+            @test B1 != B2
+        end
+    end
+
+    # basis(B1) != basis(B2)
+    test_volume = 5.0
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 4; 4 5; 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors),
+                       volume=test_volume)
+            B2 = Blade(convert(Array{precision_type2}, vectors2),
+                       volume=test_volume)
+            @test B1 != B2
         end
     end
 end
@@ -287,12 +331,68 @@ end
     vectors = [3 3; 4 4; 0 1]
     B = Blade(vectors)
 
-    # x::Blade, y::Blade
+    # dim(B1) == dim(B2), grade(B1) == grade(B2), volume(B1) ≈ volume(B2)
+    # basis(B1) ≈ basis(B2)
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             B1 = Blade(convert(Array{precision_type1}, vectors))
             B2 = Blade(convert(Array{precision_type2}, vectors))
             @test B1 ≈ B2
+        end
+    end
+
+    # dim(B1) != dim(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 3; 4 4; 0 1; 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors2))
+            @test B1 ≉ B2
+        end
+    end
+
+    # grade(B1) != grade(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 3 3; 4 4 4; 0 1 0; 0 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors2))
+            @test B1 ≉ B2
+        end
+    end
+
+    # volume(B1) ≉ volume(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors))
+            B2 = Blade(convert(Array{precision_type2}, vectors),
+                       volume=2*volume(B1))
+            @test B1 ≉ B2
+        end
+    end
+
+    # basis(B1) ≉ basis(B2)
+    test_volume = 5.0
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 4; 4 10; 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors),
+                       volume=test_volume)
+            B2 = Blade(convert(Array{precision_type2}, vectors2),
+                       volume=test_volume)
+            @test B1 ≉ B2
+        end
+    end
+
+    # B1 and B2 have opposite orientations
+    test_volume = 5.0
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Blade(convert(Array{precision_type1}, vectors),
+                       volume=test_volume)
+            B2 = Blade(convert(Array{precision_type2}, vectors),
+                       volume=-test_volume)
+            @test B1 ≉ B2
         end
     end
 end

@@ -55,7 +55,7 @@ function ≈(B1::Blade{T1}, B2::Blade{T2};
     end
 
     # Check that B1 and B2 have the same orientation
-    return sign(B1) * sign(B2) * sign(projection) == 1
+    return sign(B1) * sign(B2) == sign(projection)
 end
 
 ≈(B1::Scalar{T1}, B2::Scalar{T2};
