@@ -29,33 +29,42 @@ export Zero, One
 Supertype for all blade types. Blades are represented with the floating-point
 precision of type `T`.
 
-For the AbstractBlade type, the norm and orientation are encoded by the `value`
-of the blade. For Blades, the norm of the blade is equal to `abs(value)` and
-the orientation of the blade relative to its `basis` is equal `sign(value)`.
-For Scalars, the `basis` of the scalar is `1`, so the `value` of the scalar
-has its expected meaning.
+For the AbstractBlade type, the norm and orientation are encoded by the `volume`
+of the blade. For Blades, the norm of the blade is equal to `abs(volume)` and
+the orientation of the blade relative to its `basis` is equal `sign(volume)`.
+For Scalars, the `basis` and `volume` of the scalar are `1` and the value
+of the scalar, respectively.
 
 Methods
--------
-    dim(B::AbstractBlade{T})::Int
-    grade(B::AbstractBlade{T})::Int
-    basis(B::AbstractBlade{T})::Union{Matrix{T}, Real}
-    value(B::AbstractBlade{T})::T
-    norm(B::AbstractBlade{T})::T
-    sign(B::AbstractBlade{T})::Int8
+---------
+    dim(B)::Integer
+    grade(B)::Integer
+    basis(B)::Matrix{AbstractFloat}
+    volume(B)::AbstractFloat
+    norm(B)::AbstractFloat
+    sign(B)::Integer
 
 Unary Operations
-----------------
-    -(B::AbstractBlade{T})::AbstractBlade{T}
+------------------
+    -(B)::AbstractBlade
+    reverse(B)::AbstractBlade
 
 Binary Operations
-------------------
-    +(B::AbstractBlade, C::AbstractBlade)::Multivector
-    -(B::AbstractBlade, C::AbstractBlade)::Multivector
-    *(B::AbstractBlade, C::AbstractBlade)::Multivector
-    /(B::AbstractBlade, C::AbstractBlade)::Multivector
-    ∧(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-    ⋅(B::AbstractBlade, C::AbstractBlade)::Multivector
+--------------------
+    ∧(B, C)::AbstractBlade
+    wedge(B, C)::AbstractBlade
+    outer(B, C)::AbstractBlade
+
+    ⋅(B, C)::AbstractBlade
+    inner(B, C)::AbstractBlade
+
+    +(B, C)::AbstractMultivector
+    -(B, C)::AbstractMultivector
+    *(B, C)::AbstractMultivector
+    /(B, C)::AbstractMultivector
+
+    dual(A, B)::AbstractBlade
+    project(A, B)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} end
 
@@ -66,6 +75,10 @@ abstract type AbstractBlade{T<:AbstractFloat} end
 
 Supertype for all scalar types (i.e., 0-blades). Scalars are represented with
 the floating-point precision of type `T`.
+
+Methods
+---------
+    value(B)::AbstractFloat
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
@@ -88,42 +101,42 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #   the order of the columns in `basis` defines the orientation for the
     #   unit blade represented by `basis`.
     #
-    # * `value`: the signed-norm (hypervolume) of the blade. The sign
-    #    of `value` indicates the orientation of the blade relative to the
+    # * `volume`: the signed-norm (hypervolume) of the blade. The sign
+    #    of `volume` indicates the orientation of the blade relative to the
     #    unit blade represented by `basis`. It is positive when the blade has
     #    the same orientation as `basis` and negative when the blade has the
     #    opposite orientation.
     dim::Int
     grade::Int
     basis::Matrix{T}
-    value::T
+    volume::T
 
     """
         Blade{T}(vectors::Matrix{T};
-                 value::Union{Real, Nothing}=nothing,
+                 volume::Union{Real, Nothing}=nothing,
                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
     matrix. Zero{T}() is returned when the norm of the blade is less than
     `atol`.
 
-    By default, `vectors` determines the value of the blade. However, if
-    `value` is specified, `vectors` is only used to define the subspace
+    By default, `vectors` determines the volume of the blade. However, if
+    `volume` is specified, `vectors` is only used to define the subspace
     represented by the blade.
 
-    When `value` is positive, the orientation of the blade is the same as the
+    When `volume` is positive, the orientation of the blade is the same as the
     orientation of the outer product of the columns of `vectors` (taken in
-    order). When `value` is negative, the orientation of the blade is the
+    order). When `volume` is negative, the orientation of the blade is the
     opposite of the orientation implied by the `vectors`.
     """
     function Blade{T}(vectors::Matrix{T};
-                      value::Union{Real, Nothing}=nothing,
+                      volume::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
         # --- Handle edge cases
 
-        # `value` is effectively zero
-        if value != nothing && abs(value) < atol
+        # `volume` is effectively zero
+        if volume != nothing && abs(volume) < atol
             return Zero{T}()
         end
 
@@ -148,42 +161,42 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         # Orthonormal basis for subspace
         basis::Matrix{T} = F.Q
 
-        # Compute value
-        value = (value == nothing) ? signed_norm : value * sign(signed_norm)
+        # Compute volume
+        volume = (volume == nothing) ? signed_norm : volume * sign(signed_norm)
 
-        # Return Zero if `value` is effectively zero
-        if abs(value) < atol
+        # Return Zero if `volume` is effectively zero
+        if abs(volume) < atol
             return Zero{T}()
         end
 
         # Return new Blade
-        new(dims[1], dims[2], basis, value)
+        new(dims[1], dims[2], basis, volume)
     end
 
     """
         Blade{T}(vector::Vector{T};
-                 value::Union{Real, Nothing}=nothing,
+                 volume::Union{Real, Nothing}=nothing,
                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Construct a Blade from a single vector. Zero{T}() is returned when the
     norm of the blade is less than `atol`.
 
-    By default, `vector` determines the value of the blade. However, if
-    `value` is specified, `vector` is only used to define the subspace
+    By default, `vector` determines the volume of the blade. However, if
+    `volume` is specified, `vector` is only used to define the subspace
     represented by the blade.
 
-    When `value` is positive, the orientation of the blade is the same as the
-    direction of `vector`. When `value` is negative, the orientation of the
+    When `volume` is positive, the orientation of the blade is the same as the
+    direction of `vector`. When `volume` is negative, the orientation of the
     blade is the opposite of the direction of `vector`.
     """
     function Blade{T}(vector::Vector{T};
-                      value::Union{Real, Nothing}=nothing,
+                      volume::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
         # --- Handle edge cases
 
-        # `value` is effectively zero
-        if value != nothing && abs(value) < atol
+        # `volume` is effectively zero
+        if volume != nothing && abs(volume) < atol
             return Zero{T}()
         end
 
@@ -193,89 +206,89 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         norm_vector = LinearAlgebra.norm(vector)
         basis::Matrix{T} = reshape(vector, length(vector), 1) / norm_vector
 
-        # Set value
-        value = (value == nothing) ? norm_vector : value
+        # Set volume
+        volume = (volume == nothing) ? norm_vector : volume
 
-        # Return Zero if `value` is effectively zero
-        if abs(value) < atol
+        # Return Zero if `volume` is effectively zero
+        if abs(volume) < atol
             return Zero{T}()
         end
 
         # Return new Blade
-        new(length(vector), 1, basis, value)
+        new(length(vector), 1, basis, volume)
     end
 
     """
         Blade{T}(B::Blade{T};
-                 value::Real=value(B),
+                 volume::Real=volume(B),
                  copy_basis::Bool=false) where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
-    `value`. When `copy_basis` is true, the `basis` of the new Blade is a copy
+    `volume`. When `copy_basis` is true, the `basis` of the new Blade is a copy
     of the `basis` of the original Blade; otherwise, the `basis` of the new
     Blade is reference to the `basis` of the original Blade.
     """
     function Blade{T}(B::Blade{T};
-                      value::Real=value(B),
+                      volume::Real=volume(B),
                       copy_basis::Bool=false) where {T<:AbstractFloat}
         # Return new Blade
-        copy_basis ? new(dim(B), grade(B), copy(basis(B)), value) :
-                     new(dim(B), grade(B), basis(B), value)
+        copy_basis ? new(dim(B), grade(B), copy(basis(B)), volume) :
+                     new(dim(B), grade(B), basis(B), volume)
     end
 
     """
         Blade{T}(B::Blade{S};
-                 value::Real=value(B),
+                 volume::Real=volume(B),
                  copy_basis::Bool=false) where {T<:AbstractFloat,
                                                 S<:AbstractFloat}
 
-    Convert the floating-point precision of a Blade. If `value` is specified,
-    the value of the blade of the new blade is set to `value`. When
+    Convert the floating-point precision of a Blade. If `volume` is specified,
+    the volume of the blade of the new blade is set to `volume`. When
     `copy_basis` is true, the `basis` of the new Blade is a copy of the
     `basis` of the original Blade; otherwise, the `basis` of the new Blade is
     reference to the `basis` of the original Blade.
     """
     function Blade{T}(B::Blade{S};
-                      value::Real=value(B),
+                      volume::Real=volume(B),
                       copy_basis::Bool=false) where {T<:AbstractFloat,
                                                      S<:AbstractFloat}
         # Handle special cases
         if T == S
-            return B{T}(B, value=value, copy_basis=copy_basis)
+            return B{T}(B, volume=volume, copy_basis=copy_basis)
         end
 
         # Return new Blade
-        new(dim(B), grade(B), convert(Array{T}, basis(B)), value)
+        new(dim(B), grade(B), convert(Array{T}, basis(B)), volume)
     end
 end
 
 """
     Blade(vectors::Array{T};
-          value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+          volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
     Blade{T}(vectors::Array{<:AbstractFloat};
-             value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+             volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
     Blade(vectors::Array{<:Integer};
-          value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64))
+          volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64))
 
     Blade{T}(vectors::Array{<:Integer};
-             value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+             volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
 of a matrix or (2) a single vector. Zero{T}() is returned when the norm of the
 blade is less than `atol`.
 
-By default, `vectors` determines the value (i.e., norm and orientation) of the
-blade. However, if `value` is specified, `vectors` is only used to define the
+By default, `vectors` determines the volume (i.e., norm and orientation) of the
+blade. However, if `volume` is specified, `vectors` is only used to define the
 subspace represented by the blade.
 
-When `value` is positive, the orientation of the blade is the same as the
+When `volume` is positive, the orientation of the blade is the same as the
 orientation of the outer product of the columns of `vectors` (taken in order).
-When `value` is negative, the orientation of the blade is the opposite of the
+When `volume` is negative, the orientation of the blade is the opposite of the
 orientation implied by the `vectors`.
 
 When the precision is not specified, the following rules are applied to set
@@ -288,26 +301,26 @@ the precision of the Blade.
   defaults to `Float64`.
 """
 Blade(vectors::Array{T};
-      value::Union{Real, Nothing}=nothing,
+      volume::Union{Real, Nothing}=nothing,
       atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade{T}(vectors, value=value, atol=atol)
+    Blade{T}(vectors, volume=volume, atol=atol)
 
 Blade{T}(vectors::Array{<:AbstractFloat};
-         value::Union{Real, Nothing}=nothing,
+         volume::Union{Real, Nothing}=nothing,
          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade(convert(Array{T}, vectors), value=value, atol=atol)
+    Blade(convert(Array{T}, vectors), volume=volume, atol=atol)
 
 Blade(vectors::Array{<:Integer};
-      value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64)) =
-    Blade(convert(Array{Float64}, vectors), value=value, atol=atol)
+      volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64)) =
+    Blade(convert(Array{Float64}, vectors), volume=volume, atol=atol)
 
 Blade{T}(vectors::Array{<:Integer};
-         value::Union{Real, Nothing}=nothing,
+         volume::Union{Real, Nothing}=nothing,
          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade(convert(Array{T}, vectors), value=value, atol=atol)
+    Blade(convert(Array{T}, vectors), volume=volume, atol=atol)
 
 """
-    Blade(B::Blade{T}; value::Real=value(B), copy_basis=false)
+    Blade(B::Blade{T}; volume::Real=volume(B), copy_basis=false)
         where {T<:AbstractFloat}
 
 Copy constructor. Construct a Blade representing the same space as `B` having
@@ -317,11 +330,27 @@ otherwise, the `basis` of the new Blade is reference to the `basis` of the
 original Blade.
 """
 Blade(B::Blade{T};
-      value::Real=value(B), copy_basis=false) where {T<:AbstractFloat} =
-    Blade{T}(B, value=value, copy_basis=copy_basis)
+      volume::Real=volume(B), copy_basis=false) where {T<:AbstractFloat} =
+    Blade{T}(B, volume=volume, copy_basis=copy_basis)
 
-# TODO Consider adding convenience functions Blade(x::Real)
+"""
+    Blade(x::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
+    Blade{T}(x::AbstractFloat; atol::Real=blade_atol(T))
+        where {T<:AbstractFloat}
+
+    Blade(x::Integer)
+
+    Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar(x)
+
+Convenience constructors for constructing Scalars.
+"""
+Blade(x::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
+    Scalar(x; atol=atol)
+Blade{T}(x::AbstractFloat; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
+    Scalar{T}(x; atol=atol)
+Blade(x::Integer) = Scalar(x)
+Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar{T}(x)
 
 # Scalar
 """
@@ -432,10 +461,10 @@ One(::Type{<:AbstractBlade}) = One{Float64}()
 One(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = One{T}()
 
 
-# --- Basic Blade functions
+# --- Core AbstractBlade functions
 
 # Exports
-export dim, grade, basis, value, norm, sign
+export dim, grade, basis, volume, norm, sign
 
 """
     dim(B::AbstractBlade{<:AbstractFloat})
@@ -463,36 +492,51 @@ basis(B::Blade) = B.basis
 basis(B::AbstractScalar{T}) where {T<:AbstractFloat} = T(1)
 
 """
-    value(B::AbstractBlade)::Real
+    volume(B::AbstractBlade)::Real
 
-Return the value of a blade. For Blades, `value(B)` is the signed norm of
-the blade relative to its unit basis. For Scalars, `value(B)` is the value
+Return the volume of a blade. For Blades, `volume(B)` is the signed norm of
+the blade relative to its unit basis. For Scalars, `volume(B)` is the value
 of the scalar (note that the basis for Scalars is 1).
 """
-value(B::Blade) = B.value
-value(B::Scalar) = B.value
-value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
-value(B::One{T}) where {T<:AbstractFloat} = T(1)
+volume(B::Blade) = B.volume
+volume(B::Scalar) = B.value
+volume(B::Zero{T}) where {T<:AbstractFloat} = T(0)
+volume(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 """
     norm(B::AbstractBlade{<:AbstractFloat})
 
 Return the norm of the blade.
 """
-norm(B::Blade) = abs(value(B))
-norm(B::Scalar) = abs(value(B))
-norm(B::Zero) = value(B)
-norm(B::One) = value(B)
+norm(B::Blade) = abs(volume(B))
+norm(B::Scalar) = abs(volume(B))
+norm(B::Zero) = volume(B)
+norm(B::One) = volume(B)
 
 """
     sign(B::AbstractBlade)::Int8
 
 Return the sign of a blade relative to its unit basis.
 """
-sign(B::Blade)::Int8 = sign(B.value)
+sign(B::Blade)::Int8 = sign(B.volume)
 sign(B::Scalar)::Int8 = sign(B.value)
 sign(B::Zero)::Int8 = 0
 sign(B::One)::Int8 = 1
+
+
+# --- Core AbstractScalar functions
+
+# Exports
+export value
+
+"""
+    value(B::AbstractBlade)::Real
+
+Return the value of a scalar.
+"""
+value(B::Scalar) = B.value
+value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
+value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 
 # --- Utility functions

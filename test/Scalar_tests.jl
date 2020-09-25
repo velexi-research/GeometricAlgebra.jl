@@ -232,8 +232,8 @@ end
         @test dim(S) == 0
         @test grade(S) == 0
         @test basis(S) == 1
-        @test value(S) isa precision_type
-        @test value(S) == positive_test_value
+        @test volume(S) isa precision_type
+        @test volume(S) == positive_test_value
         @test norm(S) isa precision_type
         @test norm(S) == positive_test_value
         @test sign(S) == 1
@@ -245,8 +245,8 @@ end
         @test dim(S) == 0
         @test grade(S) == 0
         @test basis(S) == 1
-        @test value(S) isa precision_type
-        @test value(S) == negative_test_value
+        @test volume(S) isa precision_type
+        @test volume(S) == negative_test_value
         @test norm(S) isa precision_type
         @test norm(S) == abs(negative_test_value)
         @test sign(S) == -1
@@ -257,8 +257,8 @@ end
         @test dim(S) == 0
         @test grade(S) == 0
         @test basis(S) == 1
-        @test value(S) isa precision_type
-        @test value(S) == 0
+        @test volume(S) isa precision_type
+        @test volume(S) == 0
         @test norm(S) isa precision_type
         @test norm(S) == 0
         @test sign(S) == 0
@@ -268,8 +268,8 @@ end
         @test dim(S) == 0
         @test grade(S) == 0
         @test basis(S) == 1
-        @test value(S) isa precision_type
-        @test value(S) == precision_type(Inf)
+        @test volume(S) isa precision_type
+        @test volume(S) == precision_type(Inf)
         @test norm(S) isa precision_type
         @test norm(S) == Inf
         @test sign(S) == 1
@@ -279,14 +279,71 @@ end
         @test dim(S) == 0
         @test grade(S) == 0
         @test basis(S) == 1
-        @test value(S) isa precision_type
-        @test value(S) == precision_type(-Inf)
+        @test volume(S) isa precision_type
+        @test volume(S) == precision_type(-Inf)
         @test norm(S) isa precision_type
         @test norm(S) == Inf
         @test sign(S) == -1
     end
 end
 
+@testset "Scalar: AbstractScalar interface tests" begin
+    # Preparations
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_test_value = precision_type(test_value)
+
+        # value > 0
+        positive_test_value = converted_test_value > 0 ?
+            converted_test_value : -converted_test_value
+        S = Scalar(positive_test_value)
+        @test value(S) isa precision_type
+        @test value(S) == positive_test_value
+
+        # value < 0
+        negative_test_value = converted_test_value > 0 ?
+            -converted_test_value : converted_test_value
+        S = Scalar(negative_test_value)
+        @test value(S) isa precision_type
+        @test value(S) == negative_test_value
+
+        # value = 0
+        S = Scalar(precision_type(0))
+        @test S === Zero{precision_type}()
+        @test value(S) isa precision_type
+        @test value(S) == 0
+
+        # value = Inf
+        S = Scalar(precision_type(Inf))
+        @test value(S) isa precision_type
+        @test value(S) == precision_type(Inf)
+
+        # value = -Inf
+        S = Scalar(precision_type(-Inf))
+        @test value(S) isa precision_type
+        @test value(S) == precision_type(-Inf)
+    end
+end
+
+@testset "Scalar: convert() tests" begin
+    # Preparations
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            # Preparations
+            converted_test_value = precision_type_src(test_value)
+            S = Scalar{precision_type_src}(converted_test_value)
+
+            @test convert(Scalar{precision_type_converted}, S) isa
+                  Scalar{precision_type_converted}
+        end
+    end
+end
 @testset "Scalar: convert() tests" begin
     # Preparations
     test_value = rand() + 1  # add 1 to avoid 0

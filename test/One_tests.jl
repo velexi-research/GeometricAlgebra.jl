@@ -66,9 +66,9 @@ end
         @test basis(B) isa precision_type
         @test basis(B) == 1
 
-        # value()
-        @test value(B) isa precision_type
-        @test value(B) == 1
+        # volume()
+        @test volume(B) isa precision_type
+        @test volume(B) == 1
 
         # norm()
         @test norm(B) isa precision_type
@@ -76,5 +76,15 @@ end
 
         # sign()
         @test sign(B) == 1
+    end
+end
+
+@testset "One: AbstractScalar interface tests" begin
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        B = One(precision_type)
+
+        # value()
+        @test value(B) == 1
     end
 end
