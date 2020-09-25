@@ -85,7 +85,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "==(x, y), !=(x, y): Scalar" begin
+@testset "==(x, y): Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -324,6 +324,47 @@ end
     end
 end
 
+@testset "==(x, y): Blade, AbstractScalar" begin
+    # Preparations
+    vectors = [3 3; 4 4; 0 1]
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            # x::Blade, y::Scalar
+            B1 = Blade{precision_type1}(vectors)
+            B2 = Scalar{precision_type2}(test_value)
+            @test B1 != B2
+
+            # x::Scalar, y::Blade
+            B1 = Scalar{precision_type1}(test_value)
+            B2 = Blade{precision_type2}(vectors)
+            @test B1 != B2
+
+            # x::Blade, y::Zero
+            B1 = Blade{precision_type1}(vectors)
+            B2 = Zero(precision_type2)
+            @test B1 != B2
+
+            # x::Zero, y::Blade
+            B1 = Zero(precision_type1)
+            B2 = Blade{precision_type2}(vectors)
+            @test B1 != B2
+
+            # x::Blade, y::One
+            B1 = Blade{precision_type1}(vectors)
+            B2 = One(precision_type2)
+            @test B1 != B2
+
+            # x::One, y::Blade
+            B1 = One(precision_type1)
+            B2 = Blade{precision_type2}(vectors)
+            @test B1 != B2
+        end
+    end
+end
+
 # --- ≈(x, y)
 
 @testset "≈(x, y): Blade" begin
@@ -418,6 +459,47 @@ end
         B = Scalar(converted_value)
         @test B ≈ converted_value
         @test converted_value ≈ B
+    end
+end
+
+@testset "≈(x, y): Blade, AbstractScalar" begin
+    # Preparations
+    vectors = [3 3; 4 4; 0 1]
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            # x::Blade, y::Scalar
+            B1 = Blade{precision_type1}(vectors)
+            B2 = Scalar{precision_type2}(test_value)
+            @test B1 ≉ B2
+
+            # x::Scalar, y::Blade
+            B1 = Scalar{precision_type1}(test_value)
+            B2 = Blade{precision_type2}(vectors)
+            @test B1 ≉ B2
+
+            # x::Blade, y::Zero
+            B1 = Blade{precision_type1}(vectors)
+            B2 = Zero(precision_type2)
+            @test B1 ≉ B2
+
+            # x::Zero, y::Blade
+            B1 = Zero(precision_type1)
+            B2 = Blade{precision_type2}(vectors)
+            @test B1 ≉ B2
+
+            # x::Blade, y::One
+            B1 = Blade{precision_type1}(vectors)
+            B2 = One(precision_type2)
+            @test B1 ≉ B2
+
+            # x::One, y::Blade
+            B1 = One(precision_type1)
+            B2 = Blade{precision_type2}(vectors)
+            @test B1 ≉ B2
+        end
     end
 end
 
