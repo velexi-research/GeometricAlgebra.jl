@@ -21,7 +21,7 @@ import LinearAlgebra
 
 # Exports
 export AbstractBlade, AbstractScalar, Blade, Scalar
-export Zero, One
+export ZeroBlade, OneBlade, InfBlade
 
 # AbstractBlade
 """
@@ -115,8 +115,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
                  atol::Real=blade_atol(T), enforce_constraints::Bool=true,
                  copy_basis::Bool=true) where {T<:AbstractFloat}
 
-    Construct a Blade from the specified data field values. Zero() is returned
-    when the absolute value of `volume` is less than `atol`.
+    Construct a Blade from the specified data field values. ZeroBlade() is
+    returned when the absolute value of `volume` is less than `atol`.
 
     When `enforce_constraints` is true, constraints are enforced. When
     `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
@@ -157,7 +157,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return Zero()
+            return ZeroBlade()
         end
 
         # Return new Blade
@@ -171,8 +171,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
             where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
-    matrix. Zero() is returned when the absolute value of `volume` is less than
-    `atol`.
+    matrix. ZeroBlade() is returned when the absolute value of `volume` is less
+    than `atol`.
 
     By default, `vectors` determines the volume of the blade. However, if
     `volume` is specified, `vectors` is only used to define the subspace
@@ -191,7 +191,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return Zero()
+            return ZeroBlade()
         end
 
         # number of vectors > dimension of column space
@@ -202,7 +202,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
                 # vector and call constructor for single column vector.
                 return Blade{T}(reshape(vectors, dims[2]))
             else
-                return Zero()
+                return ZeroBlade()
             end
         end
 
@@ -228,8 +228,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
                  volume::Union{Real, Nothing}=nothing,
                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
-    Construct a Blade from a single vector. Zero() is returned when the norm
-    of the blade is less than `atol`.
+    Construct a Blade from a single vector. ZeroBlade() is returned when the
+    norm of the blade is less than `atol`.
 
     By default, `vector` determines the volume of the blade. However, if
     `volume` is specified, `vector` is only used to define the subspace
@@ -247,7 +247,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return Zero()
+            return ZeroBlade()
         end
 
         # --- Construct Blade
@@ -270,8 +270,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
                  copy_basis::Bool=false) where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
-    oriented `volume` relative to `B`. Zero() is returned if the absolute value
-    of `volume` is less than `atol`,
+    oriented `volume` relative to `B`. ZeroBlade() is returned if the absolute
+    value of `volume` is less than `atol`,
 
     When `copy_basis` is true, the `basis` of the new Blade is a copy
     of the `basis` of the original Blade; otherwise, the `basis` of the new
@@ -293,8 +293,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     Convert the floating-point precision of a Blade.
 
     If `volume` is specified, the oriented volume of the blade of the new blade
-    (relative to `B`) is set to `volume`. Zero() is returned if the absolute
-    value of `volume` is less than `atol`.
+    (relative to `B`) is set to `volume`. ZeroBlade() is returned if the
+    absolute value of `volume` is less than `atol`.
 
     When `copy_basis` is true, the `basis` of the new Blade is a copy of the
     `basis` of the original Blade; otherwise, the `basis` of the new Blade is
@@ -333,8 +333,8 @@ end
         where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
-of a matrix or (2) a single vector. Zero() is returned when the norm of the
-blade is less than `atol`.
+of a matrix or (2) a single vector. ZeroBlade() is returned when the norm of
+the blade is less than `atol`.
 
 By default, `vectors` determines the volume (i.e., norm and orientation) of the
 blade. However, if `volume` is specified, `vectors` is only used to define the
@@ -379,8 +379,8 @@ Blade{T}(vectors::Array{<:Integer};
           copy_basis=false) where {T<:AbstractFloat}
 
 Copy constructor. Construct a Blade representing the same space as `B` having
-a specified oriented volume relative to `B`. Zero() is returned if the absolute
-value of `volume` is less than `atol`.
+a specified oriented volume relative to `B`. ZeroBlade() is returned if the
+absolute value of `volume` is less than `atol`.
 
 When `copy_basis` is true, the `basis` of the new Blade is a copy of the
 `basis` of the original Blade; otherwise, the `basis` of the new Blade is
@@ -426,10 +426,10 @@ struct Scalar{T<:AbstractFloat} <: AbstractScalar
         Scalar{T}(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Construct a Scalar with the specified value. Scalars with absolute value
-    less than `atol` are returned as Zero().
+    less than `atol` are returned as ZeroBlade().
     """
     Scalar{T}(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-        abs(value) < atol ? Zero() : new(value)
+        abs(value) < atol ? ZeroBlade() : new(value)
 end
 
 """
@@ -442,7 +442,7 @@ end
 
     Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
-Construct a Scalar with the specified value. Zero() is returned when the
+Construct a Scalar with the specified value. ZeroBlade() is returned when the
 absolute value of `value` is (1) less than `atol` or (2) exactly equal to
 zero.
 
@@ -463,37 +463,37 @@ Scalar{T}(value::AbstractFloat;
     Scalar(convert(T, value), atol=atol)
 
 Scalar(value::Integer) = (abs(value) == 0) ?
-    Zero() : Scalar{Float64}(convert(Float64, value))
+    ZeroBlade() : Scalar{Float64}(convert(Float64, value))
 
 Scalar{T}(value::Integer) where {T<:AbstractFloat} =
-    (abs(value) == 0) ? Zero() : Scalar{T}(convert(T, value))
+    (abs(value) == 0) ? ZeroBlade() : Scalar{T}(convert(T, value))
 
 
-# Zero
+# ZeroBlade
 """
-    struct Zero <: AbstractScalar
+    struct ZeroBlade <: AbstractScalar
 
 The additive identity 0.
 """
-struct Zero <: AbstractScalar end
+struct ZeroBlade <: AbstractScalar end
 
 """
     zero(B::AbstractBlade)
-    Zero(::Type{<:AbstractBlade})
+    zero(::Type{<:AbstractBlade})
 
 Return the additive identity 0.
 """
-zero(B::AbstractBlade) = Zero()
-zero(::Type{<:AbstractBlade}) = Zero()
+zero(B::AbstractBlade) = ZeroBlade()
+zero(::Type{<:AbstractBlade}) = ZeroBlade()
 
 
-# One
+# OneBlade
 """
-    struct One <: AbstractScalar
+    struct OneBlade <: AbstractScalar
 
 The multiplicative identity 1.
 """
-struct One <: AbstractScalar end
+struct OneBlade <: AbstractScalar end
 
 """
     one(B::AbstractBlade)
@@ -501,8 +501,17 @@ struct One <: AbstractScalar end
 
 Return the multiplicative identity 1.
 """
-one(B::AbstractBlade) = One()
-one(::Type{<:AbstractBlade}) = One()
+one(B::AbstractBlade) = OneBlade()
+one(::Type{<:AbstractBlade}) = OneBlade()
+
+
+# InfBlade
+"""
+    struct InfBlade <: AbstractScalar
+
+A scalar with value greater than all finite floating point values.
+"""
+struct InfBlade <: AbstractScalar end
 
 
 # --- Core AbstractBlade functions
@@ -544,8 +553,8 @@ of the scalar (note that the basis for Scalars is 1).
 """
 volume(B::Blade) = B.volume
 volume(B::Scalar) = B.value
-volume(B::Zero) = 0
-volume(B::One) = 1
+volume(B::ZeroBlade) = 0
+volume(B::OneBlade) = 1
 
 """
     norm(B::AbstractBlade{<:AbstractFloat})
@@ -554,8 +563,8 @@ Return the norm of the blade.
 """
 norm(B::Blade) = abs(volume(B))
 norm(B::Scalar) = abs(volume(B))
-norm(B::Zero) = volume(B)
-norm(B::One) = volume(B)
+norm(B::ZeroBlade) = volume(B)
+norm(B::OneBlade) = volume(B)
 
 """
     sign(B::AbstractBlade)::Int8
@@ -564,8 +573,8 @@ Return the sign of a blade relative to its unit basis.
 """
 sign(B::Blade)::Int8 = sign(B.volume)
 sign(B::Scalar)::Int8 = sign(B.value)
-sign(B::Zero)::Int8 = 0
-sign(B::One)::Int8 = 1
+sign(B::ZeroBlade)::Int8 = 0
+sign(B::OneBlade)::Int8 = 1
 
 
 # --- Core AbstractScalar functions
@@ -579,8 +588,8 @@ export value
 Return the value of a scalar.
 """
 value(B::Scalar) = B.value
-value(B::Zero) = 0
-value(B::One) = 1
+value(B::ZeroBlade) = 0
+value(B::OneBlade) = 1
 
 
 # --- Utility functions

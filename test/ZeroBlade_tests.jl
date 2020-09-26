@@ -1,5 +1,5 @@
 """
-Unit tests for the One type.
+Unit tests for the ZeroBlade type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -21,28 +21,28 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "One: one() tests" begin
-    # one(B::AbstractBlade)
+@testset "ZeroBlade: zero() tests" begin
+    # zero(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
-        @test one(Blade{precision_type}([1 2 3])) === One()
-        @test one(Scalar{precision_type}(1)) === One()
+        @test zero(Blade{precision_type}([1 2 3])) === ZeroBlade()
+        @test zero(Scalar{precision_type}(1)) === ZeroBlade()
     end
-    @test one(Zero()) === One()
-    @test one(One()) === One()
+    @test zero(ZeroBlade()) === ZeroBlade()
+    @test zero(OneBlade()) === ZeroBlade()
 
-    # one(::Type{<:AbstractBlade})
-    for blade_type in (Blade, AbstractScalar, Scalar, Zero, One)
-        @test one(blade_type) === One()
+    # zero(::Type{<:AbstractBlade})
+    for blade_type in (Blade, AbstractScalar, Scalar, ZeroBlade, OneBlade)
+        @test zero(blade_type) === ZeroBlade()
     end
     for precision_type in subtypes(AbstractFloat)
-        @test one(Blade{precision_type}) === One()
-        @test one(Scalar{precision_type}) === One()
+        @test zero(Blade{precision_type}) === ZeroBlade()
+        @test zero(Scalar{precision_type}) === ZeroBlade()
     end
 end
 
-@testset "One: AbstractBlade interface tests" begin
+@testset "ZeroBlade: AbstractBlade interface tests" begin
     # Preparations
-    B = One()
+    B = ZeroBlade()
 
     # dim()
     @test dim(B) == 0
@@ -54,19 +54,19 @@ end
     @test basis(B) == 1
 
     # volume()
-    @test volume(B) == 1
+    @test volume(B) == 0
 
     # norm()
-    @test norm(B) == 1
+    @test norm(B) == 0
 
     # sign()
-    @test sign(B) == 1
+    @test sign(B) == 0
 end
 
-@testset "One: AbstractScalar interface tests" begin
+@testset "ZeroBlade: AbstractScalar interface tests" begin
     # Preparations
-    B = One()
+    B = ZeroBlade()
 
     # value()
-    @test value(B) == 1
+    @test value(B) == 0
 end
