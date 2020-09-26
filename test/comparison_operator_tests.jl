@@ -186,141 +186,113 @@ end
 
     # x::Scalar, y::Zero
     # x::Zero, y::Scalar
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # !=(x,y)
-            @test Scalar(precision_type1(1)) != Zero(precision_type2)
-            @test Zero(precision_type2) != Scalar(precision_type1(1))
-        end
+    for precision_type in subtypes(AbstractFloat)
+        # !=(x,y)
+        @test Scalar(precision_type(2.5)) != Zero()
+        @test Zero() != Scalar(precision_type(2.5))
     end
 
     # x::Scalar, y::One
     # x::One, y::Scalar
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # ==(x, y)
-            @test Scalar(precision_type1(1)) == One(precision_type2)
-            @test One(precision_type2) == Scalar(precision_type1(1))
-
-            # ==(x, y)
-            @test Scalar(precision_type1(5)) != One(precision_type2)
-            @test One(precision_type2) != Scalar(precision_type1(5))
-        end
-    end
-
-    # x::Zero, y::Zero
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # ==(x, y)
-            @test Zero(precision_type1) == Zero(precision_type2)
-        end
-    end
-
-    # x::Zero, y::Real
-    # x::Real, y::Zero
     for precision_type in subtypes(AbstractFloat)
-        # x::Zero, y::AbstractFloat
-        # x::AbstractFloat, y::Zero
-        for value_type in subtypes(AbstractFloat)
-            # ==(x, y)
-            @test Zero(precision_type) == value_type(0)
-            @test value_type(0) == Zero(precision_type)
+        # ==(x, y)
+        @test Scalar(precision_type(1)) == One()
+        @test One() == Scalar(precision_type(1))
 
-            # !=(x, y)
-            @test Zero(precision_type) != value_type(5)
-            @test value_type(5) != Zero(precision_type)
-        end
-
-        # x::Zero, y::Integer
-        # x::Integer, y::Zero
-        for value_type in subtypes(Signed)
-            # ==(x, y)
-            @test Zero(precision_type) == value_type(0)
-            @test value_type(0) == Zero(precision_type)
-
-            # !=(x, y)
-            @test Zero(precision_type) != value_type(5)
-            @test value_type(5) != Zero(precision_type)
-        end
-
-        for value_type in subtypes(Unsigned)
-            # ==(x, y)
-            @test Zero(precision_type) == value_type(0)
-            @test value_type(0) == Zero(precision_type)
-
-            # !=(x, y)
-            @test Zero(precision_type) != value_type(5)
-            @test value_type(5) != Zero(precision_type)
-        end
-
-        # Bool
-        @test Zero(precision_type) == 0
-        @test 0 == Zero(precision_type)
-        @test Zero(precision_type) != 1
-        @test 1 != Zero(precision_type)
+        # ==(x, y)
+        @test Scalar(precision_type(5)) != One()
+        @test One() != Scalar(precision_type(5))
     end
 
-    # x::One, y::One
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # ==(x, y)
-            @test One(precision_type1) == One(precision_type2)
-        end
+    # --- x::Zero, y::Real
+    #     x::Real, y::Zero
+
+    # x::Zero, y::AbstractFloat
+    # x::AbstractFloat, y::Zero
+    for value_type in subtypes(AbstractFloat)
+        # ==(x, y)
+        @test Zero() == value_type(0)
+        @test value_type(0) == Zero()
+
+        # !=(x, y)
+        @test Zero() != value_type(5)
+        @test value_type(5) != Zero()
     end
 
-    # x::One, y::Real
-    # x::Real, y::One
-    for precision_type in subtypes(AbstractFloat)
-        # x::One, y::AbstractFloat
-        # x::AbstractFloat, y::One
-        for value_type in subtypes(AbstractFloat)
-            # ==(x, y)
-            @test One(precision_type) == value_type(1)
-            @test value_type(1) == One(precision_type)
+    # x::Zero, y::Integer
+    # x::Integer, y::Zero
+    for value_type in subtypes(Signed)
+        # ==(x, y)
+        @test Zero() == value_type(0)
+        @test value_type(0) == Zero()
 
-            # !=(x, y)
-            @test One(precision_type) != value_type(3)
-            @test value_type(3) != One(precision_type)
-        end
-
-        # x::One, y::Integer
-        # x::Integer, y::One
-        for value_type in subtypes(Signed)
-            # ==(x, y)
-            @test One(precision_type) == value_type(1)
-            @test value_type(1) == One(precision_type)
-
-            # !=(x, y)
-            @test One(precision_type) != value_type(5)
-            @test value_type(5) != One(precision_type)
-        end
-
-        for value_type in subtypes(Unsigned)
-            # ==(x, y)
-            @test One(precision_type) == value_type(1)
-            @test value_type(1) == One(precision_type)
-
-            # !=(x, y)
-            @test One(precision_type) != value_type(5)
-            @test value_type(5) != One(precision_type)
-        end
-
-        # Bool
-        @test One(precision_type) == 1
-        @test 1 == One(precision_type)
-        @test One(precision_type) != 0
-        @test 0 != One(precision_type)
+        # !=(x, y)
+        @test Zero() != value_type(5)
+        @test value_type(5) != Zero()
     end
+
+    for value_type in subtypes(Unsigned)
+        # ==(x, y)
+        @test Zero() == value_type(0)
+        @test value_type(0) == Zero()
+
+        # !=(x, y)
+        @test Zero() != value_type(5)
+        @test value_type(5) != Zero()
+    end
+
+    # Bool
+    @test Zero() == 0
+    @test 0 == Zero()
+    @test Zero() != 1
+    @test 1 != Zero()
+
+    # --- x::One, y::Real
+    #     x::Real, y::One
+
+    # x::One, y::AbstractFloat
+    # x::AbstractFloat, y::One
+    for value_type in subtypes(AbstractFloat)
+        # ==(x, y)
+        @test One() == value_type(1)
+        @test value_type(1) == One()
+
+        # !=(x, y)
+        @test One() != value_type(3)
+        @test value_type(3) != One()
+    end
+
+    # x::One, y::Integer
+    # x::Integer, y::One
+    for value_type in subtypes(Signed)
+        # ==(x, y)
+        @test One() == value_type(1)
+        @test value_type(1) == One()
+
+        # !=(x, y)
+        @test One() != value_type(5)
+        @test value_type(5) != One()
+    end
+
+    for value_type in subtypes(Unsigned)
+        # ==(x, y)
+        @test One() == value_type(1)
+        @test value_type(1) == One()
+
+        # !=(x, y)
+        @test One() != value_type(5)
+        @test value_type(5) != One()
+    end
+
+    # Bool
+    @test One() == 1
+    @test 1 == One()
+    @test One() != 0
+    @test 0 != One()
 
     # x::Zero, y::One
     # x::One, y::Zero
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # !=(x, y)
-            @test One(precision_type1) != Zero(precision_type2)
-            @test Zero(precision_type1) != One(precision_type2)
-        end
-    end
+    @test One() != Zero()
 end
 
 @testset "!=(x, y): x, y::{Blade, AbstractScalar}" begin
@@ -332,35 +304,28 @@ end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             # x::Blade, y::Scalar
+            # x::Scalar, y::Blade
             B1 = Blade{precision_type1}(vectors)
             B2 = Scalar{precision_type2}(test_value)
             @test B1 != B2
-
-            # x::Scalar, y::Blade
-            B1 = Scalar{precision_type1}(test_value)
-            B2 = Blade{precision_type2}(vectors)
-            @test B1 != B2
-
-            # x::Blade, y::Zero
-            B1 = Blade{precision_type1}(vectors)
-            B2 = Zero(precision_type2)
-            @test B1 != B2
-
-            # x::Zero, y::Blade
-            B1 = Zero(precision_type1)
-            B2 = Blade{precision_type2}(vectors)
-            @test B1 != B2
-
-            # x::Blade, y::One
-            B1 = Blade{precision_type1}(vectors)
-            B2 = One(precision_type2)
-            @test B1 != B2
-
-            # x::One, y::Blade
-            B1 = One(precision_type1)
-            B2 = Blade{precision_type2}(vectors)
-            @test B1 != B2
+            @test B2 != B1
         end
+    end
+
+    for precision_type in subtypes(AbstractFloat)
+        # x::Blade, y::Zero
+        # x::Zero, y::Blade
+        B1 = Blade{precision_type}(vectors)
+        B2 = Zero()
+        @test B1 != B2
+        @test B2 != B1
+
+        # x::Blade, y::One
+        # x::One, y::Blade
+        B1 = Blade{precision_type}(vectors)
+        B2 = One()
+        @test B1 != B2
+        @test B2 != B1
     end
 end
 
@@ -470,34 +435,27 @@ end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             # x::Blade, y::Scalar
+            # x::Scalar, y::Blade
             B1 = Blade{precision_type1}(vectors)
             B2 = Scalar{precision_type2}(test_value)
             @test B1 ≉ B2
-
-            # x::Scalar, y::Blade
-            B1 = Scalar{precision_type1}(test_value)
-            B2 = Blade{precision_type2}(vectors)
-            @test B1 ≉ B2
-
-            # x::Blade, y::Zero
-            B1 = Blade{precision_type1}(vectors)
-            B2 = Zero(precision_type2)
-            @test B1 ≉ B2
-
-            # x::Zero, y::Blade
-            B1 = Zero(precision_type1)
-            B2 = Blade{precision_type2}(vectors)
-            @test B1 ≉ B2
-
-            # x::Blade, y::One
-            B1 = Blade{precision_type1}(vectors)
-            B2 = One(precision_type2)
-            @test B1 ≉ B2
-
-            # x::One, y::Blade
-            B1 = One(precision_type1)
-            B2 = Blade{precision_type2}(vectors)
-            @test B1 ≉ B2
+            @test B2 ≉ B1
         end
+    end
+
+    for precision_type in subtypes(AbstractFloat)
+        # x::Blade, y::Zero
+        # x::Zero, y::Blade
+        B1 = Blade{precision_type}(vectors)
+        B2 = Zero()
+        @test B1 ≉ B2
+        @test B2 ≉ B1
+
+        # x::Blade, y::One
+        # x::One, y::Blade
+        B1 = Blade{precision_type}(vectors)
+        B2 = One()
+        @test B1 ≉ B2
+        @test B2 ≉ B1
     end
 end
