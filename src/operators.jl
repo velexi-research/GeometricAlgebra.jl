@@ -11,14 +11,16 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Imports
 
-import Base.:(==), Base.:(≈), Base.:(-)
+import Base.:(==), Base.:(≈)
+import Base.:(-)
+import Base.:(*)
 import LinearAlgebra
 
 
 # --- Comparison operators
 
 """
-    ==(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})
+    ==(B1::AbstractBlade, B2::AbstractBlade)
 
 Return true if B1 and B2 are equal; otherwise, return false.
 """
@@ -33,7 +35,7 @@ Return true if B1 and B2 are equal; otherwise, return false.
 
 
 """
-    ≈(B1::AbstractBlade{<:AbstractFloat}, B2::AbstractBlade{<:AbstractFloat})
+    ≈(B1::AbstractBlade, B2::AbstractBlade)
 
 Return true if B1 and B2 are approximatly equal; otherwise, return false.
 """
@@ -78,7 +80,7 @@ end
 # --- Unary operations
 
 # Exports
-export reciprocal
+export reciprocal, reverse
 
 """
     -(B::AbstractBlade)
@@ -89,7 +91,7 @@ Return the additive inverse of `B`.
 -(B::Scalar) = Scalar(-value(B))
 
 """
-    reciprocal(B::AbstractBlade{<:AbstractFloat})
+    reciprocal(B::AbstractBlade)
 
 Return the multiplicative inverse of `B`.
 """
@@ -103,17 +105,34 @@ reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
 reciprocal(B::One{T}) where {T<:AbstractFloat} = One{T}()
 
 
+"""
+    reverse(B::AbstractBlade)
+
+Return the multiplicative inverse of `B`.
+"""
+reverse(B::Blade{<:AbstractFloat}) =
+    mod(grade(B), 4) < 2 ?
+        Blade(B, volume=1 / norm(B)) :
+        Blade(B, volume=-1 / norm(B))
+
+reverse(B::Scalar{<:AbstractFloat}) = Scalar(1 / value(B))
+reverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
+reverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
+
+
 # --- Binary operations
 
 # Exports
 export ∧, outer
 
 """
-    ∧(B, C)
-    outer(B,C)
+    ∧(B::Union{AbstractBlade, Vector, Real},
+      C::Union{AbstractBlade, Vector, Real})
 
-Return the outer product of `B` and `C` where the arguments can be any of the
-following types: AbstractBlade, Vector, Real.
+    outer(B::Union{AbstractBlade, Vector, Real},
+          C::Union{AbstractBlade, Vector, Real})
+
+Return the outer product of `B` and `C`.
 """
 ∧(B::Blade, C::Blade) =
     Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
@@ -128,18 +147,33 @@ following types: AbstractBlade, Vector, Real.
 ∧(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
 ∧(B::Blade, x::Real) = x ∧ B
 
-outer(x, y) = x ∧ y
+outer(x::Union{AbstractBlade, Vector, Real},
+      y::Union{AbstractBlade, Vector, Real}) = x ∧ y
 
 """
-    ⋅(B::Blade, C::Blade)
-    ⋅(B::Vector, C::Blade)
-    ⋅(B::Blade, C::Vector)
-    ⋅(v::Vector, w::Vector)
+    ⋅(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
+    inner(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
 
 TODO: fill in other function signatures
 
-Return the inner product of a combination of vectors and blades.
+Return the inner product (left contraction) of `B` and `C`.
 """
 # TODO: implement
 #⋅(v::Vector{<:AbstractFloat}, w::Vector{<:AbstractFloat}) = 3
 #⋅(v::Blade{<:AbstractFloat}, w::Blade{<:AbstractFloat}) = 4
+#inner(x::Union{AbstractBlade, Vector, Real},
+#      y::Union{AbstractBlade, Vector, Real}) = x ⋅ y
+
+"""
+    *(B::Union{AbstractBlade, Real}, C::Union{AbstractBlade, Real})
+
+TODO: add documentation
+
+Return the geometric product of `B` and `C`.
+"""
+# TODO: implement
+*(x::Real, B::Blade{<:AbstractFloat}) = Blade(B, volume=x * volume(B))
+*(B::Blade{<:AbstractFloat}, x::Real) = x * B
+*(x::AbstractScalar, B::Blade{<:AbstractFloat}) =
+    Blade(B, volume=volume(x) * volume(B))
+*(B::Blade{<:AbstractFloat}, x::AbstractScalar) = x * B
