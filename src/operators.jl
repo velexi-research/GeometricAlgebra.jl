@@ -78,17 +78,15 @@ end
 # --- Unary operations
 
 # Exports
-export opposite, reciprocal
+export reciprocal
 
 """
-    -(B::AbstractBlade), opposite(B::AbstractBlade)
+    -(B::AbstractBlade)
 
 Return the additive inverse of `B`.
 """
-opposite(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B))
-opposite(B::Scalar) = Scalar(-value(B))
-
--(B::AbstractBlade{<:AbstractFloat}) = opposite(B)
+-(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B))
+-(B::Scalar) = Scalar(-value(B))
 
 """
     reciprocal(B::AbstractBlade{<:AbstractFloat})
@@ -111,27 +109,11 @@ reciprocal(B::One{T}) where {T<:AbstractFloat} = One{T}()
 export ∧, outer
 
 """
-    +(B::AbstractBlade, C::AbstractBlade)
+    ∧(B, C)
+    outer(B,C)
 
-TODO: fill in other function signatures
-
-Return the sum of blades.
-"""
-# TODO: implement
-#+(B::Blade, C::Blade) =
-#    Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
-"""
-    ∧(B::AbstractBlade, C::AbstractBlade)
-
-    ∧(v::Vector, C::AbstractBlade)
-    ∧(B::AbstractBlade, v::Vector)
-
-    ∧(v::Vector, w::Vector)
-
-    ∧(x::Real, C::AbstractBlade)
-    ∧(B::AbstractBlade, x::Real)
-
-Return the outer product of a combination of blades and vectors.
+Return the outer product of `B` and `C` where the arguments can be any of the
+following types: AbstractBlade, Vector, Real.
 """
 ∧(B::Blade, C::Blade) =
     Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
@@ -146,8 +128,7 @@ Return the outer product of a combination of blades and vectors.
 ∧(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
 ∧(B::Blade, x::Real) = x ∧ B
 
-const outer = ∧
-const wedge = ∧
+outer(x, y) = x ∧ y
 
 """
     ⋅(B::Blade, C::Blade)
