@@ -21,70 +21,52 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "Zero: constructor tests" begin
-    # Zero()
-    @test Zero() === Zero{Float64}()
-
-    # Zero(B::AbstractBlade{T}) where {T<:AbstractFloat}
+@testset "Zero: zero() tests" begin
+    # zero(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
-        @test Zero(Blade{precision_type}([1 2 3])) === Zero{precision_type}()
-        @test Zero(Scalar{precision_type}(1)) === Zero{precision_type}()
-        @test Zero(Zero{precision_type}()) === Zero{precision_type}()
-        @test Zero(One{precision_type}()) === Zero{precision_type}()
+        @test zero(Blade{precision_type}([1 2 3])) === Zero()
+        @test zero(Scalar{precision_type}(1)) === Zero()
     end
+    @test zero(Zero()) === Zero()
+    @test zero(One()) === Zero()
 
-    # Zero(::Type{T}) where {T<:AbstractFloat}
+    # zero(::Type{<:AbstractBlade})
+    for blade_type in (Blade, AbstractScalar, Scalar, Zero, One)
+        @test zero(blade_type) === Zero()
+    end
     for precision_type in subtypes(AbstractFloat)
-        @test Zero(precision_type) === Zero{precision_type}()
-    end
-
-    # Zero(::Type{<:AbstractBlade})
-    for blade_type in (Blade, Scalar, Zero, One)
-        @test Zero(blade_type) === Zero{Float64}()
-    end
-
-    # Zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
-    for blade_type in (Blade, Scalar, Zero, One)
-        for precision_type in subtypes(AbstractFloat)
-            @test Zero(blade_type{precision_type}) === Zero{precision_type}()
-        end
+        @test zero(Blade{precision_type}) === Zero()
+        @test zero(Scalar{precision_type}) === Zero()
     end
 end
 
 @testset "Zero: AbstractBlade interface tests" begin
-    for precision_type in subtypes(AbstractFloat)
-        # Preparations
-        B = Zero(precision_type)
+    # Preparations
+    B = Zero()
 
-        # dim()
-        @test dim(B) == 0
+    # dim()
+    @test dim(B) == 0
 
-        # grade()
-        @test grade(B) == 0
+    # grade()
+    @test grade(B) == 0
 
-        # basis()
-        @test basis(B) isa precision_type
-        @test basis(B) == 1
+    # basis()
+    @test basis(B) == 1
 
-        # volume()
-        @test volume(B) isa precision_type
-        @test volume(B) == 0
+    # volume()
+    @test volume(B) == 0
 
-        # norm()
-        @test norm(B) isa precision_type
-        @test norm(B) == 0
+    # norm()
+    @test norm(B) == 0
 
-        # sign()
-        @test sign(B) == 0
-    end
+    # sign()
+    @test sign(B) == 0
 end
 
 @testset "Zero: AbstractScalar interface tests" begin
-    for precision_type in subtypes(AbstractFloat)
-        # Preparations
-        B = Zero(precision_type)
+    # Preparations
+    B = Zero()
 
-        # value()
-        @test value(B) == 0
-    end
+    # value()
+    @test value(B) == 0
 end

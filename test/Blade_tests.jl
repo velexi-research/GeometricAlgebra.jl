@@ -66,8 +66,7 @@ using GeometricAlgebra
         # default enforce_constraints, copy_basis
         B = Blade{precision_type}(dim, grade, normalized_basis, volume,
                                   atol=abs(volume) + 1)
-
-        @test B === Zero(precision_type)
+        @test B === Zero()
 
         # invalid data fields: dim != size(basis, 1)
         # enforce_constraints = true
@@ -136,17 +135,17 @@ using GeometricAlgebra
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
         B = Blade{precision_type}(vectors)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # vectors are linearly dependent
         vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
         B = Blade{precision_type}(vectors)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # norm(blade) < atol
         vectors = Matrix{precision_type}([3 3; 4 4; 0 1])
         B = Blade{precision_type}(vectors, atol=6)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
     end
 
     # --- Basic constructor with a single vector
@@ -192,20 +191,20 @@ using GeometricAlgebra
         # vector is a zero vector
         zero_vector = Array{precision_type}([0. 0. 0.])
         B = Blade(zero_vector)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # norm(vector) < default atol
         small_vector = Vector{precision_type}(vector)
         small_vector /= LinearAlgebra.norm(small_vector)
         small_vector *= blade_atol(precision_type) / 2
         B = Blade{precision_type}(small_vector)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # norm(vector) < atol
         col_vector = Vector{precision_type}(vector)
         B = Blade{precision_type}(col_vector,
                                   atol=LinearAlgebra.norm(col_vector) + 1)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
     end
 
     # --- Copy constructor
@@ -341,11 +340,11 @@ end
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_vectors / 6
         B = Blade(small_blade)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # --- vectors isa Vector
 
@@ -364,11 +363,11 @@ end
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_one_vector / 6
         B = Blade(small_blade)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
     end
 
     # --- Blade{T}(vectors::Array{<:AbstractFloat};
@@ -398,11 +397,11 @@ end
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_vectors / 6
             B = Blade{precision_type}(small_blade)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
 
             # --- vectors isa Vector
 
@@ -421,11 +420,11 @@ end
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_one_vector / 6
             B = Blade{precision_type}(small_blade)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
         end
     end
 
@@ -451,7 +450,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B === Zero{Float64}()
+        @test B === Zero()
 
         # --- vectors isa Vector
 
@@ -469,7 +468,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B === Zero{Float64}()
+        @test B === Zero()
     end
 
     # subtypes(Unsigned)
@@ -490,7 +489,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B === Zero{Float64}()
+        @test B === Zero()
 
         # --- vectors isa Vector
 
@@ -508,7 +507,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B === Zero{Float64}()
+        @test B === Zero()
     end
 
     # --- Bool
@@ -527,7 +526,7 @@ end
 
     # norm(blade) < atol
     B = Blade(converted_vectors, atol=2)
-    @test B === Zero{Float64}()
+    @test B === Zero()
 
     # ------ vectors isa Vector
 
@@ -544,7 +543,7 @@ end
 
     # norm(blade) < atol
     B = Blade(converted_one_vector, atol=2)
-    @test B === Zero{Float64}()
+    @test B === Zero()
 
     # --- Blade{T}(vectors::Array{<:Integer};
     #              volume::Union{Real, Nothing}=nothing,
@@ -574,7 +573,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
 
             # --- vectors isa Vector
 
@@ -592,7 +591,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
         end
 
         # subtypes(Unsigned)
@@ -617,7 +616,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
 
             # --- vectors isa Vector
 
@@ -635,7 +634,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B === Zero{precision_type}()
+            @test B === Zero()
         end
 
         # --- Bool
@@ -657,7 +656,7 @@ end
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_vectors, atol=2)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
 
         # ------ vectors isa Vector
 
@@ -673,7 +672,7 @@ end
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_one_vector, atol=2)
-        @test B === Zero{precision_type}()
+        @test B === Zero()
     end
 end
 
@@ -748,7 +747,7 @@ end
 
         # value == 0
         B = Blade(precision_type(0))
-        @test B isa Zero{precision_type}
+        @test B === Zero()
     end
 
     # --- Blade{T}(x::AbstractFloat;
@@ -766,7 +765,7 @@ end
 
             # value == 0
             B = Blade{precision_type}(precision_type(0))
-            @test B isa Zero{precision_type}
+            @test B === Zero()
         end
     end
 
@@ -786,7 +785,7 @@ end
 
         # value == 0
         B = Blade(value_type(0))
-        @test B isa Zero{Float64}
+        @test B === Zero()
     end
 
     # subtypes(Unsigned)
@@ -800,7 +799,7 @@ end
 
         # value == 0
         B = Blade(value_type(0))
-        @test B isa Zero{Float64}
+        @test B === Zero()
     end
 
     # --- Bool
@@ -812,7 +811,7 @@ end
 
     # value == false
     B = Blade(false)
-    @test B isa Zero{Float64}
+    @test B === Zero()
 
     # --- Blade{T}(x::Integer) where {T<:AbstractFloat}
 
@@ -831,7 +830,7 @@ end
 
             # value == 0
             B = Blade{precision_type}(value_type(0))
-            @test B isa Zero{precision_type}
+            @test B === Zero()
         end
 
         # subtypes(Unsigned)
@@ -845,7 +844,7 @@ end
 
             # value == 0
             B = Blade{precision_type}(value_type(0))
-            @test B isa Zero{precision_type}
+            @test B === Zero()
         end
 
         # --- Bool
@@ -857,7 +856,7 @@ end
 
         # value == false
         B = Blade{precision_type}(false)
-        @test B isa Zero{precision_type}
+        @test B === Zero()
     end
 end
 
