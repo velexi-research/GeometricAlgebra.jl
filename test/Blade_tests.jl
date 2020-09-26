@@ -33,6 +33,74 @@ using GeometricAlgebra
     test_volume = rand() + 1  # add 1 to avoid 0
     test_volume = rand() > 0.5 ? test_volume : -test_volume
 
+    # --- Default constructor with constraint enforcement
+    #
+    # Blade{T}(dim::Int, grade::Int, basis::Matrix{T}, volume::Real;
+    #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        dim = 3
+        grade = 2
+        volume = 5
+
+        basis = Matrix{precision_type}([3 -3; 4 -4; 0 1])
+        normalized_basis = copy(basis)
+        for i in size(normalized_basis, 2)
+            normalized_basis[:, i] /= LinearAlgebra.norm(basis[:, i])
+        end
+
+        # valid data fields; default atol, enforce_constraints, copy_basis
+        B = Blade{precision_type}(dim, grade, normalized_basis, volume)
+
+        @test B.dim == dim
+        @test B.grade == grade
+        @test B.basis == normalized_basis
+        @test B.basis !== normalized_basis
+        for i in size(B.basis, 2)
+            @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+        end
+        @test B.volume == volume
+
+        # valid data fields; volume < atol
+        # default enforce_constraints, copy_basis
+        B = Blade{precision_type}(dim, grade, normalized_basis, volume,
+                                  atol=abs(volume) + 1)
+
+        @test B === Zero(precision_type)
+
+        # invalid data fields: dim != size(basis, 1)
+        # enforce_constraints = true
+        @test_throws DimensionMismatch Blade{precision_type}(dim + 1, grade,
+                                                             basis, volume)
+
+        # invalid data fields: grade != size(basis, 2)
+        # enforce_constraints = true
+        @test_throws DimensionMismatch Blade{precision_type}(dim, grade + 1,
+                                                             basis, volume)
+
+        # invalid data fields: basis not normalized
+        # enforce_constraints = true
+        @test_throws ErrorException Blade{precision_type}(dim, grade,
+                                                          basis, volume)
+
+        # invalid data fields
+        # enforce_constraints = false
+        B = Blade{precision_type}(dim + 1, grade + 1, basis, volume,
+                                  enforce_constraints=false)
+        @test B.dim == dim + 1
+        @test B.grade == grade + 1
+        @test B.basis == basis
+        @test B.basis !== basis
+
+        # valid data fields
+        # copy_basis = false
+        B = Blade{precision_type}(dim, grade, normalized_basis, volume,
+                                  copy_basis=false)
+
+        @test B.basis === normalized_basis
+    end
+
     # --- Basic constructor with multiple vectors
     #
     # Blade{T}(vectors::Matrix{T};

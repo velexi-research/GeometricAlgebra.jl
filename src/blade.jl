@@ -47,6 +47,7 @@ Methods
 Unary Operations
 ------------------
     -(B)::AbstractBlade
+    reciprocal(B)::AbstractBlade
     reverse(B)::AbstractBlade
 
 Binary Operations
@@ -112,13 +113,68 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     volume::T
 
     """
+        Blade{T}(dim::Int, grade::Int, basis::Matrix{T}, volume::Real;
+                 atol::Real=blade_atol(T), enforce_constraints::Bool=true,
+                 copy_basis::Bool=true) where {T<:AbstractFloat}
+
+    Construct a Blade from the specified data field values. Zero{T}() is
+    returned when the absolute value of `volume` is less than `atol`.
+
+    When `enforce_constraints` is true, constraints are enforced. When
+    `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
+    otherwise, the basis of the new Blade is a reference to `basis`.
+
+    Note: this inner constructor intended primarily for internal use by
+    other inner constructors to enforce constraints.
+    """
+    function Blade{T}(dim::Int, grade::Int, basis::Matrix{T}, volume::Real;
+                      atol::Real=blade_atol(T), enforce_constraints::Bool=true,
+                      copy_basis::Bool=true) where {T<:AbstractFloat}
+
+        # --- Enforce constraints
+
+        if enforce_constraints
+            basis_size = size(basis)
+
+            if dim != basis_size[1]
+                message = string("`dim` not equal to the number of ",
+                                 "rows in `basis`")
+                throw(DimensionMismatch(message))
+            end
+
+            if grade != basis_size[2]
+                message = string("`grade` not equal to the number of ",
+                                 "columns in `basis`")
+                throw(DimensionMismatch(message))
+            end
+
+            for i in basis_size[2]
+                if LinearAlgebra.norm(basis[:, i]) ≉ 1
+                    error("columns of `basis` not normalized")
+                end
+            end
+        end
+
+        # --- Handle edge cases
+
+        # `volume` is effectively zero
+        if volume != nothing && abs(volume) < atol
+            return Zero{T}()
+        end
+
+        # Return new Blade
+        copy_basis ?
+        new(dim, grade, copy(basis), volume) : new(dim, grade, basis, volume)
+    end
+
+    """
         Blade{T}(vectors::Matrix{T};
-                 volume::Union{Real, Nothing}=nothing,
-                 atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+                 volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+            where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
-    matrix. Zero{T}() is returned when the norm of the blade is less than
-    `atol`.
+    matrix. Zero{T}() is returned when the absolute value of `volume` is less
+    than `atol`.
 
     By default, `vectors` determines the volume of the blade. However, if
     `volume` is specified, `vectors` is only used to define the subspace
@@ -164,13 +220,9 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         # Compute volume
         volume = (volume == nothing) ? signed_norm : volume * sign(signed_norm)
 
-        # Return Zero if `volume` is effectively zero
-        if abs(volume) < atol
-            return Zero{T}()
-        end
-
         # Return new Blade
-        new(dims[1], dims[2], basis, volume)
+        Blade{T}(dims[1], dims[2], basis, volume,
+                 atol=atol, enforce_constraints=false, copy_basis=false)
     end
 
     """
@@ -209,56 +261,60 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         # Set volume
         volume = (volume == nothing) ? norm_vector : volume
 
-        # Return Zero if `volume` is effectively zero
-        if abs(volume) < atol
-            return Zero{T}()
-        end
-
         # Return new Blade
-        new(length(vector), 1, basis, volume)
+        Blade{T}(length(vector), 1, basis, volume, atol=atol,
+                 enforce_constraints=false, copy_basis=false)
     end
 
     """
         Blade{T}(B::Blade{T};
-                 volume::Real=volume(B),
+                 volume::Real=volume(B), atol::Real=blade_atol(T),
                  copy_basis::Bool=false) where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
-    `volume`. When `copy_basis` is true, the `basis` of the new Blade is a copy
+    oriented `volume` relative to `B`. Zero{T}() is returned if the absolute
+    value of `volume` is less than `atol`,
+
+    When `copy_basis` is true, the `basis` of the new Blade is a copy
     of the `basis` of the original Blade; otherwise, the `basis` of the new
     Blade is reference to the `basis` of the original Blade.
     """
-    function Blade{T}(B::Blade{T};
-                      volume::Real=volume(B),
-                      copy_basis::Bool=false) where {T<:AbstractFloat}
-        # Return new Blade
-        copy_basis ? new(dim(B), grade(B), copy(basis(B)), volume) :
-                     new(dim(B), grade(B), basis(B), volume)
-    end
+    Blade{T}(B::Blade{T};
+             volume::Real=volume(B), atol::Real=blade_atol(T),
+             copy_basis::Bool=false) where {T<:AbstractFloat} =
+
+        Blade{T}(dim(B), grade(B), basis(B), volume,
+                 atol=atol, enforce_constraints=false, copy_basis=copy_basis)
 
     """
         Blade{T}(B::Blade{S};
-                 volume::Real=volume(B),
-                 copy_basis::Bool=false) where {T<:AbstractFloat,
-                                                S<:AbstractFloat}
+                 volume::Real=volume(B), atol::Real=blade_atol(T),
+                 copy_basis::Bool=false)
+            where {T<:AbstractFloat, S<:AbstractFloat}
 
-    Convert the floating-point precision of a Blade. If `volume` is specified,
-    the volume of the blade of the new blade is set to `volume`. When
-    `copy_basis` is true, the `basis` of the new Blade is a copy of the
+    Convert the floating-point precision of a Blade.
+
+    If `volume` is specified, the oriented volume of the blade of the new blade
+    (relative to `B`) is set to `volume`. Zero{T}() is returned if the absolute
+    value of `volume` is less than `atol`.
+
+    When `copy_basis` is true, the `basis` of the new Blade is a copy of the
     `basis` of the original Blade; otherwise, the `basis` of the new Blade is
     reference to the `basis` of the original Blade.
     """
     function Blade{T}(B::Blade{S};
-                      volume::Real=volume(B),
+                      volume::Real=volume(B), atol::Real=blade_atol(T),
                       copy_basis::Bool=false) where {T<:AbstractFloat,
                                                      S<:AbstractFloat}
         # Handle special cases
         if T == S
-            return B{T}(B, volume=volume, copy_basis=copy_basis)
+            return B{T}(B, volume=volume, atol=atol,
+                        enforce_constraints=false, copy_basis=copy_basis)
         end
 
         # Return new Blade
-        new(dim(B), grade(B), convert(Array{T}, basis(B)), volume)
+        Blade{T}(dim(B), grade(B), convert(Array{T}, basis(B)), volume,
+                 atol=atol, enforce_constraints=false, copy_basis=false)
     end
 end
 
@@ -320,18 +376,22 @@ Blade{T}(vectors::Array{<:Integer};
     Blade(convert(Array{T}, vectors), volume=volume, atol=atol)
 
 """
-    Blade(B::Blade{T}; volume::Real=volume(B), copy_basis=false)
-        where {T<:AbstractFloat}
+    Blade(B::Blade{T};
+          volume::Real=volume(B), atol::Real=blade_atol(T),
+          copy_basis=false) where {T<:AbstractFloat}
 
 Copy constructor. Construct a Blade representing the same space as `B` having
-a specified norm and orientation relative to `B`. When `copy_basis` is true,
-the `basis` of the new Blade is a copy of the `basis` of the original Blade;
-otherwise, the `basis` of the new Blade is reference to the `basis` of the
-original Blade.
+a specified oriented volume relative to `B`. Zero{T}() is returned if the
+absolute value of `volume` is less than `atol`.
+
+When `copy_basis` is true, the `basis` of the new Blade is a copy of the
+`basis` of the original Blade; otherwise, the `basis` of the new Blade is
+reference to the `basis` of the original Blade.
 """
 Blade(B::Blade{T};
-      volume::Real=volume(B), copy_basis=false) where {T<:AbstractFloat} =
-    Blade{T}(B, volume=volume, copy_basis=copy_basis)
+      volume::Real=volume(B), atol::Real=blade_atol(T),
+      copy_basis=false) where {T<:AbstractFloat} =
+    Blade{T}(B, volume=volume, atol=atol, copy_basis=copy_basis)
 
 """
     Blade(x::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
