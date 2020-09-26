@@ -20,20 +20,19 @@ export AbstractMultivector, Multivector
 
 # AbstractMultivector
 """
-    abstract type AbstractMultivector{T<:AbstractFloat}
+    abstract type AbstractMultivector
 
-Supertype for all multivector types. Multivectors are represented with the
-floating-point precision of type `T`.
+Supertype for all multivector types.
 
 Methods
 -------
-    summands(M::AbstractMultivector{T})::Dict
-    norm(M::AbstractMultivector{T})::T
-    reduce(M::AbstractMultivector{T})::AbstractMultivector{T}
+    summands(M::AbstractMultivector)::Dict
+    norm(M::AbstractMultivector)::AbstractFloat
+    reduce(M::AbstractMultivector)::AbstractMultivector
 
 Unary Operations
 ----------------
-    -(M::AbstractMultivector{T})::AbstractMultivector{T}
+    -(M::AbstractMultivector)::AbstractMultivector
 
 Binary Operations
 ------------------
@@ -42,16 +41,16 @@ Binary Operations
     *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 """
-abstract type AbstractMultivector{T<:AbstractFloat} end
+abstract type AbstractMultivector end
 
 
 # Multivector
 """
-    struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
+    struct Multivector{T<:AbstractFloat} <: AbstractMultivector
 
 TODO
 """
-struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
+struct Multivector{T<:AbstractFloat} <: AbstractMultivector
     # Fields
     # ------
     # * `summands`: collection of blades that sum to the value of the
@@ -59,29 +58,29 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     #
     # * `reduced`: True if multivector is guaranteed to be reduced to a sum
     #   of orthogonal blades; False otherwise.
-    summands::Dict{Int, Vector{AbstractBlade{T}}}
+    summands::Dict{Int, Vector{AbstractBlade}}
     reduced::Bool
 
     """
-        Multivector{T}(blades::Vector{AbstractBlade{T}};
+        Multivector{T}(blades::Vector{AbstractBlade};
                        reduced::Bool=false) where {T<:AbstractFloat}
 
     Construct a Multivector from a of vector of blades. When `reduced` is true,
     the summands are combined so that the multivectors of grade ``k`` form
     an orthogonal basis for the subspace of ``k``-vectors.
     """
-    function Multivector{T}(blades::Vector{AbstractBlade{T}};
+    function Multivector{T}(blades::Vector{AbstractBlade};
                             reduced::Bool=false) where {T<:AbstractFloat}
 
         # --- Construct Multivector
 
         # Construct `summands`. Sort blades by grade.
-        summands = Dict{Int, Vector{AbstractBlade{T}}}()
+        summands = Dict{Int, Vector{AbstractBlade}}()
         for B in blades
             if haskey(summands, grade(B))
                 append!(summands[grade(B)], B)
             else
-                summands[grade(B)] = Vector{AbstractBlade{T}}([B])
+                summands[grade(B)] = Vector{AbstractBlade}([B])
             end
         end
 
@@ -109,7 +108,7 @@ Multivector(blades::Array{T}; reduced::Bool=false) where {T<:AbstractFloat} =
 
 Multivector{T}(blades::Array{<:AbstractFloat};
                reduced::Bool=false) where {T<:AbstractFloat} =
-    Multivector{T}(convert.(blades, AbstractBlade{T}), reduced=reduced)
+    Multivector{T}(convert.(blades, AbstractBlade), reduced=reduced)
 
 
 # --- Basic Multivector functions
