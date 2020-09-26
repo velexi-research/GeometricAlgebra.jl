@@ -13,7 +13,6 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
-import LinearAlgebra
 using Test
 
 # GeometricAlgebra.jl
