@@ -43,7 +43,7 @@ using GeometricAlgebra
 
         # abs(value) < default atol
         S = Scalar{precision_type}(blade_atol(precision_type) / 2)
-        @test S === Zero()
+        @test S === ZeroBlade()
 
         # abs(value) > atol
         S = Scalar{precision_type}(converted_test_value,
@@ -58,7 +58,7 @@ using GeometricAlgebra
         # abs(value) < atol
         S = Scalar{precision_type}(converted_test_value,
                                    atol=abs(converted_test_value) + 1)
-        @test S === Zero()
+        @test S === ZeroBlade()
     end
 end
 
@@ -89,7 +89,7 @@ end
 
         # abs(value) < default atol
         S = Scalar(precision_type(blade_atol(precision_type) / 2))
-        @test S === Zero()
+        @test S === ZeroBlade()
 
         # abs(value) > atol
         S = Scalar(converted_test_value, atol=abs(converted_test_value) - 1)
@@ -101,7 +101,7 @@ end
 
         # abs(value) < atol
         S = Scalar(converted_test_value, atol=abs(converted_test_value) + 1)
-        @test S === Zero()
+        @test S === ZeroBlade()
     end
 
     # --- Scalar{T}(value::AbstractFloat;
@@ -119,7 +119,7 @@ end
             # abs(value) < default atol
             S = Scalar{precision_type}(
                 value_type(blade_atol(precision_type) / 2))
-            @test S === Zero()
+            @test S === ZeroBlade()
 
             # abs(value) > atol
             S = Scalar{precision_type}(
@@ -137,7 +137,7 @@ end
             S = Scalar{precision_type}(
                 converted_test_value,
                 atol=abs(precision_type(converted_test_value)) + 1)
-            @test S === Zero()
+            @test S === ZeroBlade()
         end
     end
 
@@ -151,7 +151,7 @@ end
 
         # value is zero
         S = Scalar(convert(value_type, 0))
-        @test S === Zero()
+        @test S === ZeroBlade()
     end
 
     # subtypes(Unsigned)
@@ -162,7 +162,7 @@ end
 
         # value is zero
         S = Scalar(convert(value_type, 0))
-        @test S === Zero()
+        @test S === ZeroBlade()
     end
 
     # Bool
@@ -170,7 +170,7 @@ end
     @test S isa Scalar{Float64}
 
     S = Scalar(false)
-    @test S === Zero()
+    @test S === ZeroBlade()
 
     # --- Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
@@ -183,7 +183,7 @@ end
 
             # value is zero
             S = Scalar{precision_type}(convert(value_type, 0))
-            @test S === Zero()
+            @test S === ZeroBlade()
         end
     end
 
@@ -196,7 +196,7 @@ end
 
             # value is zero
             S = Scalar{precision_type}(convert(value_type, 0))
-            @test S === Zero()
+            @test S === ZeroBlade()
         end
     end
 
@@ -209,7 +209,7 @@ end
         # value is zero
         value = 0
         S = Scalar{precision_type}(false)
-        @test S === Zero()
+        @test S === ZeroBlade()
     end
 end
 
@@ -253,7 +253,7 @@ end
 
         # value = 0
         S = Scalar(precision_type(0))
-        @test S === Zero()
+        @test S === ZeroBlade()
 
         # value = Inf
         S = Scalar(precision_type(Inf))
@@ -304,7 +304,7 @@ end
 
         # value = 0
         S = Scalar(precision_type(0))
-        @test S === Zero()
+        @test S === ZeroBlade()
 
         # value = Inf
         S = Scalar(precision_type(Inf))
