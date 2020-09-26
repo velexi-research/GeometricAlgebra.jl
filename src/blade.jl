@@ -61,7 +61,7 @@ Binary Operations
 
     +(B, C)::AbstractMultivector
     -(B, C)::AbstractMultivector
-    *(B, C)::AbstractMultivector
+    *(B, C)::Union{AbstactBlade, AbstractMultivector}
     /(B, C)::AbstractMultivector
 
     dual(A, B)::AbstractBlade
