@@ -428,33 +428,27 @@ Scalar (0-blade) represented with the floating-point precision of type `T`.
 struct Scalar{T<:AbstractFloat} <: AbstractBlade
     # Fields
     # ------
-    # * `dim`: the dimension of the space that the blade is embedded in
-    #
     # * `value`: the value of the scalar
-    dim::Int
     value::T
 
     """
-        Scalar{T}(dim::Integer, value::T) where {T<:AbstractFloat}
+        Scalar{T}(value::T) where {T<:AbstractFloat}
 
-    Construct a Scalar with for a geometric algebra in `dim` dimensions with
-    the specified value.
+    Construct a Scalar with the specified value.
     """
-    Scalar{T}(dim::Integer, value::T) where {T<:AbstractFloat} =
-        new(dim, value)
+    Scalar{T}(value::T) where {T<:AbstractFloat} = new(value)
 end
 
 """
-    Scalar(dim::Integer, value::T) where {T<:AbstractFloat}
+    Scalar(value::T) where {T<:AbstractFloat}
 
-    Scalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat}
+    Scalar{T}(value::AbstractFloat) where {T<:AbstractFloat}
 
-    Scalar(dim::Integer, value::Integer)
+    Scalar(value::Integer)
 
-    Scalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
+    Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
-Construct a Scalar with for a geometric algebra in `dim` dimensions with
-the specified value.
+Construct a Scalar with the specified value.
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Scalar.
@@ -465,15 +459,13 @@ the precision of the Scalar.
 * If `value` is an integer, the precision of the constructed Scalar defaults
   to `Float64`.
 """
-Scalar(dim::Integer, value::T) where {T<:AbstractFloat} = Scalar{T}(dim, value)
+Scalar(value::T) where {T<:AbstractFloat} = Scalar{T}(value)
 
-Scalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat} =
-    Scalar(dim, T(value))
+Scalar{T}(value::AbstractFloat) where {T<:AbstractFloat} = Scalar(T(value))
 
-Scalar(dim::Integer, value::Integer) = Scalar(dim, Float64(value))
+Scalar(value::Integer) = Scalar(Float64(value))
 
-Scalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
-    Scalar(dim, T(value))
+Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
 
 
 # Pseudoscalar
@@ -581,7 +573,7 @@ export dim, grade, basis, volume, norm, sign
 Return dimension of space that Blade blade is embedded in.
 """
 dim(B::Blade) = B.dim
-dim(B::Scalar) = B.dim
+dim(B::Scalar) = 0
 dim(B::Pseudoscalar) = B.dim
 
 """
