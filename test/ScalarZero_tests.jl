@@ -1,5 +1,5 @@
 """
-Unit tests for the ZeroBlade constants.
+Unit tests for the ScalarZero constants.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -17,36 +17,36 @@ using Test
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
-import GeometricAlgebra.ZeroBladePrecisions
+import GeometricAlgebra.ScalarZeroPrecisions
 
 
 # --- Tests
 
-@testset "ZeroBlade: zero() tests" begin
+@testset "ScalarZero: zero() tests" begin
     # zero(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
         @test zero(Blade{precision_type}([1 2 3])) ===
-            ZeroBladePrecisions[precision_type]
+            ScalarZeroPrecisions[precision_type]
         @test zero(Scalar{precision_type}(1)) ===
-            ZeroBladePrecisions[precision_type]
+            ScalarZeroPrecisions[precision_type]
     end
 
     # zero(::Type{Blade{T}}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
         @test zero(Blade{precision_type}) ===
-            ZeroBladePrecisions[precision_type]
+            ScalarZeroPrecisions[precision_type]
     end
 
     # zero(::Type{Scalar{T}}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
         @test zero(Scalar{precision_type}) ===
-            ZeroBladePrecisions[precision_type]
+            ScalarZeroPrecisions[precision_type]
     end
 
     @test_throws MethodError zero(AbstractScalar)
 end
 
-@testset "ZeroBlade: AbstractBlade interface tests" begin
+@testset "ScalarZero: AbstractBlade interface tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = zero(Blade{precision_type})
@@ -71,7 +71,7 @@ end
     end
 end
 
-@testset "ZeroBlade: AbstractScalar interface tests" begin
+@testset "ScalarZero: AbstractScalar interface tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = zero(Blade{precision_type})

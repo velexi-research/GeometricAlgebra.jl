@@ -1,5 +1,5 @@
 """
-Unit tests for the OneBlade constants.
+Unit tests for the ScalarOne constants.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -17,36 +17,36 @@ using Test
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
-import GeometricAlgebra.OneBladePrecisions
+import GeometricAlgebra.ScalarOnePrecisions
 
 
 # --- Tests
 
-@testset "OneBlade: one() tests" begin
+@testset "ScalarOne: one() tests" begin
     # one(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
         @test one(Blade{precision_type}([1 2 3])) ===
-            OneBladePrecisions[precision_type]
+            ScalarOnePrecisions[precision_type]
         @test one(Scalar{precision_type}(1)) ===
-            OneBladePrecisions[precision_type]
+            ScalarOnePrecisions[precision_type]
     end
 
     # one(::Type{Blade{T}}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
         @test one(Blade{precision_type}) ===
-            OneBladePrecisions[precision_type]
+            ScalarOnePrecisions[precision_type]
     end
 
     # one(::Type{Scalar{T}}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
         @test one(Scalar{precision_type}) ===
-            OneBladePrecisions[precision_type]
+            ScalarOnePrecisions[precision_type]
     end
 
     @test_throws MethodError one(AbstractScalar)
 end
 
-@testset "OneBlade: AbstractBlade interface tests" begin
+@testset "ScalarOne: AbstractBlade interface tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = one(Blade{precision_type})
@@ -71,7 +71,7 @@ end
     end
 end
 
-@testset "OneBlade: AbstractScalar interface tests" begin
+@testset "ScalarOne: AbstractScalar interface tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = one(Blade{precision_type})
