@@ -36,13 +36,6 @@ Return true if B1 and B2 are equal; otherwise, return false.
 ==(B1::Pseudoscalar, B2::Pseudoscalar) =
     (dim(B1) == dim(B2)) && (value(B1) == value(B2))
 
-# By default, AbstractBlades are not equal
-==(B1::AbstractBlade, B2::AbstractBlade) = false
-
-# By default, AbstractBlades and Real numbers are not equal
-==(B1::AbstractBlade, B2::Real) = false
-==(B1::Real, B2::AbstractBlade) = false
-
 """
     ≈(B1::AbstractBlade, B2::AbstractBlade)
 
