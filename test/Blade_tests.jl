@@ -139,6 +139,12 @@ using GeometricAlgebra
         B = Blade{precision_type}(vectors)
         @test B == zero(Blade{precision_type})
 
+        # number of vectors > dimension of column space; volume < default atol
+        vectors = Matrix{precision_type}([1 2 3; 4 5 6])
+        B = Blade{precision_type}(vectors,
+                                  volume=blade_atol(precision_type) / 2)
+        @test B == zero(Blade{precision_type})
+
         # vectors are linearly dependent
         vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
         B = Blade{precision_type}(vectors)
@@ -180,6 +186,12 @@ using GeometricAlgebra
         F = LinearAlgebra.qr(vectors)
         signed_norm = prod(LinearAlgebra.diag(F.R))
         @test B.volume == sign(signed_norm) * precision_type(test_volume)
+
+        # vector is a column vector; volume < default atol
+        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
+        B = Blade{precision_type}(col_vector,
+                                  volume=blade_atol(precision_type) / 2)
+        @test B == zero(Blade{precision_type})
 
         # vector is a row vector
         row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
