@@ -402,21 +402,15 @@ Blade(B::Blade{T};
     Blade{T}(B, volume=volume, atol=atol, copy_basis=copy_basis)
 
 """
-    Blade(x::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
-
-    Blade{T}(x::AbstractFloat; atol::Real=blade_atol(T))
-        where {T<:AbstractFloat}
-
+    Blade(x::T) where {T<:AbstractFloat}
+    Blade{T}(x::AbstractFloat) where {T<:AbstractFloat}
     Blade(x::Integer)
-
     Blade{T}(x::Integer) where {T<:AbstractFloat}
 
 Convenience constructors for constructing Scalars.
 """
-Blade(x::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Scalar(x; atol=atol)
-Blade{T}(x::AbstractFloat; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Scalar{T}(x; atol=atol)
+Blade(x::T) where {T<:AbstractFloat} = Scalar(x)
+Blade{T}(x::AbstractFloat) where {T<:AbstractFloat} = Scalar{T}(x)
 Blade(x::Integer) = Scalar(x)
 Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar{T}(x)
 
@@ -445,11 +439,8 @@ end
 
 """
     Scalar(value::T) where {T<:AbstractFloat}
-
     Scalar{T}(value::AbstractFloat) where {T<:AbstractFloat}
-
     Scalar(value::Integer)
-
     Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
 Construct a Scalar with the specified value.
@@ -464,11 +455,8 @@ the precision of the Scalar.
   to `Float64`.
 """
 Scalar(value::T) where {T<:AbstractFloat} = Scalar{T}(value)
-
 Scalar{T}(value::AbstractFloat) where {T<:AbstractFloat} = Scalar(T(value))
-
 Scalar(value::Integer) = Scalar(Float64(value))
-
 Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
 
 
@@ -502,11 +490,8 @@ end
 
 """
     Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
-
     Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat}
-
     Pseudoscalar(dim::Integer, value::Integer)
-
     Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
 
 Construct a Pseudoscalar with for a geometric algebra in `dim` dimensions with
