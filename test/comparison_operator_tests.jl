@@ -193,11 +193,59 @@ end
     end
 end
 
-@testset "!=(x, y): x, y::{Blade, Scalar}" begin
+@testset "==(x, y): x, y::Pseudoscalar" begin
+    # Preparations
+    dim = 10
+
+    value = rand()
+    value = rand() > 0.5 ? value : -value
+
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # dim(B1) == dim(B2), value(B1) == value(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Pseudoscalar(dim, precision_type1(value))
+            B2 = Pseudoscalar(dim, precision_type2(value))
+            if precision_type1 == precision_type2
+                @test B1 == B2
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B1 == B2
+            else
+                @test B1 != B2
+            end
+        end
+    end
+
+    # dim(B1) != dim(B2), value(B1) == value(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Pseudoscalar(dim, precision_type1(value))
+            B2 = Pseudoscalar(dim + 1, precision_type2(value))
+            @test B1 != B2
+        end
+    end
+
+    # dim(B1) == dim(B2), value(B1) != value(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Pseudoscalar(dim, precision_type1(value))
+            B2 = Pseudoscalar(dim, precision_type2(value) + 1)
+            @test B1 != B2
+        end
+    end
+end
+
+@testset "!=(x, y): x, y::{AbstractBlade, Real}" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
+    dim = size(vectors, 1)
+    println(dim)
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- x::AbstractBlade, y::AbstractBlade
 
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
@@ -207,7 +255,38 @@ end
             B2 = Scalar{precision_type2}(test_value)
             @test B1 != B2
             @test B2 != B1
+
+            # x::Blade, y::Pseudoscalar
+            # x::Pseudoscalar, y::Blade
+            B1 = Blade{precision_type1}(vectors)
+            B2 = Pseudoscalar{precision_type2}(dim, test_value)
+            @test B1 != B2
+            @test B2 != B1
+
+            # x::Scalar, y::Pseudoscalar
+            # x::Pseudoscalar, y::Scalar
+            B1 = Scalar{precision_type1}(test_value)
+            B2 = Pseudoscalar{precision_type2}(dim, test_value)
+            @test B1 != B2
+            @test B2 != B1
         end
+    end
+
+    # --- x::Union{Blade, Pseudoscalar}, y::Real
+    #     x::Real, y::Union{Blade, Pseudoscalar}
+
+    for precision_type in subtypes(AbstractFloat)
+        # x::Blade, y::Real
+        # x::Real, y::Blade
+        B = Blade{precision_type}(vectors)
+        @test B != test_value
+        @test test_value != B
+
+        # x::Pseudoscalar, y::Real
+        # x::Real, y::Pseudoscalar
+        B = Pseudoscalar{precision_type}(dim, test_value)
+        @test B != test_value
+        @test test_value != B
     end
 end
 
@@ -308,11 +387,50 @@ end
     end
 end
 
-@testset "≉(x, y): x, y::{Blade, Scalar}" begin
+@testset "≈(x, y): x, y::Pseudoscalar" begin
+    # Preparations
+    dim = 10
+
+    value = rand()
+    value = rand() > 0.5 ? value : -value
+
+    # dim(B1) == dim(B2), value(B1) == value(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Pseudoscalar(dim, precision_type1(value))
+            B2 = Pseudoscalar(dim, precision_type2(value))
+            @test B1 ≈ B2
+        end
+    end
+
+    # dim(B1) != dim(B2), value(B1) == value(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Pseudoscalar(dim, precision_type1(value))
+            B2 = Pseudoscalar(dim + 1, precision_type2(value))
+            @test B1 ≉ B2
+        end
+    end
+
+    # dim(B1) == dim(B2), value(B1) != value(B2)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B1 = Pseudoscalar(dim, precision_type1(value))
+            B2 = Pseudoscalar(dim, precision_type2(value) + 1)
+            @test B1 ≉ B2
+        end
+    end
+end
+
+
+@testset "≉(x, y): x, y::{AbstractBlade, Real}" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
+    dim = size(vectors, 1)
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- x::AbstractBlade, y::AbstractBlade
 
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
@@ -322,6 +440,37 @@ end
             B2 = Scalar{precision_type2}(test_value)
             @test B1 ≉ B2
             @test B2 ≉ B1
+
+            # x::Blade, y::Pseudoscalar
+            # x::Pseudoscalar, y::Blade
+            B1 = Blade{precision_type1}(vectors)
+            B2 = Pseudoscalar{precision_type2}(dim, test_value)
+            @test B1 ≉ B2
+            @test B2 ≉ B1
+
+            # x::Scalar, y::Pseudoscalar
+            # x::Pseudoscalar, y::Scalar
+            B1 = Scalar{precision_type1}(test_value)
+            B2 = Pseudoscalar{precision_type2}(dim, test_value)
+            @test B1 ≉ B2
+            @test B2 ≉ B1
         end
+    end
+
+    # --- x::Union{Blade, Pseudoscalar}, y::Real
+    #     x::Real, y::Union{Blade, Pseudoscalar}
+
+    for precision_type in subtypes(AbstractFloat)
+        # x::Blade, y::Real
+        # x::Real, y::Blade
+        B = Blade{precision_type}(vectors)
+        @test B ≉ test_value
+        @test test_value ≉ B
+
+        # x::Pseudoscalar, y::Real
+        # x::Real, y::Pseudoscalar
+        B = Pseudoscalar{precision_type}(dim, test_value)
+        @test B ≉ test_value
+        @test test_value ≉ B
     end
 end
