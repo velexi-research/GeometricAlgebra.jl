@@ -74,13 +74,29 @@ using GeometricAlgebra
     expected_B_wedge_C = Blade(hcat(B_vectors, C_vector))
 
     # Exercise functionality
-    B_wedge_C = B ∧ C
+    B_wedge_C = B ∧ C_vector
     @test B_wedge_C == outer(B, C)
     @test B_wedge_C ≈ expected_B_wedge_C
 
-    C_wedge_B = C ∧ B
+    C_wedge_B = C_vector ∧ B
     @test C_wedge_B == outer(C, B)
     @test C_wedge_B ≈ (-1)^(grade(B)) * expected_B_wedge_C
+
+    # --- B::Vector, C::Vector
+
+    # Preparations
+    B_vector = [0; 2; 0; 0; 0]
+    B = Blade(B_vector)
+
+    C_vector = [0; 0; 3; 0; 0]
+    C = Blade(C_vector)
+
+    expected_B_wedge_C = Blade(hcat(B_vector, C_vector))
+
+    # Exercise functionality
+    B_wedge_C = B_vector ∧ C_vector
+    @test B_wedge_C == outer(B, C)
+    @test B_wedge_C ≈ expected_B_wedge_C
 
     # --- B::Blade, C::Real
     #     B::Real, C::Blade
