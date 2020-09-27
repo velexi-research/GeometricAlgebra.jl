@@ -12,8 +12,7 @@ except according to the terms contained in the LICENSE file.
 # --- Imports
 
 # Standard library
-import Base.sign, Base.convert
-import Base.one, Base.zero
+import Base.convert
 import LinearAlgebra
 
 
@@ -505,7 +504,7 @@ const ScalarOne16 = Scalar{Float16}(Float16(1))
 Singleton instance of type Scalar{BigFloat} representing the multiplicative
 identity 1.
 """
-const ScalarOneBigFloat = Scalar{BigFloat}(BigFloat(1))
+const ScalarOneBigFloat = Scalar{BigFloat}(BigFloat(Inf))
 
 const ScalarOnePrecisions = Dict([(Float64, ScalarOne64),
                                   (Float32, ScalarOne32),
@@ -513,7 +512,7 @@ const ScalarOnePrecisions = Dict([(Float64, ScalarOne64),
                                   (BigFloat, ScalarOneBigFloat)])
 
 # ScalarInf constants
-const ScalarInf64 = Scalar{Float64}(Float64(1))
+const ScalarInf64 = Scalar{Float64}(Float64(Inf))
 const ScalarInf = ScalarInf64
 """
     ScalarInf, ScalarInf64
@@ -527,21 +526,21 @@ ScalarInf, ScalarInf64
 
 Singleton instance of type Scalar{Float32} representing Inf.
 """
-const ScalarInf32 = Scalar{Float32}(Float32(1))
+const ScalarInf32 = Scalar{Float32}(Float32(Inf))
 
 """
     ScalarInf16
 
 Singleton instance of type Scalar{Float16} representing Inf.
 """
-const ScalarInf16 = Scalar{Float16}(Float16(1))
+const ScalarInf16 = Scalar{Float16}(Float16(Inf))
 
 """
     ScalarInfBigFloat
 
 Singleton instance of type Scalar{BigFloat} representing Inf.
 """
-const ScalarInfBigFloat = Scalar{BigFloat}(BigFloat(1))
+const ScalarInfBigFloat = Scalar{BigFloat}(BigFloat(Inf))
 
 const ScalarInfPrecisions = Dict([(Float64, ScalarInf64),
                                   (Float32, ScalarInf32),
@@ -585,6 +584,12 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
 
 # --- Special number access functions
 
+# Imports
+import Base.zero, Base.one
+
+# Exports
+export inf
+
 """
     zero(B::AbstractBlade)
     zero(::Type{Blade{T}}) where {T<:AbstractFloat}
@@ -607,8 +612,22 @@ one(B::AbstractBlade) = one(typeof(B))
 one(::Type{Blade{T}}) where {T<:AbstractFloat} = ScalarOnePrecisions[T]
 one(::Type{Scalar{T}}) where {T<:AbstractFloat} = ScalarOnePrecisions[T]
 
+"""
+    inf(B::AbstractBlade)
+    inf(::Type{Blade{T}}) where {T<:AbstractFloat}
+    inf(::Type{Scalar{T}}) where {T<:AbstractFloat}
+
+Return the Scalar representing Inf.
+"""
+inf(B::AbstractBlade) = inf(typeof(B))
+inf(::Type{Blade{T}}) where {T<:AbstractFloat} = ScalarInfPrecisions[T]
+inf(::Type{Scalar{T}}) where {T<:AbstractFloat} = ScalarInfPrecisions[T]
+
 
 # --- Core AbstractBlade functions
+
+# Imports
+import Base.sign
 
 # Exports
 export dim, grade, basis, volume, norm, sign
