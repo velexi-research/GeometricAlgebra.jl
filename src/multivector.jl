@@ -51,13 +51,15 @@ abstract type AbstractMultivector end
 TODO
 """
 struct Multivector{T<:AbstractFloat} <: AbstractMultivector
-    # Fields
-    # ------
-    # * `summands`: collection of blades that sum to the value of the
-    #   multivector
-    #
-    # * `reduced`: True if multivector is guaranteed to be reduced to a sum
-    #   of orthogonal blades; False otherwise.
+    #=
+      Fields
+      ------
+      * `summands`: collection of blades that sum to the value of the
+        multivector
+
+      * `reduced`: True if multivector is guaranteed to be reduced to a sum
+        of orthogonal blades; False otherwise.
+    =#
     summands::Dict{Int, Vector{AbstractBlade}}
     reduced::Bool
 
