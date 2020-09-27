@@ -12,7 +12,6 @@ except according to the terms contained in the LICENSE file.
 # --- Imports
 
 # Standard library
-import Base.convert
 import LinearAlgebra
 
 
@@ -634,6 +633,9 @@ value(B::Pseudoscalar) = B.value
 # --- Utility functions
 
 # Exports
+import Base.convert
+
+# Exports
 export blade_atol
 
 """
@@ -651,6 +653,16 @@ Convert Scalar to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}} =
     Scalar{T}(value(B))
+
+"""
+    convert(::Type{S}, B::Pseudoscalar)
+        where {T<:AbstractFloat, S<:Pseudoscalar{T}}
+
+Convert Psuedoscalar to have the floating-point precision of type `T`.
+"""
+convert(::Type{S}, B::Pseudoscalar) where {T<:AbstractFloat,
+                                           S<:Pseudoscalar{T}} =
+    Pseudoscalar{T}(dim(B), value(B))
 
 #=
  TODO: review numerical error in factorizations to see if a different
