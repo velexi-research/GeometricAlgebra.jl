@@ -34,16 +34,19 @@ using GeometricAlgebra
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
+    dim = length(one_vector)
+
     # --- Multivector{T}(blades::Vector{AbstractBlade{T}};
     #                    reduced::Bool=false) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        two_blade = Blade{precision_type}(vectors)
+        scalar = Scalar{precision_type}(test_value)
         one_blade = Blade{precision_type}(one_vector)
-        zero_blade = Scalar{precision_type}(test_value)
+        two_blade = Blade{precision_type}(vectors)
+        pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
 
-        blades = Vector([zero_blade, one_blade, two_blade])
+        blades = Vector([scalar, one_blade, two_blade, pseudoscalar])
 
         # default value for `reduced`
         M = Multivector{precision_type}(blades)
@@ -75,22 +78,26 @@ end
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
+    dim = length(one_vector)
+
     # --- Multivector{T}(blades::Vector{AbstractBlade{T}};
     #                    reduced::Bool=false) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
+        scalar = Scalar{precision_type}(test_value)
         two_blade = Blade{precision_type}(vectors)
         one_blade = Blade{precision_type}(one_vector)
-        zero_blade = Scalar{precision_type}(test_value)
-        blades = Vector([zero_blade, one_blade, two_blade])
+        pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
+        blades = Vector([scalar, one_blade, two_blade, pseudoscalar])
         M = Multivector{precision_type}(blades)
 
         # summands()
-        expected_summands = Dict(0=>Vector([zero_blade]),
+        expected_summands = Dict(0=>Vector([scalar]),
                                  1=>Vector([one_blade]),
-                                 2=>Vector([two_blade]))
-        @test summands(M) isa Dict{Int, Vector{AbstractBlade{precision_type}}}
+                                 2=>Vector([two_blade]),
+                                 dim=>Vector([pseudoscalar]))
+        @test summands(M) isa Dict{Int, Vector{AbstractBlade}}
         @test summands(M) == expected_summands
     end
 end

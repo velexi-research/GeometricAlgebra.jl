@@ -79,11 +79,9 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
         # Construct `summands`. Sort blades by grade.
         summands = Dict{Int, Vector{AbstractBlade}}()
         for B in blades
-            if haskey(summands, grade(B))
-                append!(summands[grade(B)], B)
-            else
-                summands[grade(B)] = Vector{AbstractBlade}([B])
-            end
+            k = grade(B)
+            k_vectors = get!(summands, k, [])
+            push!(k_vectors, B)
         end
 
         # Reduce multivector
