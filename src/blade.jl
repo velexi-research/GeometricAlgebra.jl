@@ -19,10 +19,9 @@ import LinearAlgebra
 # --- Types
 
 # Exports
-export AbstractBlade, AbstractScalar, Blade, Scalar
+export AbstractBlade, Blade, Scalar
 export ScalarZero, ScalarZero64, ScalarZero32, ScalarZero16, ScalarZeroBigFloat
 export ScalarOne, ScalarOne64, ScalarOne32, ScalarOne16, ScalarOneBigFloat
-export ScalarInf, ScalarInf64, ScalarInf32, ScalarInf16, ScalarInfBigFloat
 
 # AbstractBlade
 """
@@ -70,19 +69,6 @@ Binary Operations
 abstract type AbstractBlade end
 
 
-# AbstractScalar
-"""
-    abstract type AbstractScalar <: AbstractBlade
-
-Supertype for all scalar types (i.e., 0-blades).
-
-Methods
--------
-    value(B)::AbstractFloat
-"""
-abstract type AbstractScalar <: AbstractBlade end
-
-
 # Blade
 """
     struct Blade{T<:AbstractFloat} <: AbstractBlade
@@ -112,12 +98,17 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     volume::T
 
     """
-        Blade{T}(dim::Int, grade::Int, basis::Matrix{T}, volume::Real;
-                 atol::Real=blade_atol(T), enforce_constraints::Bool=true,
-                 copy_basis::Bool=true) where {T<:AbstractFloat}
+        Blade{T}(dim::Int, grade::Int,
+                 basis::Matrix{T},
+                 volume::Real;
+                 atol::Real=blade_atol(T),
+                 enforce_constraints::Bool=true,
+                 copy_basis::Bool=true)
+            where {T<:AbstractFloat}
 
-    Construct a Blade from the specified data field values. A ScalarZero is
-    returned when the absolute value of `volume` is less than `atol`.
+    Construct a Blade from the specified data field values. A ScalarZero
+    instance is returned when the absolute value of `volume` is less than
+    `atol`.
 
     When `enforce_constraints` is true, constraints are enforced. When
     `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
@@ -126,8 +117,12 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     Note: this inner constructor intended primarily for internal use by
     other inner constructors to enforce constraints.
     """
-    function Blade{T}(dim::Int, grade::Int, basis::Matrix{T}, volume::Real;
-                      atol::Real=blade_atol(T), enforce_constraints::Bool=true,
+    function Blade{T}(dim::Int,
+                      grade::Int,
+                      basis::Matrix{T},
+                      volume::Real;
+                      atol::Real=blade_atol(T),
+                      enforce_constraints::Bool=true,
                       copy_basis::Bool=true) where {T<:AbstractFloat}
 
         # --- Enforce constraints
@@ -168,12 +163,13 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
     """
         Blade{T}(vectors::Matrix{T};
-                 volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+                 volume::Union{Real, Nothing}=nothing,
+                 atol::Real=blade_atol(T))
             where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
-    matrix. A ScalarZero is returned when the absolute value of `volume` is
-    less than `atol`.
+    matrix. A ScalarZero instance is returned when the absolute value of
+    `volume` is less than `atol`.
 
     By default, `vectors` determines the volume of the blade. However, if
     `volume` is specified, `vectors` is only used to define the subspace
@@ -227,10 +223,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     """
         Blade{T}(vector::Vector{T};
                  volume::Union{Real, Nothing}=nothing,
-                 atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+                 atol::Real=blade_atol(T))
+            where {T<:AbstractFloat}
 
-    Construct a Blade from a single vector. A ScalarZero is returned when the
-    norm of the blade is less than `atol`.
+    Construct a Blade from a single vector. A ScalarZero instance is returned
+    when the norm of the blade is less than `atol`.
 
     By default, `vector` determines the volume of the blade. However, if
     `volume` is specified, `vector` is only used to define the subspace
@@ -267,19 +264,22 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
     """
         Blade{T}(B::Blade{T};
-                 volume::Real=volume(B), atol::Real=blade_atol(T),
-                 copy_basis::Bool=false) where {T<:AbstractFloat}
+                 volume::Real=volume(B),
+                 atol::Real=blade_atol(T),
+                 copy_basis::Bool=false)
+            where {T<:AbstractFloat}
 
     Construct a Blade representing the same space as `B` having a specified
-    oriented `volume` relative to `B`. A ScalarZero is returned if the absolute
-    value of `volume` is less than `atol`,
+    oriented `volume` relative to `B`. A ScalarZero instance is returned if
+    the absolute value of `volume` is less than `atol`,
 
     When `copy_basis` is true, the `basis` of the new Blade is a copy
     of the `basis` of the original Blade; otherwise, the `basis` of the new
     Blade is reference to the `basis` of the original Blade.
     """
     Blade{T}(B::Blade{T};
-             volume::Real=volume(B), atol::Real=blade_atol(T),
+             volume::Real=volume(B),
+             atol::Real=blade_atol(T),
              copy_basis::Bool=false) where {T<:AbstractFloat} =
 
         Blade{T}(dim(B), grade(B), basis(B), volume,
@@ -287,22 +287,24 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
     """
         Blade{T}(B::Blade{S};
-                 volume::Real=volume(B), atol::Real=blade_atol(T),
+                 volume::Real=volume(B),
+                 atol::Real=blade_atol(T),
                  copy_basis::Bool=false)
             where {T<:AbstractFloat, S<:AbstractFloat}
 
     Convert the floating-point precision of a Blade.
 
     If `volume` is specified, the oriented volume of the blade of the new blade
-    (relative to `B`) is set to `volume`. A ScalarZero is returned if the
-    absolute value of `volume` is less than `atol`.
+    (relative to `B`) is set to `volume`. A ScalarZero instance is returned if
+    the absolute value of `volume` is less than `atol`.
 
     When `copy_basis` is true, the `basis` of the new Blade is a copy of the
     `basis` of the original Blade; otherwise, the `basis` of the new Blade is
     reference to the `basis` of the original Blade.
     """
     function Blade{T}(B::Blade{S};
-                      volume::Real=volume(B), atol::Real=blade_atol(T),
+                      volume::Real=volume(B),
+                      atol::Real=blade_atol(T),
                       copy_basis::Bool=false) where {T<:AbstractFloat,
                                                      S<:AbstractFloat}
         # Handle special cases
@@ -319,23 +321,27 @@ end
 
 """
     Blade(vectors::Array{T};
-          volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+          volume::Union{Real, Nothing}=nothing,
+          atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
     Blade{T}(vectors::Array{<:AbstractFloat};
-             volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+             volume::Union{Real, Nothing}=nothing,
+             atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
     Blade(vectors::Array{<:Integer};
-          volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64))
+          volume::Union{Real, Nothing}=nothing,
+          atol::Real=blade_atol(Float64))
 
     Blade{T}(vectors::Array{<:Integer};
-             volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+             volume::Union{Real, Nothing}=nothing,
+             atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
-of a matrix or (2) a single vector. A ScalarZero is returned when the norm of
-the blade is less than `atol`.
+of a matrix or (2) a single vector. A ScalarZero instance is returned when the
+norm of the blade is less than `atol`.
 
 By default, `vectors` determines the volume (i.e., norm and orientation) of the
 blade. However, if `volume` is specified, `vectors` is only used to define the
@@ -366,7 +372,8 @@ Blade{T}(vectors::Array{<:AbstractFloat};
     Blade(convert(Array{T}, vectors), volume=volume, atol=atol)
 
 Blade(vectors::Array{<:Integer};
-      volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(Float64)) =
+      volume::Union{Real, Nothing}=nothing,
+      atol::Real=blade_atol(Float64)) =
     Blade(convert(Array{Float64}, vectors), volume=volume, atol=atol)
 
 Blade{T}(vectors::Array{<:Integer};
@@ -376,19 +383,21 @@ Blade{T}(vectors::Array{<:Integer};
 
 """
     Blade(B::Blade{T};
-          volume::Real=volume(B), atol::Real=blade_atol(T),
+          volume::Real=volume(B),
+          atol::Real=blade_atol(T),
           copy_basis=false) where {T<:AbstractFloat}
 
 Copy constructor. Construct a Blade representing the same space as `B` having
-a specified oriented volume relative to `B`. A ScalarZero is returned if the
-absolute value of `volume` is less than `atol`.
+a specified oriented volume relative to `B`. A ScalarZero instance is returned h
+if the absolute value of `volume` is less than `atol`.
 
 When `copy_basis` is true, the `basis` of the new Blade is a copy of the
 `basis` of the original Blade; otherwise, the `basis` of the new Blade is
 reference to the `basis` of the original Blade.
 """
 Blade(B::Blade{T};
-      volume::Real=volume(B), atol::Real=blade_atol(T),
+      volume::Real=volume(B),
+      atol::Real=blade_atol(T),
       copy_basis=false) where {T<:AbstractFloat} =
     Blade{T}(B, volume=volume, atol=atol, copy_basis=copy_basis)
 
@@ -400,7 +409,7 @@ Blade(B::Blade{T};
 
     Blade(x::Integer)
 
-    Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar(x)
+    Blade{T}(x::Integer) where {T<:AbstractFloat}
 
 Convenience constructors for constructing Scalars.
 """
@@ -414,21 +423,20 @@ Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar{T}(x)
 
 # Scalar
 """
-    struct Scalar{T<:AbstractFloat} <: AbstractScalar
+    struct Scalar{T<:AbstractFloat} <: AbstractBlade
 
 Scalar (0-blade) represented with the floating-point precision of type `T`.
 """
-struct Scalar{T<:AbstractFloat} <: AbstractScalar
+struct Scalar{T<:AbstractFloat} <: AbstractBlade
     # Fields
     # ------
     # * `value`: the value of the scalar
     value::T
 
     """
-        Scalar{T}(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+        Scalar{T}(value::T) where {T<:AbstractFloat}
 
-    Construct a Scalar with the specified value. Scalars with absolute value
-    less than `atol` are returned as a ScalarZero.
+    Construct a Scalar with the specified value.
     """
     Scalar{T}(value::T) where {T<:AbstractFloat} = new(value)
 end
@@ -504,62 +512,23 @@ const ScalarOne16 = Scalar{Float16}(Float16(1))
 Singleton instance of type Scalar{BigFloat} representing the multiplicative
 identity 1.
 """
-const ScalarOneBigFloat = Scalar{BigFloat}(BigFloat(Inf))
+const ScalarOneBigFloat = Scalar{BigFloat}(BigFloat(1))
 
 const ScalarOnePrecisions = Dict([(Float64, ScalarOne64),
                                   (Float32, ScalarOne32),
                                   (Float16, ScalarOne16),
                                   (BigFloat, ScalarOneBigFloat)])
 
-# ScalarInf constants
-const ScalarInf64 = Scalar{Float64}(Float64(Inf))
-const ScalarInf = ScalarInf64
 """
-    ScalarInf, ScalarInf64
-
-Singleton instance of type Scalar{Float64} representing Inf.
-"""
-ScalarInf, ScalarInf64
-
-"""
-    ScalarInf32
-
-Singleton instance of type Scalar{Float32} representing Inf.
-"""
-const ScalarInf32 = Scalar{Float32}(Float32(Inf))
-
-"""
-    ScalarInf16
-
-Singleton instance of type Scalar{Float16} representing Inf.
-"""
-const ScalarInf16 = Scalar{Float16}(Float16(Inf))
-
-"""
-    ScalarInfBigFloat
-
-Singleton instance of type Scalar{BigFloat} representing Inf.
-"""
-const ScalarInfBigFloat = Scalar{BigFloat}(BigFloat(Inf))
-
-const ScalarInfPrecisions = Dict([(Float64, ScalarInf64),
-                                  (Float32, ScalarInf32),
-                                  (Float16, ScalarInf16),
-                                  (BigFloat, ScalarInfBigFloat)])
-
-"""
-    Scalar(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
-
-    Scalar{T}(value::AbstractFloat;
-              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    Scalar(value::T) where {T<:AbstractFloat}
 
     Scalar(value::Integer)
 
     Scalar{T}(value::Integer) where {T<:AbstractFloat}
 
-Construct a Scalar with the specified value. ScalarZero is returned when the
-absolute value of `value` is (1) less than `atol` or (2) exactly equal to
-zero.
+Construct a Scalar with the specified value. ScalarZero is returned when
+`value` is exactly equal to 0. ScalarOne is returned when `value` is exactly
+equal to 1.
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Scalar.
@@ -570,12 +539,7 @@ the precision of the Scalar.
 * If `value` is an integer, the precision of the constructed Scalar defaults
   to `Float64`.
 """
-Scalar{T}(value::AbstractFloat;
-          atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    abs(value) < atol ? ScalarZeroPrecisions[T] : Scalar{T}(T(value))
-
-Scalar(value::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Scalar{T}(value, atol=atol)
+Scalar(value::T) where {T<:AbstractFloat} = Scalar{T}(value)
 
 Scalar(value::Integer) = Scalar(Float64(value))
 
@@ -586,9 +550,6 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
 
 # Imports
 import Base.zero, Base.one
-
-# Exports
-export inf
 
 """
     zero(B::AbstractBlade)
@@ -612,17 +573,6 @@ one(B::AbstractBlade) = one(typeof(B))
 one(::Type{Blade{T}}) where {T<:AbstractFloat} = ScalarOnePrecisions[T]
 one(::Type{Scalar{T}}) where {T<:AbstractFloat} = ScalarOnePrecisions[T]
 
-"""
-    inf(B::AbstractBlade)
-    inf(::Type{Blade{T}}) where {T<:AbstractFloat}
-    inf(::Type{Scalar{T}}) where {T<:AbstractFloat}
-
-Return the Scalar representing Inf.
-"""
-inf(B::AbstractBlade) = inf(typeof(B))
-inf(::Type{Blade{T}}) where {T<:AbstractFloat} = ScalarInfPrecisions[T]
-inf(::Type{Scalar{T}}) where {T<:AbstractFloat} = ScalarInfPrecisions[T]
-
 
 # --- Core AbstractBlade functions
 
@@ -638,7 +588,7 @@ export dim, grade, basis, volume, norm, sign
 Return dimension of space that Blade blade is embedded in.
 """
 dim(B::Blade) = B.dim
-dim(B::AbstractScalar) = 0
+dim(B::Scalar) = 0
 
 """
     grade(B::AbstractBlade{<:AbstractFloat})
@@ -646,16 +596,16 @@ dim(B::AbstractScalar) = 0
 Return the grade of the dimension of the space spanned by the blade.
 """
 grade(B::Blade) = B.grade
-grade(B::AbstractScalar) = 0
+grade(B::Scalar) = 0
 
 """
     basis(B::AbstractBlade{<:AbstractFloat})
 
 When `B` is a Blade, return an orthonormal basis for the space spanned by the
-blade. When `B` is a scalar (subtype of AbstractScalar), return 1.
+blade. When `B` is a Scalar, return 1.
 """
 basis(B::Blade) = B.basis
-basis(B::AbstractScalar) = 1
+basis(B::Scalar) = 1
 
 """
     volume(B::AbstractBlade)::Real
@@ -684,13 +634,13 @@ sign(B::Blade)::Int8 = sign(B.volume)
 sign(B::Scalar)::Int8 = sign(B.value)
 
 
-# --- Core AbstractScalar functions
+# --- Core Scalar functions
 
 # Exports
 export value
 
 """
-    value(B::AbstractBlade)::Real
+    value(B::Scalar)::Real
 
 Return the value of a scalar.
 """
@@ -703,14 +653,19 @@ value(B::Scalar) = B.value
 export blade_atol
 
 """
-    convert(::Type{S}, B::AbstractBlade)
-        where {T<:AbstractFloat, S<:AbstractBlade{T}}
+    convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
 
-Convert AbstractBlade to have the floating-point precision of type `T`.
+Convert Blade to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}} =
     Blade{T}(B)
-convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat, S<:Scalar{T}} =
+
+"""
+    convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}}
+
+Convert Scalar to have the floating-point precision of type `T`.
+"""
+convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}} =
     Scalar{T}(value(B))
 
 # TODO: review numerical error in factorizations to see if a different

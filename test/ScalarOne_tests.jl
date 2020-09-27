@@ -42,8 +42,6 @@ import GeometricAlgebra.ScalarOnePrecisions
         @test one(Scalar{precision_type}) ===
             ScalarOnePrecisions[precision_type]
     end
-
-    @test_throws MethodError one(AbstractScalar)
 end
 
 @testset "ScalarOne: AbstractBlade interface tests" begin
@@ -71,7 +69,7 @@ end
     end
 end
 
-@testset "ScalarOne: AbstractScalar interface tests" begin
+@testset "ScalarOne: Scalar method tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = one(Blade{precision_type})

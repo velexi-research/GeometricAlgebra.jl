@@ -42,8 +42,6 @@ import GeometricAlgebra.ScalarZeroPrecisions
         @test zero(Scalar{precision_type}) ===
             ScalarZeroPrecisions[precision_type]
     end
-
-    @test_throws MethodError zero(AbstractScalar)
 end
 
 @testset "ScalarZero: AbstractBlade interface tests" begin
@@ -71,7 +69,7 @@ end
     end
 end
 
-@testset "ScalarZero: AbstractScalar interface tests" begin
+@testset "ScalarZero: Scalar method tests" begin
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         B = zero(Blade{precision_type})
