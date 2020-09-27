@@ -826,6 +826,120 @@ end
     end
 end
 
+@testset "Blade: outer constructor tests - Pseudoscalar constructors" begin
+    #=
+      Notes
+      -----
+      * Test type of constructed instances. Correct construction of instances
+        is tested by the inner constructor tests.
+    =#
+
+    # --- Preparations
+
+    test_dim = 10
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Blade(dim::Integer, x::T) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(test_value)
+        B = Blade(test_dim, converted_value)
+        @test B isa Pseudoscalar{precision_type}
+        @test dim(B) == test_dim
+        @test value(B) == converted_value
+    end
+
+    # --- Blade{T}(dim::Integer, x::AbstractFloat) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        for value_type in subtypes(AbstractFloat)
+            converted_value = value_type(test_value)
+            B = Blade{precision_type}(test_dim, converted_value)
+            @test B isa Pseudoscalar{precision_type}
+            @test dim(B) == test_dim
+            @test value(B) == precision_type(converted_value)
+        end
+    end
+
+    # --- Blade(dim::Integer, x::Integer)
+
+    # Preparations
+    test_value = 3
+
+    # subtypes(Signed)
+    for value_type in subtypes(Signed)
+        converted_value = value_type(test_value)
+        B = Blade(test_dim, converted_value)
+        @test B isa Pseudoscalar{Float64}
+        @test dim(B) == test_dim
+        @test value(B) == Float64(converted_value)
+    end
+
+    # subtypes(Unsigned)
+    for value_type in subtypes(Unsigned)
+        converted_value = value_type(test_value)
+        B = Blade(test_dim, converted_value)
+        @test B isa Pseudoscalar{Float64}
+        @test dim(B) == test_dim
+        @test value(B) == Float64(converted_value)
+    end
+
+    # --- Bool
+
+    # value == true
+    B = Blade(test_dim, true)
+    @test B isa Pseudoscalar{Float64}
+    @test dim(B) == test_dim
+    @test value(B) == 1
+
+    # value == false
+    B = Blade(test_dim, false)
+    @test B isa Pseudoscalar{Float64}
+    @test dim(B) == test_dim
+    @test value(B) == 0
+
+    # --- Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        test_value = 3
+
+        # subtypes(Signed)
+        for value_type in subtypes(Signed)
+            converted_value = value_type(test_value)
+            B = Blade{precision_type}(test_dim, converted_value)
+            @test B isa Pseudoscalar{precision_type}
+            @test dim(B) == test_dim
+            @test value(B) == precision_type(converted_value)
+        end
+
+        # subtypes(Unsigned)
+        for value_type in subtypes(Unsigned)
+            converted_value = value_type(test_value)
+            B = Blade{precision_type}(test_dim, converted_value)
+            @test B isa Pseudoscalar{precision_type}
+            @test dim(B) == test_dim
+            @test value(B) == precision_type(converted_value)
+        end
+
+        # --- Bool
+
+        # value == true
+        B = Blade{precision_type}(test_dim, true)
+        @test B isa Pseudoscalar{precision_type}
+        @test dim(B) == test_dim
+        @test value(B) == 1
+
+        # value == false
+        B = Blade{precision_type}(test_dim, false)
+        @test B isa Pseudoscalar{precision_type}
+        @test dim(B) == test_dim
+        @test value(B) == 0
+    end
+end
+
 # --- Function tests
 
 @testset "Blade: AbstractBlade interface tests" begin

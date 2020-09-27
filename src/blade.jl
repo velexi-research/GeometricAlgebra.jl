@@ -413,6 +413,21 @@ Blade{T}(x::AbstractFloat) where {T<:AbstractFloat} = Scalar{T}(x)
 Blade(x::Integer) = Scalar(x)
 Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar{T}(x)
 
+"""
+    Blade(dim::Integer, x::T) where {T<:AbstractFloat}
+    Blade{T}(dim::Integer, x::AbstractFloat) where {T<:AbstractFloat}
+    Blade(dim::Integer, x::Integer)
+    Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat}
+
+Convenience constructors for constructing Pseudoscalars.
+"""
+Blade(dim::Integer, x::T) where {T<:AbstractFloat} = Pseudoscalar(dim, x)
+Blade{T}(dim::Integer, x::AbstractFloat) where {T<:AbstractFloat} =
+    Pseudoscalar{T}(dim, x)
+Blade(dim::Integer, x::Integer) = Pseudoscalar(dim, x)
+Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat} =
+    Pseudoscalar{T}(dim, x)
+
 
 # Scalar
 """
