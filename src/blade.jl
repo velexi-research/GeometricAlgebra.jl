@@ -75,21 +75,23 @@ Blade (having nonzero grade) represented with the floating-point precision of
 type `T`.
 """
 struct Blade{T<:AbstractFloat} <: AbstractBlade
-    # Fields
-    # ------
-    # * `dim`: the dimension of the space that the blade is embedded in
-    #
-    # * `grade`: the dimension of the space spanned by the blade
-    #
-    # * `basis`: an orthonormal for the space spanned by the blade. Note that
-    #   the order of the columns in `basis` defines the orientation for the
-    #   unit blade represented by `basis`.
-    #
-    # * `volume`: the signed-norm (hypervolume) of the blade. The sign
-    #    of `volume` indicates the orientation of the blade relative to the
-    #    unit blade represented by `basis`. It is positive when the blade has
-    #    the same orientation as `basis` and negative when the blade has the
-    #    opposite orientation.
+    #=
+     Fields
+      ------
+      * `dim`: the dimension of the space that the blade is embedded in
+
+      * `grade`: the dimension of the space spanned by the blade
+
+      * `basis`: an orthonormal for the space spanned by the blade. Note that
+        the order of the columns in `basis` defines the orientation for the
+        unit blade represented by `basis`.
+
+      * `volume`: the signed-norm (hypervolume) of the blade. The sign
+         of `volume` indicates the orientation of the blade relative to the
+         unit blade represented by `basis`. It is positive when the blade has
+         the same orientation as `basis` and negative when the blade has the
+         opposite orientation.
+    =#
     dim::Int
     grade::Int
     basis::Matrix{T}
@@ -426,9 +428,11 @@ Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar{T}(x)
 Scalar (0-blade) represented with the floating-point precision of type `T`.
 """
 struct Scalar{T<:AbstractFloat} <: AbstractBlade
-    # Fields
-    # ------
-    # * `value`: the value of the scalar
+    #=
+      Fields
+      ------
+      * `value`: the value of the scalar
+    =#
     value::T
 
     """
@@ -476,11 +480,13 @@ Pseudoscalar ((n-1)-blade) represented with the floating-point precision of
 type `T`.
 """
 struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
-    # Fields
-    # ------
-    # * `dim`: the dimension of the space that the blade is embedded in
-    #
-    # * `value`: the value of the pseudoscalar
+    #=
+      Fields
+      ------
+      * `dim`: the dimension of the space that the blade is embedded in
+
+      * `value`: the value of the pseudoscalar
+    =#
     dim::Int
     value::T
 
@@ -661,8 +667,10 @@ Convert Scalar to have the floating-point precision of type `T`.
 convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}} =
     Scalar{T}(value(B))
 
-# TODO: review numerical error in factorizations to see if a different
-#       tolerance would be better.
+#=
+ TODO: review numerical error in factorizations to see if a different
+       tolerance would be better.
+=#
 """
     blade_atol(::Type{T}) where {T<:AbstractFloat}
 
