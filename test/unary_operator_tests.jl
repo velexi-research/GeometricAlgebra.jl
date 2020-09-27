@@ -96,30 +96,28 @@ end
         converted_value = precision_type(value)
 
         # value > 0
-        S = Scalar(converted_value)
+        S = Scalar{precision_type}(converted_value)
         @test reciprocal(S) == Scalar{precision_type}(1 / converted_value)
 
         # value < 0
         negative_value = -(abs(converted_value))
-        S = Scalar(negative_value)
+        S = Scalar{precision_type}(negative_value)
         @test reciprocal(S) == Scalar{precision_type}(1 / negative_value)
 
+        # value = 0
+        S = zero(Scalar{precision_type})
+        @test reciprocal(S) == Scalar{precision_type}(Inf)
+
+        # value == 1
+        S = one(Scalar{precision_type})
+        @test reciprocal(S) == S
+
         # value = Inf
-        S = Scalar(precision_type(Inf))
-        @test reciprocal(S) === Zero{precision_type}()
+        S = Scalar{precision_type}(Inf)
+        @test reciprocal(S) == zero(Scalar{precision_type})
 
         # value = -Inf
-        S = Scalar(precision_type(-Inf))
-        @test reciprocal(S) === Zero{precision_type}()
-    end
-
-    # x::Zero
-    for precision_type in subtypes(AbstractFloat)
-        @test reciprocal(Zero(precision_type)) == Scalar(Inf)
-    end
-
-    # x::One
-    for precision_type in subtypes(AbstractFloat)
-        @test reciprocal(One(precision_type)) === One(precision_type)
+        S = Scalar{precision_type}(-Inf)
+        @test reciprocal(S) == zero(Scalar{precision_type})
     end
 end

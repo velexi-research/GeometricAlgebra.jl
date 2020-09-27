@@ -86,7 +86,7 @@ end
 
 @testset "==(x, y): x, y::Scalar" begin
     # Preparations
-    value = rand() + 1  # add 1 to avoid 0
+    value = rand()
     value = rand() > 0.5 ? value : -value
 
     float64_or_bigfloat = (Float64, BigFloat)
@@ -183,122 +183,12 @@ end
         @test Scalar(precision_type(false)) != 1
         @test 1 != Scalar(precision_type(false))
     end
-
-    # x::Scalar, y::Zero
-    # x::Zero, y::Scalar
-    for precision_type in subtypes(AbstractFloat)
-        # !=(x,y)
-        @test Scalar(precision_type(2.5)) != Zero()
-        @test Zero() != Scalar(precision_type(2.5))
-    end
-
-    # x::Scalar, y::One
-    # x::One, y::Scalar
-    for precision_type in subtypes(AbstractFloat)
-        # ==(x, y)
-        @test Scalar(precision_type(1)) == One()
-        @test One() == Scalar(precision_type(1))
-
-        # ==(x, y)
-        @test Scalar(precision_type(5)) != One()
-        @test One() != Scalar(precision_type(5))
-    end
-
-    # --- x::Zero, y::Real
-    #     x::Real, y::Zero
-
-    # x::Zero, y::AbstractFloat
-    # x::AbstractFloat, y::Zero
-    for value_type in subtypes(AbstractFloat)
-        # ==(x, y)
-        @test Zero() == value_type(0)
-        @test value_type(0) == Zero()
-
-        # !=(x, y)
-        @test Zero() != value_type(5)
-        @test value_type(5) != Zero()
-    end
-
-    # x::Zero, y::Integer
-    # x::Integer, y::Zero
-    for value_type in subtypes(Signed)
-        # ==(x, y)
-        @test Zero() == value_type(0)
-        @test value_type(0) == Zero()
-
-        # !=(x, y)
-        @test Zero() != value_type(5)
-        @test value_type(5) != Zero()
-    end
-
-    for value_type in subtypes(Unsigned)
-        # ==(x, y)
-        @test Zero() == value_type(0)
-        @test value_type(0) == Zero()
-
-        # !=(x, y)
-        @test Zero() != value_type(5)
-        @test value_type(5) != Zero()
-    end
-
-    # Bool
-    @test Zero() == 0
-    @test 0 == Zero()
-    @test Zero() != 1
-    @test 1 != Zero()
-
-    # --- x::One, y::Real
-    #     x::Real, y::One
-
-    # x::One, y::AbstractFloat
-    # x::AbstractFloat, y::One
-    for value_type in subtypes(AbstractFloat)
-        # ==(x, y)
-        @test One() == value_type(1)
-        @test value_type(1) == One()
-
-        # !=(x, y)
-        @test One() != value_type(3)
-        @test value_type(3) != One()
-    end
-
-    # x::One, y::Integer
-    # x::Integer, y::One
-    for value_type in subtypes(Signed)
-        # ==(x, y)
-        @test One() == value_type(1)
-        @test value_type(1) == One()
-
-        # !=(x, y)
-        @test One() != value_type(5)
-        @test value_type(5) != One()
-    end
-
-    for value_type in subtypes(Unsigned)
-        # ==(x, y)
-        @test One() == value_type(1)
-        @test value_type(1) == One()
-
-        # !=(x, y)
-        @test One() != value_type(5)
-        @test value_type(5) != One()
-    end
-
-    # Bool
-    @test One() == 1
-    @test 1 == One()
-    @test One() != 0
-    @test 0 != One()
-
-    # x::Zero, y::One
-    # x::One, y::Zero
-    @test One() != Zero()
 end
 
-@testset "!=(x, y): x, y::{Blade, AbstractScalar}" begin
+@testset "!=(x, y): x, y::{Blade, Scalar}" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
-    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
     for precision_type1 in subtypes(AbstractFloat)
@@ -310,22 +200,6 @@ end
             @test B1 != B2
             @test B2 != B1
         end
-    end
-
-    for precision_type in subtypes(AbstractFloat)
-        # x::Blade, y::Zero
-        # x::Zero, y::Blade
-        B1 = Blade{precision_type}(vectors)
-        B2 = Zero()
-        @test B1 != B2
-        @test B2 != B1
-
-        # x::Blade, y::One
-        # x::One, y::Blade
-        B1 = Blade{precision_type}(vectors)
-        B2 = One()
-        @test B1 != B2
-        @test B2 != B1
     end
 end
 
@@ -404,7 +278,7 @@ end
 
 @testset "≈(x, y): x, y::Scalar" begin
     # Preparations
-    value = rand() + 1  # add 1 to avoid 0
+    value = rand()
     value = rand() > 0.5 ? value : -value
 
     # x::Scalar, y::Scalar
@@ -426,10 +300,10 @@ end
     end
 end
 
-@testset "≉(x, y): x, y::{Blade, AbstractScalar}" begin
+@testset "≉(x, y): x, y::{Blade, Scalar}" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
-    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
     for precision_type1 in subtypes(AbstractFloat)
@@ -441,21 +315,5 @@ end
             @test B1 ≉ B2
             @test B2 ≉ B1
         end
-    end
-
-    for precision_type in subtypes(AbstractFloat)
-        # x::Blade, y::Zero
-        # x::Zero, y::Blade
-        B1 = Blade{precision_type}(vectors)
-        B2 = Zero()
-        @test B1 ≉ B2
-        @test B2 ≉ B1
-
-        # x::Blade, y::One
-        # x::One, y::Blade
-        B1 = Blade{precision_type}(vectors)
-        B2 = One()
-        @test B1 ≉ B2
-        @test B2 ≉ B1
     end
 end

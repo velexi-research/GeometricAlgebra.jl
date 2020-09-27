@@ -60,25 +60,6 @@ using GeometricAlgebra
     @test C_wedge_B == outer(C, B)
     @test C_wedge_B ≈ expected_B_wedge_C
 
-    # --- B::Blade, C::Zero
-    #     B::Zero, C::Blade
-
-    # Preparations
-    B_vectors = hcat([1; 0; 0; 0; 0],
-                     [0; 2; 0; 0; 0])
-    B = Blade(B_vectors)
-
-    C = Zero()
-
-    # Exercise functionality
-    B_wedge_C = B ∧ C
-    @test B_wedge_C == outer(B, C)
-    @test B_wedge_C === Zero()
-
-    C_wedge_B = C ∧ B
-    @test C_wedge_B == outer(C, B)
-    @test C_wedge_B === Zero()
-
     # --- B::Blade, C::Vector
     #     B::Vector, C::Blade
 
@@ -161,10 +142,4 @@ end
     # Exercise functionality
     @test S * B == expected_S_times_B
     @test B * S == expected_S_times_B
-
-    # --- S::Zero, B::Blade
-    #     B::Blade, S::Zero
-
-    @test Zero() * B === Zero()
-    @test B * Zero() === Zero()
 end
