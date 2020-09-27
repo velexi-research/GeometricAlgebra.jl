@@ -301,21 +301,13 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     `basis` of the original Blade; otherwise, the `basis` of the new Blade is
     reference to the `basis` of the original Blade.
     """
-    function Blade{T}(B::Blade{S};
-                      volume::Real=volume(B),
-                      atol::Real=blade_atol(T),
-                      copy_basis::Bool=false) where {T<:AbstractFloat,
-                                                     S<:AbstractFloat}
-        # Handle special cases
-        if T == S
-            return B{T}(B, volume=volume, atol=atol,
-                        enforce_constraints=false, copy_basis=copy_basis)
-        end
-
-        # Return new Blade
+    Blade{T}(B::Blade{S};
+             volume::Real=volume(B),
+             atol::Real=blade_atol(T),
+             copy_basis::Bool=false) where {T<:AbstractFloat,
+                                            S<:AbstractFloat} =
         Blade{T}(dim(B), grade(B), convert(Array{T}, basis(B)), volume,
                  atol=atol, enforce_constraints=false, copy_basis=false)
-    end
 end
 
 """
