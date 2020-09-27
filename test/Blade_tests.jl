@@ -23,9 +23,11 @@ using GeometricAlgebra
 # --- Constructor tests
 
 @testset "Blade: inner constructor tests" begin
-    # Notes
-    # -----
-    # * Test value of constructed instance
+    #=
+      Notes
+      -----
+      * Test value of constructed instance
+    =#
 
     # --- Preparations
 
@@ -66,7 +68,7 @@ using GeometricAlgebra
         # default enforce_constraints, copy_basis
         B = Blade{precision_type}(dim, grade, normalized_basis, volume,
                                   atol=abs(volume) + 1)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # invalid data fields: dim != size(basis, 1)
         # enforce_constraints = true
@@ -135,17 +137,17 @@ using GeometricAlgebra
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
         B = Blade{precision_type}(vectors)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # vectors are linearly dependent
         vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
         B = Blade{precision_type}(vectors)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # norm(blade) < atol
         vectors = Matrix{precision_type}([3 3; 4 4; 0 1])
         B = Blade{precision_type}(vectors, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
     end
 
     # --- Basic constructor with a single vector
@@ -191,20 +193,20 @@ using GeometricAlgebra
         # vector is a zero vector
         zero_vector = Array{precision_type}([0. 0. 0.])
         B = Blade(zero_vector)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # norm(vector) < default atol
         small_vector = Vector{precision_type}(vector)
         small_vector /= LinearAlgebra.norm(small_vector)
         small_vector *= blade_atol(precision_type) / 2
         B = Blade{precision_type}(small_vector)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # norm(vector) < atol
         col_vector = Vector{precision_type}(vector)
         B = Blade{precision_type}(col_vector,
                                   atol=LinearAlgebra.norm(col_vector) + 1)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
     end
 
     # --- Copy constructor
@@ -298,12 +300,14 @@ using GeometricAlgebra
 end
 
 @testset "Blade: outer constructor tests - basic constructors" begin
-    # Notes
-    # -----
-    # * Test type of constructed instances. Correct construction of instances
-    #   is tested by the inner constructor tests.
-    #
-    # * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+    #=
+      Notes
+      -----
+      * Test type of constructed instances. Correct construction of instances
+        is tested by the inner constructor tests.
+
+      * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+    =#
 
     # --- Preparations
 
@@ -340,11 +344,11 @@ end
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_vectors / 6
         B = Blade(small_blade)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # --- vectors isa Vector
 
@@ -363,11 +367,11 @@ end
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_one_vector / 6
         B = Blade(small_blade)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
     end
 
     # --- Blade{T}(vectors::Array{<:AbstractFloat};
@@ -397,11 +401,11 @@ end
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_vectors / 6
             B = Blade{precision_type}(small_blade)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
 
             # --- vectors isa Vector
 
@@ -420,11 +424,11 @@ end
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_one_vector / 6
             B = Blade{precision_type}(small_blade)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
         end
     end
 
@@ -450,7 +454,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{Float64})
 
         # --- vectors isa Vector
 
@@ -468,7 +472,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{Float64})
     end
 
     # subtypes(Unsigned)
@@ -489,7 +493,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{Float64})
 
         # --- vectors isa Vector
 
@@ -507,7 +511,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{Float64})
     end
 
     # --- Bool
@@ -526,7 +530,7 @@ end
 
     # norm(blade) < atol
     B = Blade(converted_vectors, atol=2)
-    @test B === ZeroBlade()
+    @test B == zero(Blade{Float64})
 
     # ------ vectors isa Vector
 
@@ -543,7 +547,7 @@ end
 
     # norm(blade) < atol
     B = Blade(converted_one_vector, atol=2)
-    @test B === ZeroBlade()
+    @test B == zero(Blade{Float64})
 
     # --- Blade{T}(vectors::Array{<:Integer};
     #              volume::Union{Real, Nothing}=nothing,
@@ -573,7 +577,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
 
             # --- vectors isa Vector
 
@@ -591,7 +595,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
         end
 
         # subtypes(Unsigned)
@@ -616,7 +620,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
 
             # --- vectors isa Vector
 
@@ -634,7 +638,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B === ZeroBlade()
+            @test B == zero(Blade{precision_type})
         end
 
         # --- Bool
@@ -656,7 +660,7 @@ end
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_vectors, atol=2)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
 
         # ------ vectors isa Vector
 
@@ -672,17 +676,19 @@ end
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_one_vector, atol=2)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
     end
 end
 
 @testset "Blade: outer constructor tests - copy constructor" begin
-    # Notes
-    # -----
-    # * Test type of constructed instances. Correct construction of instances
-    #   is tested by the inner constructor tests.
-    #
-    # * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+    #=
+      Notes
+      -----
+      * Test type of constructed instances. Correct construction of instances
+        is tested by the inner constructor tests.
+
+      * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+    =#
 
     # --- Preparations
 
@@ -721,51 +727,35 @@ end
 end
 
 @testset "Blade: outer constructor tests - Scalar constructors" begin
-    # Notes
-    # -----
-    # * Test type of constructed instances. Correct construction of instances
-    #   is tested by the inner constructor tests.
-    #
-    # * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+    #=
+      Notes
+      -----
+      * Test type of constructed instances. Correct construction of instances
+        is tested by the inner constructor tests.
+    =#
 
     # --- Preparations
 
-    # Select random value for tests where `value` != 0
-    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    # --- Blade(x::T; atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    # --- Blade(x::T) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
-        # Preparations
         converted_value = precision_type(test_value)
-
-        # value != 0
         B = Blade(converted_value)
         @test B isa Scalar{precision_type}
-        @test volume(B) == converted_value
-
-        # value == 0
-        B = Blade(precision_type(0))
-        @test B === ZeroBlade()
+        @test value(B) == converted_value
     end
 
-    # --- Blade{T}(x::AbstractFloat;
-    #              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    # --- Blade{T}(x::AbstractFloat) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
-            # Preparations
             converted_value = value_type(test_value)
-
-            # value != 0
             B = Blade{precision_type}(converted_value)
             @test B isa Scalar{precision_type}
-            @test volume(B) == precision_type(converted_value)
-
-            # value == 0
-            B = Blade{precision_type}(precision_type(0))
-            @test B === ZeroBlade()
+            @test value(B) == precision_type(converted_value)
         end
     end
 
@@ -777,29 +767,17 @@ end
     # subtypes(Signed)
     for value_type in subtypes(Signed)
         converted_value = value_type(test_value)
-
-        # value != 0
         B = Blade(converted_value)
         @test B isa Scalar{Float64}
-        @test volume(B) == Float64(converted_value)
-
-        # value == 0
-        B = Blade(value_type(0))
-        @test B === ZeroBlade()
+        @test value(B) == Float64(converted_value)
     end
 
     # subtypes(Unsigned)
     for value_type in subtypes(Unsigned)
         converted_value = value_type(test_value)
-
-        # value != 0
         B = Blade(converted_value)
         @test B isa Scalar{Float64}
-        @test volume(B) == Float64(converted_value)
-
-        # value == 0
-        B = Blade(value_type(0))
-        @test B === ZeroBlade()
+        @test value(B) == Float64(converted_value)
     end
 
     # --- Bool
@@ -807,11 +785,11 @@ end
     # value == true
     B = Blade(true)
     @test B isa Scalar{Float64}
-    @test volume(B) == 1
+    @test value(B) == 1
 
     # value == false
     B = Blade(false)
-    @test B === ZeroBlade()
+    @test B == zero(Blade{Float64})
 
     # --- Blade{T}(x::Integer) where {T<:AbstractFloat}
 
@@ -822,29 +800,17 @@ end
         # subtypes(Signed)
         for value_type in subtypes(Signed)
             converted_value = value_type(test_value)
-
-            # value != 0
             B = Blade{precision_type}(converted_value)
             @test B isa Scalar{precision_type}
-            @test volume(B) == precision_type(converted_value)
-
-            # value == 0
-            B = Blade{precision_type}(value_type(0))
-            @test B === ZeroBlade()
+            @test value(B) == precision_type(converted_value)
         end
 
         # subtypes(Unsigned)
         for value_type in subtypes(Unsigned)
             converted_value = value_type(test_value)
-
-            # value != 0
             B = Blade{precision_type}(converted_value)
             @test B isa Scalar{precision_type}
-            @test volume(B) == precision_type(converted_value)
-
-            # value == 0
-            B = Blade{precision_type}(value_type(0))
-            @test B === ZeroBlade()
+            @test value(B) == precision_type(converted_value)
         end
 
         # --- Bool
@@ -852,11 +818,11 @@ end
         # value == true
         B = Blade{precision_type}(true)
         @test B isa Scalar{precision_type}
-        @test volume(B) == 1
+        @test value(B) == 1
 
         # value == false
         B = Blade{precision_type}(false)
-        @test B === ZeroBlade()
+        @test B == zero(Blade{precision_type})
     end
 end
 
