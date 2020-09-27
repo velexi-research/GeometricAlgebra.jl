@@ -1,5 +1,5 @@
 """
-Unit tests for the ZeroBlade type.
+Unit tests for the ZeroBlade constants.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -17,6 +17,7 @@ using Test
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
+import GeometricAlgebra.ZeroBladePrecisions
 
 
 # --- Tests
@@ -24,49 +25,58 @@ using GeometricAlgebra
 @testset "ZeroBlade: zero() tests" begin
     # zero(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
-        @test zero(Blade{precision_type}([1 2 3])) === ZeroBlade()
-        @test zero(Scalar{precision_type}(1)) === ZeroBlade()
+        @test zero(Blade{precision_type}([1 2 3])) ===
+            ZeroBladePrecisions[precision_type]
+        @test zero(Scalar{precision_type}(1)) ===
+            ZeroBladePrecisions[precision_type]
     end
-    @test zero(ZeroBlade()) === ZeroBlade()
-    @test zero(OneBlade()) === ZeroBlade()
 
-    # zero(::Type{<:AbstractBlade})
-    for blade_type in (Blade, AbstractScalar, Scalar, ZeroBlade, OneBlade)
-        @test zero(blade_type) === ZeroBlade()
-    end
+    # zero(::Type{Blade{T}}) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
-        @test zero(Blade{precision_type}) === ZeroBlade()
-        @test zero(Scalar{precision_type}) === ZeroBlade()
+        @test zero(Blade{precision_type}) ===
+            ZeroBladePrecisions[precision_type]
     end
+
+    # zero(::Type{Scalar{T}}) where {T<:AbstractFloat}
+    for precision_type in subtypes(AbstractFloat)
+        @test zero(Scalar{precision_type}) ===
+            ZeroBladePrecisions[precision_type]
+    end
+
+    @test_throws MethodError zero(AbstractScalar)
 end
 
 @testset "ZeroBlade: AbstractBlade interface tests" begin
-    # Preparations
-    B = ZeroBlade()
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        B = zero(Blade{precision_type})
 
-    # dim()
-    @test dim(B) == 0
+        # dim()
+        @test dim(B) == 0
 
-    # grade()
-    @test grade(B) == 0
+        # grade()
+        @test grade(B) == 0
 
-    # basis()
-    @test basis(B) == 1
+        # basis()
+        @test basis(B) == 1
 
-    # volume()
-    @test volume(B) == 0
+        # volume()
+        @test volume(B) == 0
 
-    # norm()
-    @test norm(B) == 0
+        # norm()
+        @test norm(B) == 0
 
-    # sign()
-    @test sign(B) == 0
+        # sign()
+        @test sign(B) == 0
+    end
 end
 
 @testset "ZeroBlade: AbstractScalar interface tests" begin
-    # Preparations
-    B = ZeroBlade()
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        B = zero(Blade{precision_type})
 
-    # value()
-    @test value(B) == 0
+        # value()
+        @test value(B) == 0
+    end
 end
