@@ -28,10 +28,10 @@ Return true if B1 and B2 are equal; otherwise, return false.
     dim(B1) == dim(B2) && grade(B1) == grade(B2) &&
     volume(B1) == volume(B2) && basis(B1) == basis(B2)
 
-==(B1::AbstractScalar, B2::AbstractScalar) = (value(B1) == value(B2))
+==(B1::Scalar, B2::Scalar) = (value(B1) == value(B2))
 
-==(B::AbstractScalar, x::Real) = (x == value(B))
-==(x::Real, B::AbstractScalar) = (B == x)
+==(B::Scalar, x::Real) = (x == value(B))
+==(x::Real, B::Scalar) = (B == x)
 
 
 """
@@ -73,8 +73,8 @@ end
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(B, x, rtol=rtol, atol=atol)
 
-≈(B1::Blade, B2::AbstractScalar) = false
-≈(B1::AbstractScalar, B2::Blade) = false
+≈(B1::Blade, B2::Scalar) = false
+≈(B1::Scalar, B2::Blade) = false
 
 
 # --- Unary operations
@@ -100,24 +100,14 @@ reciprocal(B::Blade{<:AbstractFloat}) =
         Blade(B, volume=1 / norm(B)) :
         Blade(B, volume=-1 / norm(B))
 
-reciprocal(B::Scalar{<:AbstractFloat}) = Scalar(1 / value(B))
-reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
-reciprocal(B::One{T}) where {T<:AbstractFloat} = One{T}()
-
+reciprocal(B::Scalar) = Scalar(1 / value(B))
 
 """
     reverse(B::AbstractBlade)
 
 Return the multiplicative inverse of `B`.
 """
-reverse(B::Blade{<:AbstractFloat}) =
-    mod(grade(B), 4) < 2 ?
-        Blade(B, volume=1 / norm(B)) :
-        Blade(B, volume=-1 / norm(B))
-
-reverse(B::Scalar{<:AbstractFloat}) = Scalar(1 / value(B))
-reverse(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
-reverse(B::One{T}) where {T<:AbstractFloat} = One{T}()
+# TODO: implement
 
 
 # --- Binary operations
@@ -137,8 +127,8 @@ Return the outer product of `B` and `C`.
 ∧(B::Blade, C::Blade) =
     Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
 
-∧(B::AbstractScalar, C::Blade) = Blade(C, volume=volume(B) * volume(C))
-∧(B::Blade, C::AbstractScalar) = Blade(B, volume=volume(B) * volume(C))
+∧(B::Scalar, C::Blade) = Blade(C, volume=volume(B) * volume(C))
+∧(B::Blade, C::Scalar) = Blade(B, volume=volume(B) * volume(C))
 
 ∧(v::Vector, B::Blade) = Blade(v) ∧ B
 ∧(B::Blade, v::Vector) = B ∧ Blade(v)
@@ -159,10 +149,6 @@ TODO: fill in other function signatures
 Return the inner product (left contraction) of `B` and `C`.
 """
 # TODO: implement
-#⋅(v::Vector{<:AbstractFloat}, w::Vector{<:AbstractFloat}) = 3
-#⋅(v::Blade{<:AbstractFloat}, w::Blade{<:AbstractFloat}) = 4
-#inner(x::Union{AbstractBlade, Vector, Real},
-#      y::Union{AbstractBlade, Vector, Real}) = x ⋅ y
 
 """
     *(B::Union{AbstractBlade, Real}, C::Union{AbstractBlade, Real})
@@ -174,6 +160,6 @@ Return the geometric product of `B` and `C`.
 # TODO: implement
 *(x::Real, B::Blade{<:AbstractFloat}) = Blade(B, volume=x * volume(B))
 *(B::Blade{<:AbstractFloat}, x::Real) = x * B
-*(x::AbstractScalar, B::Blade{<:AbstractFloat}) =
+*(x::Scalar, B::Blade{<:AbstractFloat}) =
     Blade(B, volume=volume(x) * volume(B))
-*(B::Blade{<:AbstractFloat}, x::AbstractScalar) = x * B
+*(B::Blade{<:AbstractFloat}, x::Scalar) = x * B
