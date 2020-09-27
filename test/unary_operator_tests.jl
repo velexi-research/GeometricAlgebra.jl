@@ -54,6 +54,28 @@ end
     end
 end
 
+@testset "-(x) tests: x::Pseudoscalar" begin
+    # Preparations
+    value = rand() + 1  # add 1 to avoid 0
+    value = rand() > 0.5 ? value : -value
+    dim = 10
+
+    # x::Pseudoscalar{<:AbstractFloat}
+    for value_type in subtypes(AbstractFloat)
+        B = Pseudoscalar(dim, value_type(value))
+        expected_result = Pseudoscalar(dim, -value_type(value))
+        @test -B == expected_result
+    end
+
+    # x::Pseudoscalar{<:Signed}
+    int_value::Int = 3
+    for value_type in subtypes(Signed)
+        B = Pseudoscalar(dim, value_type(int_value))
+        expected_result = Pseudoscalar(dim, -value_type(int_value))
+        @test -B == expected_result
+    end
+end
+
 # --- reciprocal(x)
 
 @testset "reciprocal(x) tests: x::Blade" begin
@@ -119,5 +141,38 @@ end
         # value = -Inf
         S = Scalar{precision_type}(-Inf)
         @test reciprocal(S) == zero(Scalar{precision_type})
+    end
+end
+
+@testset "reciprocal(x) tests: x::Pseudoscalar" begin
+    # Preparations
+    value = rand() + 1  # add 1 to avoid 0
+    value = rand() > 0.5 ? value : -value
+
+    # x::Pseudoscalar
+    for precision_type in subtypes(AbstractFloat)
+        # mod(dim, 4) == 1
+        dim = 5
+        B = Pseudoscalar(dim, value)
+        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(value))
+        @test reciprocal(B) ≈ expected_reciprocal
+
+        # mod(dim, 4) == 2
+        dim = 6
+        B = Pseudoscalar(dim, value)
+        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(value))
+        @test reciprocal(B) ≈ expected_reciprocal
+
+        # mod(dim, 4) == 3
+        dim = 7
+        B = Pseudoscalar(dim, value)
+        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(value))
+        @test reciprocal(B) ≈ expected_reciprocal
+
+        # mod(dim, 4) == 0
+        dim = 8
+        B = Pseudoscalar(dim, value)
+        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(value))
+        @test reciprocal(B) ≈ expected_reciprocal
     end
 end

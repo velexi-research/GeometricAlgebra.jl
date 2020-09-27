@@ -33,6 +33,15 @@ Return true if B1 and B2 are equal; otherwise, return false.
 ==(B::Scalar, x::Real) = (x == value(B))
 ==(x::Real, B::Scalar) = (B == x)
 
+==(B1::Pseudoscalar, B2::Pseudoscalar) =
+    (dim(B1) == dim(B2)) && (value(B1) == value(B2))
+
+# By default, AbstractBlades are not equal
+==(B1::AbstractBlade, B2::AbstractBlade) = false
+
+# By default, AbstractBlades and Real numbers are not equal
+==(B1::AbstractBlade, B2::Real) = false
+==(B1::Real, B2::AbstractBlade) = false
 
 """
     ≈(B1::AbstractBlade, B2::AbstractBlade)
@@ -68,13 +77,23 @@ end
 
 ≈(B::Scalar{T}, x::Real;
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
-    ≈(x, value(B), rtol=rtol, atol=atol)
+    ≈(x, value(B), atol=atol, rtol=rtol)
 ≈(x::Real, B::Scalar{T};
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
-    ≈(B, x, rtol=rtol, atol=atol)
+    ≈(B, x, atol=atol, rtol=rtol)
 
-≈(B1::Blade, B2::Scalar) = false
-≈(B1::Scalar, B2::Blade) = false
+≈(B1::Pseudoscalar{T1}, B2::Pseudoscalar{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    (dim(B1) == dim(B2)) && ≈(value(B1), value(B2), atol=atol, rtol=rtol)
+
+# By default, AbstractBlades are not approximately equal
+≈(B1::AbstractBlade, B2::AbstractBlade) = false
+
+# By default, AbstractBlades and Real numbers are not approximately equal
+≈(B1::AbstractBlade, B2::Real) = false
+≈(B1::Real, B2::AbstractBlade) = false
 
 
 # --- Unary operations
@@ -89,18 +108,24 @@ Return the additive inverse of `B`.
 """
 -(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B))
 -(B::Scalar) = Scalar(-value(B))
+-(B::Pseudoscalar) = Pseudoscalar(dim(B), -value(B))
 
 """
     reciprocal(B::AbstractBlade)
 
 Return the multiplicative inverse of `B`.
 """
-reciprocal(B::Blade{<:AbstractFloat}) =
+reciprocal(B::Blade) =
     mod(grade(B), 4) < 2 ?
         Blade(B, volume=1 / norm(B)) :
         Blade(B, volume=-1 / norm(B))
 
 reciprocal(B::Scalar) = Scalar(1 / value(B))
+
+reciprocal(B::Pseudoscalar) =
+    mod(dim(B), 4) < 2 ?
+        Pseudoscalar(dim(B), 1 / value(B)) :
+        Pseudoscalar(dim(B), -1 / value(B))
 
 """
     reverse(B::AbstractBlade)
