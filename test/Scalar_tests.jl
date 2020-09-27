@@ -131,60 +131,6 @@ end
 
 # --- Function tests
 
-@testset "Scalar: zero() tests" begin
-    # zero(B::AbstractBlade)
-    for precision_type in subtypes(AbstractFloat)
-        B = zero(Blade{precision_type}([1 2 3]))
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
-
-        B = zero(Scalar{precision_type}(1))
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
-    end
-
-    # zero(::Type{Blade{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = zero(Blade{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
-    end
-
-    # zero(::Type{Scalar{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = zero(Scalar{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
-    end
-end
-
-@testset "Scalar: one() tests" begin
-    # one(B::AbstractBlade)
-    for precision_type in subtypes(AbstractFloat)
-        B = one(Blade{precision_type}([1 2 3]))
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
-
-        B = one(Scalar{precision_type}(1))
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
-    end
-
-    # one(::Type{Blade{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = one(Blade{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
-    end
-
-    # one(::Type{Scalar{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = one(Scalar{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
-    end
-end
-
 @testset "Scalar: AbstractBlade interface tests" begin
     # Preparations
     test_value = rand() + 1  # add 1 to avoid 0
