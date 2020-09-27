@@ -241,7 +241,6 @@ end
     # Preparations
     vectors = [3 3; 4 4; 0 1]
     dim = size(vectors, 1)
-    println(dim)
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
