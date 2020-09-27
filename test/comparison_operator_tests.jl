@@ -131,57 +131,65 @@ end
         # x::Scalar, y::AbstractFloat
         # x::AbstractFloat, y::Scalar
         for value_type in subtypes(AbstractFloat)
+            B = Scalar(precision_type(value))
+
             # ==(x, y)
             if precision_type == value_type
-                @test Scalar(precision_type(value)) == value_type(value)
-                @test value_type(value) == Scalar(precision_type(value))
+                @test B == value_type(value)
+                @test value_type(value) == B
             elseif precision_type in float64_or_bigfloat &&
                    value_type in float64_or_bigfloat
-                @test Scalar(precision_type(value)) == value_type(value)
-                @test value_type(value) == Scalar(precision_type(value))
+                @test B == value_type(value)
+                @test value_type(value) == B
             else
-                @test Scalar(precision_type(value)) != value_type(value)
-                @test value_type(value) != Scalar(precision_type(value))
+                @test B != value_type(value)
+                @test value_type(value) != B
             end
 
             # !=(x,y)
-            @test Scalar(precision_type(value)) != value_type(2 * value)
-            @test value_type(2 * value) != Scalar(precision_type(value))
+            @test B != value_type(2 * value)
+            @test value_type(2 * value) != B
         end
 
         # x::Scalar, y::Integer
         # x::Integer, y::Scalar
         int_value::Int = 3
         for value_type in subtypes(Signed)
+            B = Scalar(precision_type(int_value))
+
             # ==(x, y)
-            @test Scalar(precision_type(int_value)) == value_type(int_value)
-            @test value_type(int_value) == Scalar(precision_type(int_value))
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
 
             # !=(x,y)
-            @test Scalar(precision_type(int_value)) != value_type(2 * int_value)
-            @test value_type(2 * int_value) != Scalar(precision_type(int_value))
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
         end
 
         for value_type in subtypes(Unsigned)
+            B = Scalar(precision_type(int_value))
+
             # ==(x, y)
-            @test Scalar(precision_type(int_value)) == value_type(int_value)
-            @test value_type(int_value) == Scalar(precision_type(int_value))
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
 
             # !=(x,y)
-            @test Scalar(precision_type(int_value)) != value_type(2 * int_value)
-            @test value_type(2 * int_value) != Scalar(precision_type(int_value))
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
         end
 
         # Bool
-        @test Scalar(precision_type(true)) == 1
-        @test 1 == Scalar(precision_type(true))
-        @test Scalar(precision_type(true)) != 0
-        @test false != Scalar(precision_type(true))
+        B = Scalar(precision_type(true))
+        @test B == 1
+        @test 1 == B
+        @test B != 0
+        @test 0 != B
 
-        @test Scalar(precision_type(false)) == 0
-        @test 0 == Scalar(precision_type(false))
-        @test Scalar(precision_type(false)) != 1
-        @test 1 != Scalar(precision_type(false))
+        B = Scalar(precision_type(false))
+        @test B == 0
+        @test 0 == B
+        @test B != 1
+        @test 1 != B
     end
 end
 
