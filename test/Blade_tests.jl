@@ -986,7 +986,7 @@ end
     end
 end
 
-@testset "Blade: convert() tests" begin
+@testset "Blade: convert(B) tests" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
 

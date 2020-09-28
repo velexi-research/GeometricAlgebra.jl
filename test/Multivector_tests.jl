@@ -102,7 +102,7 @@ end
     end
 end
 
-@testset "Multivector: convert() tests" begin
+@testset "Multivector: convert(B) tests" begin
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
         end

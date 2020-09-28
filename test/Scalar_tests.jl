@@ -240,7 +240,7 @@ end
     end
 end
 
-@testset "Scalar: convert() tests" begin
+@testset "Scalar: convert(B) tests" begin
     # Preparations
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
