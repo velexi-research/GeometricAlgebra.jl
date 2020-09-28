@@ -112,7 +112,7 @@ end
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
 
-    # x::Scalar
+    # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         converted_value = precision_type(value)
@@ -149,7 +149,7 @@ end
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
 
-    # x::Pseudoscalar
+    # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
         # mod(dim, 4) == 1
         dim = 5
@@ -174,5 +174,20 @@ end
         B = Pseudoscalar(dim, value)
         expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(value))
         @test reciprocal(B) ≈ expected_reciprocal
+    end
+end
+
+# --- dual(x)
+
+@testset "dual(x) tests: x::Pseudoscalar" begin
+    # Preparations
+    dim = 5
+    value = rand() + 1  # add 1 to avoid 0
+    value = rand() > 0.5 ? value : -value
+
+    # Exercise functionality and check results
+    for precision_type in subtypes(AbstractFloat)
+        B = Pseudoscalar(dim, value)
+        @test dual(B) ≈ Scalar(value)
     end
 end

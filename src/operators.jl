@@ -11,13 +11,14 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Imports
 
-import Base.:(==), Base.:(≈)
-import Base.:(-)
-import Base.:(*)
+# Standard library
 import LinearAlgebra
 
 
 # --- Comparison operators
+
+# Imports
+import Base.:(==), Base.:(≈)
 
 """
     ==(B1::AbstractBlade, B2::AbstractBlade)
@@ -91,8 +92,11 @@ end
 
 # --- Unary operations
 
+# Imports
+import Base.:(-)
+
 # Exports
-export reciprocal, reverse
+export dual, reciprocal, reverse
 
 """
     -(B::AbstractBlade)
@@ -127,8 +131,21 @@ Return the multiplicative inverse of `B`.
 """
 # TODO: implement
 
+"""
+    dual(B::AbstractBlade)
+
+Return the dual `B`.
+"""
+# TODO: implement
+dual(B::Blade) = nothing
+dual(B::Scalar) = nothing
+dual(B::Pseudoscalar) = Scalar(value(B))
+
 
 # --- Binary operations
+
+# Imports
+import Base.:(*)
 
 # Exports
 export ∧, outer

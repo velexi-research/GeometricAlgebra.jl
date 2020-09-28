@@ -44,6 +44,7 @@ Methods
 Unary Operations
 ----------------
     -(B)::AbstractBlade
+    dual(B)::AbstractBlade
     reciprocal(B)::AbstractBlade
     reverse(B)::AbstractBlade
 
