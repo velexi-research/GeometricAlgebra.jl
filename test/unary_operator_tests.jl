@@ -19,33 +19,33 @@ using Test
 using GeometricAlgebra
 
 
-# --- -(x)
+# --- -(B)
 
-@testset "-(x) tests: x::Blade" begin
+@testset "-(B) tests: B::Blade" begin
     # Preparations
     vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
 
-    # x::Blade
+    # B::Blade
     negative_B = Blade(B, volume=-volume(B))
     @test -B == negative_B
 
     @test -negative_B == B
 end
 
-@testset "-(x) tests: x::Scalar" begin
+@testset "-(B) tests: B::Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
 
-    # x::Scalar{<:AbstractFloat}
+    # B::Scalar{<:AbstractFloat}
     for value_type in subtypes(AbstractFloat)
         B = Scalar(value_type(value))
         expected_result = Scalar(-value_type(value))
         @test -B == expected_result
     end
 
-    # x::Scalar{<:Signed}
+    # B::Scalar{<:Signed}
     int_value::Int = 3
     for value_type in subtypes(Signed)
         B = Scalar(value_type(int_value))
@@ -54,20 +54,20 @@ end
     end
 end
 
-@testset "-(x) tests: x::Pseudoscalar" begin
+@testset "-(B) tests: B::Pseudoscalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
     dim = 10
 
-    # x::Pseudoscalar{<:AbstractFloat}
+    # B::Pseudoscalar{<:AbstractFloat}
     for value_type in subtypes(AbstractFloat)
         B = Pseudoscalar(dim, value_type(value))
         expected_result = Pseudoscalar(dim, -value_type(value))
         @test -B == expected_result
     end
 
-    # x::Pseudoscalar{<:Signed}
+    # B::Pseudoscalar{<:Signed}
     int_value::Int = 3
     for value_type in subtypes(Signed)
         B = Pseudoscalar(dim, value_type(int_value))
@@ -76,9 +76,9 @@ end
     end
 end
 
-# --- reciprocal(x)
+# --- reciprocal(B)
 
-@testset "reciprocal(x) tests: x::Blade" begin
+@testset "reciprocal(B) tests: B::Blade" begin
     for precision_type in subtypes(AbstractFloat)
         # mod(grade, 4) == 1
         vectors = Vector{precision_type}([3; 4; 0; 0; 0])
@@ -107,7 +107,7 @@ end
     end
 end
 
-@testset "reciprocal(x) tests: x::Scalar" begin
+@testset "reciprocal(B) tests: B::Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -144,7 +144,7 @@ end
     end
 end
 
-@testset "reciprocal(x) tests: x::Pseudoscalar" begin
+@testset "reciprocal(B) tests: B::Pseudoscalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -177,9 +177,9 @@ end
     end
 end
 
-# --- dual(x)
+# --- dual(B)
 
-@testset "dual(x) tests: x::Pseudoscalar" begin
+@testset "dual(B) tests: B::Pseudoscalar" begin
     # Preparations
     dim = 5
     value = rand() + 1  # add 1 to avoid 0

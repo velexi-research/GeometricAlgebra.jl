@@ -138,24 +138,20 @@ end
     @test B * x == expected_x_times_B
 end
 
-@testset "*(S, B) tests: x::Scalar, B::Blade" begin
+@testset "*(B, C) tests: B::Blade, C::Scalar" begin
     # --- Preparations
 
     B_vectors = hcat([1; 0; 0; 0; 0],
                      [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
 
-    # --- S::Scalar, B::Blade
-    #     B::Blade, S::Scalar
-
-    # Preparations
     x = rand() + 1  # add 1 to avoid 0
     x = rand() > 0.5 ? x : -x
-    S = Scalar(x)
+    C = Scalar(x)
 
-    expected_S_times_B = Blade(B_vectors, volume=2 * x)
+    expected_B_times_C = Blade(B_vectors, volume=2 * x)
 
     # Exercise functionality
-    @test S * B == expected_S_times_B
-    @test B * S == expected_S_times_B
+    @test B * C == expected_B_times_C
+    @test C * B == expected_B_times_C
 end
