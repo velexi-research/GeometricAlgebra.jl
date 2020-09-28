@@ -21,53 +21,53 @@ import LinearAlgebra
 import Base.:(==), Base.:(≈)
 
 """
-    ==(B1::AbstractBlade, B2::AbstractBlade)
+    ==(B::AbstractBlade, C::AbstractBlade)
 
-Return true if B1 and B2 are equal; otherwise, return false.
+Return true if B and C are equal; otherwise, return false.
 """
-==(B1::Blade, B2::Blade) =
-    dim(B1) == dim(B2) && grade(B1) == grade(B2) &&
-    volume(B1) == volume(B2) && basis(B1) == basis(B2)
+==(B::Blade, C::Blade) =
+    dim(B) == dim(C) && grade(B) == grade(C) &&
+    volume(B) == volume(C) && basis(B) == basis(C)
 
-==(B1::Scalar, B2::Scalar) = (value(B1) == value(B2))
+==(B::Scalar, C::Scalar) = (value(B) == value(C))
 
 ==(B::Scalar, x::Real) = (x == value(B))
 ==(x::Real, B::Scalar) = (B == x)
 
-==(B1::Pseudoscalar, B2::Pseudoscalar) =
-    (dim(B1) == dim(B2)) && (value(B1) == value(B2))
+==(B::Pseudoscalar, C::Pseudoscalar) =
+    (dim(B) == dim(C)) && (value(B) == value(C))
 
 """
-    ≈(B1::AbstractBlade, B2::AbstractBlade)
+    ≈(B::AbstractBlade, C::AbstractBlade)
 
-Return true if B1 and B2 are approximatly equal; otherwise, return false.
+Return true if B and C are approximatly equal; otherwise, return false.
 """
-function ≈(B1::Blade{T1}, B2::Blade{T2};
+function ≈(B::Blade{T1}, C::Blade{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
                                                           T2<:AbstractFloat}
     # Check dim, grade, and norm
-    if dim(B1) != dim(B2) || grade(B1) != grade(B2) ||
-        ≉(norm(B1), norm(B2), atol=atol, rtol=rtol)
+    if dim(B) != dim(C) || grade(B) != grade(C) ||
+        ≉(norm(B), norm(C), atol=atol, rtol=rtol)
 
         return false
     end
 
-    # Check that B1 and B2 represent the same space
-    projection = LinearAlgebra.det(transpose(basis(B1)) * basis(B2))
+    # Check that B and C represent the same space
+    projection = LinearAlgebra.det(transpose(basis(B)) * basis(C))
     if ≉(abs(projection), 1, atol=atol, rtol=rtol)
         return false
     end
 
-    # Check that B1 and B2 have the same orientation
-    return sign(B1) * sign(B2) == sign(projection)
+    # Check that B and C have the same orientation
+    return sign(B) * sign(C) == sign(projection)
 end
 
-≈(B1::Scalar{T1}, B2::Scalar{T2};
+≈(B::Scalar{T1}, C::Scalar{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
                                                           T2<:AbstractFloat} =
-    ≈(value(B1), value(B2), atol=atol, rtol=rtol)
+    ≈(value(B), value(C), atol=atol, rtol=rtol)
 
 ≈(B::Scalar{T}, x::Real;
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
@@ -76,18 +76,18 @@ end
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(B, x, atol=atol, rtol=rtol)
 
-≈(B1::Pseudoscalar{T1}, B2::Pseudoscalar{T2};
+≈(B::Pseudoscalar{T1}, C::Pseudoscalar{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
                                                           T2<:AbstractFloat} =
-    (dim(B1) == dim(B2)) && ≈(value(B1), value(B2), atol=atol, rtol=rtol)
+    (dim(B) == dim(C)) && ≈(value(B), value(C), atol=atol, rtol=rtol)
 
 # By default, AbstractBlades are not approximately equal
-≈(B1::AbstractBlade, B2::AbstractBlade) = false
+≈(B::AbstractBlade, C::AbstractBlade) = false
 
 # By default, AbstractBlades and Real numbers are not approximately equal
-≈(B1::AbstractBlade, B2::Real) = false
-≈(B1::Real, B2::AbstractBlade) = false
+≈(B::AbstractBlade, C::Real) = false
+≈(B::Real, C::AbstractBlade) = false
 
 
 # --- Unary operations
@@ -131,14 +131,14 @@ Return the multiplicative inverse of `B`.
 """
 # TODO: implement
 
+
 """
     dual(B::AbstractBlade)
 
-Return the dual `B`.
+Return the dual `B` (relative to the space that the geometric algebra is
+extended from).
 """
-# TODO: implement
-dual(B::Blade) = nothing
-dual(B::Scalar) = nothing
+dual(B::Blade) = nothing  # TODO: implement
 dual(B::Pseudoscalar) = Scalar(value(B))
 
 
@@ -198,3 +198,54 @@ Return the geometric product of `B` and `C`.
 *(x::Scalar, B::Blade{<:AbstractFloat}) =
     Blade(B, volume=volume(x) * volume(B))
 *(B::Blade{<:AbstractFloat}, x::Scalar) = x * B
+
+"""
+    dual(B::AbstractBlade, C::AbstractBlade)
+
+Return the dual `B` relative to `C`.
+
+Notes
+-----
+* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+  vector spaces of the same dimension and (2) the subspace represented by `B`
+  is contained in subspace represented by `C`.
+
+* The volume of `C` is ignored.
+"""
+function dual(B::Blade, C::Blade)
+    # --- Handle edge cases
+
+    # Check that B and C are extended from the real vector spaces of the same
+    # dimension
+    if dim(B) != dim(C)
+        throw(DimensionMismatch("`dim(B)` not equal to `dim(C)`"))
+    end
+
+    # Check that B is contained in C
+    projection_coefficients = transpose(basis(C)) * basis(B)
+    if LinearAlgebra.norm(projection_coefficients) ≉ grade(B)
+        throw(DimensionMismatch("`B` not contained in `C`"))
+    end
+
+    # Subspaces represented by B and C are the same
+    if grade(B) == grade(C)
+        return Scalar(volume(B))
+    end
+
+    # --- Compute dual
+
+    permutation = sortperm(sum(abs.(projection_coefficients), dims=2)[:, 1])
+    B_ext = hcat(basis(B), basis(C)[:, permutation[1:grade(C) - grade(B)]])
+    F = LinearAlgebra.qr(B_ext)
+    Blade(Matrix(F.Q)[:, grade(B) + 1:end], volume=volume(B))
+end
+
+function dual(B::Pseudoscalar, C::Pseudoscalar)
+    # Handle edge cases
+    if dim(B) != dim(C)
+        throw(DimensionMismatch("`dim(B)` not equal to `dim(C)`"))
+    end
+
+    # Compute dual
+    Scalar(value(B))
+end
