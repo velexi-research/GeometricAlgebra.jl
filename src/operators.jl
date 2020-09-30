@@ -140,6 +140,7 @@ extended from).
 """
 dual(B::Blade) = nothing  # TODO: implement
 dual(B::Pseudoscalar) = Scalar(value(B))
+dual(B::Scalar) = error("The dual of a Scalar is not well-defined")
 
 
 # --- Binary operations
@@ -223,7 +224,7 @@ function dual(B::Blade, C::Blade)
 
     # Check that B is contained in C
     projection_coefficients = transpose(basis(C)) * basis(B)
-    if LinearAlgebra.norm(projection_coefficients) ≉ grade(B)
+    if LinearAlgebra.norm(projection_coefficients)^2 ≉ grade(B)
         throw(DimensionMismatch("`B` not contained in `C`"))
     end
 
@@ -232,12 +233,13 @@ function dual(B::Blade, C::Blade)
         return Scalar(volume(B))
     end
 
-    # --- Compute dual
+    # --- Compute dual using the basis vectors of `C` with the smallest
+    #     projections (i.e., largest rejections) onto the basis of `B`.
 
     permutation = sortperm(sum(abs.(projection_coefficients), dims=2)[:, 1])
-    B_ext = hcat(basis(B), basis(C)[:, permutation[1:grade(C) - grade(B)]])
-    F = LinearAlgebra.qr(B_ext)
-    Blade(Matrix(F.Q)[:, grade(B) + 1:end], volume=volume(B))
+    dual_basis = rejection(basis(C)[:, permutation[1:grade(C) - grade(B)]], B,
+                           normalize=true)
+    Blade(dual_basis, volume=volume(B))
 end
 
 function dual(B::Pseudoscalar, C::Pseudoscalar)
@@ -248,4 +250,95 @@ function dual(B::Pseudoscalar, C::Pseudoscalar)
 
     # Compute dual
     Scalar(value(B))
+end
+
+dual(B::Scalar, C::Blade) = Blade(basis(C), volume=value(B))
+dual(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B))
+
+"""
+    dual_qr(B::AbstractBlade, C::AbstractBlade)
+
+Return the dual `B` relative to `C`.
+
+Notes
+-----
+* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+  vector spaces of the same dimension and (2) the subspace represented by `B`
+  is contained in subspace represented by `C`.
+
+* The volume of `C` is ignored.
+
+* The extension of `basis(B)` to `basis(C)` is computed using a QR
+  factorization.
+"""
+function dual_qr(B::Blade, C::Blade)
+    # --- Handle edge cases
+
+    # Check that B and C are extended from the real vector spaces of the same
+    # dimension
+    if dim(B) != dim(C)
+        throw(DimensionMismatch("`dim(B)` not equal to `dim(C)`"))
+    end
+
+    # Check that B is contained in C
+    projection_coefficients = transpose(basis(C)) * basis(B)
+    if LinearAlgebra.norm(projection_coefficients)^2 ≉ grade(B)
+        throw(DimensionMismatch("`B` not contained in `C`"))
+    end
+
+    # Subspaces represented by B and C are the same
+    if grade(B) == grade(C)
+        return Scalar(volume(B))
+    end
+
+    # --- Compute dual using the basis vectors of `C` with the smallest
+    #     projections (i.e., largest rejections) onto the basis of `B`.
+
+    permutation = sortperm(sum(abs.(projection_coefficients), dims=2)[:, 1])
+    B_ext = hcat(basis(B), basis(C)[:, permutation[1:grade(C) - grade(B)]])
+    F = LinearAlgebra.qr(B_ext)
+    Blade(Matrix(F.Q)[:, grade(B) + 1:end],
+          volume=volume(B) * sign(LinearAlgebra.det(F.R)))
+end
+
+
+# --- Utility functions
+
+export rejection
+
+"""
+    rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
+
+Compute rejections of `vectors` from `B`. When `normalize` is true, the
+rejection vectors are normalized.
+"""
+function rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
+    # --- Check arguments
+
+    if size(vectors, 1) != dim(B)
+        throw(DimensionMismatch("`dim(vectors)` not equal to `dim(B)`"))
+    end
+
+    # --- Compute rejections using modified Gram-Schmidt algorithm
+
+    # Initialize rejections
+    rejections = Matrix(vectors)
+
+    # Remove basis(B) from rejections
+    for idx_B in 1:grade(B)
+        B_column = basis(B)[:, idx_B]
+        for idx in 1:size(rejections, 2)
+            rejections[:, idx] -=
+                (rejections[:, idx] ⋅ B_column) * B_column
+        end
+    end
+
+    # Normalize rejection vectors
+    if normalize
+        for idx in 1:size(rejections, 2)
+            rejections[:, idx] /= LinearAlgebra.norm(rejections[:, idx])
+        end
+    end
+
+    return rejections
 end
