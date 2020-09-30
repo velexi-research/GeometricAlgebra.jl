@@ -561,9 +561,10 @@ one(::Type{Pseudoscalar{T}}) where {T<:AbstractFloat} = one(Scalar{T})
 
 # Imports
 import Base.sign
+import LinearAlgebra.norm
 
 # Exports
-export dim, grade, basis, volume, norm, sign
+export dim, grade, basis, volume, norm
 
 """
     dim(B::AbstractBlade)::Integer
@@ -640,7 +641,7 @@ value(B::Pseudoscalar) = B.value
 
 # --- Utility functions
 
-# Exports
+# Imports
 import Base.convert
 
 # Exports
