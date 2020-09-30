@@ -152,7 +152,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
         # --- Handle edge cases
 
         # `volume` is effectively zero
-        if volume != nothing && abs(volume) < atol
+        if abs(volume) < atol
             return zero(Blade{T})
         end
 
@@ -209,11 +209,16 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
         F = LinearAlgebra.qr(vectors)
         signed_norm = prod(LinearAlgebra.diag(F.R))
 
-        # Orthonormal basis for subspace
+        # Return zero if norm is below tolerance
+        if abs(signed_norm) < atol
+            return zero(Blade{T})
+        end
+
+        # Compute orthonormal basis for subspace
         basis::Matrix{T} = F.Q
 
         # Compute volume
-        volume = (volume == nothing) ? signed_norm : volume * sign(signed_norm)
+        volume = (volume == nothing) ?  signed_norm : volume * sign(signed_norm)
 
         # Return new Blade
         Blade{T}(dims[1], dims[2], basis, volume,
@@ -250,11 +255,17 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
         # --- Construct Blade
 
-        # Compute basis
         norm_vector = LinearAlgebra.norm(vector)
+
+        # Return zero if norm is below tolerance
+        if abs(norm_vector) < atol
+            return zero(Blade{T})
+        end
+
+        # Compute basis
         basis::Matrix{T} = reshape(vector, length(vector), 1) / norm_vector
 
-        # Set volume
+        # Compute volume
         volume = (volume == nothing) ? norm_vector : volume
 
         # Return new Blade
