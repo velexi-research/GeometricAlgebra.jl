@@ -147,9 +147,11 @@ dual(B::Scalar) = error("The dual of a Scalar is not well-defined")
 
 # Imports
 import Base.:(*)
+import LinearAlgebra.:(⋅)
 
 # Exports
 export ∧, outer
+export dual
 
 """
     ∧(B::Union{AbstractBlade, Vector, Real},
@@ -237,10 +239,14 @@ function dual(B::Blade, C::Blade)
     #     projections (i.e., largest rejections) onto the basis of `B`.
 
     permutation = sortperm(sum(abs.(projection_coefficients), dims=2)[:, 1])
-    dual_basis = rejection(basis(C)[:, permutation[1:grade(C) - grade(B)]], B,
-                           normalize=true)
-    Blade(dual_basis, volume=volume(B))
+    B_ext = hcat(basis(B), basis(C)[:, permutation[1:grade(C) - grade(B)]])
+    F = LinearAlgebra.qr(B_ext)
+    Blade(Matrix(F.Q)[:, grade(B) + 1:end],
+          volume=volume(B) * sign(LinearAlgebra.det(F.R)))
 end
+
+dual(B::Scalar, C::Blade) = Blade(basis(C), volume=value(B))
+dual(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B))
 
 function dual(B::Pseudoscalar, C::Pseudoscalar)
     # Handle edge cases
@@ -250,55 +256,6 @@ function dual(B::Pseudoscalar, C::Pseudoscalar)
 
     # Compute dual
     Scalar(value(B))
-end
-
-dual(B::Scalar, C::Blade) = Blade(basis(C), volume=value(B))
-dual(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B))
-
-"""
-    dual_qr(B::AbstractBlade, C::AbstractBlade)
-
-Return the dual `B` relative to `C`.
-
-Notes
------
-* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
-  vector spaces of the same dimension and (2) the subspace represented by `B`
-  is contained in subspace represented by `C`.
-
-* The volume of `C` is ignored.
-
-* The extension of `basis(B)` to `basis(C)` is computed using a QR
-  factorization.
-"""
-function dual_qr(B::Blade, C::Blade)
-    # --- Handle edge cases
-
-    # Check that B and C are extended from the real vector spaces of the same
-    # dimension
-    if dim(B) != dim(C)
-        throw(DimensionMismatch("`dim(B)` not equal to `dim(C)`"))
-    end
-
-    # Check that B is contained in C
-    projection_coefficients = transpose(basis(C)) * basis(B)
-    if LinearAlgebra.norm(projection_coefficients)^2 ≉ grade(B)
-        throw(DimensionMismatch("`B` not contained in `C`"))
-    end
-
-    # Subspaces represented by B and C are the same
-    if grade(B) == grade(C)
-        return Scalar(volume(B))
-    end
-
-    # --- Compute dual using the basis vectors of `C` with the smallest
-    #     projections (i.e., largest rejections) onto the basis of `B`.
-
-    permutation = sortperm(sum(abs.(projection_coefficients), dims=2)[:, 1])
-    B_ext = hcat(basis(B), basis(C)[:, permutation[1:grade(C) - grade(B)]])
-    F = LinearAlgebra.qr(B_ext)
-    Blade(Matrix(F.Q)[:, grade(B) + 1:end],
-          volume=volume(B) * sign(LinearAlgebra.det(F.R)))
 end
 
 
@@ -336,7 +293,10 @@ function rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
     # Normalize rejection vectors
     if normalize
         for idx in 1:size(rejections, 2)
-            rejections[:, idx] /= LinearAlgebra.norm(rejections[:, idx])
+            norm = LinearAlgebra.norm(rejections[:, idx])
+            if norm > 0
+                rejections[:, idx] /= norm
+            end
         end
     end
 
