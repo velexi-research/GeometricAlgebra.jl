@@ -245,9 +245,6 @@ function dual(B::Blade, C::Blade)
           volume=volume(B) * sign(LinearAlgebra.det(F.R)))
 end
 
-dual(B::Scalar, C::Blade) = Blade(basis(C), volume=value(B))
-dual(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B))
-
 function dual(B::Pseudoscalar, C::Pseudoscalar)
     # Handle edge cases
     if dim(B) != dim(C)
@@ -257,6 +254,9 @@ function dual(B::Pseudoscalar, C::Pseudoscalar)
     # Compute dual
     Scalar(value(B))
 end
+
+dual(B::Scalar, C::Blade) = Blade(basis(C), volume=value(B))
+dual(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B))
 
 
 # --- Utility functions
