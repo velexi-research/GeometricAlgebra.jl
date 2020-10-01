@@ -17,6 +17,7 @@ module GeometricAlgebra
 include("blade.jl")
 include("multivector.jl")
 include("operators.jl")
+include("operators_mgs.jl")
 
 
 end  # End of GeometricAlgebra.jl module
