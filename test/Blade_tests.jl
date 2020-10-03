@@ -289,7 +289,7 @@ using GeometricAlgebra
         @test B_copy.basis === B.basis
         @test B_copy.volume == precision_type(test_volume)
 
-        # Construct a Blade representing the blade as `B` containing
+        # Construct a Blade representing the same blade as `B` containing
         # a copy of the basis (instead of a reference).
         B_copy = Blade{precision_type}(B, copy_basis=true)
         @test B_copy.dim == B.dim
@@ -798,17 +798,18 @@ end
         converted_vectors = Matrix{precision_type}(vectors)
         B = Blade(converted_vectors)
 
-        # Construct a Blade representing the blade as `B`
+        # Construct a Blade representing the same blade as `B`
         B_copy = Blade(B)
         @test B_copy isa Blade{precision_type}
         @test B_copy.basis === B.basis
 
-        # Construct a Blade representing the blade as `B` with specified volume
+        # Construct a Blade representing the same blade as `B` with specified
+        # volume
         B_copy = Blade(B, volume=test_volume)
         @test B_copy isa Blade{precision_type}
         @test volume(B_copy) == precision_type(test_volume)
 
-        # Construct Blade representing the blade as `B` containing
+        # Construct Blade representing the same blade as `B` containing
         # a copy of the basis (instead of a reference).
         B_copy = Blade(B, copy_basis=true)
         @test B_copy isa Blade{precision_type}
