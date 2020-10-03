@@ -552,7 +552,7 @@ Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
                  value::Real=value(B)) where {T<:AbstractFloat}
 
 Copy constructor. Construct a Pseudoscalar representing the same space as
-`B` having a value.
+`B` having the specified value.
 """
 Pseudoscalar(B::Pseudoscalar{T};
              value::Real=value(B)) where {T<:AbstractFloat} =
