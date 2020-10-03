@@ -18,7 +18,7 @@ import LinearAlgebra
 # --- Types
 
 # Exports
-export AbstractBlade, Blade, Scalar, Pseudoscalar
+export AbstractBlade, Scalar, Blade, Pseudoscalar
 
 # AbstractBlade
 """
@@ -109,79 +109,6 @@ Scalar(value::T) where {T<:AbstractFloat} = Scalar{T}(value)
 Scalar{T}(value::AbstractFloat) where {T<:AbstractFloat} = Scalar(T(value))
 Scalar(value::Integer) = Scalar(Float64(value))
 Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
-
-
-# Pseudoscalar
-"""
-    struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
-
-Pseudoscalar ((n-1)-blade) represented with the floating-point precision of
-type `T`. The `basis` for a Pseudoscalar is the standard basis for ``R^n``.
-The norm and orientation of a Pseudoscalar are encoded in its `value`. The
-norm of a Pseudoscalar is equal to `abs(value)` and the orientation of a
-Pseudoscalar relative to the standard basis for ``R^n`` is equal to
-`sign(value)`.
-"""
-struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
-    #=
-      Fields
-      ------
-      * `dim`: the dimension of the space that the blade is embedded in
-
-      * `value`: the value of the pseudoscalar
-    =#
-    dim::Int
-    value::T
-
-    """
-        Pseudoscalar{T}(value::T) where {T<:AbstractFloat}
-
-    Construct a Pseudoscalar with for a geometric algebra in `dim` dimensions
-    with the specified value.
-    """
-    Pseudoscalar{T}(dim::Integer, value::T) where {T<:AbstractFloat} =
-        new(dim, value)
-end
-
-"""
-    Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
-    Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat}
-    Pseudoscalar(dim::Integer, value::Integer)
-    Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
-
-Construct a Pseudoscalar with for a geometric algebra in `dim` dimensions with
-the specified value.
-
-When the precision is not specified, the following rules are applied to set
-the precision of the Pseudoscalar.
-
-* If `value` is a floating-point value, the precision of the constructed
-  Pseudoscalar is inferred from the precision of `value`.
-
-* If `value` is an integer, the precision of the constructed Pseudoscalar
-  defaults to `Float64`.
-"""
-Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat} =
-    Pseudoscalar{T}(dim, value)
-
-Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat} =
-    Pseudoscalar(dim, T(value))
-
-Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
-
-Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
-    Pseudoscalar(dim, T(value))
-
-"""
-    Pseudoscalar(B::Pseudoscalar{T};
-                 value::Real=value(B)) where {T<:AbstractFloat}
-
-Copy constructor. Construct a Pseudoscalar representing the same space as
-`B` having the specified value.
-"""
-Pseudoscalar(B::Pseudoscalar{T};
-             value::Real=value(B)) where {T<:AbstractFloat} =
-    Pseudoscalar{T}(dim(B), value)
 
 
 # Blade
@@ -559,6 +486,79 @@ Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat} =
     Pseudoscalar{T}(dim, x)
 
 
+# Pseudoscalar
+"""
+    struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
+
+Pseudoscalar ((n-1)-blade) represented with the floating-point precision of
+type `T`. The `basis` for a Pseudoscalar is the standard basis for ``R^n``.
+The norm and orientation of a Pseudoscalar are encoded in its `value`. The
+norm of a Pseudoscalar is equal to `abs(value)` and the orientation of a
+Pseudoscalar relative to the standard basis for ``R^n`` is equal to
+`sign(value)`.
+"""
+struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
+    #=
+      Fields
+      ------
+      * `dim`: the dimension of the space that the blade is embedded in
+
+      * `value`: the value of the pseudoscalar
+    =#
+    dim::Int
+    value::T
+
+    """
+        Pseudoscalar{T}(value::T) where {T<:AbstractFloat}
+
+    Construct a Pseudoscalar with for a geometric algebra in `dim` dimensions
+    with the specified value.
+    """
+    Pseudoscalar{T}(dim::Integer, value::T) where {T<:AbstractFloat} =
+        new(dim, value)
+end
+
+"""
+    Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
+    Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat}
+    Pseudoscalar(dim::Integer, value::Integer)
+    Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
+
+Construct a Pseudoscalar with for a geometric algebra in `dim` dimensions with
+the specified value.
+
+When the precision is not specified, the following rules are applied to set
+the precision of the Pseudoscalar.
+
+* If `value` is a floating-point value, the precision of the constructed
+  Pseudoscalar is inferred from the precision of `value`.
+
+* If `value` is an integer, the precision of the constructed Pseudoscalar
+  defaults to `Float64`.
+"""
+Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat} =
+    Pseudoscalar{T}(dim, value)
+
+Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat} =
+    Pseudoscalar(dim, T(value))
+
+Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
+
+Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
+    Pseudoscalar(dim, T(value))
+
+"""
+    Pseudoscalar(B::Pseudoscalar{T};
+                 value::Real=value(B)) where {T<:AbstractFloat}
+
+Copy constructor. Construct a Pseudoscalar representing the same space as
+`B` having the specified value.
+"""
+Pseudoscalar(B::Pseudoscalar{T};
+             value::Real=value(B)) where {T<:AbstractFloat} =
+    Pseudoscalar{T}(dim(B), value)
+
+
 # --- Special number functions
 
 # Imports
@@ -605,8 +605,8 @@ export dim, grade, basis, volume, norm
 
 Return dimension of space that Blade blade is embedded in.
 """
-dim(B::Blade) = B.dim
 dim(B::Scalar) = 0
+dim(B::Blade) = B.dim
 dim(B::Pseudoscalar) = B.dim
 
 """
@@ -614,8 +614,8 @@ dim(B::Pseudoscalar) = B.dim
 
 Return the grade of the dimension of the space spanned by the blade.
 """
-grade(B::Blade) = B.grade
 grade(B::Scalar) = 0
+grade(B::Blade) = B.grade
 grade(B::Pseudoscalar) = B.dim
 
 """
@@ -624,8 +624,8 @@ grade(B::Pseudoscalar) = B.dim
 When `B` is a Blade, return an orthonormal basis for the space spanned by the
 blade. When `B` is a Scalar, return 1.
 """
-basis(B::Blade) = B.basis
 basis(B::Scalar) = 1
+basis(B::Blade) = B.basis
 basis(B::Pseudoscalar) = LinearAlgebra.I
 
 """
@@ -635,8 +635,8 @@ Return the volume of a blade. For Blades, `volume(B)` is the signed norm of
 the blade relative to its unit basis. For Scalars, `volume(B)` is the value
 of the scalar (note that the basis for Scalars is 1).
 """
-volume(B::Blade) = B.volume
 volume(B::Scalar) = B.value
+volume(B::Blade) = B.volume
 volume(B::Pseudoscalar) = B.value
 
 """
@@ -644,18 +644,14 @@ volume(B::Pseudoscalar) = B.value
 
 Return the norm of the blade.
 """
-norm(B::Blade) = abs(volume(B))
-norm(B::Scalar) = abs(volume(B))
-norm(B::Pseudoscalar) = abs(volume(B))
+norm(B::AbstractBlade) = abs(volume(B))
 
 """
     sign(B::AbstractBlade)::Int8
 
 Return the sign of a blade relative to its unit basis.
 """
-sign(B::Blade)::Int8 = sign(B.volume)
-sign(B::Scalar)::Int8 = sign(B.value)
-sign(B::Pseudoscalar)::Int8 = sign(B.value)
+sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 
 # --- Core Scalar functions
@@ -682,20 +678,20 @@ import Base.convert
 export blade_atol
 
 """
-    convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
-
-Convert Blade to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}} =
-    Blade{T}(B)
-
-"""
     convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}}
 
 Convert Scalar to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}} =
     Scalar{T}(value(B))
+
+"""
+    convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
+
+Convert Blade to have the floating-point precision of type `T`.
+"""
+convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}} =
+    Blade{T}(B)
 
 """
     convert(::Type{S}, B::Pseudoscalar)
