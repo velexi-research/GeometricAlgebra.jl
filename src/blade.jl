@@ -535,9 +535,6 @@ the precision of the Pseudoscalar.
 
 * If `value` is an integer, the precision of the constructed Pseudoscalar
   defaults to `Float64`.
-
-TODO: Add check for value < atol.
-TODO: Add comment on orientation of Pseudoscalar.
 """
 Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat} =
     Pseudoscalar{T}(dim, value)
@@ -549,6 +546,17 @@ Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
 
 Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
     Pseudoscalar(dim, T(value))
+
+"""
+    Pseudoscalar(B::Pseudoscalar{T};
+                 value::Real=value(B)) where {T<:AbstractFloat}
+
+Copy constructor. Construct a Pseudoscalar representing the same space as
+`B` having a value.
+"""
+Pseudoscalar(B::Pseudoscalar{T};
+             value::Real=value(B)) where {T<:AbstractFloat} =
+    Pseudoscalar{T}(dim(B), value)
 
 
 # --- Special number functions

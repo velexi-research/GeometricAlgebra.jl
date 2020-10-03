@@ -48,7 +48,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Pseudoscalar: outer constructor tests" begin
+@testset "Pseudoscalar: outer constructor tests - basic constructors" begin
     #=
       Notes
       -----
@@ -136,6 +136,35 @@ end
     end
 end
 
+@testset "Pseudoscalar: outer constructor tests - copy constructor" begin
+    #=
+      Notes
+      -----
+      * Test type of constructed instances. Correct construction of instances
+        is tested by the inner constructor tests.
+
+      * Test behavior of keyword arguments: `value`.
+    =#
+
+    # --- Preparations
+
+    test_dim = 10
+
+    test_value = rand()
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # --- Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_test_value = precision_type(test_value)
+        S = Pseudoscalar(test_dim, converted_test_value)
+
+        # Construct a Pseudoscalar representing the same pseudoscalar as `S`
+        S_copy = Pseudoscalar(S)
+        @test S_copy isa Pseudoscalar{precision_type}
+    end
+end
 
 # --- Function tests
 
