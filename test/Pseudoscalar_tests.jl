@@ -163,6 +163,12 @@ end
         # Construct a Pseudoscalar representing the same pseudoscalar as `S`
         S_copy = Pseudoscalar(S)
         @test S_copy isa Pseudoscalar{precision_type}
+
+        # Construct a Pseudoscalar representing the same space as `S` with a
+        # different value.
+        S_copy = Pseudoscalar(S, value=converted_test_value + 1)
+        @test S_copy isa Pseudoscalar{precision_type}
+        @test value(S_copy) == converted_test_value + 1
     end
 end
 
