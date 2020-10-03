@@ -27,10 +27,7 @@ export AbstractBlade, Blade, Scalar, Pseudoscalar
 Supertype for all blade types.
 
 For the AbstractBlade type, the norm and orientation are encoded by the `volume`
-of the blade. For Blades, the norm of the blade is equal to `abs(volume)` and
-the orientation of the blade relative to its `basis` is equal `sign(volume)`.
-For Scalars, the `basis` and `volume` of the scalar are `1` and the value
-of the scalar, respectively.
+of the blade.
 
 Methods
 -------
@@ -72,7 +69,9 @@ abstract type AbstractBlade end
     struct Blade{T<:AbstractFloat} <: AbstractBlade
 
 Blade (having nonzero grade) represented with the floating-point precision of
-type `T`.
+type `T`. The norm and orientation of a Blade are encoded by its `volume`. The
+norm of a Blade is equal to `abs(volume)` and the orientation of a Blade
+relative to its `basis` is equal to `sign(volume)`.
 """
 struct Blade{T<:AbstractFloat} <: AbstractBlade
     #=
@@ -106,9 +105,9 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
                  copy_basis::Bool=true)
             where {T<:AbstractFloat}
 
-    Construct a Blade from the specified data field values. A Scalar
-    representing zero is returned when the absolute value of `volume` is less
-    than `atol`.
+    Construct a Blade from the specified data field values. If the absolute
+    value of `volume` is less than `atol`, a Scalar representing zero is
+    returned. If the `dim` and `grade` are equal, a Pseudoscalar is returned.
 
     When `enforce_constraints` is true, constraints are enforced. When
     `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
@@ -156,6 +155,12 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
             return zero(Blade{T})
         end
 
+        # Return a Pseudoscalar if the grade of the blade is equal to the
+        # dimension of the embedding space.
+        if grade == dim
+            return Pseudoscalar{T}(dim, volume)
+        end
+
         # Return new Blade
         copy_basis ?
         new(dim, grade, copy(basis), volume) : new(dim, grade, basis, volume)
@@ -168,12 +173,13 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
             where {T<:AbstractFloat}
 
     Construct a Blade from a collection of vectors stored as the columns of a
-    matrix. A Scalar representing zero is returned when the absolute value of
-    `volume` is less than `atol`.
+    matrix. If the norm the blade is less than `atol`, a Scalar representing
+    zero is returned. If the grade of the blade is equal to the dimension of
+    the space that the blade is embedded in, a Pseudoscalar is returned.
 
     By default, `vectors` determines the volume of the blade. However, if
     `volume` is specified, `vectors` is only used to define the subspace
-    represented by the blade.
+    (including orientation) represented by the blade.
 
     When `volume` is positive, the orientation of the blade is the same as the
     orientation of the outer product of the columns of `vectors` (taken in
@@ -437,7 +443,9 @@ Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat} =
 """
     struct Scalar{T<:AbstractFloat} <: AbstractBlade
 
-Scalar (0-blade) represented with the floating-point precision of type `T`.
+Scalar (0-blade) represented with the floating-point precision of type `T`. The
+`basis` and `volume` of a Scalar are `1` and the value of the Scalar,
+respectively.
 """
 struct Scalar{T<:AbstractFloat} <: AbstractBlade
     #=
@@ -483,7 +491,11 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
     struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
 
 Pseudoscalar ((n-1)-blade) represented with the floating-point precision of
-type `T`.
+type `T`. The `basis` for a Pseudoscalar is the standard basis for ``R^n``.
+The norm and orientation of a Pseudoscalar are encoded in its `value`. The
+norm of a Pseudoscalar is equal to `abs(value)` and the orientation of a
+Pseudoscalar relative to the standard basis for ``R^n`` is equal to
+`sign(value)`.
 """
 struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
     #=
@@ -523,6 +535,9 @@ the precision of the Pseudoscalar.
 
 * If `value` is an integer, the precision of the constructed Pseudoscalar
   defaults to `Float64`.
+
+TODO: Add check for value < atol.
+TODO: Add comment on orientation of Pseudoscalar.
 """
 Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat} =
     Pseudoscalar{T}(dim, value)
@@ -678,7 +693,7 @@ convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}} =
     convert(::Type{S}, B::Pseudoscalar)
         where {T<:AbstractFloat, S<:Pseudoscalar{T}}
 
-Convert Psuedoscalar to have the floating-point precision of type `T`.
+Convert Pseudoscalar to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Pseudoscalar) where {T<:AbstractFloat,
                                            S<:Pseudoscalar{T}} =
