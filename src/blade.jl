@@ -279,7 +279,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     end
 
     """
-        Blade{T}(vector::Vector{T};
+        Blade{T}(v::Vector{T};
                  volume::Union{Real, Nothing}=nothing,
                  atol::Real=blade_atol(T))
             where {T<:AbstractFloat}
@@ -287,15 +287,15 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
     Construct a Blade from a single vector. A Scalar representing zero is
     returned when the norm of the blade is less than `atol`.
 
-    By default, `vector` determines the volume of the blade. However, if
-    `volume` is specified, `vector` is only used to define the subspace
-    represented by the blade.
+    By default, `v` determines the volume of the blade. However, if `volume`
+    is specified, `v` is only used to define the subspace represented by the
+    blade.
 
     When `volume` is positive, the orientation of the blade is the same as the
-    direction of `vector`. When `volume` is negative, the orientation of the
-    blade is the opposite of the direction of `vector`.
+    direction of `v`. When `volume` is negative, the orientation of the blade
+    is the opposite of the direction of `v`.
     """
-    function Blade{T}(vector::Vector{T};
+    function Blade{T}(v::Vector{T};
                       volume::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
@@ -308,21 +308,21 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade
 
         # --- Construct Blade
 
-        norm_vector = LinearAlgebra.norm(vector)
+        norm_v = LinearAlgebra.norm(v)
 
         # Return zero if norm is below tolerance
-        if abs(norm_vector) < atol
+        if abs(norm_v) < atol
             return zero(Blade{T})
         end
 
         # Compute basis
-        basis::Matrix{T} = reshape(vector, length(vector), 1) / norm_vector
+        basis::Matrix{T} = reshape(v, length(v), 1) / norm_v
 
         # Compute volume
-        volume = (volume == nothing) ? norm_vector : volume
+        volume = (volume == nothing) ? norm_v : volume
 
         # Return new Blade
-        Blade{T}(length(vector), 1, basis, volume, atol=atol,
+        Blade{T}(length(v), 1, basis, volume, atol=atol,
                  enforce_constraints=false, copy_basis=false)
     end
 
