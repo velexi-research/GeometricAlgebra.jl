@@ -26,6 +26,7 @@ Supertype for all multivector types.
 
 Methods
 -------
+    grades(M::AbstractMultivector)::KeySet
     summands(M::AbstractMultivector)::Dict
     norm(M::AbstractMultivector)::AbstractFloat
     reduce(M::AbstractMultivector)::AbstractMultivector
@@ -71,7 +72,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
     the summands are combined so that the multivectors of grade ``k`` form
     an orthogonal basis for the subspace of ``k``-vectors.
     """
-    function Multivector{T}(blades::Vector{AbstractBlade};
+    function Multivector{T}(blades::Vector{<:AbstractBlade};
                             reduced::Bool=false) where {T<:AbstractFloat}
 
         # --- Construct Multivector
@@ -95,7 +96,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
 end
 
 """
-    Multivector(vectors::Array{T};
+    Multivector(blades::Vector{T};
           value::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
         where {T<:AbstractFloat}
 
@@ -103,17 +104,21 @@ Construct a Multivector from a of vector of blades. When `reduced` is true, the
 summands are combined so that the multivectors of grade ``k`` form an
 orthogonal basis for the subspace of ``k``-vectors.
 """
-Multivector(blades::Array{T}; reduced::Bool=false) where {T<:AbstractFloat} =
-    Multivector{T}(blades, reduced=reduced)
-
-Multivector{T}(blades::Array{<:AbstractFloat};
-               reduced::Bool=false) where {T<:AbstractFloat} =
-    Multivector{T}(convert.(blades, AbstractBlade), reduced=reduced)
+Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
+    Multivector{typeof(volume(blades[1]))}(blades, reduced=reduced)
 
 
 # --- Basic Multivector functions
 
 # Exports
-export summands
+export grades, summands
 
+"""
+TODO
+"""
+grades(M::Multivector) = keys(M.summands)
+
+"""
+TODO
+"""
 summands(M::Multivector) = M.summands
