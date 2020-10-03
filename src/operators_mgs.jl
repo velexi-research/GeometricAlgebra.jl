@@ -27,7 +27,8 @@ import LinearAlgebra
 # --- Binary operations
 
 # Exports
-export dual_mgs, outer_mgs
+export outer_mgs
+export dual_mgs
 
 """
     outer_mgs(B::Blade, C::Blade)
