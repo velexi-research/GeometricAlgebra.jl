@@ -603,7 +603,7 @@ export dim, grade, basis, volume, norm
 """
     dim(B::AbstractBlade)::Integer
 
-Return dimension of space that Blade blade is embedded in.
+Return dimension of space that `B` is embedded in.
 """
 dim(B::Scalar) = 0
 dim(B::Blade) = B.dim
@@ -612,7 +612,7 @@ dim(B::Pseudoscalar) = B.dim
 """
     grade(B::AbstractBlade)::Integer
 
-Return the grade of the dimension of the space spanned by the blade.
+Return the grade of the dimension of the space spanned by `B`.
 """
 grade(B::Scalar) = 0
 grade(B::Blade) = B.grade
@@ -622,7 +622,8 @@ grade(B::Pseudoscalar) = B.dim
     basis(B::AbstractBlade)
 
 When `B` is a Blade, return an orthonormal basis for the space spanned by the
-blade. When `B` is a Scalar, return 1.
+blade. When `B` is a Scalar, return 1. When `B` is a Pseudoscalar, return
+LinearAlgebra.I.
 """
 basis(B::Scalar) = 1
 basis(B::Blade) = B.basis
@@ -631,9 +632,9 @@ basis(B::Pseudoscalar) = LinearAlgebra.I
 """
     volume(B::AbstractBlade)::Real
 
-Return the volume of a blade. For Blades, `volume(B)` is the signed norm of
-the blade relative to its unit basis. For Scalars, `volume(B)` is the value
-of the scalar (note that the basis for Scalars is 1).
+Return the volume of `B`. For Blades, `volume(B)` is the signed norm of the
+blade relative to its unit basis. For Scalars, `volume(B)` is the value of the
+scalar (note that the basis for Scalars is 1).
 """
 volume(B::Scalar) = B.value
 volume(B::Blade) = B.volume
@@ -642,14 +643,14 @@ volume(B::Pseudoscalar) = B.value
 """
     norm(B::AbstractBlade)::Real
 
-Return the norm of the blade.
+Return the norm of `B`.
 """
 norm(B::AbstractBlade) = abs(volume(B))
 
 """
     sign(B::AbstractBlade)::Int8
 
-Return the sign of a blade relative to its unit basis.
+Return the sign of `B` relative to its unit basis.
 """
 sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
@@ -663,7 +664,7 @@ export value
     value(B::Scalar)::Real
     value(B::Pseudoscalar)::Real
 
-Return the value of a scalar.
+Return the value of `B`.
 """
 value(B::Scalar) = B.value
 value(B::Pseudoscalar) = B.value
