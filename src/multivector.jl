@@ -49,7 +49,7 @@ abstract type AbstractMultivector end
 """
     struct Multivector{T<:AbstractFloat} <: AbstractMultivector
 
-TODO
+Multivector represented with the floating-point precision of type `T`.
 """
 struct Multivector{T<:AbstractFloat} <: AbstractMultivector
     #=
@@ -114,11 +114,15 @@ Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
 export grades, summands
 
 """
-TODO
+    grades(M::Multivector)
+
+Return the grades of the blades that the multivector is composed of.
 """
 grades(M::Multivector) = keys(M.summands)
 
 """
-TODO
+    summands(M::Multivector) = M.summands
+
+Return the blades that the multivector is composed of.
 """
 summands(M::Multivector) = M.summands
