@@ -12,7 +12,7 @@ Contents
 
 2. [Installation][#2]
 
-   2.1. [Software Dependencies][#2.1]
+    2.1. [Software Dependencies][#2.1]
 
 3. [Known Issues][#3]
 
