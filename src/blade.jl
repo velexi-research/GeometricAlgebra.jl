@@ -99,11 +99,10 @@ Construct a Scalar with the specified value.
 When the precision is not specified, the following rules are applied to set
 the precision of the Scalar.
 
-* If `value` is a floating-point value, the precision of the constructed
-  Scalar is inferred from the precision of `value`.
+* If `value` is a floating-point value, the precision of the Scalar is inferred
+  from the precision of `value`.
 
-* If `value` is an integer, the precision of the constructed Scalar defaults
-  to `Float64`.
+* If `value` is an integer, the precision of the Scalar defaults to `Float64`.
 """
 Scalar(value::T) where {T<:AbstractFloat} = Scalar{T}(value)
 Scalar{T}(value::AbstractFloat) where {T<:AbstractFloat} = Scalar(T(value))
@@ -411,11 +410,11 @@ orientation implied by the `vectors`.
 When the precision is not specified, the following rules are applied to set
 the precision of the Blade.
 
-* If `vectors` is an Array of floating-point values, the precision of the
-  constructed Blade is inferred from the precision of the elements of `vector`.
+* If `vectors` is an Array of floating-point values, the precision of the Blade
+  is inferred from the precision of the elements of `vector`.
 
-* If `vectors` is an Array of integers, the precision of the constructed Blade
-  defaults to `Float64`.
+* If `vectors` is an Array of integers, the precision of the Blade defaults to
+ `Float64`.
 """
 Blade(vectors::Array{T};
       volume::Union{Real, Nothing}=nothing,
@@ -530,11 +529,11 @@ the specified value.
 When the precision is not specified, the following rules are applied to set
 the precision of the Pseudoscalar.
 
-* If `value` is a floating-point value, the precision of the constructed
-  Pseudoscalar is inferred from the precision of `value`.
+* If `value` is a floating-point value, the precision of the Pseudoscalar is
+  inferred from the precision of `value`.
 
-* If `value` is an integer, the precision of the constructed Pseudoscalar
-  defaults to `Float64`.
+* If `value` is an integer, the precision of the Pseudoscalar defaults to
+  `Float64`.
 """
 Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat} =
     Pseudoscalar{T}(dim, value)
