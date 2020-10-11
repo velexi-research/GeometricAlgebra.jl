@@ -16,7 +16,7 @@ import InteractiveUtils.subtypes
 using Test
 
 # External packages
-import DataStructures.SortedDict
+import DataStructures.SDMKeyIteration, DataStructures.SortedDict
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
@@ -122,7 +122,8 @@ end
                                        dim=>Vector([pseudoscalar]))
 
         # grades()
-        @test collect(grades(M)) == [0, 1, 3]
+        @test grades(M) == [0, 1, 3]
+        @test grades(M, collect=false) isa SDMKeyIteration
 
         # summands()
         @test summands(M) isa SortedDict{Int, Vector{AbstractBlade}}

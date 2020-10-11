@@ -26,7 +26,7 @@ Supertype for all multivector types.
 
 Methods
 -------
-    grades(M::AbstractMultivector)::KeySet
+    grades(M::AbstractMultivector)::Vector
     summands(M::AbstractMultivector)::SortedDict
     norm(M::AbstractMultivector)::AbstractFloat
     reduce(M::AbstractMultivector)::AbstractMultivector
@@ -121,11 +121,13 @@ Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
 export grades, summands
 
 """
-    grades(M::Multivector)
+    grades(M::Multivector; collect=true)
 
-Return the grades of the blades that the multivector is composed of.
+Return the grades of the blades that the multivector is composed of. When
+`collect` is `false`, an iterator over the keys is returned.
 """
-grades(M::Multivector) = keys(M.summands)
+grades(M::Multivector; collect=true) =
+    collect ? Base.collect(keys(M.summands)) : keys(M.summands)
 
 """
     summands(M::Multivector)
