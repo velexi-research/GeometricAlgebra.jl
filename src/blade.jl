@@ -22,7 +22,7 @@ export AbstractBlade, Scalar, Blade, Pseudoscalar
 
 # AbstractBlade
 """
-    abstract type AbstractBlade
+    abstract type AbstractBlade{T<:AbstractFloat}
 
 Supertype for all blade types.
 
@@ -61,18 +61,18 @@ Binary Operations
     dual(A, B)::AbstractBlade
     project(A, B)::AbstractBlade
 """
-abstract type AbstractBlade end
+abstract type AbstractBlade{T<:AbstractFloat} end
 
 
 # Scalar
 """
-    struct Scalar{T<:AbstractFloat} <: AbstractBlade
+    struct Scalar{T<:AbstractFloat} <: AbstractBlade{T}
 
 Scalar (0-blade) represented with the floating-point precision of type `T`. The
 `basis` and `volume` of a Scalar are `1` and the value of the Scalar,
 respectively.
 """
-struct Scalar{T<:AbstractFloat} <: AbstractBlade
+struct Scalar{T<:AbstractFloat} <: AbstractBlade{T}
     #=
       Fields
       ------
@@ -112,14 +112,14 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
 
 # Blade
 """
-    struct Blade{T<:AbstractFloat} <: AbstractBlade
+    struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
 Blade (having nonzero grade) represented with the floating-point precision of
 type `T`. The norm and orientation of a Blade are encoded by its `volume`. The
 norm of a Blade is equal to `abs(volume)` and the orientation of a Blade
 relative to its `basis` is equal to `sign(volume)`.
 """
-struct Blade{T<:AbstractFloat} <: AbstractBlade
+struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #=
      Fields
       ------
@@ -496,7 +496,7 @@ norm of a Pseudoscalar is equal to `abs(value)` and the orientation of a
 Pseudoscalar relative to the standard basis for ``R^n`` is equal to
 `sign(value)`.
 """
-struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
+struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     #=
       Fields
       ------
@@ -682,16 +682,16 @@ export blade_atol
 
 Convert Scalar to have the floating-point precision of type `T`.
 """
-convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}} =
-    Scalar{T}(value(B))
+convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:AbstractBlade{T}} =
+    T == typeof(volume(B)) ? B : Scalar{T}(value(B))
 
 """
     convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
 
 Convert Blade to have the floating-point precision of type `T`.
 """
-convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}} =
-    Blade{T}(B)
+convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:AbstractBlade{T}} =
+    T == typeof(volume(B)) ? B : Blade{T}(B)
 
 """
     convert(::Type{S}, B::Pseudoscalar)
@@ -700,8 +700,8 @@ convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}} =
 Convert Pseudoscalar to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Pseudoscalar) where {T<:AbstractFloat,
-                                           S<:Pseudoscalar{T}} =
-    Pseudoscalar{T}(dim(B), value(B))
+                                           S<:AbstractBlade{T}} =
+    T == typeof(volume(B)) ? B : Pseudoscalar{T}(dim(B), value(B))
 
 #=
  TODO: review numerical error in factorizations to see if a different

@@ -301,8 +301,17 @@ end
             converted_test_value = precision_type_src(test_value)
             S = Pseudoscalar{precision_type_src}(test_dim, converted_test_value)
 
-            @test convert(Pseudoscalar{precision_type_converted}, S) isa
-                  Pseudoscalar{precision_type_converted}
+            # Exercise functionality and check results
+            S_converted = convert(Pseudoscalar{precision_type_converted}, S)
+
+            @test S_converted isa Pseudoscalar{precision_type_converted}
+
+            if precision_type_src == precision_type_converted
+                @test S_converted === S
+            else
+                @test S_converted !== S
+                @test S_converted ≈ S
+            end
         end
     end
 end

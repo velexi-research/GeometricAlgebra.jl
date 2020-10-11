@@ -1076,8 +1076,17 @@ end
             converted_vectors = convert.(precision_type_src, vectors)
             B = Blade{precision_type_src}(converted_vectors)
 
-            @test convert(Blade{precision_type_converted}, B) isa
-                  Blade{precision_type_converted}
+            # Exercise functionality and check results
+            B_converted = convert(Blade{precision_type_converted}, B)
+
+            @test B_converted isa Blade{precision_type_converted}
+
+            if precision_type_src == precision_type_converted
+                @test B_converted === B
+            else
+                @test B_converted !== B
+                @test B_converted ≈ B
+            end
         end
     end
 end
