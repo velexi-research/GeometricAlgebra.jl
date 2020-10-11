@@ -15,6 +15,9 @@ except according to the terms contained in the LICENSE file.
 import InteractiveUtils.subtypes
 using Test
 
+# External packages
+import DataStructures.SortedDict
+
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
@@ -63,13 +66,7 @@ end
     # -----
     # * Test type of constructed instances. Correct construction of instances
     #   is tested by the inner constructor tests.
-    #
-    # * Test behavior of keyword arguments: `TODO`
-end
 
-# --- Function tests
-
-@testset "Multivector: AbstractMultivector interface tests" begin
     # --- Preparations
 
     vectors = [3 3; -4 -4; 0 1]
@@ -87,24 +84,87 @@ end
         # Preparations
         scalar = Scalar{precision_type}(test_value)
         two_blade = Blade{precision_type}(vectors)
+        pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
+
+        blades = Vector([scalar, two_blade, pseudoscalar])
+
+        # default value for `reduced`
+        M = Multivector(blades)
+        @test M isa Multivector{precision_type}
+    end
+end
+
+# --- Function tests
+
+@testset "Multivector: AbstractMultivector interface tests" begin
+    # --- Preparations
+
+    vectors = [3 3; -4 -4; 0 1]
+    one_vector = [3; 4; 0]
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    dim = length(one_vector)
+
+    # --- Test basic functions
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        scalar = Scalar{precision_type}(test_value)
         one_blade = Blade{precision_type}(one_vector)
         pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
-        blades = Vector([scalar, one_blade, two_blade, pseudoscalar])
+        blades = Vector([scalar, one_blade, pseudoscalar])
         M = Multivector{precision_type}(blades)
 
+        expected_summands = SortedDict(0=>Vector([scalar]),
+                                       1=>Vector([one_blade]),
+                                       dim=>Vector([pseudoscalar]))
+
+        # grades()
+        @test collect(grades(M)) == [0, 1, 3]
+
         # summands()
-        expected_summands = Dict(0=>Vector([scalar]),
-                                 1=>Vector([one_blade]),
-                                 2=>Vector([two_blade]),
-                                 dim=>Vector([pseudoscalar]))
-        @test summands(M) isa Dict{Int, Vector{AbstractBlade}}
+        @test summands(M) isa SortedDict{Int, Vector{AbstractBlade}}
         @test summands(M) == expected_summands
+
+        # norm()
+        @test_skip norm(M) == 0
+
     end
 end
 
 @testset "Multivector: convert(B) tests" begin
+    # Preparations
+    vectors = [3 3; -4 -4; 0 1]
+    one_vector = [3; 4; 0]
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    dim = length(one_vector)
+
+    # Tests
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
+            # Preparations
+            scalar = Scalar{precision_type_src}(test_value)
+            one_blade = Blade{precision_type_src}(one_vector)
+            pseudoscalar = Pseudoscalar{precision_type_src}(dim, test_value)
+            blades = Vector([scalar, one_blade, pseudoscalar])
+            M = Multivector{precision_type_src}(blades)
+
+            # Exercise functionality and check results
+            M_converted = convert(Multivector{precision_type_converted}, M)
+
+            @test M_converted isa Multivector{precision_type_converted}
+
+            if precision_type_src == precision_type_converted
+                @test M_converted === M
+            else
+                @test M_converted !== M
+                @test_skip M_converted ≈ M
+            end
         end
     end
 end
