@@ -53,13 +53,14 @@ Binary Operations
     ⋅(B, C)::AbstractBlade
     inner(B, C)::AbstractBlade
 
+    *(B, C)::Union{AbstactBlade, AbstractMultivector}
+    /(B, C)::Union{AbstactBlade, AbstractMultivector}
+
     +(B, C)::AbstractMultivector
     -(B, C)::AbstractMultivector
-    *(B, C)::Union{AbstactBlade, AbstractMultivector}
-    /(B, C)::AbstractMultivector
 
-    dual(A, B)::AbstractBlade
     project(A, B)::AbstractBlade
+    dual(A, B)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} end
 
@@ -114,10 +115,15 @@ Scalar{T}(value::Integer) where {T<:AbstractFloat} = Scalar(T(value))
 """
     struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
-Blade (having nonzero grade) represented with the floating-point precision of
-type `T`. The norm and orientation of a Blade are encoded by its `volume`. The
-norm of a Blade is equal to `abs(volume)` and the orientation of a Blade
-relative to its `basis` is equal to `sign(volume)`.
+Blade represented with the floating-point precision of type `T`. The norm and
+orientation of a Blade are encoded by its `volume`. The norm of a Blade is
+equal to `abs(volume)` and the orientation of a Blade relative to its `basis`
+is equal to `sign(volume)`.
+
+Notes
+-----
+* The grade of a Blade type is greater than 0 and less than the dimension of
+  the space  that the blade is embedded in
 """
 struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #=
