@@ -1,7 +1,7 @@
 # --- Julia files
 
 # Project files
-**/Manifest.toml
+Manifest.toml
 
 # Coverage.jl files
 *.jl.*.cov
