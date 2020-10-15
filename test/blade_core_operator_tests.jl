@@ -13,6 +13,7 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 using Test
+import LinearAlgebra.norm
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
@@ -230,7 +231,7 @@ end
     C = Pseudoscalar(dim, test_value_2)
 
     expected_result = zero(B)
-    @test B ∧ C == zero(B)
+    @test B ∧ C == expected_result
     @test outer(B, C) == expected_result
 
     # dim(B) != dim(C)
@@ -246,8 +247,8 @@ end
     C = Blade(vectors)
 
     expected_result = zero(B)
-    @test B ∧ C == zero(B)
-    @test C ∧ B == zero(B)
+    @test B ∧ C == expected_result
+    @test C ∧ B == expected_result
     @test outer(B, C) == expected_result
     @test outer(C, B) == expected_result
 
@@ -375,6 +376,94 @@ end
     @test project(C, B) == expected_result
 end
 
+@testset "project(B, C) tests: B or C isa Pseudoscalar" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # Dimension of embedding space
+    dim = 10
+
+    # Blade vectors
+    vectors = randn(dim, 3)
+
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Pseudoscalar(dim, test_value_2)
+
+    expected_result = B
+    @test project(B, C) == expected_result
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Pseudoscalar(dim + 1, test_value_2)
+    @test_throws DimensionMismatch project(B, C)
+
+    # --- B::Pseudoscalar, C::Blade
+    #     B::Blade, C::Pseudoscalar
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Blade(vectors)
+
+    expected_result = zero(B)
+    @test project(B, C) == expected_result
+
+    expected_result = C
+    @test project(C, B) == expected_result
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(dim + 1, test_value_1)
+    C = Blade(vectors)
+    @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(C, B)
+end
+
+# --- dual(B)
+
+@testset "dual(B) tests" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # Dimension of embedding space
+    dim_B = 10
+
+    # --- B::Scalar
+
+    B = Scalar(test_value)
+    @test_throws ErrorException dual(B)
+
+    # --- B::Pseudoscalar
+
+    B = Pseudoscalar(dim_B, test_value)
+
+    expected_result = Scalar(value(B))
+    @test dual(B) == expected_result
+
+    # --- B::Blade
+
+    for grade_B in 2:5
+        B = Blade(randn(dim_B, grade_B))
+
+        dual_B = dual(B)
+        @test dim(dual_B) == dim_B
+        @test grade(dual_B) == dim_B - grade_B
+        @test norm(dual_B) == norm(B)
+        @test norm(transpose(basis(dual_B)) * basis(B)) < 10 * eps(Float64)
+        @test_skip sign(dual_B) == sign(B)
+    end
+end
+
 # --- dual(B, C)
 
 @testset "dual(B, C) tests: B or C isa Scalar" begin
@@ -426,7 +515,7 @@ end
     B = Scalar(test_value_1)
 
     # Exercise functionality and check results
-    for dim_C in dim:dim+4
+    for dim_C in dim:dim + 3
         C = Pseudoscalar(dim_C, test_value_2)
 
         expected_result = mod(grade(C), 4) < 2 ?
@@ -437,4 +526,54 @@ end
         expected_result = zero(C)
         @test dual(C, B) == expected_result
     end
+end
+
+@testset "dual(B, C) tests: B or C isa Pseudoscalar" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # Dimension of embedding space
+    dim = 10
+
+    # Blade vectors
+    vectors = randn(dim, 3)
+
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Pseudoscalar(dim, test_value_2)
+
+    expected_result = Scalar(value(B))
+    @test dual(B, C) == expected_result
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Pseudoscalar(dim + 1, test_value_2)
+    @test_throws DimensionMismatch dual(B, C)
+
+    # --- B::Pseudoscalar, C::Blade
+    #     B::Blade, C::Pseudoscalar
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Blade(vectors)
+
+    expected_result = zero(B)
+    @test dual(B, C) == expected_result
+
+    expected_result = C
+    @test_skip dual(C, B) == expected_result
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(dim + 1, test_value_1)
+    C = Blade(vectors)
+    @test_throws DimensionMismatch dual(B, C)
+    @test_throws DimensionMismatch dual(C, B)
 end
