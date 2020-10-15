@@ -30,11 +30,11 @@ using GeometricAlgebra
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Blade vectors
-    vectors = randn(6, 3)
+    # Dimension of embedding space
+    dim = 10
 
-    # Pseudoscalar dimension
-    dim = 100
+    # Blade vectors
+    vectors = randn(dim, 3)
 
     # --- x::Real, B::Scalar
     #     B::Scalar, x::Real
@@ -44,9 +44,9 @@ using GeometricAlgebra
     B = Scalar(test_value_2)
 
     # Exercise functionality and check results
-    expected_x_times_B = Scalar(x * value(B))
-    @test x * B == expected_x_times_B
-    @test B * x == expected_x_times_B
+    expected_result = Scalar(x * value(B))
+    @test x * B == expected_result
+    @test B * x == expected_result
 
     # --- B::Scalar, C::Scalar
 
@@ -55,8 +55,8 @@ using GeometricAlgebra
     C = Scalar(test_value_2)
 
     # Exercise functionality and check results
-    expected_B_times_C = Scalar(value(B) * value(C))
-    @test B * C == expected_B_times_C
+    expected_result = Scalar(value(B) * value(C))
+    @test B * C == expected_result
 
     # --- x::Real, B::Blade
     #     B::Blade, x::Real
@@ -66,9 +66,9 @@ using GeometricAlgebra
     B = Blade(vectors)
 
     # Exercise functionality and check results
-    expected_x_times_B = Blade(basis(B), volume=x * volume(B))
-    @test x * B ≈ expected_x_times_B
-    @test B * x ≈ expected_x_times_B
+    expected_result = Blade(basis(B), volume=x * volume(B))
+    @test x * B ≈ expected_result
+    @test B * x ≈ expected_result
 
     # --- B::Scalar, C::Blade
     #     B::Blade, C::Scalar
@@ -78,9 +78,9 @@ using GeometricAlgebra
     C = Blade(vectors)
 
     # Exercise functionality and check results
-    expected_B_times_C = Blade(basis(C), volume=value(B) * volume(C))
-    @test B * C ≈ expected_B_times_C
-    @test C * B ≈ expected_B_times_C
+    expected_result = Blade(basis(C), volume=value(B) * volume(C))
+    @test B * C ≈ expected_result
+    @test C * B ≈ expected_result
 
     # --- x::Real, B::Pseudoscalar
     #     B::Pseudoscalar, x::Real
@@ -90,9 +90,9 @@ using GeometricAlgebra
     B = Pseudoscalar(dim, test_value_2)
 
     # Exercise functionality and check results
-    expected_x_times_B = Pseudoscalar(dim, x * value(B))
-    @test x * B == expected_x_times_B
-    @test B * x == expected_x_times_B
+    expected_result = Pseudoscalar(dim, x * value(B))
+    @test x * B == expected_result
+    @test B * x == expected_result
 
     # --- B::Scalar, C::Pseudoscalar
     #     B::Pseudoscalar, C::Scalar
@@ -102,9 +102,9 @@ using GeometricAlgebra
     C = Pseudoscalar(dim, test_value_2)
 
     # Exercise functionality and check results
-    expected_B_times_C = Pseudoscalar(dim, value(B) * value(C))
-    @test B * C ≈ expected_B_times_C
-    @test C * B ≈ expected_B_times_C
+    expected_result = Pseudoscalar(dim, value(B) * value(C))
+    @test B * C == expected_result
+    @test C * B == expected_result
 end
 
 # --- ∧(B, C)
@@ -119,11 +119,11 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Blade vectors
-    vectors = randn(6, 3)
+    # Dimension of embedding space
+    dim = 10
 
-    # Pseudoscalar dimension
-    dim = 100
+    # Blade vectors
+    vectors = randn(dim, 3)
 
     # --- x::Real, B::Scalar
     #     B::Scalar, x::Real
@@ -192,8 +192,8 @@ end
 
     # Exercise functionality and check results
     expected_B_wedge_C = Pseudoscalar(dim, value(B) * value(C))
-    @test B ∧ C ≈ expected_B_wedge_C
-    @test C ∧ B ≈ expected_B_wedge_C
+    @test B ∧ C == expected_B_wedge_C
+    @test C ∧ B == expected_B_wedge_C
 end
 
 @testset "∧(B, C) tests: B, C::{Blade, Vector}" begin
@@ -250,4 +250,129 @@ end
     B_wedge_C = B_vector ∧ C_vector
     @test B_wedge_C ≈ expected_B_wedge_C
     @test B_wedge_C == outer(B, C)
+end
+
+# --- project(B, C)
+
+@testset "project(B, C) tests: B or C isa Vector" begin
+    # TODO
+end
+
+@testset "project(B, C) tests: B or C isa Scalar" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # Dimension of embedding space
+    dim = 10
+
+    # Blade vectors
+    vectors = randn(dim, 3)
+
+    # --- B::Scalar, C::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+    C = Scalar(test_value_2)
+
+    # Exercise functionality and check results
+    expected_result = Scalar(value(B))
+    @test project(B, C) == expected_result
+
+    # --- B::Scalar, C::Blade
+    #     B::Blade, C::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+    C = Blade(vectors)
+
+    # Exercise functionality and check results
+    expected_result = Scalar(value(B))
+    @test project(B, C) == expected_result
+
+    expected_result = zero(C)
+    @test project(C, B) == expected_result
+
+    # --- B::Scalar, C::Pseudoscalar
+    #     B::Pseudoscalar, C::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+    C = Pseudoscalar(dim, test_value_2)
+
+    # Exercise functionality and check results
+    expected_result = Scalar(value(B))
+    @test project(B, C) == expected_result
+
+    expected_result = zero(C)
+    @test project(C, B) == expected_result
+end
+
+# --- dual(B, C)
+
+@testset "dual(B, C) tests: B or C isa Scalar" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # Dimension of embedding space
+    dim = 10
+
+    # --- B::Scalar, C::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+    C = Scalar(test_value_2)
+
+    # Exercise functionality and check results
+    expected_result = Scalar(value(B))
+    @test dual(B, C) == expected_result
+
+    # --- B::Scalar, C::Blade
+    #     B::Blade, C::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+
+    # Exercise functionality and check results
+    for grade_C in 1:4
+        C = Blade(randn(dim, grade_C))
+
+        expected_result = mod(grade(C), 4) < 2 ?
+            Blade(C, volume=value(B)) :
+            Blade(C, volume=-value(B))
+        @test dual(B, C) ≈ expected_result
+
+        expected_result = zero(C)
+        @test dual(C, B) == expected_result
+    end
+
+    # --- B::Scalar, C::Pseudoscalar
+    #     B::Pseudoscalar, C::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+
+    # Exercise functionality and check results
+    for dim_C in dim:dim+4
+        C = Pseudoscalar(dim_C, test_value_2)
+
+        expected_result = mod(grade(C), 4) < 2 ?
+            Pseudoscalar(dim_C, value(B)) :
+            Pseudoscalar(dim_C, -value(B))
+        @test dual(B, C) == expected_result
+
+        expected_result = zero(C)
+        @test dual(C, B) == expected_result
+    end
 end
