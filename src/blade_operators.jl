@@ -280,12 +280,10 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 function dual(B::Blade)
     F = LinearAlgebra.qr(basis(B))
     dual_sign = mod(grade(B), 4) < 2 ?
-        sign(LinearAlgebra.det(F.Q)) :
-        -sign(LinearAlgebra.det(F.Q))
+        sign(LinearAlgebra.det(F.Q)) : -sign(LinearAlgebra.det(F.Q))
 
     dual_volume = mod(dim(B), 4) < 2 ?
-        dual_sign * volume(B) :
-        -dual_sign * volume(B)
+        dual_sign * volume(B) : -dual_sign * volume(B)
 
     Blade(F.Q[:, grade(B) + 1:end], volume=dual_volume)
 end
@@ -304,15 +302,19 @@ Notes
 * The volume of `C` is ignored.
 """
 # Duals involving Scalars
+dual(B::Scalar, C::Scalar) = B
+
 dual(B::Scalar, C::Blade) =
     mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B)) :
-        Blade(C, volume=-value(B))
+        Blade(C, volume=value(B)) : Blade(C, volume=-value(B))
+
+dual(B::Blade, C::Scalar) = zero(B)
 
 dual(B::Scalar, C::Pseudoscalar) =
     mod(grade(C), 4) < 2 ?
-        Pseudoscalar(C, value=value(B)) :
-        Pseudoscalar(C, value=-value(B))
+        Pseudoscalar(C, value=value(B)) : Pseudoscalar(C, value=-value(B))
+
+dual(B::Pseudoscalar, C::Scalar) = zero(B)
 
 # Duals involving Pseudoscalars
 function dual(B::Pseudoscalar, C::Pseudoscalar)
@@ -362,8 +364,7 @@ function dual(B::Blade, C::Blade)
 
     relative_sign_B_C = sign(prod(LinearAlgebra.diag(F.R)))
     dual_volume = mod(grade(B), 4) < 2 ?
-        relative_sign_B_C * volume(B) :
-        -relative_sign_B_C * volume(B)
+        relative_sign_B_C * volume(B) : -relative_sign_B_C * volume(B)
 
     Blade(Matrix(F.Q)[:, grade(B) + 1:end], volume=dual_volume)
 end
@@ -395,8 +396,7 @@ reciprocal(B::Scalar) = Scalar(1 / value(B))
 
 reciprocal(B::Blade) =
     mod(grade(B), 4) < 2 ?
-        Blade(B, volume=1 / norm(B)) :
-        Blade(B, volume=-1 / norm(B))
+        Blade(B, volume=1 / norm(B)) : Blade(B, volume=-1 / norm(B))
 
 reciprocal(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
@@ -499,8 +499,7 @@ Return the geometric product of `B` and `C`.
 # Geometric products involving Pseudoscalars
 *(B::Pseudoscalar, C::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
-        Scalar(value(B) * value(C)) :
-        Scalar(-value(B) * value(C))
+        Scalar(value(B) * value(C)) : Scalar(-value(B) * value(C))
 
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
 *(B::Pseudoscalar, C::Blade) = zero(B)
