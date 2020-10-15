@@ -12,8 +12,8 @@ except according to the terms contained in the LICENSE file.
 # --- Imports
 
 # Standard library
+import LinearAlgebra
 using Test
-import LinearAlgebra.norm
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
@@ -435,9 +435,6 @@ end
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    # Dimension of embedding space
-    dim_B = 10
-
     # --- B::Scalar
 
     B = Scalar(test_value)
@@ -445,6 +442,7 @@ end
 
     # --- B::Pseudoscalar
 
+    dim_B = 10
     B = Pseudoscalar(dim_B, test_value)
 
     expected_result = Scalar(value(B))
@@ -456,12 +454,25 @@ end
         B = Blade(randn(dim_B, grade_B))
 
         dual_B = dual(B)
+
         @test dim(dual_B) == dim_B
         @test grade(dual_B) == dim_B - grade_B
         @test norm(dual_B) == norm(B)
-        @test norm(transpose(basis(dual_B)) * basis(B)) < 10 * eps(Float64)
-        @test_skip sign(dual_B) == sign(B)
-    end
+
+        # Verify that B and dual(B) are orthogonal complements
+        @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
+            10 * eps(Float64)
+
+        # --- Verify sign(dual(B))
+
+        # Compute sign of I formed from basis(B) and basis(dual(B))
+        sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
+
+        # Account for reversals required to eliminate B
+        expected_sign = mod(grade(B), 4) < 2 ?
+            sign(B) * sign_Q : -sign(B) * sign_Q
+        @test sign(dual_B) == expected_sign
+   end
 end
 
 # --- dual(B, C)
@@ -538,42 +549,64 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Dimension of embedding space
-    dim = 10
-
-    # Blade vectors
-    vectors = randn(dim, 3)
-
     # --- B::Pseudoscalar, C::Pseudoscalar
 
+    # Dimension of embedding space
+    dim_B = 10
+
     # dim(B) == dim(C)
-    B = Pseudoscalar(dim, test_value_1)
-    C = Pseudoscalar(dim, test_value_2)
+    B = Pseudoscalar(dim_B, test_value_1)
+    C = Pseudoscalar(dim_B, test_value_2)
 
     expected_result = Scalar(value(B))
     @test dual(B, C) == expected_result
 
     # dim(B) != dim(C)
-    B = Pseudoscalar(dim, test_value_1)
-    C = Pseudoscalar(dim + 1, test_value_2)
+    B = Pseudoscalar(dim_B, test_value_1)
+    C = Pseudoscalar(dim_B + 1, test_value_2)
     @test_throws DimensionMismatch dual(B, C)
 
-    # --- B::Pseudoscalar, C::Blade
-    #     B::Blade, C::Pseudoscalar
+    # --- B::Blade, C::Pseudoscalar
+    #     B::Pseudoscalar, C::Blade
+
+    # Dimension of embedding space
+    dim_C = 10
 
     # dim(B) == dim(C)
-    B = Pseudoscalar(dim, test_value_1)
-    C = Blade(vectors)
+    B = Blade(randn(dim_C, 3))
+    C = Pseudoscalar(dim_C, test_value_1)
 
     expected_result = zero(B)
-    @test dual(B, C) == expected_result
+    @test dual(C, B) == expected_result
 
-    expected_result = C
-    @test_skip dual(C, B) == expected_result
+    for grade_B in 2:5
+        B = Blade(randn(dim_C, grade_B))
+        C = Pseudoscalar(dim_C, test_value_1)
+
+        dual_B = dual(B, C)
+
+        @test dim(dual_B) == dim_C
+        @test grade(dual_B) == dim_C - grade(B)
+        @test norm(dual_B) == norm(B)
+
+        # Verify that B and dual(B) are orthogonal complements
+        @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
+            10 * eps(Float64)
+
+        # --- Verify sign(dual(B))
+
+        # Compute sign of I formed from basis(B) and basis(dual(B, C))
+        sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
+
+        # Account for reversals required to eliminate B
+        expected_sign = mod(grade(B), 4) < 2 ?
+            sign(B) * sign_Q : -sign(B) * sign_Q
+        @test sign(dual_B) == expected_sign
+    end
 
     # dim(B) != dim(C)
-    B = Pseudoscalar(dim + 1, test_value_1)
-    C = Blade(vectors)
+    B = Blade(randn(dim_C, 3))
+    C = Pseudoscalar(dim_C + 1, test_value_1)
     @test_throws DimensionMismatch dual(B, C)
     @test_throws DimensionMismatch dual(C, B)
 end

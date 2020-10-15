@@ -279,11 +279,11 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 
 function dual(B::Blade)
     F = LinearAlgebra.qr(basis(B))
-    dual_sign = mod(grade(B), 4) < 2 ?
-        sign(LinearAlgebra.det(F.Q)) : -sign(LinearAlgebra.det(F.Q))
 
-    dual_volume = mod(dim(B), 4) < 2 ?
-        dual_sign * volume(B) : -dual_sign * volume(B)
+    sign_Q = sign(LinearAlgebra.det(F.Q))  # sign of Q relative to orientation
+                                           # of I formed from standard basis
+    dual_volume = mod(grade(B), 4) < 2 ?
+         sign_Q * volume(B) : -sign_Q * volume(B)
 
     Blade(F.Q[:, grade(B) + 1:end], volume=dual_volume)
 end
