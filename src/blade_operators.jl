@@ -327,7 +327,10 @@ function dual(B::Pseudoscalar, C::Blade)
     zero(B)
 end
 
-dual(B::Blade, C::Pseudoscalar) = dual(B)
+function dual(B::Blade, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    dual(B)
+end
 
 # Duals involving Blades
 function dual(B::Blade, C::Blade)
