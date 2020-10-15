@@ -133,9 +133,9 @@ end
     B = Scalar(test_value_2)
 
     # Exercise functionality and check results
-    expected_x_wedge_B = Scalar(x * value(B))
-    @test x ∧ B == expected_x_wedge_B
-    @test B ∧ x == expected_x_wedge_B
+    expected_result = Scalar(x * value(B))
+    @test x ∧ B == expected_result
+    @test B ∧ x == expected_result
 
     # --- B::Scalar, C::Scalar
 
@@ -144,8 +144,8 @@ end
     C = Scalar(test_value_2)
 
     # Exercise functionality and check results
-    expected_B_wedge_C = Scalar(value(B) * value(C))
-    @test B ∧ C == expected_B_wedge_C
+    expected_result = Scalar(value(B) * value(C))
+    @test B ∧ C == expected_result
 
     # --- x::Real, B::Blade
     #     B::Blade, x::Real
@@ -155,9 +155,9 @@ end
     B = Blade(vectors)
 
     # Exercise functionality and check results
-    expected_x_wedge_B = Blade(basis(B), volume=x * volume(B))
-    @test x ∧ B ≈ expected_x_wedge_B
-    @test B ∧ x ≈ expected_x_wedge_B
+    expected_result = Blade(basis(B), volume=x * volume(B))
+    @test x ∧ B ≈ expected_result
+    @test B ∧ x ≈ expected_result
 
     # --- B::Scalar, C::Blade
     #     B::Blade, C::Scalar
@@ -167,9 +167,9 @@ end
     C = Blade(vectors)
 
     # Exercise functionality and check results
-    expected_B_wedge_C = Blade(basis(C), volume=value(B) * volume(C))
-    @test B ∧ C ≈ expected_B_wedge_C
-    @test C ∧ B ≈ expected_B_wedge_C
+    expected_result = Blade(basis(C), volume=value(B) * volume(C))
+    @test B ∧ C ≈ expected_result
+    @test C ∧ B ≈ expected_result
 
     # --- x::Real, B::Pseudoscalar
     #     B::Pseudoscalar, x::Real
@@ -179,9 +179,9 @@ end
     B = Pseudoscalar(dim, test_value_2)
 
     # Exercise functionality and check results
-    expected_x_wedge_B = Pseudoscalar(dim, x * value(B))
-    @test x ∧ B == expected_x_wedge_B
-    @test B ∧ x == expected_x_wedge_B
+    expected_result = Pseudoscalar(dim, x * value(B))
+    @test x ∧ B == expected_result
+    @test B ∧ x == expected_result
 
     # --- B::Scalar, C::Pseudoscalar
     #     B::Pseudoscalar, C::Scalar
@@ -191,13 +191,61 @@ end
     C = Pseudoscalar(dim, test_value_2)
 
     # Exercise functionality and check results
-    expected_B_wedge_C = Pseudoscalar(dim, value(B) * value(C))
-    @test B ∧ C == expected_B_wedge_C
-    @test C ∧ B == expected_B_wedge_C
+    expected_result = Pseudoscalar(dim, value(B) * value(C))
+    @test B ∧ C == expected_result
+    @test C ∧ B == expected_result
 end
 
-@testset "∧(B, C) tests: B, C::{Blade, Vector}" begin
-    # --- B, C::Blade
+@testset "∧(B, C) tests: B or C isa Pseudoscalar" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # Dimension of embedding space
+    dim = 10
+
+    # Blade vectors
+    vectors = randn(dim, 3)
+
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Pseudoscalar(dim, test_value_2)
+
+    expected_result = zero(B)
+    @test B ∧ C == zero(B)
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Pseudoscalar(dim + 1, test_value_2)
+    @test_throws DimensionMismatch B ∧ C
+
+    # --- B::Pseudoscalar, C::Blade
+    #     B::Blade, C::Pseudoscalar
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(dim, test_value_1)
+    C = Blade(vectors)
+
+    expected_result = zero(B)
+    @test B ∧ C == zero(B)
+    @test C ∧ B == zero(B)
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(dim + 1, test_value_1)
+    C = Blade(vectors)
+    @test_throws DimensionMismatch B ∧ C
+    @test_throws DimensionMismatch C ∧ B
+end
+
+@testset "∧(B, C) tests: B and C::{Blade, Vector}" begin
+    # --- B and C::Blade
 
     # Preparations
     B_vectors = hcat([1; 0; 0; 0; 0],
@@ -224,15 +272,15 @@ end
     C_vector = [0; 0; 3; 0; 0]
     C = Blade(C_vector)
 
-    expected_B_wedge_C = Blade(hcat(B_vectors, C_vector))
+    expected_result = Blade(hcat(B_vectors, C_vector))
 
     # Exercise functionality
     B_wedge_C = B ∧ C_vector
-    @test B_wedge_C ≈ expected_B_wedge_C
+    @test B_wedge_C ≈ expected_result
     @test B_wedge_C == outer(B, C)
 
     C_wedge_B = C_vector ∧ B
-    @test C_wedge_B ≈ (-1)^(grade(B)) * expected_B_wedge_C
+    @test C_wedge_B ≈ (-1)^(grade(B)) * expected_result
     @test C_wedge_B == outer(C, B)
 
     # --- B::Vector, C::Vector
@@ -244,11 +292,11 @@ end
     C_vector = [0; 0; 3; 0; 0]
     C = Blade(C_vector)
 
-    expected_B_wedge_C = Blade(hcat(B_vector, C_vector))
+    expected_result = Blade(hcat(B_vector, C_vector))
 
     # Exercise functionality
     B_wedge_C = B_vector ∧ C_vector
-    @test B_wedge_C ≈ expected_B_wedge_C
+    @test B_wedge_C ≈ expected_result
     @test B_wedge_C == outer(B, C)
 end
 
