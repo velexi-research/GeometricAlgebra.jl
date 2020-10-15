@@ -107,7 +107,7 @@ using GeometricAlgebra
     @test C * B == expected_result
 end
 
-# --- ∧(B, C)
+# --- ∧(B, C), outer(B, C)
 
 @testset "∧(B, C) tests: B or C isa {Scalar, Real}" begin
     # --- Preparations
@@ -136,6 +136,8 @@ end
     expected_result = Scalar(x * value(B))
     @test x ∧ B == expected_result
     @test B ∧ x == expected_result
+    @test outer(x, B) == expected_result
+    @test outer(B, x) == expected_result
 
     # --- B::Scalar, C::Scalar
 
@@ -146,6 +148,7 @@ end
     # Exercise functionality and check results
     expected_result = Scalar(value(B) * value(C))
     @test B ∧ C == expected_result
+    @test outer(B, C) == expected_result
 
     # --- x::Real, B::Blade
     #     B::Blade, x::Real
@@ -158,6 +161,8 @@ end
     expected_result = Blade(basis(B), volume=x * volume(B))
     @test x ∧ B ≈ expected_result
     @test B ∧ x ≈ expected_result
+    @test outer(x, B) ≈ expected_result
+    @test outer(B, x) ≈ expected_result
 
     # --- B::Scalar, C::Blade
     #     B::Blade, C::Scalar
@@ -170,6 +175,8 @@ end
     expected_result = Blade(basis(C), volume=value(B) * volume(C))
     @test B ∧ C ≈ expected_result
     @test C ∧ B ≈ expected_result
+    @test outer(B, C) ≈ expected_result
+    @test outer(C, B) ≈ expected_result
 
     # --- x::Real, B::Pseudoscalar
     #     B::Pseudoscalar, x::Real
@@ -182,6 +189,8 @@ end
     expected_result = Pseudoscalar(dim, x * value(B))
     @test x ∧ B == expected_result
     @test B ∧ x == expected_result
+    @test outer(x, B) == expected_result
+    @test outer(B, x) == expected_result
 
     # --- B::Scalar, C::Pseudoscalar
     #     B::Pseudoscalar, C::Scalar
@@ -194,6 +203,8 @@ end
     expected_result = Pseudoscalar(dim, value(B) * value(C))
     @test B ∧ C == expected_result
     @test C ∧ B == expected_result
+    @test outer(B, C) == expected_result
+    @test outer(C, B) == expected_result
 end
 
 @testset "∧(B, C) tests: B or C isa Pseudoscalar" begin
@@ -220,6 +231,7 @@ end
 
     expected_result = zero(B)
     @test B ∧ C == zero(B)
+    @test outer(B, C) == expected_result
 
     # dim(B) != dim(C)
     B = Pseudoscalar(dim, test_value_1)
@@ -236,6 +248,8 @@ end
     expected_result = zero(B)
     @test B ∧ C == zero(B)
     @test C ∧ B == zero(B)
+    @test outer(B, C) == expected_result
+    @test outer(C, B) == expected_result
 
     # dim(B) != dim(C)
     B = Pseudoscalar(dim + 1, test_value_1)
