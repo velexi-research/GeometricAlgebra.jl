@@ -278,12 +278,25 @@ dual(B::Scalar) = error("The dual of a Scalar is not well-defined")
 dual(B::Pseudoscalar) = Scalar(value(B))
 
 function dual(B::Blade)
+    # --- Extend basis(B) to an orthonormal basis for entire space.
+
     F = LinearAlgebra.qr(basis(B))
 
-    sign_Q = sign(LinearAlgebra.det(F.Q))  # sign of Q relative to orientation
-                                           # of I formed from standard basis
-    dual_volume = mod(grade(B), 4) < 2 ?
-         sign_Q * volume(B) : -sign_Q * volume(B)
+    # --- Compute volume of dual
+
+    # Account for orientation of Q relative to orientation of I formed from
+    # standard basis
+    dual_volume = volume(B) * sign(LinearAlgebra.det(F.Q))
+
+    # Account for sign of I^{-1} relative to I
+    if mod(dim(B), 4) >= 2
+        dual_volume = -dual_volume
+    end
+
+    # Account for reversals required to eliminate B
+    if mod(grade(B), 4) >= 2
+        dual_volume = -dual_volume
+    end
 
     Blade(F.Q[:, grade(B) + 1:end], volume=dual_volume)
 end
@@ -341,7 +354,7 @@ function dual(B::Blade, C::Blade)
     assert_dim_equal(B, C)
 
     # Check that B is contained in C
-    projection_coefficients = transpose(basis(B)) * basis(C)
+    projection_coefficients = transpose(basis(C)) * basis(B)
     if LinearAlgebra.norm(projection_coefficients)^2 ≉ grade(B)
         error("`B` not contained in `C`")
     end
@@ -358,18 +371,35 @@ function dual(B::Blade, C::Blade)
         return Scalar(dual_volume)
     end
 
-    # --- Compute dual using the basis vectors of `C` with the smallest
-    #     projections (i.e., largest rejections) onto the basis of `B`.
+    # --- Extend basis(B) to an orthonormal basis for entire subspace
+    #     represented by basis(C)
 
-    permutation = sortperm(sum(abs.(projection_coefficients), dims=1)[1, :])
-    B_ext = hcat(basis(B), basis(C)[:, permutation[1:grade(C) - grade(B)]])
-    F = LinearAlgebra.qr(B_ext)
+    F = LinearAlgebra.qr(projection_coefficients)
 
-    relative_sign_B_C = sign(prod(LinearAlgebra.diag(F.R)))
-    dual_volume = mod(grade(B), 4) < 2 ?
-        relative_sign_B_C * volume(B) : -relative_sign_B_C * volume(B)
+    # --- Compute volume of dual
 
-    Blade(Matrix(F.Q)[:, grade(B) + 1:end], volume=dual_volume)
+    # Account for orientation of Q relative to orientation of basis(C)
+    dual_volume = volume(B) * sign(LinearAlgebra.det(F.Q))
+
+    # Account for orientation of columns of Q that are the new basis for B
+    # relative to orientation of basis(B)
+    if prod(LinearAlgebra.diag(F.R)) < 0
+        dual_volume = -dual_volume
+    end
+
+    # Account for sign of I_C^{-1} relative to I_C
+    if mod(grade(C), 4) >= 2
+        dual_volume = -dual_volume
+    end
+
+    # Account for reversals required to eliminate B
+    if mod(grade(B), 4) >= 2
+        dual_volume = -dual_volume
+    end
+
+    # --- Construct Blade in embedding space
+
+    Blade(basis(C) * F.Q[:, grade(B) + 1:end], volume=dual_volume)
 end
 
 
