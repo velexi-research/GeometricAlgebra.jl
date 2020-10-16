@@ -176,18 +176,3 @@ end
         @test reciprocal(B) ≈ expected_reciprocal
     end
 end
-
-# --- dual(B)
-
-@testset "dual(B): B::Pseudoscalar" begin
-    # Preparations
-    dim = 5
-    value = rand() + 1  # add 1 to avoid 0
-    value = rand() > 0.5 ? value : -value
-
-    # Exercise functionality and check results
-    for precision_type in subtypes(AbstractFloat)
-        B = Pseudoscalar(dim, value)
-        @test dual(B) ≈ Scalar(value)
-    end
-end
