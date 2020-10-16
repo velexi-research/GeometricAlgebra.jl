@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- *(B, C): scalar multiplication
 
-@testset "*(B, C) tests: B or C isa {Scalar, Real}" begin
+@testset "*(B, C): B or C isa {Scalar, Real}" begin
     # --- Preparations
 
     # Test values
@@ -110,7 +110,7 @@ end
 
 # --- ∧(B, C), outer(B, C)
 
-@testset "∧(B, C) tests: B or C isa {Scalar, Real}" begin
+@testset "∧(B, C): B or C isa {Scalar, Real}" begin
     # --- Preparations
 
     # Test values
@@ -208,7 +208,7 @@ end
     @test outer(C, B) == expected_result
 end
 
-@testset "∧(B, C) tests: B or C isa Pseudoscalar" begin
+@testset "∧(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
     # Test values
@@ -259,8 +259,8 @@ end
     @test_throws DimensionMismatch C ∧ B
 end
 
-@testset "∧(B, C) tests: B and C::{Blade, Vector}" begin
-    # --- B and C::Blade
+@testset "∧(B, C): B, C::{Blade, Vector}" begin
+    # --- B::Blade, C::Blade
 
     # Preparations
     B_vectors = hcat([1; 0; 0; 0; 0],
@@ -317,11 +317,11 @@ end
 
 # --- project(B, C)
 
-@testset "project(B, C) tests: B or C isa Vector" begin
-    # TODO
+@testset "project(B, C): B or C isa Vector" begin
+    @test_skip 1
 end
 
-@testset "project(B, C) tests: B or C isa Scalar" begin
+@testset "project(B, C): B or C isa Scalar" begin
     # --- Preparations
 
     # Test values
@@ -376,7 +376,7 @@ end
     @test project(C, B) == expected_result
 end
 
-@testset "project(B, C) tests: B or C isa Pseudoscalar" begin
+@testset "project(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
     # Test values
@@ -426,7 +426,9 @@ end
     @test_throws DimensionMismatch project(C, B)
 end
 
-# --- dual(B)
+@testset "project(B, C): B, C::Blade" begin
+    @test_skip 1
+end
 
 @testset "dual(B) tests" begin
     # --- Preparations
@@ -477,7 +479,7 @@ end
 
 # --- dual(B, C)
 
-@testset "dual(B, C) tests: B or C isa Scalar" begin
+@testset "dual(B, C): B or C isa Scalar" begin
     # --- Preparations
 
     # Test values
@@ -539,7 +541,7 @@ end
     end
 end
 
-@testset "dual(B, C) tests: B or C isa Pseudoscalar" begin
+@testset "dual(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
     # Test values
@@ -609,4 +611,33 @@ end
     C = Pseudoscalar(dim_C + 1, test_value_1)
     @test_throws DimensionMismatch dual(B, C)
     @test_throws DimensionMismatch dual(C, B)
+end
+
+@testset "dual(B, C): B, C::Blade" begin
+    # --- Preparations
+
+    # Dimension of embedding space
+    dim_B = 10
+
+    C = Blade(randn(dim_B, 7))
+
+    for grade_B in 2:5
+        B_vectors = randn(dim_B, grade_B)
+
+        # dim(B) == dim(C)
+        B = Blade(basis(C) * randn(grade(C), grade_B))
+        expected_result = nothing
+        @test_skip dual(B, C)
+
+        # dim(B) != dim(C)
+        B = Blade(randn(dim_B + 1, grade_B))
+        @test_throws DimensionMismatch dual(B, C)
+
+        # `B` not contained in `C`
+        B = Blade(randn(dim_B, grade_B))
+        while LinearAlgebra.norm(rejection(basis(B), C)) < sqrt(eps(Float64))
+            B = Blade(randn(dim_B, grade_B))
+        end
+        @test_throws ErrorException dual(B, C)
+    end
 end
