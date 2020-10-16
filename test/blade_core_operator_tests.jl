@@ -447,8 +447,17 @@ end
     dim_B = 10
     B = Pseudoscalar(dim_B, test_value)
 
+    dual_B = dual(B)
+
     expected_result = Scalar(value(B))
-    @test dual(B) == expected_result
+    @test dual_B == expected_result
+
+    # Verify dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+    if mod(dim(B), 4) < 2
+        @test_skip dual(dual_B) ≈ B
+    else
+        @test_skip dual(dual_B) ≈ -B
+    end
 
     # --- B::Blade
 
@@ -489,8 +498,9 @@ end
 
             @test sign(dual_B) == expected_sign
 
-            # --- Verify dual(dual_B) = (-1)^(dim_B * (dim_B-1) / 2) B
+            # --- Verify mathematical properties of dual
 
+            # dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
             if mod(dim(B), 4) < 2
                 @test dual(dual_B) ≈ B
             else
@@ -579,12 +589,24 @@ end
     # Dimension of embedding space
     dim_B = 10
 
-    # dim(B) == dim(C)
+    # ------ dim(B) == dim(C)
+
     B = Pseudoscalar(dim_B, test_value_1)
     C = Pseudoscalar(dim_B, test_value_2)
 
+    dual_B = dual(B, C)
+
     expected_result = Scalar(value(B))
-    @test dual(B, C) == expected_result
+    @test dual_B == expected_result
+
+    # Verify dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+    if mod(grade(C), 4) < 2
+        @test dual(dual_B, C) ≈ B
+    else
+        @test dual(dual_B, C) ≈ -B
+    end
+
+    # ------ Error cases
 
     # dim(B) != dim(C)
     B = Pseudoscalar(dim_B, test_value_1)
@@ -597,7 +619,8 @@ end
     # Dimension of embedding space
     dim_C = 10
 
-    # dim(B) == dim(C)
+    # ------ dim(B) == dim(C)
+
     B = Blade(randn(dim_C, 3))
     C = Pseudoscalar(dim_C, test_value_1)
 
@@ -610,7 +633,16 @@ end
 
         dual_B = dual(B, C)
         @test dual_B == dual(B)
+
+        # Verify dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        if mod(grade(C), 4) < 2
+            @test dual(dual_B, C) ≈ B
+        else
+            @test dual(dual_B, C) ≈ -B
+        end
     end
+
+    # ------ Error cases
 
     # dim(B) != dim(C)
     B = Blade(randn(dim_C, 3))
@@ -629,7 +661,8 @@ end
 
     # --- Exercise functionality and check results
 
-    # dim(B) == dim(C), grade(B) < grade(C)
+    # ------ dim(B) == dim(C), grade(B) < grade(C)
+
     for grade_B in 2:5
         B_vectors = basis(C)[:, 1:grade_B] * randn(grade_B, grade_B)
         B = Blade(B_vectors)
@@ -667,9 +700,17 @@ end
         end
 
         @test sign(dual_B) == expected_sign
+
+        # Verify dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        if mod(grade(C), 4) < 2
+            @test dual(dual_B, C) ≈ B
+        else
+            @test dual(dual_B, C) ≈ -B
+        end
     end
 
-    # dim(B) == dim(C), grade(B) == grade(C)
+    # ------ dim(B) == dim(C), grade(B) == grade(C)
+
     coefficients = randn(grade(C), grade(C))
     B_vectors = basis(C) * coefficients
     B = Blade(B_vectors)
@@ -681,7 +722,8 @@ end
         Scalar(-relative_orientation * volume(B))
     @test dual(B, C) ≈ expected_result
 
-    # Invalid arguments
+    # ------ Error cases
+
     for grade_B in 2:5
         # dim(B) != dim(C)
         B = Blade(randn(dim_B + 1, grade_B))
