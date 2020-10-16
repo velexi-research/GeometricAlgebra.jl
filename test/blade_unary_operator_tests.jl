@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- -(B)
 
-@testset "-(B) tests: B::Blade" begin
+@testset "-(B): B::Blade" begin
     # Preparations
     vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
@@ -33,7 +33,7 @@ using GeometricAlgebra
     @test -negative_B == B
 end
 
-@testset "-(B) tests: B::Scalar" begin
+@testset "-(B): B::Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -54,7 +54,7 @@ end
     end
 end
 
-@testset "-(B) tests: B::Pseudoscalar" begin
+@testset "-(B): B::Pseudoscalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -78,7 +78,7 @@ end
 
 # --- reciprocal(B)
 
-@testset "reciprocal(B) tests: B::Blade" begin
+@testset "reciprocal(B): B::Blade" begin
     for precision_type in subtypes(AbstractFloat)
         # mod(grade, 4) == 1
         vectors = Vector{precision_type}([3; 4; 0; 0; 0])
@@ -107,7 +107,7 @@ end
     end
 end
 
-@testset "reciprocal(B) tests: B::Scalar" begin
+@testset "reciprocal(B): B::Scalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -144,7 +144,7 @@ end
     end
 end
 
-@testset "reciprocal(B) tests: B::Pseudoscalar" begin
+@testset "reciprocal(B): B::Pseudoscalar" begin
     # Preparations
     value = rand() + 1  # add 1 to avoid 0
     value = rand() > 0.5 ? value : -value
@@ -179,7 +179,7 @@ end
 
 # --- dual(B)
 
-@testset "dual(B) tests: B::Pseudoscalar" begin
+@testset "dual(B): B::Pseudoscalar" begin
     # Preparations
     dim = 5
     value = rand() + 1  # add 1 to avoid 0

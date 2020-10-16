@@ -23,7 +23,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Pseudoscalar: inner constructor tests" begin
+@testset "Pseudoscalar: inner constructor" begin
     #=
       Notes
       -----
@@ -48,7 +48,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Pseudoscalar: outer constructor tests - basic constructors" begin
+@testset "Pseudoscalar: outer constructor - basic constructors" begin
     #=
       Notes
       -----
@@ -136,7 +136,7 @@ end
     end
 end
 
-@testset "Pseudoscalar: outer constructor tests - copy constructor" begin
+@testset "Pseudoscalar: outer constructor - copy constructor" begin
     #=
       Notes
       -----
@@ -174,7 +174,7 @@ end
 
 # --- Function tests
 
-@testset "Pseudoscalar: AbstractBlade interface tests" begin
+@testset "AbstractBlade interface: S::Blade" begin
     # Preparations
     test_dim = 10
 
@@ -246,7 +246,7 @@ end
     end
 end
 
-@testset "Pseudoscalar: Pseudoscalar interface tests" begin
+@testset "Pseudoscalar: Pseudoscalar interface" begin
     # Preparations
     test_dim = 10
 
@@ -288,7 +288,7 @@ end
     end
 end
 
-@testset "Pseudoscalar: convert() tests" begin
+@testset "convert(S): S::Pseudoscalar" begin
     # Preparations
     test_dim = 10
 

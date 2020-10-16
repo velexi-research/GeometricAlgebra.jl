@@ -20,7 +20,7 @@ using GeometricAlgebra
 
 # --- *(B, C)
 
-@testset "*(x, B) tests: x::Real, B::Blade" begin
+@testset "*(x, B): x::Real, B::Blade" begin
     # Preparations
     x = rand() + 1  # add 1 to avoid 0
     x = rand() > 0.5 ? x : -x
@@ -36,7 +36,7 @@ using GeometricAlgebra
     @test B * x == expected_x_times_B
 end
 
-@testset "*(B, C) tests: B::Blade, C::Scalar" begin
+@testset "*(B, C): B::Blade, C::Scalar" begin
     # --- Preparations
 
     B_vectors = hcat([1; 0; 0; 0; 0],

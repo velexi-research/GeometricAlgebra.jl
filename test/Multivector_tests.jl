@@ -24,7 +24,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Multivector: inner constructor tests" begin
+@testset "Multivector: inner constructor" begin
     # Notes
     # -----
     # * Test value of constructed instance
@@ -61,7 +61,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Multivector: outer constructor tests" begin
+@testset "Multivector: outer constructor" begin
     # Notes
     # -----
     # * Test type of constructed instances. Correct construction of instances
@@ -96,7 +96,7 @@ end
 
 # --- Function tests
 
-@testset "Multivector: AbstractMultivector interface tests" begin
+@testset "AbstractMultivector interface: M::Multivector" begin
     # --- Preparations
 
     vectors = [3 3; -4 -4; 0 1]
@@ -135,7 +135,7 @@ end
     end
 end
 
-@testset "Multivector: convert(B) tests" begin
+@testset "convert(M): M::Multivector" begin
     # Preparations
     vectors = [3 3; -4 -4; 0 1]
     one_vector = [3; 4; 0]

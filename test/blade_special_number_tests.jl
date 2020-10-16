@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- Special number function tests
 
-@testset "zero() tests" begin
+@testset "zero()" begin
     # zero(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
         B = zero(Blade{precision_type}([1 2 3]))
@@ -59,7 +59,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "one() tests" begin
+@testset "one()" begin
     # one(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
         B = one(Blade{precision_type}([1 2 3]))

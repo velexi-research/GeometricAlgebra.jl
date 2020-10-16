@@ -22,7 +22,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Blade: inner constructor tests" begin
+@testset "Blade: inner constructor" begin
     #=
       Notes
       -----
@@ -353,7 +353,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Blade: outer constructor tests - basic constructors" begin
+@testset "Blade: outer constructor - basic constructors" begin
     #=
       Notes
       -----
@@ -771,7 +771,7 @@ end
     end
 end
 
-@testset "Blade: outer constructor tests - copy constructor" begin
+@testset "Blade: outer constructor - copy constructor" begin
     #=
       Notes
       -----
@@ -818,7 +818,7 @@ end
     end
 end
 
-@testset "Blade: outer constructor tests - Scalar constructors" begin
+@testset "Blade: outer constructor - Scalar constructors" begin
     #=
       Notes
       -----
@@ -918,7 +918,7 @@ end
     end
 end
 
-@testset "Blade: outer constructor tests - Pseudoscalar constructors" begin
+@testset "Blade: outer constructor - Pseudoscalar constructors" begin
     #=
       Notes
       -----
@@ -1034,7 +1034,7 @@ end
 
 # --- Function tests
 
-@testset "Blade: AbstractBlade interface tests" begin
+@testset "AbstractBlade interface: B::Blade" begin
     # --- Preparations
 
     vectors = [3 3; 4 4; 0 1]
@@ -1066,7 +1066,7 @@ end
     end
 end
 
-@testset "Blade: convert(B) tests" begin
+@testset "convert(B): B::Blade" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
 

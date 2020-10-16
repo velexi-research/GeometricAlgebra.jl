@@ -22,7 +22,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Scalar: inner constructor tests" begin
+@testset "Scalar: inner constructor" begin
     #=
       Notes
       -----
@@ -44,7 +44,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Scalar: outer constructor tests" begin
+@testset "Scalar: outer constructor" begin
     #=
       Notes
       -----
@@ -130,7 +130,7 @@ end
 
 # --- Function tests
 
-@testset "Scalar: AbstractBlade interface tests" begin
+@testset "AbstractBlade interface: S::Scalar" begin
     # Preparations
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
@@ -200,7 +200,7 @@ end
     end
 end
 
-@testset "Scalar: Scalar interface tests" begin
+@testset "Scalar interface" begin
     # Preparations
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
@@ -240,7 +240,7 @@ end
     end
 end
 
-@testset "Scalar: convert(B) tests" begin
+@testset "convert(S): S::Scalar" begin
     # Preparations
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
