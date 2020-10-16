@@ -488,6 +488,14 @@ end
             end
 
             @test sign(dual_B) == expected_sign
+
+            # --- Verify dual(dual_B) = (-1)^(dim_B * (dim_B-1) / 2) B
+
+            if mod(dim(B), 4) < 2
+                @test dual(dual_B) ≈ B
+            else
+                @test dual(dual_B) ≈ -B
+            end
         end
     end
 end
@@ -601,35 +609,7 @@ end
         C = Pseudoscalar(dim_C, test_value_1)
 
         dual_B = dual(B, C)
-
-        @test dim(dual_B) == dim_C
-        @test grade(dual_B) == dim_C - grade(B)
-        @test norm(dual_B) == norm(B)
-
-        # --- Verify that B and dual(B, C) are orthogonal complements
-
-        @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
-            10 * eps(Float64)
-
-        # --- Verify sign(dual(B, C))
-
-        # Compute sign of I formed from basis(B) and basis(dual(B, C))
-        sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
-
-        # Compute expected_sign
-        expected_sign = sign(B) * sign_Q
-
-        # Account for sign of I_C^{-1} relative to I_C
-        if mod(dim(B), 4) >= 2
-            expected_sign = -expected_sign
-        end
-
-        # Account for reversals required to eliminate B
-        if mod(grade(B), 4) >= 2
-            expected_sign = -expected_sign
-        end
-
-        @test sign(dual_B) == expected_sign
+        @test dual_B == dual(B)
     end
 
     # dim(B) != dim(C)
