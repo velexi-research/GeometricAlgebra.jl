@@ -452,29 +452,44 @@ end
 
     # --- B::Blade
 
-    for grade_B in 2:5
-        B = Blade(randn(dim_B, grade_B))
+    for dim_B in 10:13
+        for grade_B in 2:5
+            B = Blade(randn(dim_B, grade_B))
 
-        dual_B = dual(B)
+            dual_B = dual(B)
 
-        @test dim(dual_B) == dim_B
-        @test grade(dual_B) == dim_B - grade_B
-        @test norm(dual_B) == norm(B)
+            # --- Verify dim, grade, and norm
 
-        # Verify that B and dual(B) are orthogonal complements
-        @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
-            10 * eps(Float64)
+            @test dim(dual_B) == dim_B
+            @test grade(dual_B) == dim_B - grade_B
+            @test norm(dual_B) == norm(B)
 
-        # --- Verify sign(dual(B))
+            # --- Verify that B and dual(B) are orthogonal complements
 
-        # Compute sign of I formed from basis(B) and basis(dual(B))
-        sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
+            @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
+                10 * eps(Float64)
 
-        # Account for reversals required to eliminate B
-        expected_sign = mod(grade(B), 4) < 2 ?
-            sign(B) * sign_Q : -sign(B) * sign_Q
-        @test sign(dual_B) == expected_sign
-   end
+            # --- Verify sign(dual(B))
+
+            # Compute sign of I formed from basis(B) and basis(dual(B))
+            sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
+
+            # Compute expected_sign
+            expected_sign = sign(B) * sign_Q
+
+            # Account for sign of I^{-1} relative to I
+            if mod(dim(B), 4) >= 2
+                expected_sign = -expected_sign
+            end
+
+            # Account for reversals required to eliminate B
+            if mod(grade(B), 4) >= 2
+                expected_sign = -expected_sign
+            end
+
+            @test sign(dual_B) == expected_sign
+        end
+    end
 end
 
 # --- dual(B, C)
@@ -591,18 +606,29 @@ end
         @test grade(dual_B) == dim_C - grade(B)
         @test norm(dual_B) == norm(B)
 
-        # Verify that B and dual(B) are orthogonal complements
+        # --- Verify that B and dual(B, C) are orthogonal complements
+
         @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
             10 * eps(Float64)
 
-        # --- Verify sign(dual(B))
+        # --- Verify sign(dual(B, C))
 
         # Compute sign of I formed from basis(B) and basis(dual(B, C))
         sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
 
+        # Compute expected_sign
+        expected_sign = sign(B) * sign_Q
+
+        # Account for sign of I_C^{-1} relative to I_C
+        if mod(dim(B), 4) >= 2
+            expected_sign = -expected_sign
+        end
+
         # Account for reversals required to eliminate B
-        expected_sign = mod(grade(B), 4) < 2 ?
-            sign(B) * sign_Q : -sign(B) * sign_Q
+        if mod(grade(B), 4) >= 2
+            expected_sign = -expected_sign
+        end
+
         @test sign(dual_B) == expected_sign
     end
 
@@ -617,18 +643,66 @@ end
     # --- Preparations
 
     # Dimension of embedding space
-    dim_B = 10
+    dim_B = 20
 
     C = Blade(randn(dim_B, 7))
 
+    # --- Exercise functionality and check results
+
+    # dim(B) == dim(C), grade(B) < grade(C)
     for grade_B in 2:5
-        B_vectors = randn(dim_B, grade_B)
+        B_vectors = basis(C)[:, 1:grade_B] * randn(grade_B, grade_B)
+        B = Blade(B_vectors)
 
-        # dim(B) == dim(C)
-        B = Blade(basis(C) * randn(grade(C), grade_B))
-        expected_result = nothing
-        @test_skip dual(B, C)
+        dual_B = dual(B, C)
 
+        # --- Verify dim, grade, and norm
+
+        @test dim(dual_B) == dim_B
+        @test grade(dual_B) == grade(C) - grade_B
+        @test norm(dual_B) == norm(B)
+
+        # --- Verify that B and dual(B) are orthogonal complements
+
+        @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
+            10 * eps(Float64)
+
+        # --- Verify sign(dual(B, C))
+
+        # Compute sign of I_C formed from basis(B) and basis(dual(B, C))
+        sign_Q = sign(LinearAlgebra.det(
+            transpose(hcat(basis(B), basis(dual_B))) * basis(C)))
+
+        # Compute expected_sign
+        expected_sign = sign(B) * sign_Q
+
+        # Account for sign of I_C^{-1} relative to I_C
+        if mod(grade(C), 4) >= 2
+            expected_sign = -expected_sign
+        end
+
+        # Account for reversals required to eliminate B
+        if mod(grade(B), 4) >= 2
+            expected_sign = -expected_sign
+        end
+
+        @test sign(dual_B) == expected_sign
+    end
+
+    # dim(B) == dim(C), grade(B) == grade(C)
+    coefficients = randn(grade(C), grade(C))
+    B_vectors = basis(C) * coefficients
+    B = Blade(B_vectors)
+
+    relative_orientation =
+        sign(LinearAlgebra.det(transpose(basis(B)) * basis(C)))
+    expected_result = mod(grade(B), 4) < 2 ?
+        Scalar(relative_orientation * volume(B)) :
+        Scalar(-relative_orientation * volume(B))
+    @test dual(B, C) ≈ expected_result
+
+    # Invalid arguments
+    for grade_B in 2:5
         # dim(B) != dim(C)
         B = Blade(randn(dim_B + 1, grade_B))
         @test_throws DimensionMismatch dual(B, C)
