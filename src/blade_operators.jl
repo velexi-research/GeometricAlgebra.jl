@@ -26,7 +26,8 @@ import Base.:(==), Base.:(≈)
 Return true if B and C are equal; otherwise, return false.
 """
 # Scalar comparison
-==(B::Scalar, C::Scalar) = (value(B) == value(C))
+==(B::Scalar, C::Scalar) =
+    (dim(B) == dim(C)) && (value(B) == value(C))
 ==(B::Scalar, x::Real) = (x == value(B))
 ==(x::Real, B::Scalar) = (B == x)
 
@@ -49,11 +50,13 @@ Return true if B and C are approximatly equal; otherwise, return false.
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
                                                           T2<:AbstractFloat} =
+    (dim(B) == dim(C)) &&
     ≈(value(B), value(C), atol=atol, rtol=rtol)
 
 ≈(B::Scalar{T}, x::Real;
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(x, value(B), atol=atol, rtol=rtol)
+
 ≈(x::Real, B::Scalar{T};
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(B, x, atol=atol, rtol=rtol)
@@ -107,16 +110,30 @@ Return the product of `B` and `C`.
 """
 *(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
 *(B::Scalar, x::Real) = x * B
-*(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
+
+function *(B::Scalar, C::Scalar)
+    assert_dim_equal(B, C)
+    Scalar(B, value=value(B) * value(C))
+end
 
 *(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
 *(B::Blade, x::Real) = x * B
-*(B::Scalar, C::Blade) = value(B) * C
+
+function *(B::Scalar, C::Blade)
+    assert_dim_equal(B, C)
+    value(B) * C
+end
+
 *(B::Blade, C::Scalar) = C * B
 
 *(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
 *(B::Pseudoscalar, x::Real) = x * B
-*(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
+
+function *(B::Scalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    Pseudoscalar(C, value=value(B) * value(C))
+end
+
 *(B::Pseudoscalar, C::Scalar) = C * B
 
 """
@@ -183,41 +200,36 @@ Return the projection of vector `v` onto the subspace represented by blade `B`.
 When `B` is a Blade or a Pseudoscalar, the return value is a Vector. When `B`
 is a Scalar, the return value is a Scalar representing zero.
 """
-project(v::Vector{<:Real}, B::Scalar) = zero(B)
+project(v::Vector{<:Real}, B::Scalar) =
+    length(v) != dim(B) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        zero(B)
+
 project(B::Scalar, v::Vector{<:Real}) = B
 
-function project(v::Vector{<:Real}, B::Pseudoscalar)
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
-    v
-end
+project(v::Vector{<:Real}, B::Pseudoscalar) =
+    length(v) != dim(B) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        v
 
-function project(B::Pseudoscalar, v::Vector{<:Real})
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
-    zero(B)
-end
+project(B::Pseudoscalar, v::Vector{<:Real}) =
+    length(v) != dim(B) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        zero(B)
 
-function project(v::Vector{<:Real}, B::Blade)
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
+project(v::Vector{<:Real}, B::Blade) =
+    length(v) != dim(B) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        grade(B) == 1 ?
+            basis(B) * LinearAlgebra.dot(v, basis(B)) :
+            basis(B) * transpose(transpose(v) * basis(B))
 
-    grade(B) == 1 ?
-        basis(B) * LinearAlgebra.dot(v, basis(B)) :
-        basis(B) * transpose(transpose(v) * basis(B))
-end
-
-function project(B::Blade, v::Vector{<:Real})
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
-
-    grade(B) == 1 ?
-        basis(B) * LinearAlgebra.dot(v, basis(B)) : zero(B)
-end
+project(B::Blade, v::Vector{<:Real}) =
+    length(v) != dim(B) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        grade(B) == 1 ?
+            basis(B) * LinearAlgebra.dot(v, basis(B)) :
+            zero(B)
 
 """
     project(B::AbstractBlade, C::AbstractBlade)
@@ -274,8 +286,10 @@ end
 Return the dual `B` (relative to the space that the geometric algebra is
 extended from).
 """
-dual(B::Scalar) = mod(dim(B), 4) < 2 ?
-    Pseudoscalar(dim(B), value(B)) : Pseudoscalar(dim(B), -value(B))
+dual(B::Scalar) =
+    mod(dim(B), 4) < 2 ?
+        Pseudoscalar(dim(B), value(B)) :
+        Pseudoscalar(dim(B), -value(B))
 
 dual(B::Pseudoscalar) = Scalar(dim(B), value(B))
 
@@ -319,13 +333,17 @@ Notes
 # Duals involving Scalars
 dual(B::Scalar, C::Scalar) = B
 
-dual(B::Scalar, C::Blade) = mod(grade(C), 4) < 2 ?
-    Blade(C, volume=value(B)) : Blade(C, volume=-value(B))
+dual(B::Scalar, C::Blade) =
+    mod(grade(C), 4) < 2 ?
+        Blade(C, volume=value(B)) :
+        Blade(C, volume=-value(B))
 
 dual(B::Blade, C::Scalar) = zero(B)
 
-dual(B::Scalar, C::Pseudoscalar) = mod(grade(C), 4) < 2 ?
-    Pseudoscalar(C, value=value(B)) : Pseudoscalar(C, value=-value(B))
+dual(B::Scalar, C::Pseudoscalar) =
+    mod(grade(C), 4) < 2 ?
+        Pseudoscalar(C, value=value(B)) :
+        Pseudoscalar(C, value=-value(B))
 
 dual(B::Pseudoscalar, C::Scalar) = zero(B)
 
@@ -427,11 +445,15 @@ Return the multiplicative inverse of `B`.
 """
 reciprocal(B::Scalar) = Scalar(B, value=1 / value(B))
 
-reciprocal(B::Blade) = mod(grade(B), 4) < 2 ?
-    Blade(B, volume=1 / norm(B)) : Blade(B, volume=-1 / norm(B))
+reciprocal(B::Blade) =
+    mod(grade(B), 4) < 2 ?
+        Blade(B, volume=1 / norm(B)) :
+        Blade(B, volume=-1 / norm(B))
 
-reciprocal(B::Pseudoscalar) = mod(grade(B), 4) < 2 ?
-    Pseudoscalar(B, value=1 / value(B)) : Pseudoscalar(B, value=-1 / value(B))
+reciprocal(B::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?
+        Pseudoscalar(B, value=1 / value(B)) :
+        Pseudoscalar(B, value=-1 / value(B))
 
 """
     reverse(B::AbstractBlade)
@@ -504,17 +526,10 @@ function ⋅(v::Vector{<:Real}, B::Blade)
     Blade(dual(Blade(projection), B), volume=projection_norm * volume(B))
 end
 
-function ⋅(B::Blade, v::Vector{<:Real})
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
-
-    if dim(B) > 1
-        return zero(B)
-    end
-
-    basis(B) ⋅ v
-end
+⋅(B::Blade, v::Vector{<:Real}) =
+    length(v) != dim(B) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        dim(B) > 1 ? zero(B) : basis(B) ⋅ v
 
 # Function aliases
 dot(x::AbstractBlade, y::AbstractBlade) = x ⋅ y
@@ -527,8 +542,10 @@ dot(x::Union{Vector{<:Real}, Real}, y::AbstractBlade) = x ⋅ y
 Return the geometric product of `B` and `C`.
 """
 # Geometric products involving Pseudoscalars
-*(B::Pseudoscalar, C::Pseudoscalar) = mod(grade(B), 4) < 2 ?
-    Scalar(dim(B), value(B) * value(C)) : Scalar(dim(B), -value(B) * value(C))
+*(B::Pseudoscalar, C::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?
+        Scalar(dim(B), value(B) * value(C)) :
+        Scalar(dim(B), -value(B) * value(C))
 
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
 *(B::Pseudoscalar, C::Blade) = zero(B)
@@ -558,13 +575,10 @@ end
 
 *(B::Blade, v::Vector{<:Real}) = B ∧ v
 
-function *(v::Vector{<:Real}, w::Vector{<:Real})
-    if length(v) != length(w)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
-
-    v ⋅ w
-end
+*(v::Vector{<:Real}, w::Vector{<:Real}) =
+    length(v) != length(w) ?
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
+        v ⋅ w
 
 
 # --- Utility functions
