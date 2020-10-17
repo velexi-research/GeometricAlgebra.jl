@@ -82,6 +82,16 @@ using GeometricAlgebra
         S = Pseudoscalar{precision_type}(test_dim, false)
         @test S == zero(Pseudoscalar{precision_type})
     end
+
+    # --- Invalid arguments
+
+    for precision_type in subtypes(AbstractFloat)
+        # dim == 0
+        @test_throws ErrorException Pseudoscalar(0, 10)
+
+        # dim < 0
+        @test_throws ErrorException Pseudoscalar(-1, 10)
+    end
 end
 
 @testset "Pseudoscalar: outer constructor - basic constructors" begin
