@@ -27,35 +27,17 @@ using GeometricAlgebra
         B = zero(Blade{precision_type}([1 2 3]))
         @test B isa Scalar{precision_type}
         @test B.value == 0
+        @test B.dim == 3
 
-        B = zero(Scalar{precision_type}(5))
+        B = zero(Scalar{precision_type}(7, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 0
+        @test B.dim == 7
 
         B = zero(Pseudoscalar{precision_type}(10, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 0
-    end
-
-    # zero(::Type{Blade{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = zero(Blade{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
-    end
-
-    # zero(::Type{Scalar{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = zero(Scalar{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
-    end
-
-    # zero(::Type{Pseudoscalar{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = zero(Pseudoscalar{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 0
+        @test B.dim == 10
     end
 end
 
@@ -65,34 +47,16 @@ end
         B = one(Blade{precision_type}([1 2 3]))
         @test B isa Scalar{precision_type}
         @test B.value == 1
+        @test B.dim == 3
 
-        B = one(Scalar{precision_type}(5))
+        B = one(Scalar{precision_type}(7, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 1
+        @test B.dim == 7
 
         B = one(Pseudoscalar{precision_type}(100, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 1
-    end
-
-    # one(::Type{Blade{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = one(Blade{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
-    end
-
-    # one(::Type{Scalar{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = one(Scalar{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
-    end
-
-    # one(::Type{Pseudoscalar{T}}) where {T<:AbstractFloat}
-    for precision_type in subtypes(AbstractFloat)
-        B = one(Pseudoscalar{precision_type})
-        @test B isa Scalar{precision_type}
-        @test B.value == 1
+        @test B.dim == 100
     end
 end
