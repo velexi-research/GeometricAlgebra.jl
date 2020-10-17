@@ -105,16 +105,16 @@ export project, dual
 
 Return the product of `B` and `C`.
 """
-*(x::Real, B::Scalar) = Scalar(x * value(B))
+*(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
 *(B::Scalar, x::Real) = x * B
-*(B::Scalar, C::Scalar) = Scalar(value(B) * value(C))
+*(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
 
 *(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
 *(B::Blade, x::Real) = x * B
 *(B::Scalar, C::Blade) = value(B) * C
 *(B::Blade, C::Scalar) = C * B
 
-*(x::Real, B::Pseudoscalar) = Pseudoscalar(dim(B), x * value(B))
+*(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
 *(B::Pseudoscalar, x::Real) = x * B
 *(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
 *(B::Pseudoscalar, C::Scalar) = C * B
@@ -274,8 +274,10 @@ end
 Return the dual `B` (relative to the space that the geometric algebra is
 extended from).
 """
-dual(B::Scalar) = error("The dual of a Scalar is not well-defined")
-dual(B::Pseudoscalar) = Scalar(value(B))
+dual(B::Scalar) = mod(dim(B), 4) < 2 ?
+    Pseudoscalar(dim(B), value(B)) : Pseudoscalar(dim(B), -value(B))
+
+dual(B::Pseudoscalar) = Scalar(dim(B), value(B))
 
 function dual(B::Blade)
     # --- Extend basis(B) to an orthonormal basis for entire space.
@@ -317,22 +319,20 @@ Notes
 # Duals involving Scalars
 dual(B::Scalar, C::Scalar) = B
 
-dual(B::Scalar, C::Blade) =
-    mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B)) : Blade(C, volume=-value(B))
+dual(B::Scalar, C::Blade) = mod(grade(C), 4) < 2 ?
+    Blade(C, volume=value(B)) : Blade(C, volume=-value(B))
 
 dual(B::Blade, C::Scalar) = zero(B)
 
-dual(B::Scalar, C::Pseudoscalar) =
-    mod(grade(C), 4) < 2 ?
-        Pseudoscalar(C, value=value(B)) : Pseudoscalar(C, value=-value(B))
+dual(B::Scalar, C::Pseudoscalar) = mod(grade(C), 4) < 2 ?
+    Pseudoscalar(C, value=value(B)) : Pseudoscalar(C, value=-value(B))
 
 dual(B::Pseudoscalar, C::Scalar) = zero(B)
 
 # Duals involving Pseudoscalars
 function dual(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    Scalar(value(B))
+    Scalar(dim(B), value(B))
 end
 
 function dual(B::Pseudoscalar, C::Blade)
@@ -368,7 +368,7 @@ function dual(B::Blade, C::Blade)
         dual_volume = LinearAlgebra.det(projection_coefficients) > 0 ?
             dual_sign * volume(B) : -dual_sign * volume(B)
 
-        return Scalar(dual_volume)
+        return Scalar(dim(B), dual_volume)
     end
 
     # --- Extend basis(B) to an orthonormal basis for entire subspace
@@ -416,25 +416,22 @@ export reciprocal, reverse
 
 Return the additive inverse of `B`.
 """
--(B::Scalar) = Scalar(-value(B))
+-(B::Scalar) = Scalar(B, value=-value(B))
 -(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B))
--(B::Pseudoscalar) = Pseudoscalar(dim(B), -value(B))
+-(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
 
 """
     reciprocal(B::AbstractBlade)
 
 Return the multiplicative inverse of `B`.
 """
-reciprocal(B::Scalar) = Scalar(1 / value(B))
+reciprocal(B::Scalar) = Scalar(B, value=1 / value(B))
 
-reciprocal(B::Blade) =
-    mod(grade(B), 4) < 2 ?
-        Blade(B, volume=1 / norm(B)) : Blade(B, volume=-1 / norm(B))
+reciprocal(B::Blade) = mod(grade(B), 4) < 2 ?
+    Blade(B, volume=1 / norm(B)) : Blade(B, volume=-1 / norm(B))
 
-reciprocal(B::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?
-        Pseudoscalar(B, value=1 / value(B)) :
-        Pseudoscalar(B, value=-1 / value(B))
+reciprocal(B::Pseudoscalar) = mod(grade(B), 4) < 2 ?
+    Pseudoscalar(B, value=1 / value(B)) : Pseudoscalar(B, value=-1 / value(B))
 
 """
     reverse(B::AbstractBlade)
@@ -530,9 +527,8 @@ dot(x::Union{Vector{<:Real}, Real}, y::AbstractBlade) = x ⋅ y
 Return the geometric product of `B` and `C`.
 """
 # Geometric products involving Pseudoscalars
-*(B::Pseudoscalar, C::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?
-        Scalar(value(B) * value(C)) : Scalar(-value(B) * value(C))
+*(B::Pseudoscalar, C::Pseudoscalar) = mod(grade(B), 4) < 2 ?
+    Scalar(dim(B), value(B) * value(C)) : Scalar(dim(B), -value(B) * value(C))
 
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
 *(B::Pseudoscalar, C::Blade) = zero(B)
