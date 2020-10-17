@@ -83,7 +83,7 @@ using GeometricAlgebra
         @test S == zero(Pseudoscalar{precision_type})
     end
 
-    # --- Invalid arguments
+    # --- Invalid data fields
 
     for precision_type in subtypes(AbstractFloat)
         # dim == 0
