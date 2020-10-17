@@ -77,31 +77,23 @@ struct Scalar{T<:AbstractFloat} <: AbstractBlade{T}
     #=
       Fields
       ------
-      * `dim`: the dimension of the space that the blade is embedded in
-
       * `value`: the value of the scalar
     =#
-    dim::Int
     value::T
 
     """
-        Scalar{T}(dim::Integer, value::T) where {T<:AbstractFloat}
+        Scalar{T}(value::Real)
 
-    Construct a Scalar for a geometric algebra in `dim` dimensions having the
-    specified `value`.
+    Construct a Scalar having the specified `value`.
     """
-    Scalar{T}(dim::Integer, value::T) where {T<:AbstractFloat} =
-        new(dim, value)
+    Scalar{T}(value::Real) where {T<:AbstractFloat} = new(T(value))
 end
 
 """
-    Scalar(dim::Integer, value::T) where {T<:AbstractFloat}
-    Scalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat}
-    Scalar(dim::Integer, value::Integer)
-    Scalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
+    Scalar(value::AbstractFloat)
+    Scalar(value::Integer)
 
-Construct a Scalar for a geometric algebra in `dim` dimensions having the
-specified `value`.
+Construct a Scalar having the specified `value`.
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Scalar.
@@ -111,25 +103,16 @@ the precision of the Scalar.
 
 * If `value` is an integer, the precision of the Scalar defaults to `Float64`.
 """
-Scalar(dim::Integer, value::T) where {T<:AbstractFloat} =
-    Scalar{T}(dim, value)
-
-Scalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat} =
-    Scalar(dim, T(value))
-
-Scalar(dim::Integer, value::Integer) = Scalar(dim, Float64(value))
-
-Scalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
-    Scalar(dim, T(value))
+Scalar(value::AbstractFloat) = Scalar{typeof(value)}(value)
+Scalar(value::Integer) = Scalar(Float64(value))
 
 """
-    Scalar(B::Scalar{T}; value::Real=value(B)) where {T<:AbstractFloat}
+    Scalar(B::Scalar; value::Real=value(B))
 
-Copy constructor. Construct a Scalar from the same geometric algebra as
-`B` having the specified `value`.
+Copy constructor. Construct a Scalar with the same precision as `B` having the
+specified `value`.
 """
-Scalar(B::Scalar{T}; value::Real=value(B)) where {T<:AbstractFloat} =
-    Scalar{T}(dim(B), value)
+Scalar(B::Scalar; value::Real=value(B)) = Scalar{typeof(volume(B))}(value)
 
 
 # Blade
@@ -226,7 +209,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if abs(volume) < atol
-            return zero(T, dim)
+            return Scalar{T}(0)
         end
 
         # Return a Pseudoscalar if the grade of the blade is equal to the
@@ -268,7 +251,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return zero(T, size(vectors, 1))
+            return zero(Blade{T})
         end
 
         # number of vectors > dimension of column space
@@ -279,7 +262,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
                 # vector and call constructor for single column vector.
                 return Blade{T}(reshape(vectors, dims[2]))
             else
-                return zero(T, dims[1])
+                return zero(Blade{T})
             end
         end
 
@@ -291,7 +274,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # Return zero if norm is below tolerance
         if abs(signed_norm) < atol
-            return zero(T, dims[1])
+            return zero(Blade{T})
         end
 
         # Compute orthonormal basis for subspace
@@ -330,7 +313,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return zero(T, length(v))
+            return zero(Blade{T})
         end
 
         # --- Construct Blade
@@ -339,7 +322,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # Return zero if norm is below tolerance
         if abs(norm_v) < atol
-            return zero(T, length(v))
+            return zero(Blade{T})
         end
 
         # Compute basis
@@ -508,20 +491,18 @@ struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     value::T
 
     """
-        Pseudoscalar{T}(dim::Integer, value::T) where {T<:AbstractFloat}
+        Pseudoscalar{T}(dim::Integer, value::Real)
 
     Construct a Pseudoscalar for a geometric algebra in `dim` dimensions having
     the specified `value`.
     """
-    Pseudoscalar{T}(dim::Integer, value::T) where {T<:AbstractFloat} =
-        new(dim, value)
+    Pseudoscalar{T}(dim::Integer, value::Real) where {T<:AbstractFloat} =
+    value == 0 ? zero(Pseudoscalar{T}) : new(dim, T(value))
 end
 
 """
-    Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
-    Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat}
+    Pseudoscalar(dim::Integer, value::AbstractFloat)
     Pseudoscalar(dim::Integer, value::Integer)
-    Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
 
 Construct a Pseudoscalar for a geometric algebra in `dim` dimensions having the
 specified `value`.
@@ -535,16 +516,11 @@ the precision of the Pseudoscalar.
 * If `value` is an integer, the precision of the Pseudoscalar defaults to
   `Float64`.
 """
-Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat} =
-    Pseudoscalar{T}(dim, value)
-
-Pseudoscalar{T}(dim::Integer, value::AbstractFloat) where {T<:AbstractFloat} =
-    Pseudoscalar(dim, T(value))
+Pseudoscalar(dim::Integer, value::AbstractFloat) =
+    Pseudoscalar{typeof(value)}(dim, value)
 
 Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
 
-Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
-    Pseudoscalar(dim, T(value))
 
 """
     Pseudoscalar(B::Pseudoscalar{T};
@@ -553,9 +529,8 @@ Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat} =
 Copy constructor. Construct a Pseudoscalar representing the same space as
 `B` having the specified `value`.
 """
-Pseudoscalar(B::Pseudoscalar{T};
-             value::Real=value(B)) where {T<:AbstractFloat} =
-    Pseudoscalar{T}(dim(B), value)
+Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
+    Pseudoscalar{typeof(volume(B))}(dim(B), value)
 
 
 # --- Special number functions
@@ -565,28 +540,21 @@ import Base.zero, Base.one
 
 """
     zero(B::AbstractBlade)
-    zero(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat}
-    zero(::Type{T}, dim) where {T<:AbstractFloat}
+    zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
 
-Return the additive identity 0 for a geometric algebra in `dim(B)` dimensions.
+Return the additive identity 0.
 """
-zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Scalar{T}(dim(B), 0)
-zero(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat} =
-    Scalar{T}(dim, 0)
-zero(::Type{T}, dim) where {T<:AbstractFloat} = Scalar{T}(dim, 0)
+zero(B::AbstractBlade) = Scalar{typeof(volume(B))}(0)
+zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = Scalar{T}(0)
 
 """
     one(B::AbstractBlade)
-    one(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat}
-    one(::Type{T}, dim) where {T<:AbstractFloat}
+    one(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
 
-Return the multiplicative identity 1 for a geometric algebra in `dim(B)`
-dimensions.
+Return the multiplicative identity 1.
 """
-one(B::AbstractBlade{T}) where {T<:AbstractFloat} = Scalar{T}(dim(B), 1)
-one(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat} =
-    Scalar{T}(dim, 1)
-one(::Type{T}, dim) where {T<:AbstractFloat} = Scalar{T}(dim, 1)
+one(B::AbstractBlade) = Scalar{typeof(volume(B))}(1)
+one(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = Scalar{T}(1)
 
 
 # --- Core AbstractBlade functions
@@ -603,7 +571,7 @@ export dim, grade, basis, volume, norm
 
 Return dimension of space that `B` is embedded in.
 """
-dim(B::Scalar) = B.dim
+dim(B::Scalar) = 0
 dim(B::Blade) = B.dim
 dim(B::Pseudoscalar) = B.dim
 
@@ -682,7 +650,7 @@ export blade_atol
 Convert Scalar to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:AbstractBlade{T}} =
-    T == typeof(volume(B)) ? B : Scalar{T}(dim(B), value(B))
+    T == typeof(value(B)) ? B : Scalar{T}(value(B))
 
 """
     convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
@@ -700,7 +668,7 @@ Convert Pseudoscalar to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, B::Pseudoscalar) where {T<:AbstractFloat,
                                            S<:AbstractBlade{T}} =
-    T == typeof(volume(B)) ? B : Pseudoscalar{T}(dim(B), value(B))
+    T == typeof(value(B)) ? B : Pseudoscalar{T}(dim(B), value(B))
 
 #=
  TODO: review numerical error in factorizations to see if a different

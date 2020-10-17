@@ -30,21 +30,57 @@ using GeometricAlgebra
       * Test value of constructed instance
     =#
 
-    # Preparations
-    test_dim = 10
+    # --- Pseudoscalar{T}(dim::Integer, value::Real)
 
+    test_dim = 10
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = (rand() > 0.5) ? test_value : -test_value
 
-    # Pseudoscalar{T}(dim::Integer, value::T) where {T<:AbstractFloat}
     for precision_type in subtypes(AbstractFloat)
-        # Preparations
-        converted_test_value = precision_type(test_value)
+        for value_type in subtypes(AbstractFloat)
+            converted_test_value = precision_type(test_value)
 
-        S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test S.dim == test_dim
+            @test S.value isa precision_type
+            @test S.value == precision_type(converted_test_value)
+        end
+    end
+
+    # --- Pseudoscalar{T}(dim::Integer, value::Integer)
+
+    test_dim = 10
+    test_value = (rand() > 0.5) ? 10 : -10
+
+    for precision_type in subtypes(AbstractFloat)
+        # subtypes(Signed)
+        for value_type in subtypes(Signed)
+            converted_test_value = precision_type(test_value)
+
+            S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test S.dim == test_dim
+            @test S.value isa precision_type
+            @test S.value == precision_type(converted_test_value)
+        end
+
+        # subtypes(Unsigned)
+        for value_type in subtypes(Unsigned)
+            converted_test_value = precision_type(abs(test_value))
+
+            S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test S.dim == test_dim
+            @test S.value isa precision_type
+            @test S.value == precision_type(converted_test_value)
+        end
+
+        # Bool
+        S = Pseudoscalar{precision_type}(test_dim, true)
         @test S.dim == test_dim
         @test S.value isa precision_type
-        @test S.value == converted_test_value
+        @test S.value == precision_type(1)
+
+        S = Pseudoscalar{precision_type}(test_dim, false)
+        @test S == zero(Pseudoscalar{precision_type})
     end
 end
 
@@ -60,12 +96,10 @@ end
 
     test_dim = 10
 
+    # --- Pseudoscalar(dim::Integer, value::AbstractFloat)
+
     test_value = rand()
     test_value = (rand() > 0.5) ? test_value : -test_value
-
-    int_test_value = (rand() > 0.5) ? 10 : -10
-
-    # --- Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         converted_test_value = precision_type(test_value)
@@ -73,32 +107,19 @@ end
         @test S isa Pseudoscalar{precision_type}
     end
 
-    # --- Pseudoscalar{T}(dim::Integer, value::AbstractFloat)
-    #         where {T<:AbstractFloat}
-
-    for precision_type in subtypes(AbstractFloat)
-        for value_type in subtypes(AbstractFloat)
-            converted_test_value = value_type(test_value)
-            # Note: precision_type == value_type is covered by inner constructor
-
-            if precision_type != value_type
-                S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
-                @test S isa Pseudoscalar{precision_type}
-            end
-        end
-    end
-
     # --- Pseudoscalar(dim::Integer, value::Integer)
+
+    test_value = (rand() > 0.5) ? 10 : -10
 
     # subtypes(Signed)
     for value_type in subtypes(Signed)
-        S = Pseudoscalar(test_dim, value_type(int_test_value))
+        S = Pseudoscalar(test_dim, value_type(test_value))
         @test S isa Pseudoscalar{Float64}
     end
 
     # subtypes(Unsigned)
     for value_type in subtypes(Unsigned)
-        S = Pseudoscalar(test_dim, value_type(abs(int_test_value)))
+        S = Pseudoscalar(test_dim, value_type(abs(test_value)))
         @test S isa Pseudoscalar{Float64}
     end
 
@@ -107,33 +128,7 @@ end
     @test S isa Pseudoscalar{Float64}
 
     S = Pseudoscalar(test_dim, false)
-    @test S isa Pseudoscalar{Float64}
-
-    # --- Pseudoscalar{T}(dim::Integer, value::Integer) where {T<:AbstractFloat}
-
-    # subtypes(Signed)
-    for value_type in subtypes(Signed)
-        for precision_type in subtypes(AbstractFloat)
-            S = Pseudoscalar{precision_type}(test_dim,
-                                             value_type(int_test_value))
-            @test S isa Pseudoscalar{precision_type}
-        end
-    end
-
-    # subtypes(Unsigned)
-    for value_type in subtypes(Unsigned)
-        for precision_type in subtypes(AbstractFloat)
-            S = Pseudoscalar{precision_type}(test_dim,
-                                             value_type(abs(int_test_value)))
-            @test S isa Pseudoscalar{precision_type}
-        end
-    end
-
-    # Bool
-    for precision_type in subtypes(AbstractFloat)
-        S = Pseudoscalar{precision_type}(test_dim, true)
-        @test S isa Pseudoscalar{precision_type}
-    end
+    @test S == zero(Pseudoscalar{Float64})
 end
 
 @testset "Pseudoscalar: outer constructor - copy constructor" begin
@@ -210,17 +205,6 @@ end
         @test norm(S) isa precision_type
         @test norm(S) == abs(negative_test_value)
         @test sign(S) == -1
-
-        # value = 0
-        S = Pseudoscalar(test_dim, precision_type(0))
-        @test dim(S) == test_dim
-        @test grade(S) == test_dim
-        @test basis(S) == LinearAlgebra.I
-        @test volume(S) isa precision_type
-        @test volume(S) == 0
-        @test norm(S) isa precision_type
-        @test norm(S) == 0
-        @test sign(S) == 0
 
         # value = Inf
         S = Pseudoscalar(test_dim, precision_type(Inf))

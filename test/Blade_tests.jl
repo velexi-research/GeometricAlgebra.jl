@@ -70,7 +70,7 @@ using GeometricAlgebra
         # default values for enforce_constraints, copy_basis
         B = Blade{precision_type}(test_dim, test_grade, normalized_basis,
                                   test_volume, atol=abs(test_volume) + 1)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # valid data fields, dim == grade
         # default values for atol, enforce_constraints, copy_basis
@@ -159,27 +159,27 @@ using GeometricAlgebra
         vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
         B = Blade{precision_type}(vectors,
                                   volume=blade_atol(precision_type) / 2)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # number of vectors > dimension of column space
         vectors = Matrix{precision_type}([1 2 3; 4 5 6])
         B = Blade{precision_type}(vectors)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # vectors are linearly dependent; volume == nothing
         vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
         B = Blade{precision_type}(vectors)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # vectors are linearly dependent; volume != nothing
         vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
         B = Blade{precision_type}(vectors, volume=test_volume)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # norm(blade) < atol
         vectors = Matrix{precision_type}([3 3; 4 4; 0 1])
         B = Blade{precision_type}(vectors, atol=6)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # number of vectors == dimension of column space; volume == nothing
         vectors = Matrix{precision_type}([3 5; 4 12])
@@ -235,7 +235,7 @@ using GeometricAlgebra
         vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
         B = Blade{precision_type}(col_vector,
                                   volume=blade_atol(precision_type) / 2)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # vector is a row vector
         row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
@@ -249,25 +249,25 @@ using GeometricAlgebra
         # vector is a zero vector; volume == nothing
         zero_vector = Array{precision_type}([0., 0., 0.])
         B = Blade(zero_vector)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # vector is a zero vector; volume != nothing
         zero_vector = Array{precision_type}([0., 0., 0.])
         B = Blade(zero_vector, volume=test_volume)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # norm(vector) < default atol
         small_vector = Vector{precision_type}(vector)
         small_vector /= LinearAlgebra.norm(small_vector)
         small_vector *= blade_atol(precision_type) / 2
         B = Blade{precision_type}(small_vector)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # norm(vector) < atol
         col_vector = Vector{precision_type}(vector)
         B = Blade{precision_type}(col_vector,
                                   atol=LinearAlgebra.norm(col_vector) + 1)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
     end
 
     # --- Copy constructor
@@ -406,11 +406,11 @@ end
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_vectors / 6
         B = Blade(small_blade)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # --- vectors isa Vector
 
@@ -429,11 +429,11 @@ end
         # norm(blade) < default atol
         small_blade = blade_atol(precision_type) * converted_one_vector / 6
         B = Blade(small_blade)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # --- number of vectors == dimension of column space
 
@@ -469,11 +469,11 @@ end
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_vectors / 6
             B = Blade{precision_type}(small_blade)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # --- vectors isa Vector
 
@@ -492,11 +492,11 @@ end
             # norm(blade) < default atol
             small_blade = blade_atol(precision_type) * converted_one_vector / 6
             B = Blade{precision_type}(small_blade)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # --- number of vectors == dimension of column space
 
@@ -528,7 +528,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B == zero(Float64, dim(B))
+        @test B == zero(Blade{Float64})
 
         # --- vectors isa Vector
 
@@ -546,7 +546,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B == zero(Float64, dim(B))
+        @test B == zero(Blade{Float64})
 
         # --- number of vectors == dimension of column space
 
@@ -573,7 +573,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
-        @test B == zero(Float64, dim(B))
+        @test B == zero(Blade{Float64})
 
         # --- vectors isa Vector
 
@@ -591,7 +591,7 @@ end
 
         # norm(blade) < atol
         B = Blade(converted_one_vector, atol=6)
-        @test B == zero(Float64, dim(B))
+        @test B == zero(Blade{Float64})
 
         # --- number of vectors == dimension of column space
 
@@ -616,7 +616,7 @@ end
 
     # norm(blade) < atol
     B = Blade(converted_vectors, atol=2)
-    @test B == zero(Float64, dim(B))
+    @test B == zero(Blade{Float64})
 
     # ------ vectors isa Vector
 
@@ -633,7 +633,7 @@ end
 
     # norm(blade) < atol
     B = Blade(converted_one_vector, atol=2)
-    @test B == zero(Float64, dim(B))
+    @test B == zero(Blade{Float64})
 
     # --- Blade{T}(vectors::Array{<:Integer};
     #              volume::Union{Real, Nothing}=nothing,
@@ -663,7 +663,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # --- vectors isa Vector
 
@@ -681,7 +681,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # --- number of vectors == dimension of column space
 
@@ -712,7 +712,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # --- vectors isa Vector
 
@@ -730,7 +730,7 @@ end
 
             # norm(blade) < atol
             B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B == zero(precision_type, dim(B))
+            @test B == zero(Blade{precision_type})
 
             # --- number of vectors == dimension of column space
 
@@ -758,7 +758,7 @@ end
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_vectors, atol=2)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
 
         # ------ vectors isa Vector
 
@@ -774,7 +774,7 @@ end
 
         # norm(blade) < atol
         B = Blade{precision_type}(converted_one_vector, atol=2)
-        @test B == zero(precision_type, dim(B))
+        @test B == zero(Blade{precision_type})
     end
 end
 

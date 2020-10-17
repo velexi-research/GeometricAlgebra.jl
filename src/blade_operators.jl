@@ -1,5 +1,6 @@
 """
-The operators.jl submodule defines operations on subtypes of AbstractBlade.
+The blade_operators.jl submodule defines operations on subtypes of
+AbstractBlade.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -26,8 +27,7 @@ import Base.:(==), Base.:(≈)
 Return true if B and C are equal; otherwise, return false.
 """
 # Scalar comparison
-==(B::Scalar, C::Scalar) =
-    (dim(B) == dim(C)) && (value(B) == value(C))
+==(B::Scalar, C::Scalar) = (value(B) == value(C))
 ==(B::Scalar, x::Real) = (x == value(B))
 ==(x::Real, B::Scalar) = (B == x)
 
@@ -50,7 +50,6 @@ Return true if B and C are approximatly equal; otherwise, return false.
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
                                                           T2<:AbstractFloat} =
-    (dim(B) == dim(C)) &&
     ≈(value(B), value(C), atol=atol, rtol=rtol)
 
 ≈(B::Scalar{T}, x::Real;
@@ -110,30 +109,16 @@ Return the product of `B` and `C`.
 """
 *(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
 *(B::Scalar, x::Real) = x * B
-
-function *(B::Scalar, C::Scalar)
-    assert_dim_equal(B, C)
-    Scalar(B, value=value(B) * value(C))
-end
+*(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
 
 *(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
 *(B::Blade, x::Real) = x * B
-
-function *(B::Scalar, C::Blade)
-    assert_dim_equal(B, C)
-    value(B) * C
-end
-
+*(B::Scalar, C::Blade) = value(B) * C
 *(B::Blade, C::Scalar) = C * B
 
 *(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
 *(B::Pseudoscalar, x::Real) = x * B
-
-function *(B::Scalar, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    Pseudoscalar(C, value=value(B) * value(C))
-end
-
+*(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
 *(B::Pseudoscalar, C::Scalar) = C * B
 
 """
@@ -350,7 +335,7 @@ dual(B::Pseudoscalar, C::Scalar) = zero(B)
 # Duals involving Pseudoscalars
 function dual(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    Scalar(dim(B), value(B))
+    Scalar(value(B))
 end
 
 function dual(B::Pseudoscalar, C::Blade)
@@ -386,7 +371,7 @@ function dual(B::Blade, C::Blade)
         dual_volume = LinearAlgebra.det(projection_coefficients) > 0 ?
             dual_sign * volume(B) : -dual_sign * volume(B)
 
-        return Scalar(dim(B), dual_volume)
+        return Scalar{typeof(volume(B))}(dual_volume)
     end
 
     # --- Extend basis(B) to an orthonormal basis for entire subspace
@@ -544,8 +529,8 @@ Return the geometric product of `B` and `C`.
 # Geometric products involving Pseudoscalars
 *(B::Pseudoscalar, C::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
-        Scalar(dim(B), value(B) * value(C)) :
-        Scalar(dim(B), -value(B) * value(C))
+        Scalar(value(B) * value(C)) :
+        Scalar(-value(B) * value(C))
 
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
 *(B::Pseudoscalar, C::Blade) = zero(B)
