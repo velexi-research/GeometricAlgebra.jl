@@ -94,18 +94,6 @@ end
     float64_or_bigfloat = (Float64, BigFloat)
 
     # B::Scalar, C::Scalar
-    for precision_type in subtypes(AbstractFloat)
-        converted_value = precision_type(test_value)
-        B = Scalar(test_dim, converted_value)
-
-        # ==(B, C)
-        @test B == converted_value
-        @test converted_value == B
-
-        # !=(x,y)
-        @test B != 2 * converted_value
-        @test 2 * converted_value != B
-    end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             # ==(B, C)
@@ -120,11 +108,16 @@ end
                 @test B != C
             end
 
-            # !=(x,y)
+            # value(B) != value(C)
             B = Scalar(test_dim, precision_type1(test_value))
             C = Scalar(test_dim, precision_type2(2 * test_value))
             @test B != C
         end
+
+        # dim(B) != dim(C)
+        B = Scalar(test_dim, precision_type1(test_value))
+        C = Scalar(test_dim + 1, precision_type1(test_value))
+        @test B != C
     end
 
     # B::Scalar, C::Real
@@ -374,10 +367,16 @@ end
     # B::Scalar, C::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
+            # dim(B) == dim(C)
             B = Scalar(test_dim, precision_type1(test_value))
             C = Scalar(test_dim, precision_type2(test_value))
             @test B ≈ C
         end
+
+        # dim(B) != dim(C)
+        B = Scalar(test_dim, precision_type1(test_value))
+        C = Scalar(test_dim + 1, precision_type1(test_value))
+        @test B ≉ C
     end
 
     # B::Scalar, C::Real
