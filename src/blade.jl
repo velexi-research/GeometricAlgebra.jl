@@ -226,7 +226,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if abs(volume) < atol
-            return zero(Blade{T})
+            return zero(T, dim)
         end
 
         # Return a Pseudoscalar if the grade of the blade is equal to the
@@ -268,7 +268,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return zero(Blade{T})
+            return zero(T, size(vectors, 1))
         end
 
         # number of vectors > dimension of column space
@@ -279,7 +279,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
                 # vector and call constructor for single column vector.
                 return Blade{T}(reshape(vectors, dims[2]))
             else
-                return zero(Blade{T})
+                return zero(T, dims[1])
             end
         end
 
@@ -291,7 +291,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # Return zero if norm is below tolerance
         if abs(signed_norm) < atol
-            return zero(Blade{T})
+            return zero(T, dims[1])
         end
 
         # Compute orthonormal basis for subspace
@@ -330,7 +330,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
-            return zero(Blade{T})
+            return zero(T, length(v))
         end
 
         # --- Construct Blade
@@ -339,7 +339,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # Return zero if norm is below tolerance
         if abs(norm_v) < atol
-            return zero(Blade{T})
+            return zero(T, length(v))
         end
 
         # Compute basis
@@ -483,34 +483,6 @@ Blade(B::Blade{T};
       atol::Real=blade_atol(T),
       copy_basis=false) where {T<:AbstractFloat} =
     Blade{T}(B, volume=volume, atol=atol, copy_basis=copy_basis)
-
-"""
-    Blade(x::T) where {T<:AbstractFloat}
-    Blade{T}(x::AbstractFloat) where {T<:AbstractFloat}
-    Blade(x::Integer)
-    Blade{T}(x::Integer) where {T<:AbstractFloat}
-
-Convenience constructors for constructing Scalars.
-"""
-Blade(x::T) where {T<:AbstractFloat} = Scalar(x)
-Blade{T}(x::AbstractFloat) where {T<:AbstractFloat} = Scalar{T}(x)
-Blade(x::Integer) = Scalar(x)
-Blade{T}(x::Integer) where {T<:AbstractFloat} = Scalar{T}(x)
-
-"""
-    Blade(dim::Integer, x::T) where {T<:AbstractFloat}
-    Blade{T}(dim::Integer, x::AbstractFloat) where {T<:AbstractFloat}
-    Blade(dim::Integer, x::Integer)
-    Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat}
-
-Convenience constructors for constructing Pseudoscalars.
-"""
-Blade(dim::Integer, x::T) where {T<:AbstractFloat} = Pseudoscalar(dim, x)
-Blade{T}(dim::Integer, x::AbstractFloat) where {T<:AbstractFloat} =
-    Pseudoscalar{T}(dim, x)
-Blade(dim::Integer, x::Integer) = Pseudoscalar(dim, x)
-Blade{T}(dim::Integer, x::Integer) where {T<:AbstractFloat} =
-    Pseudoscalar{T}(dim, x)
 
 
 # Pseudoscalar
