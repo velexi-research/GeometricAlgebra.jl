@@ -37,17 +37,17 @@ using GeometricAlgebra
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    dim = length(one_vector)
+    test_dim = length(one_vector)
 
     # --- Multivector{T}(blades::Vector{AbstractBlade{T}};
     #                    reduced::Bool=false) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        scalar = Scalar{precision_type}(test_value)
+        scalar = Scalar{precision_type}(test_dim, test_value)
         one_blade = Blade{precision_type}(one_vector)
         two_blade = Blade{precision_type}(vectors)
-        pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
+        pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
 
         blades = Vector([scalar, one_blade, two_blade, pseudoscalar])
 
@@ -75,16 +75,16 @@ end
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    dim = length(one_vector)
+    test_dim = length(one_vector)
 
     # --- Multivector{T}(blades::Vector{AbstractBlade{T}};
     #                    reduced::Bool=false) where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        scalar = Scalar{precision_type}(test_value)
+        scalar = Scalar{precision_type}(test_dim, test_value)
         two_blade = Blade{precision_type}(vectors)
-        pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
+        pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
 
         blades = Vector([scalar, two_blade, pseudoscalar])
 
@@ -105,21 +105,21 @@ end
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    dim = length(one_vector)
+    test_dim = length(one_vector)
 
     # --- Test basic functions
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        scalar = Scalar{precision_type}(test_value)
+        scalar = Scalar{precision_type}(test_dim, test_value)
         one_blade = Blade{precision_type}(one_vector)
-        pseudoscalar = Pseudoscalar{precision_type}(dim, test_value)
+        pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
         blades = Vector([scalar, one_blade, pseudoscalar])
         M = Multivector{precision_type}(blades)
 
         expected_summands = SortedDict(0=>Vector([scalar]),
                                        1=>Vector([one_blade]),
-                                       dim=>Vector([pseudoscalar]))
+                                       test_dim=>Vector([pseudoscalar]))
 
         # grades()
         @test grades(M) == [0, 1, 3]
@@ -131,7 +131,6 @@ end
 
         # norm()
         @test_skip norm(M) == 0
-
     end
 end
 
@@ -143,15 +142,16 @@ end
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    dim = length(one_vector)
+    test_dim = length(one_vector)
 
     # Tests
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
             # Preparations
-            scalar = Scalar{precision_type_src}(test_value)
+            scalar = Scalar{precision_type_src}(test_dim, test_value)
             one_blade = Blade{precision_type_src}(one_vector)
-            pseudoscalar = Pseudoscalar{precision_type_src}(dim, test_value)
+            pseudoscalar = Pseudoscalar{precision_type_src}(test_dim,
+                                                            test_value)
             blades = Vector([scalar, one_blade, pseudoscalar])
             M = Multivector{precision_type_src}(blades)
 

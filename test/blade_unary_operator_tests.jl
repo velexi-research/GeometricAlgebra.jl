@@ -35,35 +35,37 @@ end
 
 @testset "-(B): B::Scalar" begin
     # Preparations
-    value = rand() + 1  # add 1 to avoid 0
-    value = rand() > 0.5 ? value : -value
+    test_dim = 5
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
 
     # B::Scalar{<:AbstractFloat}
     for value_type in subtypes(AbstractFloat)
-        B = Scalar(value_type(value))
-        expected_result = Scalar(-value_type(value))
+        B = Scalar(test_dim, value_type(test_value))
+        expected_result = Scalar(test_dim, -value_type(test_value))
         @test -B == expected_result
     end
 
     # B::Scalar{<:Signed}
     int_value::Int = 3
     for value_type in subtypes(Signed)
-        B = Scalar(value_type(int_value))
-        expected_result = Scalar(-value_type(int_value))
+        B = Scalar(test_dim, value_type(int_value))
+        expected_result = Scalar(test_dim, -value_type(int_value))
         @test -B == expected_result
     end
 end
 
 @testset "-(B): B::Pseudoscalar" begin
     # Preparations
-    value = rand() + 1  # add 1 to avoid 0
-    value = rand() > 0.5 ? value : -value
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
     dim = 10
 
     # B::Pseudoscalar{<:AbstractFloat}
     for value_type in subtypes(AbstractFloat)
-        B = Pseudoscalar(dim, value_type(value))
-        expected_result = Pseudoscalar(dim, -value_type(value))
+        B = Pseudoscalar(dim, value_type(test_value))
+        expected_result = Pseudoscalar(dim, -value_type(test_value))
         @test -B == expected_result
     end
 
@@ -109,70 +111,74 @@ end
 
 @testset "reciprocal(B): B::Scalar" begin
     # Preparations
-    value = rand() + 1  # add 1 to avoid 0
-    value = rand() > 0.5 ? value : -value
+    test_dim = 10
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
 
     # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        converted_value = precision_type(value)
+        converted_value = precision_type(test_value)
 
         # value > 0
-        S = Scalar{precision_type}(converted_value)
-        @test reciprocal(S) == Scalar{precision_type}(1 / converted_value)
+        S = Scalar{precision_type}(test_dim, converted_value)
+        @test reciprocal(S) == Scalar{precision_type}(test_dim,
+                                                      1 / converted_value)
 
         # value < 0
         negative_value = -(abs(converted_value))
-        S = Scalar{precision_type}(negative_value)
-        @test reciprocal(S) == Scalar{precision_type}(1 / negative_value)
+        S = Scalar{precision_type}(test_dim, negative_value)
+        @test reciprocal(S) == Scalar{precision_type}(test_dim,
+                                                      1 / negative_value)
 
         # value = 0
-        S = zero(Scalar{precision_type})
-        @test reciprocal(S) == Scalar{precision_type}(Inf)
+        S = zero(S)
+        @test reciprocal(S) == Scalar{precision_type}(test_dim, Inf)
 
         # value == 1
-        S = one(Scalar{precision_type})
+        S = one(S)
         @test reciprocal(S) == S
 
         # value = Inf
-        S = Scalar{precision_type}(Inf)
-        @test reciprocal(S) == zero(Scalar{precision_type})
+        S = Scalar{precision_type}(test_dim, Inf)
+        @test reciprocal(S) == zero(S)
 
         # value = -Inf
-        S = Scalar{precision_type}(-Inf)
-        @test reciprocal(S) == zero(Scalar{precision_type})
+        S = Scalar{precision_type}(test_dim, -Inf)
+        @test reciprocal(S) == zero(S)
     end
 end
 
 @testset "reciprocal(B): B::Pseudoscalar" begin
     # Preparations
-    value = rand() + 1  # add 1 to avoid 0
-    value = rand() > 0.5 ? value : -value
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
 
     # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
         # mod(dim, 4) == 1
         dim = 5
-        B = Pseudoscalar(dim, value)
-        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(value))
+        B = Pseudoscalar(dim, test_value)
+        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(test_value))
         @test reciprocal(B) ≈ expected_reciprocal
 
         # mod(dim, 4) == 2
         dim = 6
-        B = Pseudoscalar(dim, value)
-        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(value))
+        B = Pseudoscalar(dim, test_value)
+        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(test_value))
         @test reciprocal(B) ≈ expected_reciprocal
 
         # mod(dim, 4) == 3
         dim = 7
-        B = Pseudoscalar(dim, value)
-        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(value))
+        B = Pseudoscalar(dim, test_value)
+        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(test_value))
         @test reciprocal(B) ≈ expected_reciprocal
 
         # mod(dim, 4) == 0
         dim = 8
-        B = Pseudoscalar(dim, value)
-        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(value))
+        B = Pseudoscalar(dim, test_value)
+        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(test_value))
         @test reciprocal(B) ≈ expected_reciprocal
     end
 end
