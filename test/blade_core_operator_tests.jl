@@ -437,32 +437,41 @@ end
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    test_dim = 20
-
     # --- B::Scalar
 
-    B = Scalar(test_dim, test_value)
+    for dim_B in 10:13
+        B = Scalar(dim_B, test_value)
 
-    dual_B = dual(B)
+        dual_B = dual(B)
 
-    expected_result = mod(dim(B), 4) < 2 ?
-        Pseudoscalar(test_dim, value(B)) : Pseudoscalar(test_dim, -value(B))
-    @test dual_B == expected_result
+        expected_result = mod(dim(B), 4) < 2 ?
+            Pseudoscalar(dim_B, value(B)) : Pseudoscalar(dim_B, -value(B))
+        @test dual_B == expected_result
+
+        # Verify dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+        if mod(dim(B), 4) < 2
+            @test dual(dual_B) ≈ B
+        else
+            @test dual(dual_B) ≈ -B
+        end
+    end
 
     # --- B::Pseudoscalar
 
-    B = Pseudoscalar(test_dim, test_value)
+    for dim_B in 24:27
+        B = Pseudoscalar(dim_B, test_value)
 
-    dual_B = dual(B)
+        dual_B = dual(B)
 
-    expected_result = Scalar(test_dim, value(B))
-    @test dual_B == expected_result
+        expected_result = Scalar(dim_B, value(B))
+        @test dual_B == expected_result
 
-    # Verify dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
-    if mod(dim(B), 4) < 2
-        @test_skip dual(dual_B) ≈ B
-    else
-        @test_skip dual(dual_B) ≈ -B
+        # Verify dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+        if mod(dim(B), 4) < 2
+            @test dual(dual_B) ≈ B
+        else
+            @test dual(dual_B) ≈ -B
+        end
     end
 
     # --- B::Blade
