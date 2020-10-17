@@ -22,6 +22,9 @@ using GeometricAlgebra
 # --- Special number function tests
 
 @testset "zero()" begin
+    # Preparations
+    test_dim = 50
+
     # zero(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
         B = zero(Blade{precision_type}([1 2 3]))
@@ -29,19 +32,48 @@ using GeometricAlgebra
         @test B.value == 0
         @test B.dim == 3
 
-        B = zero(Scalar{precision_type}(7, 5))
+        B = zero(Scalar{precision_type}(test_dim, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 0
-        @test B.dim == 7
+        @test B.dim == test_dim
 
-        B = zero(Pseudoscalar{precision_type}(10, 5))
+        B = zero(Pseudoscalar{precision_type}(test_dim, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 0
-        @test B.dim == 10
+        @test B.dim == test_dim
+    end
+
+    # zero(::Type{<:AbstractBlade{T}}, dim)
+    for precision_type in subtypes(AbstractFloat)
+        B = zero(Blade{precision_type}, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 0
+        @test B.dim == test_dim
+
+        B = zero(Scalar{precision_type}, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 0
+        @test B.dim == test_dim
+
+        B = zero(Pseudoscalar{precision_type}, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 0
+        @test B.dim == test_dim
+    end
+
+    # zero(::Type{<:AbstractFloat}, dim)
+    for precision_type in subtypes(AbstractFloat)
+        B = zero(precision_type, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 0
+        @test B.dim == test_dim
     end
 end
 
 @testset "one()" begin
+    # Preparations
+    test_dim = 50
+
     # one(B::AbstractBlade)
     for precision_type in subtypes(AbstractFloat)
         B = one(Blade{precision_type}([1 2 3]))
@@ -49,14 +81,40 @@ end
         @test B.value == 1
         @test B.dim == 3
 
-        B = one(Scalar{precision_type}(7, 5))
+        B = one(Scalar{precision_type}(test_dim, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 1
-        @test B.dim == 7
+        @test B.dim == test_dim
 
-        B = one(Pseudoscalar{precision_type}(100, 5))
+        B = one(Pseudoscalar{precision_type}(test_dim, 5))
         @test B isa Scalar{precision_type}
         @test B.value == 1
-        @test B.dim == 100
+        @test B.dim == test_dim
+    end
+
+    # one(::Type{<:AbstractBlade{T}}, dim)
+    for precision_type in subtypes(AbstractFloat)
+        B = one(Blade{precision_type}, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 1
+        @test B.dim == test_dim
+
+        B = one(Scalar{precision_type}, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 1
+        @test B.dim == test_dim
+
+        B = one(Pseudoscalar{precision_type}, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 1
+        @test B.dim == test_dim
+    end
+
+    # one(::Type{<:AbstractFloat}, dim)
+    for precision_type in subtypes(AbstractFloat)
+        B = one(precision_type, test_dim)
+        @test B isa Scalar{precision_type}
+        @test B.value == 1
+        @test B.dim == test_dim
     end
 end

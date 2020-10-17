@@ -593,18 +593,28 @@ import Base.zero, Base.one
 
 """
     zero(B::AbstractBlade)
+    zero(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat}
+    zero(::Type{T}, dim) where {T<:AbstractFloat}
 
 Return the additive identity 0 for a geometric algebra in `dim(B)` dimensions.
 """
 zero(B::AbstractBlade{T}) where {T<:AbstractFloat} = Scalar{T}(dim(B), 0)
+zero(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat} =
+    Scalar{T}(dim, 0)
+zero(::Type{T}, dim) where {T<:AbstractFloat} = Scalar{T}(dim, 0)
 
 """
     one(B::AbstractBlade)
+    one(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat}
+    one(::Type{T}, dim) where {T<:AbstractFloat}
 
 Return the multiplicative identity 1 for a geometric algebra in `dim(B)`
 dimensions.
 """
 one(B::AbstractBlade{T}) where {T<:AbstractFloat} = Scalar{T}(dim(B), 1)
+one(::Type{<:AbstractBlade{T}}, dim) where {T<:AbstractFloat} =
+    Scalar{T}(dim, 1)
+one(::Type{T}, dim) where {T<:AbstractFloat} = Scalar{T}(dim, 1)
 
 
 # --- Core AbstractBlade functions
