@@ -85,6 +85,20 @@ using GeometricAlgebra
         @test B.dim == 2
         @test B.value == test_volume
 
+        # invalid data fields: dim == 0
+        # enforce_constraints = true
+        @test_throws ErrorException Blade{precision_type}(0,
+                                                          test_grade,
+                                                          basis,
+                                                          test_volume)
+
+        # invalid data fields: dim < 0
+        # enforce_constraints = true
+        @test_throws ErrorException Blade{precision_type}(-5,
+                                                          test_grade,
+                                                          basis,
+                                                          test_volume)
+
         # invalid data fields: dim != size(basis, 1)
         # enforce_constraints = true
         @test_throws DimensionMismatch Blade{precision_type}(test_dim + 1,
@@ -105,6 +119,18 @@ using GeometricAlgebra
                                                           test_grade,
                                                           basis,
                                                           test_volume)
+
+        # invalid data fields: dim == 0
+        # enforce_constraints = false
+        B = Blade{precision_type}(0, test_grade, basis, test_volume,
+                                  enforce_constraints=false)
+        @test B.dim == 0
+
+        # invalid data fields: dim < 0
+        # enforce_constraints = false
+        B = Blade{precision_type}(-5, test_grade, basis, test_volume,
+                                  enforce_constraints=false)
+        @test B.dim == -5
 
         # invalid data fields
         # enforce_constraints = false

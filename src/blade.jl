@@ -184,6 +184,10 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         # --- Enforce constraints
 
         if enforce_constraints
+            if dim <= 0
+                error("`dim` must be positive")
+            end
+
             basis_size = size(basis)
 
             if dim != basis_size[1]
