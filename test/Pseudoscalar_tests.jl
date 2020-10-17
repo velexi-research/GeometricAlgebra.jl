@@ -174,7 +174,7 @@ end
 
 # --- Function tests
 
-@testset "AbstractBlade interface: S::Blade" begin
+@testset "AbstractBlade interface: S::Pseudoscalar" begin
     # Preparations
     test_dim = 10
 
