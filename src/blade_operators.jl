@@ -266,17 +266,19 @@ function project(B::Blade, C::Blade)
 end
 
 """
-    dual(B::AbstractBlade)
+    dual(B::Union{Blade, Pseudoscalar})
+    dual(B::Scalar, dim::Integer)
 
 Return the dual `B` (relative to the space that the geometric algebra is
-extended from).
+extended from). Note that when `B` is a Scalar, the dimension of the embedding
+space must be explicitly specified.
 """
-dual(B::Scalar) =
-    mod(dim(B), 4) < 2 ?
-        Pseudoscalar(dim(B), value(B)) :
-        Pseudoscalar(dim(B), -value(B))
+dual(B::Scalar, dim::Integer) =
+    mod(dim, 4) < 2 ?
+        Pseudoscalar(dim, value(B)) :
+        Pseudoscalar(dim, -value(B))
 
-dual(B::Pseudoscalar) = Scalar(dim(B), value(B))
+dual(B::Pseudoscalar) = Scalar(value(B))
 
 function dual(B::Blade)
     # --- Extend basis(B) to an orthonormal basis for entire space.
