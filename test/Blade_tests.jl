@@ -38,21 +38,26 @@ using GeometricAlgebra
     # --- Default constructor with constraint enforcement
     #
     # Blade{T}(dim::Int, grade::Int, basis::Matrix{T}, volume::Real;
-    #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    #          atol::Real=blade_atol(T), enforce_constraints::Bool=true,
+    #          copy_basis::Bool=true) where {T<:AbstractFloat}
+
+    # Preparations
+    test_dim = 3
+    test_grade = 2
+    test_volume = 5
 
     for precision_type in subtypes(AbstractFloat)
-        # Preparations
-        test_dim = 3
-        test_grade = 2
-        test_volume = 5
+        # --- Preparations
 
-        basis = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        normalized_basis = copy(basis)
+        test_basis = Matrix{precision_type}([3 -3; 4 -4; 0 1])
+        normalized_basis = copy(test_basis)
         for i in size(normalized_basis, 2)
-            normalized_basis[:, i] /= LinearAlgebra.norm(basis[:, i])
+            normalized_basis[:, i] /= LinearAlgebra.norm(normalized_basis[:, i])
         end
 
-        # valid data fields
+        # --- Valid data fields
+
+        # volume > atol
         # default values for atol, enforce_constraints, copy_basis
         B = Blade{precision_type}(test_dim, test_grade, normalized_basis,
                                   test_volume)
@@ -66,15 +71,15 @@ using GeometricAlgebra
         end
         @test B.volume == test_volume
 
-        # valid data fields, volume < atol
+        # volume < atol
         # default values for enforce_constraints, copy_basis
         B = Blade{precision_type}(test_dim, test_grade, normalized_basis,
                                   test_volume, atol=abs(test_volume) + 1)
         @test B == zero(Blade{precision_type})
 
-        # valid data fields, dim == grade
+        # dim == grade, det(basis) > 0
         # default values for atol, enforce_constraints, copy_basis
-        pseudoscalar_basis = Matrix{precision_type}([1 2; 3 4])
+        pseudoscalar_basis = Matrix{precision_type}([2 1; 4 3])
         for i in size(pseudoscalar_basis, 2)
             pseudoscalar_basis[:, i] /=
                 LinearAlgebra.norm(pseudoscalar_basis[:, i])
@@ -85,150 +90,404 @@ using GeometricAlgebra
         @test B.dim == 2
         @test B.value == test_volume
 
-        # invalid data fields: dim == 0
-        # enforce_constraints = true
-        @test_throws ErrorException Blade{precision_type}(0,
-                                                          test_grade,
-                                                          basis,
-                                                          test_volume)
+        # dim == grade, det(basis) < 0
+        # default values for atol, enforce_constraints, copy_basis
+        pseudoscalar_basis = Matrix{precision_type}([1 2; 3 4])
+        for i in size(pseudoscalar_basis, 2)
+            pseudoscalar_basis[:, i] /=
+                LinearAlgebra.norm(pseudoscalar_basis[:, i])
+        end
+        B = Blade{precision_type}(2, 2, pseudoscalar_basis, test_volume)
 
-        # invalid data fields: dim < 0
-        # enforce_constraints = true
-        @test_throws ErrorException Blade{precision_type}(-5,
-                                                          test_grade,
-                                                          basis,
-                                                          test_volume)
+        @test B isa Pseudoscalar{precision_type}
+        @test B.dim == 2
+        @test B.value == -test_volume
 
-        # invalid data fields: dim != size(basis, 1)
-        # enforce_constraints = true
-        @test_throws DimensionMismatch Blade{precision_type}(test_dim + 1,
-                                                             test_grade,
-                                                             basis,
-                                                             test_volume)
+        # dim == grade, det(basis) == 0
+        # default values for atol, enforce_constraints, copy_basis
+        pseudoscalar_basis = Matrix{precision_type}([1 4; 2 8])
+        for i in size(pseudoscalar_basis, 2)
+            pseudoscalar_basis[:, i] /=
+                LinearAlgebra.norm(pseudoscalar_basis[:, i])
+        end
+        B = Blade{precision_type}(2, 2, pseudoscalar_basis, test_volume)
+        @test B == zero(Blade{precision_type})
 
-        # invalid data fields: grade != size(basis, 2)
-        # enforce_constraints = true
-        @test_throws DimensionMismatch Blade{precision_type}(test_dim,
-                                                             test_grade + 1,
-                                                             basis,
-                                                             test_volume)
-
-        # invalid data fields: basis not normalized
-        # enforce_constraints = true
-        @test_throws ErrorException Blade{precision_type}(test_dim,
-                                                          test_grade,
-                                                          basis,
-                                                          test_volume)
-
-        # invalid data fields: dim == 0
-        # enforce_constraints = false
-        B = Blade{precision_type}(0, test_grade, basis, test_volume,
-                                  enforce_constraints=false)
-        @test B.dim == 0
-
-        # invalid data fields: dim < 0
-        # enforce_constraints = false
-        B = Blade{precision_type}(-5, test_grade, basis, test_volume,
-                                  enforce_constraints=false)
-        @test B.dim == -5
-
-        # invalid data fields
-        # enforce_constraints = false
-        B = Blade{precision_type}(test_dim + 1, test_grade + 1, basis,
-                                  test_volume, enforce_constraints=false)
-        @test B.dim == test_dim + 1
-        @test B.grade == test_grade + 1
-        @test B.basis == basis
-        @test B.basis !== basis
-
-        # valid data fields
         # copy_basis = false
         B = Blade{precision_type}(test_dim, test_grade, normalized_basis,
                                   test_volume, copy_basis=false)
 
         @test B.basis === normalized_basis
+
+        # --- Invalid data fields
+
+        # ------ enforce_constraints = true
+
+        # dim == 0
+        @test_throws ErrorException Blade{precision_type}(0,
+                                                          test_grade,
+                                                          test_basis,
+                                                          test_volume)
+
+        # dim < 0
+        @test_throws ErrorException Blade{precision_type}(-5,
+                                                          test_grade,
+                                                          test_basis,
+                                                          test_volume)
+
+        # dim != size(basis, 1)
+        @test_throws DimensionMismatch Blade{precision_type}(test_dim + 1,
+                                                             test_grade,
+                                                             test_basis,
+                                                             test_volume)
+
+        # grade != size(basis, 2)
+        @test_throws DimensionMismatch Blade{precision_type}(test_dim,
+                                                             test_grade + 1,
+                                                             test_basis,
+                                                             test_volume)
+
+        # basis not normalized
+        @test_throws ErrorException Blade{precision_type}(test_dim,
+                                                          test_grade,
+                                                          test_basis,
+                                                          test_volume)
+
+        # ------ enforce_constraints = false
+
+        # dim == 0
+        B = Blade{precision_type}(0, test_grade, test_basis, test_volume,
+                                  enforce_constraints=false)
+        @test B.dim == 0
+
+        # dim < 0
+        B = Blade{precision_type}(-5, test_grade, test_basis, test_volume,
+                                  enforce_constraints=false)
+        @test B.dim == -5
+
+        # dim != size(basis, 1)
+        # grade != size(basis, 2)
+        # basis not normalized
+        B = Blade{precision_type}(test_dim + 1, test_grade + 1, test_basis,
+                                  test_volume, enforce_constraints=false)
+        @test B.dim == test_dim + 1
+        @test B.grade == test_grade + 1
+        @test B.basis == test_basis
+        @test B.basis !== test_basis
     end
 
     # --- Basic constructor with multiple vectors
     #
-    # Blade{T}(vectors::Matrix{T};
+    # Blade{T}(vectors::Matrix{<:Real};
     #          volume::Union{Real, Nothing}=nothing,
     #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
+    # Preparations
+    vectors = Matrix([3 3; -4 -4; 0 1])
+
     for precision_type in subtypes(AbstractFloat)
+
+        # --- vectors::Matrix{<:AbstractFloat}
+
+        for value_type in subtypes(AbstractFloat)
+            # Preparations
+            converted_vectors = convert(Matrix{value_type}, vectors)
+
+            # number of vectors <= dimension of column space; volume == nothing
+            B = Blade{precision_type}(converted_vectors)
+            @test B.dim == 3
+            @test B.grade == 2
+            @test size(B.basis) == (3, 2)
+            for i in size(B.basis, 2)
+                @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+            end
+            @test B.volume ≈ 5
+
+            # number of vectors <= dimension of column space; volume != nothing
+            B = Blade{precision_type}(converted_vectors, volume=test_volume)
+            @test B.dim == 3
+            @test B.grade == 2
+            @test size(B.basis) == (3, 2)
+            for i in size(B.basis, 2)
+                @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+            end
+
+            F = LinearAlgebra.qr(converted_vectors)
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            @test B.volume == sign(signed_norm) * precision_type(test_volume)
+
+            # number of vectors <= dimension of column space;
+            # volume < default atol
+            B = Blade{precision_type}(converted_vectors,
+                                      volume=blade_atol(precision_type) / 2)
+            @test B == zero(Blade{precision_type})
+
+            # norm(blade) < atol
+            B = Blade{precision_type}(converted_vectors, atol=6)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors > dimension of column space
+            special_case_vectors = Matrix{value_type}([1 2 3; 4 5 6])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # vectors are linearly dependent; volume == nothing
+            special_case_vectors = Matrix{value_type}([1 2 1; 1 2 4; 1 2 9])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # vectors are linearly dependent; volume != nothing
+            special_case_vectors = Matrix{value_type}([1 2 1; 1 2 4; 1 2 9])
+            B = Blade{precision_type}(special_case_vectors, volume=test_volume)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors == dimension of column space; volume == nothing
+            # det(vectors) > 0
+            special_case_vectors = Matrix{value_type}([3 5; 4 12])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            @test B.value ≈ LinearAlgebra.det(special_case_vectors)
+
+            # number of vectors == dimension of column space; volume == nothing
+            # det(vectors) < 0
+            special_case_vectors = Matrix{value_type}([5 3; 12 4])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            @test B.value ≈ LinearAlgebra.det(special_case_vectors)
+
+            # number of vectors == dimension of column space; volume == nothing
+            # det(vectors) == 0
+            special_case_vectors = Matrix{value_type}([5 1; 5 1])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors == dimension of column space; volume != nothing
+            special_case_vectors = Matrix{value_type}([3 5; 4 12])
+            B = Blade{precision_type}(special_case_vectors, volume=test_volume)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            sign_basis = sign(LinearAlgebra.det(convert(Matrix{precision_type},
+                                                        special_case_vectors)))
+            @test B.value ≈ sign_basis * precision_type(test_volume)
+        end
+
+        # --- vectors::Matrix{<:Integer}
+
+        # subtypes(Signed)
+        for value_type in subtypes(Signed)
+            # Preparations
+            converted_vectors = convert(Matrix{value_type}, vectors)
+
+            # number of vectors <= dimension of column space; volume == nothing
+            B = Blade{precision_type}(converted_vectors)
+            @test B.dim == 3
+            @test B.grade == 2
+            @test size(B.basis) == (3, 2)
+            for i in size(B.basis, 2)
+                @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+            end
+            @test B.volume ≈ 5
+
+            # number of vectors <= dimension of column space; volume != nothing
+            B = Blade{precision_type}(converted_vectors, volume=test_volume)
+            @test B.dim == 3
+            @test B.grade == 2
+            @test size(B.basis) == (3, 2)
+            for i in size(B.basis, 2)
+                @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+            end
+
+            F = LinearAlgebra.qr(converted_vectors)
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            @test B.volume == sign(signed_norm) * precision_type(test_volume)
+
+            # number of vectors <= dimension of column space;
+            # volume < default atol
+            B = Blade{precision_type}(converted_vectors,
+                                      volume=blade_atol(precision_type) / 2)
+            @test B == zero(Blade{precision_type})
+
+            # norm(blade) < atol
+            B = Blade{precision_type}(converted_vectors, atol=6)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors > dimension of column space
+            special_case_vectors = Matrix{value_type}([1 2 3; 4 5 6])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # vectors are linearly dependent; volume == nothing
+            special_case_vectors = Matrix{value_type}([1 2 1; 1 2 4; 1 2 9])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # vectors are linearly dependent; volume != nothing
+            special_case_vectors = Matrix{value_type}([1 2 1; 1 2 4; 1 2 9])
+            B = Blade{precision_type}(special_case_vectors, volume=test_volume)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors == dimension of column space; volume == nothing
+            special_case_vectors = Matrix{value_type}([3 5; 4 12])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            @test B.value ≈ LinearAlgebra.det(special_case_vectors)
+
+            # number of vectors == dimension of column space; volume != nothing
+            special_case_vectors = Matrix{value_type}([3 5; 4 12])
+            B = Blade{precision_type}(special_case_vectors, volume=test_volume)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            sign_basis = sign(LinearAlgebra.det(convert(Matrix{precision_type},
+                                                        special_case_vectors)))
+            @test B.value ≈ sign_basis * precision_type(test_volume)
+        end
+
+        # subtypes(Unsigned)
+        for value_type in subtypes(Unsigned)
+            # Preparations
+            converted_vectors = convert(Matrix{value_type}, abs.(vectors))
+
+            # number of vectors <= dimension of column space; volume == nothing
+            B = Blade{precision_type}(converted_vectors)
+            @test B.dim == 3
+            @test B.grade == 2
+            @test size(B.basis) == (3, 2)
+            for i in size(B.basis, 2)
+                @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+            end
+            @test B.volume ≈ 5
+
+            # number of vectors <= dimension of column space; volume != nothing
+            B = Blade{precision_type}(converted_vectors, volume=test_volume)
+            @test B.dim == 3
+            @test B.grade == 2
+            @test size(B.basis) == (3, 2)
+            for i in size(B.basis, 2)
+                @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
+            end
+
+            F = LinearAlgebra.qr(converted_vectors)
+            signed_norm = prod(LinearAlgebra.diag(F.R))
+            @test B.volume == sign(signed_norm) * precision_type(test_volume)
+
+            # number of vectors <= dimension of column space;
+            # volume < default atol
+            B = Blade{precision_type}(converted_vectors,
+                                      volume=blade_atol(precision_type) / 2)
+            @test B == zero(Blade{precision_type})
+
+            # norm(blade) < atol
+            B = Blade{precision_type}(converted_vectors, atol=6)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors > dimension of column space
+            special_case_vectors = Matrix{value_type}([1 2 3; 4 5 6])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # vectors are linearly dependent; volume == nothing
+            special_case_vectors = Matrix{value_type}([1 2 1; 1 2 4; 1 2 9])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B == zero(Blade{precision_type})
+
+            # vectors are linearly dependent; volume != nothing
+            special_case_vectors = Matrix{value_type}([1 2 1; 1 2 4; 1 2 9])
+            B = Blade{precision_type}(special_case_vectors, volume=test_volume)
+            @test B == zero(Blade{precision_type})
+
+            # number of vectors == dimension of column space; volume == nothing
+            special_case_vectors = Matrix{value_type}([3 5; 4 12])
+            B = Blade{precision_type}(special_case_vectors)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            @test B.value ≈ LinearAlgebra.det(special_case_vectors)
+
+            # number of vectors == dimension of column space; volume != nothing
+            special_case_vectors = Matrix{value_type}([3 5; 4 12])
+            B = Blade{precision_type}(special_case_vectors, volume=test_volume)
+            @test B isa Pseudoscalar{precision_type}
+            @test B.dim == 2
+            sign_basis = sign(LinearAlgebra.det(convert(Matrix{precision_type},
+                                                        special_case_vectors)))
+            @test B.value ≈ sign_basis * precision_type(test_volume)
+        end
+
+        # --- Bool
+
+        # Preparations
+        converted_vectors = Matrix{Bool}(vectors .!= 0)
+        F = LinearAlgebra.qr(convert(Matrix{precision_type}, converted_vectors))
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+
+        # norm(blade) > default atol; volume == nothing
         # number of vectors <= dimension of column space; volume == nothing
-        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type}(vectors)
+        B = Blade{precision_type}(converted_vectors)
         @test B.dim == 3
         @test B.grade == 2
         @test size(B.basis) == (3, 2)
         for i in size(B.basis, 2)
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
-        @test B.volume ≈ 5
+        @test B.volume ≈ precision_type(signed_norm)
 
         # number of vectors <= dimension of column space; volume != nothing
-        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type}(vectors, volume=test_volume)
+        B = Blade{precision_type}(converted_vectors, volume=test_volume)
         @test B.dim == 3
         @test B.grade == 2
         @test size(B.basis) == (3, 2)
         for i in size(B.basis, 2)
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
+        @test B.volume ≈ sign(signed_norm) * precision_type(test_volume)
 
-        F = LinearAlgebra.qr(vectors)
-        signed_norm = prod(LinearAlgebra.diag(F.R))
-        @test B.volume == sign(signed_norm) * precision_type(test_volume)
-
-        # number of vectors <= dimension of column space; volume < default atol
-        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type}(vectors,
+        # number of vectors <= dimension of column space;
+        # volume < default atol
+        B = Blade{precision_type}(converted_vectors,
                                   volume=blade_atol(precision_type) / 2)
         @test B == zero(Blade{precision_type})
 
+        # norm(blade) < atol
+        B = Blade{precision_type}(converted_vectors, atol=6)
+        @test B == zero(Blade{precision_type})
+
         # number of vectors > dimension of column space
-        vectors = Matrix{precision_type}([1 2 3; 4 5 6])
-        B = Blade{precision_type}(vectors)
+        special_case_vectors = Matrix{Bool}([1 0 0; 0 1 1])
+        B = Blade{precision_type}(special_case_vectors)
         @test B == zero(Blade{precision_type})
 
         # vectors are linearly dependent; volume == nothing
-        vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
-        B = Blade{precision_type}(vectors)
+        special_case_vectors = Matrix{Bool}([1 0 1; 0 1 1; 1 0 1])
+        B = Blade{precision_type}(special_case_vectors)
         @test B == zero(Blade{precision_type})
 
         # vectors are linearly dependent; volume != nothing
-        vectors = Matrix{precision_type}([1 2 1; 1 2 4; 1 2 9])
-        B = Blade{precision_type}(vectors, volume=test_volume)
-        @test B == zero(Blade{precision_type})
-
-        # norm(blade) < atol
-        vectors = Matrix{precision_type}([3 3; 4 4; 0 1])
-        B = Blade{precision_type}(vectors, atol=6)
+        special_case_vectors = Matrix{Bool}([1 0 1; 0 1 1; 1 0 1])
+        B = Blade{precision_type}(special_case_vectors, volume=test_volume)
         @test B == zero(Blade{precision_type})
 
         # number of vectors == dimension of column space; volume == nothing
-        vectors = Matrix{precision_type}([3 5; 4 12])
-        B = Blade{precision_type}(vectors)
+        special_case_vectors = Matrix{Bool}([1 1; 0 1])
+        B = Blade{precision_type}(special_case_vectors)
         @test B isa Pseudoscalar{precision_type}
         @test B.dim == 2
-        F = LinearAlgebra.qr(vectors)
-        signed_norm = prod(LinearAlgebra.diag(F.R))
-        @test B.value ≈ signed_norm
+        @test B.value ≈ LinearAlgebra.det(special_case_vectors)
 
         # number of vectors == dimension of column space; volume != nothing
-        vectors = Matrix{precision_type}([3 5; 4 12])
-        B = Blade{precision_type}(vectors, volume=test_volume)
+        special_case_vectors = Matrix{Bool}([1 1; 0 1])
+        B = Blade{precision_type}(special_case_vectors, volume=test_volume)
         @test B isa Pseudoscalar{precision_type}
         @test B.dim == 2
-        F = LinearAlgebra.qr(vectors)
-        signed_norm = prod(LinearAlgebra.diag(F.R))
-        @test B.value ≈ sign(signed_norm) * precision_type(test_volume)
+        sign_basis = sign(LinearAlgebra.det(convert(Matrix{precision_type},
+                                                    special_case_vectors)))
+        @test B.value ≈ sign_basis * precision_type(test_volume)
     end
 
     # --- Basic constructor with a single vector
     #
-    # Blade{T}(vector::Vector{T};
+    # Blade{T}(vector::Vector{<:Real};
     #          volume::Union{Real, Nothing}=nothing,
     #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
@@ -236,152 +495,303 @@ using GeometricAlgebra
         # Preparations
         vector = [3, 4, 12]
 
+        # --- vector::Vector{<:AbstractFloat}
+
+        for value_type in subtypes(AbstractFloat)
+            # Preparations
+            converted_vector = convert(Vector{value_type}, vector)
+
+            # vector is a column vector; volume == nothing
+            B = Blade{precision_type}(converted_vector)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ reshape(converted_vector / 13,
+                                    length(converted_vector), 1)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ 13
+
+            # vector is a column vector; volume != nothing
+            B = Blade{precision_type}(converted_vector, volume=test_volume)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ reshape(converted_vector / 13,
+                                    length(converted_vector), 1)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ test_volume
+
+            # vector is a column vector; volume < default atol
+            B = Blade{precision_type}(converted_vector,
+                                      volume=blade_atol(precision_type) / 2)
+            @test B == zero(Blade{precision_type})
+
+            # vector is a row vector
+            row_vector = reshape(converted_vector, 1, length(converted_vector))
+            B = Blade{precision_type}(row_vector)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ permutedims(row_vector / 13)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ 13
+
+            # vector is a zero vector; volume == nothing
+            zero_vector = Array{value_type}([0., 0., 0.])
+            B = Blade{precision_type}(zero_vector)
+            @test B == zero(Blade{precision_type})
+
+            # vector is a zero vector; volume != nothing
+            zero_vector = Array{value_type}([0., 0., 0.])
+            B = Blade{precision_type}(zero_vector, volume=test_volume)
+            @test B == zero(Blade{precision_type})
+
+            # norm(vector) < default atol
+            small_vector = Vector{value_type}(converted_vector)
+            small_vector /= LinearAlgebra.norm(small_vector)
+            small_vector *= blade_atol(precision_type) / 2
+            B = Blade{precision_type}(small_vector)
+            @test B == zero(Blade{precision_type})
+
+            # norm(vector) < atol
+            B = Blade{precision_type}(
+                converted_vector,
+                atol=LinearAlgebra.norm(converted_vector) + 1)
+            @test B == zero(Blade{precision_type})
+        end
+
+        # --- vector::Vector{<:Integer}
+
+        # subtypes(Signed)
+        for value_type in subtypes(Signed)
+            # Preparations
+            converted_vector = convert(Vector{value_type}, vector)
+
+            # vector is a column vector; volume == nothing
+            B = Blade{precision_type}(converted_vector)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ reshape(converted_vector / 13,
+                                    length(converted_vector), 1)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ 13
+
+            # vector is a column vector; volume != nothing
+            B = Blade{precision_type}(converted_vector, volume=test_volume)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ reshape(converted_vector / 13,
+                                    length(converted_vector), 1)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ test_volume
+
+            # vector is a column vector; volume < default atol
+            B = Blade{precision_type}(converted_vector,
+                                      volume=blade_atol(precision_type) / 2)
+            @test B == zero(Blade{precision_type})
+
+            # vector is a row vector
+            row_vector = reshape(converted_vector, 1, length(converted_vector))
+            B = Blade{precision_type}(row_vector)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ permutedims(row_vector / 13)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ 13
+
+            # vector is a zero vector; volume == nothing
+            zero_vector = Array{value_type}([0, 0, 0])
+            B = Blade{precision_type}(zero_vector)
+            @test B == zero(Blade{precision_type})
+
+            # vector is a zero vector; volume != nothing
+            zero_vector = Array{value_type}([0, 0, 0])
+            B = Blade{precision_type}(zero_vector, volume=test_volume)
+            @test B == zero(Blade{precision_type})
+
+            # norm(vector) < default atol
+            small_vector = Vector{value_type}(converted_vector)
+            small_vector /= LinearAlgebra.norm(small_vector)
+            small_vector *= blade_atol(precision_type) / 2
+            B = Blade{precision_type}(small_vector)
+            @test B == zero(Blade{precision_type})
+
+            # norm(vector) < atol
+            B = Blade{precision_type}(
+                converted_vector,
+                atol=LinearAlgebra.norm(converted_vector) + 1)
+            @test B == zero(Blade{precision_type})
+        end
+
+        # subtypes(Unsigned)
+        for value_type in subtypes(Unsigned)
+            # Preparations
+            converted_vector = convert(Vector{value_type}, abs.(vector))
+
+            # vector is a column vector; volume == nothing
+            B = Blade{precision_type}(converted_vector)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ reshape(converted_vector / 13,
+                                    length(converted_vector), 1)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ 13
+
+            # vector is a column vector; volume != nothing
+            B = Blade{precision_type}(converted_vector, volume=test_volume)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ reshape(converted_vector / 13,
+                                    length(converted_vector), 1)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ test_volume
+
+            # vector is a column vector; volume < default atol
+            B = Blade{precision_type}(converted_vector,
+                                      volume=blade_atol(precision_type) / 2)
+            @test B == zero(Blade{precision_type})
+
+            # vector is a row vector
+            row_vector = reshape(converted_vector, 1, length(converted_vector))
+            B = Blade{precision_type}(row_vector)
+            @test B.dim == 3
+            @test B.grade == 1
+            @test B.basis ≈ permutedims(row_vector / 13)
+            @test LinearAlgebra.norm(B.basis) ≈ 1
+            @test B.volume ≈ 13
+
+            # vector is a zero vector; volume == nothing
+            zero_vector = Array{value_type}([0, 0, 0])
+            B = Blade{precision_type}(zero_vector)
+            @test B == zero(Blade{precision_type})
+
+            # vector is a zero vector; volume != nothing
+            zero_vector = Array{value_type}([0, 0, 0])
+            B = Blade{precision_type}(zero_vector, volume=test_volume)
+            @test B == zero(Blade{precision_type})
+
+            # norm(vector) < default atol
+            small_vector = Vector{value_type}(converted_vector)
+            small_vector /= LinearAlgebra.norm(small_vector)
+            small_vector *= blade_atol(precision_type) / 2
+            B = Blade{precision_type}(small_vector)
+            @test B == zero(Blade{precision_type})
+
+            # norm(vector) < atol
+            B = Blade{precision_type}(
+                converted_vector,
+                atol=LinearAlgebra.norm(converted_vector) + 1)
+            @test B == zero(Blade{precision_type})
+        end
+
+        # --- Bool
+
+        # Preparations
+        converted_vector = Vector{Bool}(vector .!= 0)
+        norm_converted_vector = LinearAlgebra.norm(converted_vector)
+
         # vector is a column vector; volume == nothing
-        col_vector = Vector{precision_type}(vector)
-        B = Blade{precision_type}(col_vector)
+        B = Blade{precision_type}(converted_vector)
         @test B.dim == 3
         @test B.grade == 1
-        @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
+        @test B.basis ≈ reshape(converted_vector / norm_converted_vector,
+                                length(converted_vector), 1)
         @test LinearAlgebra.norm(B.basis) ≈ 1
-        @test B.volume ≈ 13
+        @test B.volume ≈ norm_converted_vector
 
         # vector is a column vector; volume != nothing
-        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type}(col_vector, volume=test_volume)
+        B = Blade{precision_type}(converted_vector, volume=test_volume)
         @test B.dim == 3
         @test B.grade == 1
-        @test B.basis ≈ reshape(col_vector / 13, length(vector), 1)
+        @test B.basis ≈ reshape(converted_vector / norm_converted_vector,
+                                length(converted_vector), 1)
         @test LinearAlgebra.norm(B.basis) ≈ 1
-
-        F = LinearAlgebra.qr(vectors)
-        signed_norm = prod(LinearAlgebra.diag(F.R))
-        @test B.volume == sign(signed_norm) * precision_type(test_volume)
+        @test B.volume ≈ test_volume
 
         # vector is a column vector; volume < default atol
-        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type}(col_vector,
+        B = Blade{precision_type}(converted_vector,
                                   volume=blade_atol(precision_type) / 2)
         @test B == zero(Blade{precision_type})
 
         # vector is a row vector
-        row_vector = reshape(Array{precision_type}(vector), 1, length(vector))
+        row_vector = reshape(converted_vector, 1, length(converted_vector))
         B = Blade{precision_type}(row_vector)
         @test B.dim == 3
         @test B.grade == 1
-        @test B.basis ≈ permutedims(row_vector / 13)
+        @test B.basis ≈ permutedims(row_vector / norm_converted_vector)
         @test LinearAlgebra.norm(B.basis) ≈ 1
-        @test B.volume ≈ 13
+        @test B.volume ≈ norm_converted_vector
 
         # vector is a zero vector; volume == nothing
-        zero_vector = Array{precision_type}([0., 0., 0.])
-        B = Blade(zero_vector)
+        zero_vector = Array{Bool}([0, 0, 0])
+        B = Blade{precision_type}(zero_vector)
         @test B == zero(Blade{precision_type})
 
         # vector is a zero vector; volume != nothing
-        zero_vector = Array{precision_type}([0., 0., 0.])
-        B = Blade(zero_vector, volume=test_volume)
-        @test B == zero(Blade{precision_type})
-
-        # norm(vector) < default atol
-        small_vector = Vector{precision_type}(vector)
-        small_vector /= LinearAlgebra.norm(small_vector)
-        small_vector *= blade_atol(precision_type) / 2
-        B = Blade{precision_type}(small_vector)
+        zero_vector = Array{Bool}([0, 0, 0])
+        B = Blade{precision_type}(zero_vector, volume=test_volume)
         @test B == zero(Blade{precision_type})
 
         # norm(vector) < atol
-        col_vector = Vector{precision_type}(vector)
-        B = Blade{precision_type}(col_vector,
-                                  atol=LinearAlgebra.norm(col_vector) + 1)
+        B = Blade{precision_type}(converted_vector,
+                                  atol=norm_converted_vector + 1)
         @test B == zero(Blade{precision_type})
     end
 
     # --- Copy constructor
     #
-    # Blade{T}(B::Blade{T};
+    # Blade{T}(B::Blade{<:AbstractFloat};
     #          volume::Real=volume(B),
+    #          atol::Real=blade_atol(T),
     #          copy_basis::Bool=false) where {T<:AbstractFloat}
 
-    for precision_type in subtypes(AbstractFloat)
+    for precision_type_src in subtypes(AbstractFloat)
         # Preparations
-        vectors = Matrix{precision_type}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type}(vectors)
+        vectors = Matrix{precision_type_src}([3 -3; 4 -4; 0 1])
+        B = Blade{precision_type_src}(vectors)
 
-        # Construct a Blade representing the same blade as `B`
-        B_copy = Blade{precision_type}(B)
-        @test B_copy.dim == B.dim
-        @test B_copy.grade == B.grade
-        @test B_copy.basis === B.basis
-        @test B_copy.volume == B.volume
+        for precision_type_converted in subtypes(AbstractFloat)
 
-        # Construct a Blade representing the same space as `B` with specified
-        # volume
-        B_copy = Blade{precision_type}(B, volume=test_volume)
-        @test B_copy.dim == B.dim
-        @test B_copy.grade == B.grade
-        @test B_copy.basis === B.basis
-        @test B_copy.volume == precision_type(test_volume)
+            # Construct a Blade representing the same blade as `B`
+            B_copy = Blade{precision_type_converted}(B)
+            @test B_copy.dim == B.dim
+            @test B_copy.grade == B.grade
 
-        # Construct a Blade representing the same blade as `B` containing
-        # a copy of the basis (instead of a reference).
-        B_copy = Blade{precision_type}(B, copy_basis=true)
-        @test B_copy.dim == B.dim
-        @test B_copy.grade == B.grade
-        @test B_copy.basis == B.basis
-        @test B_copy.basis !== B.basis
-        @test B_copy.volume == B.volume
-    end
-
-    # --- Type conversion constructor
-    #
-    #   Blade{T}(B::Blade{S};
-    #            volume::Real=volume(B),
-    #            copy_basis::Bool=false) where {T<:AbstractFloat,
-    #                                           S<:AbstractFloat}
-
-    for precision_type_converted in subtypes(AbstractFloat)
-        for precision_type_src in subtypes(AbstractFloat)
-            # Preparations
-            vectors = Matrix{precision_type_src}([3 -3; 4 -4; 0 1])
-            B = Blade{precision_type_src}(vectors)
-
-            # Convert precision of `B`
-            B_converted = Blade{precision_type_converted}(B)
-            @test B_converted.dim == B.dim
-            @test B_converted.grade == B.grade
-            if precision_type_converted == precision_type_src
-                @test B_converted.basis === B.basis
+            if precision_type_src == precision_type_converted
+                @test B_copy.basis === B.basis
             else
-                @test B_converted.basis ≈ B.basis
-                @test B_converted.basis !== B.basis
+                @test B_copy.basis ≈ B.basis
+                @test B_copy.basis !== B.basis
             end
-            @test B_converted.volume == B.volume
 
-            # Convert precision of `B` with new `volume`
-            B_converted = Blade{precision_type_converted}(B, volume=test_volume)
-            @test B_converted.dim == B.dim
-            @test B_converted.grade == B.grade
-            if precision_type_converted == precision_type_src
-                @test B_converted.basis === B.basis
-            else
-                @test B_converted.basis ≈ B.basis
-                @test B_converted.basis !== B.basis
-            end
-            @test B_converted.volume ≈ test_volume
+            @test B_copy.volume ≈ B.volume
 
-            # Convert precision of `B` using a copy of the basis (instead of
-            # a reference).
-            B_converted = Blade{precision_type_converted}(B, copy_basis=true)
-            @test B_converted.dim == B.dim
-            @test B_converted.grade == B.grade
-            if precision_type_converted == precision_type_src
-                @test B_converted.basis == B.basis
-                @test B_converted.basis !== B.basis
+            # Construct a Blade representing the same space as `B` with
+            # specified volume
+            B_copy = Blade{precision_type_converted}(B, volume=test_volume)
+            @test B_copy.dim == B.dim
+            @test B_copy.grade == B.grade
+
+            if precision_type_src == precision_type_converted
+                @test B_copy.basis === B.basis
             else
-                @test B_converted.basis ≈ B.basis
-                @test B_converted.basis !== B.basis
+                @test B_copy.basis ≈ B.basis
+                @test B_copy.basis !== B.basis
             end
-            @test B_converted.volume == B.volume
+
+            @test B_copy.volume == precision_type_converted(test_volume)
+
+            # Construct a Blade representing the same blade as `B` containing
+            # a copy of the basis (instead of a reference).
+            B_copy = Blade{precision_type_converted}(B, copy_basis=true)
+            @test B_copy.dim == B.dim
+            @test B_copy.grade == B.grade
+
+            if precision_type_src == precision_type_converted
+                @test B_copy.basis == B.basis
+            else
+                @test B_copy.basis ≈ B.basis
+            end
+            @test B_copy.basis !== B.basis
+
+            @test B_copy.volume == B.volume
         end
     end
 end
@@ -407,15 +817,14 @@ end
     test_volume = rand() > 0.5 ? test_volume : -test_volume
 
     # --- Blade(vectors::Array{T};
-    #           volume::Union{Real, Nothing}=nothing, atol::Real=blade_atol(T))
+    #           volume::Union{Real, Nothing}=nothing,
     #           atol::Real=blade_atol(T)) where {T<:AbstractFloat}
-    #         where {T<:AbstractFloat}
 
     for precision_type in subtypes(AbstractFloat)
         # --- vectors isa Matrix
 
         # Preparations
-        converted_vectors = Matrix{precision_type}(vectors)
+        converted_vectors = convert(Matrix{precision_type}, vectors)
 
         # norm(blade) > default atol; volume == nothing
         B = Blade(converted_vectors)
@@ -441,7 +850,7 @@ end
         # --- vectors isa Vector
 
         # Preparations
-        converted_one_vector = Vector{precision_type}(one_vector)
+        converted_one_vector = convert(Vector{precision_type}, one_vector)
 
         # norm(blade) > default atol; volume == nothing
         B = Blade(converted_one_vector)
@@ -463,73 +872,15 @@ end
 
         # --- number of vectors == dimension of column space
 
+        # vectors are linearly independent
         converted_vectors = Matrix{precision_type}(pseudoscalar_vectors)
-        B = Blade{precision_type}(converted_vectors)
+        B = Blade(converted_vectors)
         @test B isa Pseudoscalar{precision_type}
-    end
 
-    # --- Blade{T}(vectors::Array{<:AbstractFloat};
-    #              volume::Union{Real, Nothing}=nothing,
-    #              atol::Real=blade_atol(T))
-    #         where {T<:AbstractFloat}
-
-    for precision_type in subtypes(AbstractFloat)
-        for vectors_type in subtypes(AbstractFloat)
-            # --- vectors isa Matrix
-
-            # Preparations
-            converted_vectors = Matrix{vectors_type}(vectors)
-
-            # norm(blade) > default atol; volume == nothing
-            B = Blade{precision_type}(converted_vectors)
-            @test B isa Blade{precision_type}
-
-            # norm(blade) > default atol; volume != nothing
-            B = Blade{precision_type}(converted_vectors, volume=test_volume)
-            @test B isa Blade{precision_type}
-
-            F = LinearAlgebra.qr(converted_vectors)
-            signed_norm = prod(LinearAlgebra.diag(F.R))
-            @test volume(B) == sign(signed_norm) * precision_type(test_volume)
-
-            # norm(blade) < default atol
-            small_blade = blade_atol(precision_type) * converted_vectors / 6
-            B = Blade{precision_type}(small_blade)
-            @test B == zero(Blade{precision_type})
-
-            # norm(blade) < atol
-            B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B == zero(Blade{precision_type})
-
-            # --- vectors isa Vector
-
-            # Preparations
-            converted_one_vector = Vector{precision_type}(one_vector)
-
-            # norm(blade) > default atol; volume == nothing
-            B = Blade{precision_type}(converted_one_vector)
-            @test B isa Blade{precision_type}
-
-            # norm(blade) > default atol; volume != nothing
-            B = Blade{precision_type}(converted_one_vector, volume=test_volume)
-            @test B isa Blade{precision_type}
-            @test volume(B) == precision_type(test_volume)
-
-            # norm(blade) < default atol
-            small_blade = blade_atol(precision_type) * converted_one_vector / 6
-            B = Blade{precision_type}(small_blade)
-            @test B == zero(Blade{precision_type})
-
-            # norm(blade) < atol
-            B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B == zero(Blade{precision_type})
-
-            # --- number of vectors == dimension of column space
-
-            converted_vectors = Matrix{vectors_type}(pseudoscalar_vectors)
-            B = Blade{precision_type}(converted_vectors)
-            @test B isa Pseudoscalar{precision_type}
-        end
+        # vectors are linearly dependent
+        converted_vectors = Matrix{precision_type}([2 3 5; 4 6 10; 1 1 2])
+        B = Blade(converted_vectors)
+        @test B == zero(Blade{precision_type})
     end
 
     # --- Blade(vectors::Array{<:Integer};
@@ -541,7 +892,7 @@ end
         # --- vectors isa Matrix
 
         # Preparations
-        converted_vectors = Matrix{vectors_type}(vectors)
+        converted_vectors = convert(Matrix{vectors_type}, vectors)
 
         # norm(blade) > default atol; volume == nothing
         B = Blade(converted_vectors)
@@ -550,7 +901,10 @@ end
         # norm(blade) > default atol; volume != nothing
         B = Blade(converted_vectors, volume=test_volume)
         @test B isa Blade{Float64}
-        @test volume(B) == Float64(test_volume)
+
+        F = LinearAlgebra.qr(converted_vectors)
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+        @test volume(B) == sign(signed_norm) * Float64(test_volume)
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
@@ -559,7 +913,7 @@ end
         # --- vectors isa Vector
 
         # Preparations
-        converted_one_vector = Vector{vectors_type}(one_vector)
+        converted_one_vector = convert(Vector{vectors_type}, one_vector)
 
         # norm(blade) > default atol; volume == nothing
         B = Blade(converted_one_vector)
@@ -576,9 +930,15 @@ end
 
         # --- number of vectors == dimension of column space
 
-        converted_vectors = Matrix{vectors_type}(pseudoscalar_vectors)
+        # vectors are linearly independent
+        converted_vectors = Matrix{Float64}(pseudoscalar_vectors)
         B = Blade(converted_vectors)
         @test B isa Pseudoscalar{Float64}
+
+        # vectors are linearly dependent
+        converted_vectors = Matrix{Float64}([2 3 5; 4 6 10; 1 1 2])
+        B = Blade(converted_vectors)
+        @test B == zero(Blade{Float64})
     end
 
     # subtypes(Unsigned)
@@ -586,7 +946,7 @@ end
         # --- vectors isa Matrix
 
         # Preparations
-        converted_vectors = Matrix{vectors_type}(abs.(vectors))
+        converted_vectors = convert(Matrix{vectors_type}, abs.(vectors))
 
         # norm(blade) > default atol; volume == nothing
         B = Blade(converted_vectors)
@@ -595,7 +955,10 @@ end
         # norm(blade) > default atol; volume != nothing
         B = Blade(converted_vectors, volume=test_volume)
         @test B isa Blade{Float64}
-        @test volume(B) == Float64(test_volume)
+
+        F = LinearAlgebra.qr(converted_vectors)
+        signed_norm = prod(LinearAlgebra.diag(F.R))
+        @test volume(B) == sign(signed_norm) * Float64(test_volume)
 
         # norm(blade) < atol
         B = Blade(converted_vectors, atol=6)
@@ -604,7 +967,7 @@ end
         # --- vectors isa Vector
 
         # Preparations
-        converted_one_vector = Vector{vectors_type}(abs.(one_vector))
+        converted_one_vector = convert(Vector{vectors_type}, one_vector)
 
         # norm(blade) > default atol; volume == nothing
         B = Blade(converted_one_vector)
@@ -621,187 +984,64 @@ end
 
         # --- number of vectors == dimension of column space
 
-        converted_vectors = Matrix{vectors_type}(pseudoscalar_vectors)
+        # vectors are linearly independent
+        converted_vectors = Matrix{Float64}(pseudoscalar_vectors)
         B = Blade(converted_vectors)
         @test B isa Pseudoscalar{Float64}
+
+        # vectors are linearly dependent
+        converted_vectors = Matrix{Float64}([2 3 5; 4 6 10; 1 1 2])
+        B = Blade(converted_vectors)
+        @test B == zero(Blade{Float64})
     end
 
     # --- Bool
 
-    # ------ vectors isa Matrix
+    # --- vectors isa Matrix
+
+    # Preparations
+    converted_vectors = Matrix{Bool}(vectors .!= 0)
 
     # norm(blade) > default atol; volume == nothing
-    converted_vectors = Matrix{Bool}(vectors .!= 0)
     B = Blade(converted_vectors)
     @test B isa Blade{Float64}
 
     # norm(blade) > default atol; volume != nothing
     B = Blade(converted_vectors, volume=test_volume)
     @test B isa Blade{Float64}
-    @test volume(B) == Float64(test_volume)
+
+    F = LinearAlgebra.qr(converted_vectors)
+    signed_norm = prod(LinearAlgebra.diag(F.R))
+    @test volume(B) == sign(signed_norm) * Float64(test_volume)
 
     # norm(blade) < atol
-    B = Blade(converted_vectors, atol=2)
+    B = Blade(converted_vectors, atol=6)
     @test B == zero(Blade{Float64})
 
-    # ------ vectors isa Vector
+    # --- vectors isa Vector
 
-    # norm(blade) > atol; volume == nothing
+    # Preparations
     converted_one_vector = Vector{Bool}(one_vector .!= 0)
+
+    # norm(blade) > default atol; volume == nothing
     B = Blade(converted_one_vector)
     @test B isa Blade{Float64}
 
     # norm(blade) > default atol; volume != nothing
-    converted_one_vector = Vector{Bool}(one_vector .!= 0)
     B = Blade(converted_one_vector, volume=test_volume)
     @test B isa Blade{Float64}
     @test volume(B) == Float64(test_volume)
 
     # norm(blade) < atol
-    B = Blade(converted_one_vector, atol=2)
+    B = Blade(converted_one_vector, atol=6)
     @test B == zero(Blade{Float64})
 
-    # --- Blade{T}(vectors::Array{<:Integer};
-    #              volume::Union{Real, Nothing}=nothing,
-    #              atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+    # --- number of vectors == dimension of column space
 
-    for precision_type in subtypes(AbstractFloat)
-        # --- vectors isa Matrix
-
-        # subtypes(Signed)
-        for vectors_type in subtypes(Signed)
-            # --- vectors isa Matrix
-
-            # Preparations
-            converted_vectors = Matrix{vectors_type}(vectors)
-
-            # norm(blade) > default atol; volume == nothing
-            B = Blade{precision_type}(converted_vectors)
-            @test B isa Blade{precision_type}
-
-            # norm(blade) > default atol; volume != nothing
-            B = Blade{precision_type}(converted_vectors, volume=test_volume)
-            @test B isa Blade{precision_type}
-
-            F = LinearAlgebra.qr(converted_vectors)
-            signed_norm = prod(LinearAlgebra.diag(F.R))
-            @test volume(B) == sign(signed_norm) * precision_type(test_volume)
-
-            # norm(blade) < atol
-            B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B == zero(Blade{precision_type})
-
-            # --- vectors isa Vector
-
-            # Preparations
-            converted_one_vector = Vector{vectors_type}(one_vector)
-
-            # norm(blade) > default atol; volume == nothing
-            B = Blade{precision_type}(converted_one_vector)
-            @test B isa Blade{precision_type}
-
-            # norm(blade) > default atol; volume != nothing
-            B = Blade{precision_type}(converted_one_vector, volume=test_volume)
-            @test B isa Blade{precision_type}
-            @test volume(B) == precision_type(test_volume)
-
-            # norm(blade) < atol
-            B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B == zero(Blade{precision_type})
-
-            # --- number of vectors == dimension of column space
-
-            converted_vectors = Matrix{vectors_type}(pseudoscalar_vectors)
-            B = Blade{precision_type}(converted_vectors)
-            @test B isa Pseudoscalar{precision_type}
-        end
-
-        # subtypes(Unsigned)
-        for vectors_type in subtypes(Unsigned)
-            # --- vectors isa Matrix
-
-            # Preparations
-            converted_vectors = Matrix{vectors_type}(abs.(vectors))
-
-            # norm(blade) > default atol; volume == nothing
-            B = Blade{precision_type}(converted_vectors)
-            @test B isa Blade{precision_type}
-
-            # norm(blade) > default atol; volume != nothing
-            B = Blade{precision_type}(converted_vectors, volume=test_volume)
-            @test B isa Blade{precision_type}
-            @test volume(B) == precision_type(test_volume)
-
-            F = LinearAlgebra.qr(converted_vectors)
-            signed_norm = prod(LinearAlgebra.diag(F.R))
-            @test volume(B) == sign(signed_norm) * precision_type(test_volume)
-
-            # norm(blade) < atol
-            B = Blade{precision_type}(converted_vectors, atol=6)
-            @test B == zero(Blade{precision_type})
-
-            # --- vectors isa Vector
-
-            # Preparations
-            converted_one_vector = Vector{vectors_type}(one_vector)
-
-            # norm(blade) > default atol; volume == nothing
-            B = Blade{precision_type}(converted_one_vector)
-            @test B isa Blade{precision_type}
-
-            # norm(blade) > default atol; volume != nothing
-            B = Blade{precision_type}(converted_one_vector, volume=test_volume)
-            @test B isa Blade{precision_type}
-            @test volume(B) == precision_type(test_volume)
-
-            # norm(blade) < atol
-            B = Blade{precision_type}(converted_one_vector, atol=6)
-            @test B == zero(Blade{precision_type})
-
-            # --- number of vectors == dimension of column space
-
-            converted_vectors = Matrix{vectors_type}(pseudoscalar_vectors)
-            B = Blade{precision_type}(converted_vectors)
-            @test B isa Pseudoscalar{precision_type}
-        end
-
-        # --- Bool
-
-        # ------ vectors isa Matrix
-
-        # norm(blade) > atol; volume == nothing
-        converted_vectors = Matrix{Bool}(vectors .!= 0)
-        B = Blade{precision_type}(converted_vectors)
-        @test B isa Blade{precision_type}
-
-        # norm(blade) > default atol; volume != nothing
-        B = Blade{precision_type}(converted_vectors, volume=test_volume)
-        @test B isa Blade{precision_type}
-
-        F = LinearAlgebra.qr(Matrix{precision_type}(converted_vectors))
-        signed_norm = prod(LinearAlgebra.diag(F.R))
-        @test volume(B) == sign(signed_norm) * precision_type(test_volume)
-
-        # norm(blade) < atol
-        B = Blade{precision_type}(converted_vectors, atol=2)
-        @test B == zero(Blade{precision_type})
-
-        # ------ vectors isa Vector
-
-        # norm(blade) > atol; volume == nothing
-        converted_one_vector = Vector{Bool}(one_vector .!= 0)
-        B = Blade{precision_type}(converted_one_vector)
-        @test B isa Blade{precision_type}
-
-        # norm(blade) > default atol; volume != nothing
-        B = Blade{precision_type}(converted_one_vector, volume=test_volume)
-        @test B isa Blade{precision_type}
-        @test volume(B) == precision_type(test_volume)
-
-        # norm(blade) < atol
-        B = Blade{precision_type}(converted_one_vector, atol=2)
-        @test B == zero(Blade{precision_type})
-    end
+    # vectors are linearly independent
+    converted_vectors = Matrix{Bool}([1 1 0; 0 0 1; 0 1 0])
+    B = Blade(converted_vectors)
+    @test B isa Pseudoscalar{Float64}
 end
 
 @testset "Blade: outer constructor - copy constructor" begin

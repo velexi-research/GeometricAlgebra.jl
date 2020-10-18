@@ -82,16 +82,13 @@ struct Scalar{T<:AbstractFloat} <: AbstractBlade{T}
     value::T
 
     """
-        Scalar{T}(value::Real)
-
     Construct a Scalar having the specified `value`.
     """
     Scalar{T}(value::Real) where {T<:AbstractFloat} = new(T(value))
 end
 
 """
-    Scalar(value::AbstractFloat)
-    Scalar(value::Integer)
+    Scalar(value::Real)
 
 Construct a Scalar having the specified `value`.
 
@@ -112,7 +109,7 @@ Scalar(value::Integer) = Scalar(Float64(value))
 Copy constructor. Construct a Scalar with the same precision as `B` having the
 specified `value`.
 """
-Scalar(B::Scalar; value::Real=value(B)) = Scalar{typeof(volume(B))}(value)
+Scalar(B::Scalar; value::Real=value(B)) = Scalar{typeof(B.value)}(value)
 
 
 # Blade
@@ -153,14 +150,6 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     volume::T
 
     """
-        Blade{T}(dim::Int, grade::Int,
-                 basis::Matrix{T},
-                 volume::Real;
-                 atol::Real=blade_atol(T),
-                 enforce_constraints::Bool=true,
-                 copy_basis::Bool=true)
-            where {T<:AbstractFloat}
-
     Construct a Blade for a geometric algebra in `dim` dimensions having the
     specified data field values. If the absolute value of `volume` is less than
     `atol`, a Scalar representing zero is returned. If the `dim` and `grade`
@@ -213,26 +202,28 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if abs(volume) < atol
-            return Scalar{T}(0)
+            return zero(Blade{T})
         end
 
         # Return a Pseudoscalar if the grade of the blade is equal to the
         # dimension of the embedding space.
         if grade == dim
-            return Pseudoscalar{T}(dim, volume)
+            if LinearAlgebra.det(basis) == 0
+                return zero(Blade{T})
+            elseif LinearAlgebra.det(basis) > 0
+                return Pseudoscalar{T}(dim, volume)
+            else
+                return Pseudoscalar{T}(dim, -volume)
+            end
         end
 
         # Return new Blade
         copy_basis ?
-        new(dim, grade, copy(basis), volume) : new(dim, grade, basis, volume)
+            new(dim, grade, copy(basis), volume) :
+            new(dim, grade, basis, volume)
     end
 
     """
-        Blade{T}(vectors::Matrix{T};
-                 volume::Union{Real, Nothing}=nothing,
-                 atol::Real=blade_atol(T))
-            where {T<:AbstractFloat}
-
     Construct a Blade from a collection of vectors stored as the columns of a
     matrix. If the norm the blade is less than `atol`, a Scalar representing
     zero is returned. If the grade of the blade is equal to the dimension of
@@ -247,7 +238,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     order). When `volume` is negative, the orientation of the blade is the
     opposite of the orientation implied by the `vectors`.
     """
-    function Blade{T}(vectors::Matrix{T};
+    function Blade{T}(vectors::Matrix{<:Real};
                       volume::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
@@ -272,7 +263,9 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # --- Construct Blade
 
-        # Preparations
+        # Convert `vectors` to have type `T`, compute QR factorization
+        # and signed norm
+        vectors = convert(Matrix{T}, vectors)
         F = LinearAlgebra.qr(vectors)
         signed_norm = prod(LinearAlgebra.diag(F.R))
 
@@ -282,10 +275,10 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         end
 
         # Compute orthonormal basis for subspace
-        basis::Matrix{T} = F.Q
+        basis = Matrix(F.Q)
 
         # Compute volume
-        volume = (volume == nothing) ?  signed_norm : volume * sign(signed_norm)
+        volume = (volume == nothing) ? signed_norm : volume * sign(signed_norm)
 
         # Return new Blade
         Blade{T}(dims[1], dims[2], basis, volume,
@@ -293,11 +286,6 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     end
 
     """
-        Blade{T}(v::Vector{T};
-                 volume::Union{Real, Nothing}=nothing,
-                 atol::Real=blade_atol(T))
-            where {T<:AbstractFloat}
-
     Construct a Blade from a single vector. A Scalar representing zero is
     returned when the norm of the blade is less than `atol`.
 
@@ -309,7 +297,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     direction of `v`. When `volume` is negative, the orientation of the blade
     is the opposite of the direction of `v`.
     """
-    function Blade{T}(v::Vector{T};
+    function Blade{T}(v::Vector{<:Real};
                       volume::Union{Real, Nothing}=nothing,
                       atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
@@ -322,6 +310,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # --- Construct Blade
 
+        # Convert `v` to have type `T` and compute norm
+        v = convert(Vector{T}, v)
         norm_v = LinearAlgebra.norm(v)
 
         # Return zero if norm is below tolerance
@@ -329,8 +319,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             return zero(Blade{T})
         end
 
-        # Compute basis
-        basis::Matrix{T} = reshape(v, length(v), 1) / norm_v
+        # Compute basis as a column vector
+        basis = reshape(v, length(v), 1) / norm_v
 
         # Compute volume
         volume = (volume == nothing) ? norm_v : volume
@@ -341,12 +331,6 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     end
 
     """
-        Blade{T}(B::Blade{T};
-                 volume::Real=volume(B),
-                 atol::Real=blade_atol(T),
-                 copy_basis::Bool=false)
-            where {T<:AbstractFloat}
-
     Construct a Blade representing the same space as `B` having a specified
     oriented `volume` relative to `B`. A Scalar representing zero is returned
     if the absolute value of `volume` is less than `atol`,
@@ -355,59 +339,23 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     of the `basis` of the original Blade; otherwise, the `basis` of the new
     Blade is reference to the `basis` of the original Blade.
     """
-    Blade{T}(B::Blade{T};
+    Blade{T}(B::Blade{<:AbstractFloat};
              volume::Real=volume(B),
              atol::Real=blade_atol(T),
              copy_basis::Bool=false) where {T<:AbstractFloat} =
 
-        Blade{T}(dim(B), grade(B), basis(B), volume,
+        Blade{T}(dim(B), grade(B), convert(Matrix{T}, basis(B)), volume,
                  atol=atol, enforce_constraints=false, copy_basis=copy_basis)
-
-    """
-        Blade{T}(B::Blade{S};
-                 volume::Real=volume(B),
-                 atol::Real=blade_atol(T),
-                 copy_basis::Bool=false)
-            where {T<:AbstractFloat, S<:AbstractFloat}
-
-    Convert the floating-point precision of a Blade.
-
-    If `volume` is specified, the oriented volume of the blade of the new blade
-    (relative to `B`) is set to `volume`. A Scalar representing zero is
-    returned if the absolute value of `volume` is less than `atol`.
-
-    When `copy_basis` is true, the `basis` of the new Blade is a copy of the
-    `basis` of the original Blade; otherwise, the `basis` of the new Blade is
-    reference to the `basis` of the original Blade.
-    """
-    Blade{T}(B::Blade{S};
-             volume::Real=volume(B),
-             atol::Real=blade_atol(T),
-             copy_basis::Bool=false) where {T<:AbstractFloat,
-                                            S<:AbstractFloat} =
-        Blade{T}(dim(B), grade(B), convert(Array{T}, basis(B)), volume,
-                 atol=atol, enforce_constraints=false, copy_basis=false)
 end
 
 """
     Blade(vectors::Array{T};
           volume::Union{Real, Nothing}=nothing,
-          atol::Real=blade_atol(T))
-        where {T<:AbstractFloat}
-
-    Blade{T}(vectors::Array{<:AbstractFloat};
-             volume::Union{Real, Nothing}=nothing,
-             atol::Real=blade_atol(T))
-        where {T<:AbstractFloat}
+          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
 
     Blade(vectors::Array{<:Integer};
           volume::Union{Real, Nothing}=nothing,
           atol::Real=blade_atol(Float64))
-
-    Blade{T}(vectors::Array{<:Integer};
-             volume::Union{Real, Nothing}=nothing,
-             atol::Real=blade_atol(T))
-        where {T<:AbstractFloat}
 
 Construct a Blade from a collection of vectors represented as (1) the columns
 of a matrix or (2) a single vector. A Scalar representing zero is returned when
@@ -436,26 +384,16 @@ Blade(vectors::Array{T};
       atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
     Blade{T}(vectors, volume=volume, atol=atol)
 
-Blade{T}(vectors::Array{<:AbstractFloat};
-         volume::Union{Real, Nothing}=nothing,
-         atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade(convert(Array{T}, vectors), volume=volume, atol=atol)
-
 Blade(vectors::Array{<:Integer};
       volume::Union{Real, Nothing}=nothing,
       atol::Real=blade_atol(Float64)) =
     Blade(convert(Array{Float64}, vectors), volume=volume, atol=atol)
 
-Blade{T}(vectors::Array{<:Integer};
-         volume::Union{Real, Nothing}=nothing,
-         atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade(convert(Array{T}, vectors), volume=volume, atol=atol)
-
 """
-    Blade(B::Blade{T};
+    Blade(B::Blade;
           volume::Real=volume(B),
-          atol::Real=blade_atol(T),
-          copy_basis=false) where {T<:AbstractFloat}
+          atol::Real=blade_atol(typeof(volume(B))),
+          copy_basis=false)
 
 Copy constructor. Construct a Blade representing the same space as `B` having
 a specified oriented volume relative to `B`. A Scalar representing zero is
@@ -465,11 +403,11 @@ When `copy_basis` is true, the `basis` of the new Blade is a copy of the
 `basis` of the original Blade; otherwise, the `basis` of the new Blade is
 reference to the `basis` of the original Blade.
 """
-Blade(B::Blade{T};
-      volume::Real=volume(B),
-      atol::Real=blade_atol(T),
-      copy_basis=false) where {T<:AbstractFloat} =
-    Blade{T}(B, volume=volume, atol=atol, copy_basis=copy_basis)
+Blade(B::Blade;
+      volume::Real=B.volume,
+      atol::Real=blade_atol(typeof(B.volume)),
+      copy_basis=false) =
+    Blade{typeof(B.volume)}(B, volume=volume, atol=atol, copy_basis=copy_basis)
 
 
 # Pseudoscalar
@@ -495,8 +433,6 @@ struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     value::T
 
     """
-        Pseudoscalar{T}(dim::Integer, value::Real)
-
     Construct a Pseudoscalar for a geometric algebra in `dim` dimensions having
     the specified `value`.
     """
@@ -506,8 +442,7 @@ struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
 end
 
 """
-    Pseudoscalar(dim::Integer, value::AbstractFloat)
-    Pseudoscalar(dim::Integer, value::Integer)
+    Pseudoscalar(dim::Integer, value::Real)
 
 Construct a Pseudoscalar for a geometric algebra in `dim` dimensions having the
 specified `value`.
@@ -535,7 +470,7 @@ Copy constructor. Construct a Pseudoscalar representing the same space as
 `B` having the specified `value`.
 """
 Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
-    Pseudoscalar{typeof(volume(B))}(dim(B), value)
+    Pseudoscalar{typeof(B.value)}(dim(B), value)
 
 
 # --- Special number functions
