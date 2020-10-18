@@ -44,7 +44,7 @@ using GeometricAlgebra
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        scalar = Scalar{precision_type}(test_dim, test_value)
+        scalar = Scalar{precision_type}(test_value)
         one_blade = Blade{precision_type}(one_vector)
         two_blade = Blade{precision_type}(vectors)
         pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
@@ -82,7 +82,7 @@ end
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        scalar = Scalar{precision_type}(test_dim, test_value)
+        scalar = Scalar{precision_type}(test_value)
         two_blade = Blade{precision_type}(vectors)
         pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
 
@@ -111,7 +111,7 @@ end
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        scalar = Scalar{precision_type}(test_dim, test_value)
+        scalar = Scalar{precision_type}(test_value)
         one_blade = Blade{precision_type}(one_vector)
         pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
         blades = Vector([scalar, one_blade, pseudoscalar])
@@ -148,7 +148,7 @@ end
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
             # Preparations
-            scalar = Scalar{precision_type_src}(test_dim, test_value)
+            scalar = Scalar{precision_type_src}(test_value)
             one_blade = Blade{precision_type_src}(one_vector)
             pseudoscalar = Pseudoscalar{precision_type_src}(test_dim,
                                                             test_value)
