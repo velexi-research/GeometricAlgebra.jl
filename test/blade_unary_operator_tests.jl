@@ -35,23 +35,21 @@ end
 
 @testset "-(B): B::Scalar" begin
     # Preparations
-    test_dim = 5
-
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
     # B::Scalar{<:AbstractFloat}
     for value_type in subtypes(AbstractFloat)
-        B = Scalar(test_dim, value_type(test_value))
-        expected_result = Scalar(test_dim, -value_type(test_value))
+        B = Scalar(value_type(test_value))
+        expected_result = Scalar(-value_type(test_value))
         @test -B == expected_result
     end
 
     # B::Scalar{<:Signed}
     int_value::Int = 3
     for value_type in subtypes(Signed)
-        B = Scalar(test_dim, value_type(int_value))
-        expected_result = Scalar(test_dim, -value_type(int_value))
+        B = Scalar(value_type(int_value))
+        expected_result = Scalar(-value_type(int_value))
         @test -B == expected_result
     end
 end
@@ -111,8 +109,6 @@ end
 
 @testset "reciprocal(B): B::Scalar" begin
     # Preparations
-    test_dim = 10
-
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
@@ -122,30 +118,28 @@ end
         converted_value = precision_type(test_value)
 
         # value > 0
-        S = Scalar{precision_type}(test_dim, converted_value)
-        @test reciprocal(S) == Scalar{precision_type}(test_dim,
-                                                      1 / converted_value)
+        S = Scalar{precision_type}(converted_value)
+        @test reciprocal(S) == Scalar{precision_type}(1 / converted_value)
 
         # value < 0
         negative_value = -(abs(converted_value))
-        S = Scalar{precision_type}(test_dim, negative_value)
-        @test reciprocal(S) == Scalar{precision_type}(test_dim,
-                                                      1 / negative_value)
+        S = Scalar{precision_type}(negative_value)
+        @test reciprocal(S) == Scalar{precision_type}(1 / negative_value)
 
         # value = 0
         S = zero(S)
-        @test reciprocal(S) == Scalar{precision_type}(test_dim, Inf)
+        @test reciprocal(S) == Scalar{precision_type}(Inf)
 
         # value == 1
         S = one(S)
         @test reciprocal(S) == S
 
         # value = Inf
-        S = Scalar{precision_type}(test_dim, Inf)
+        S = Scalar{precision_type}(Inf)
         @test reciprocal(S) == zero(S)
 
         # value = -Inf
-        S = Scalar{precision_type}(test_dim, -Inf)
+        S = Scalar{precision_type}(-Inf)
         @test reciprocal(S) == zero(S)
     end
 end
