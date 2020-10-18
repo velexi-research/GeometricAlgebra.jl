@@ -263,9 +263,10 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # --- Construct Blade
 
-        # Convert `vectors` to have type `T`, compute QR factorization
-        # and signed norm
+        # Convert `vectors` to have type `T`
         vectors = convert(Matrix{T}, vectors)
+
+        # Compute QR factorization and signed norm
         F = LinearAlgebra.qr(vectors)
         signed_norm = prod(LinearAlgebra.diag(F.R))
 
