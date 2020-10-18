@@ -177,44 +177,52 @@ outer(x::AbstractBlade, y::Union{Vector{<:Real}, Real}) = x ∧ y
 outer(x::Union{Vector{<:Real}, Real}, y::AbstractBlade) = x ∧ y
 
 """
-    project(v::Vector, B::AbstractBlade)
-    project(B::AbstractBlade, v::Vector)
+    project(v::Vector, B::AbstractBlade; return_blade::Bool=true)
+    project(B::AbstractBlade, v::Vector; return_blade::Bool=true)
 
 Return the projection of vector `v` onto the subspace represented by blade `B`.
 
-When `B` is a Blade or a Pseudoscalar, the return value is a Vector. When `B`
-is a Scalar, the return value is a Scalar representing zero.
+When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
+the return value is a Real (if the result is a scalar) or a Vector.
 """
-project(v::Vector{<:Real}, B::Scalar) =
+project(v::Vector{<:Real}, B::Scalar; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+
+project(B::Scalar, v::Vector{<:Real}; return_blade::Bool=true) =
+    return_blade ? B : value(B)
+
+project(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true) =
     length(v) != dim(B) ?
         throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        zero(B)
+        return_blade ? Blade(v) : v
 
-project(B::Scalar, v::Vector{<:Real}) = B
-
-project(v::Vector{<:Real}, B::Pseudoscalar) =
+project(B::Pseudoscalar, v::Vector{<:Real}; return_blade::Bool=true) =
     length(v) != dim(B) ?
         throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        v
+        return_blade ? zero(B) : 0
 
-project(B::Pseudoscalar, v::Vector{<:Real}) =
-    length(v) != dim(B) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        zero(B)
+function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
+    if length(v) != dim(B)
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
+    end
 
-project(v::Vector{<:Real}, B::Blade) =
-    length(v) != dim(B) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        grade(B) == 1 ?
-            basis(B) * LinearAlgebra.dot(v, basis(B)) :
-            basis(B) * transpose(transpose(v) * basis(B))
+    projection = (grade(B) == 1) ?
+        basis(B) * LinearAlgebra.dot(v, basis(B)) :
+        basis(B) * transpose(transpose(v) * basis(B))
 
-project(B::Blade, v::Vector{<:Real}) =
-    length(v) != dim(B) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        grade(B) == 1 ?
-            basis(B) * LinearAlgebra.dot(v, basis(B)) :
-            zero(B)
+    return_blade ? Blade(projection) : projection
+end
+
+function project(B::Blade, v::Vector{<:Real}; return_blade::Bool=true)
+    if length(v) != dim(B)
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
+    end
+
+    projection = (grade(B) == 1) ?
+        v * LinearAlgebra.dot(v, basis(B)) : 0
+
+    return_blade ? Blade(projection) : projection
+end
 
 """
     project(B::AbstractBlade, C::AbstractBlade)
@@ -260,7 +268,7 @@ function project(B::Blade, C::Blade)
     # Compute projection (using fact that projection is an outermorphism)
     projections = Matrix{typeof(volume(B))}(undef, dim(B), grade(B))
     for i in 1:grade(B)
-        projections[:, i] = project(basis(B)[:, i], C)
+        projections[:, i] = project(basis(B)[:, i], C, return_blade=false)
     end
     Blade(projections)
 end

@@ -323,22 +323,83 @@ end
     # Dimension of embedding space
     test_dim = 20
 
-    vector = Vector(randn(test_dim))
+    # Test vector
+    v = Vector(randn(test_dim))
+
+    # Test value
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
 
     # --- Exercise functionality and check results
 
     # ------ project(v::Vector{<:Real}, B::Scalar)
 
+    # return_blade == true
+    B = Scalar(test_value)
+    @test project(v, B) == zero(B)
+
+    # return_blade == false
+    @test project(v, B, return_blade=false) == 0
+
     # ------ project(B::Scalar, v::Vector{<:Real})
 
-    # ------ project(v::Vector{<:Real}, B::Pseudoscalar)
+    # return_blade == true
+    B = Scalar(test_value)
+    @test project(B, v) === B
 
-    # ------ project(B::Pseudoscalar, v::Vector{<:Real})
+    # return_blade == false
+    B = Scalar(test_value)
+    @test project(B, v, return_blade=false) == value(B)
+
+    # ------ project(v::Vector{<:Real}, B::Pseudoscalar)
+    #        project(B::Pseudoscalar, v::Vector{<:Real})
+
+    # length(v) == dim(B), return_blade == true
+    B = Pseudoscalar(test_dim, test_value)
+    @test project(v, B) == Blade(v)
+    @test project(B, v) == zero(B)
+
+    # length(v) == dim(B), return_blade == false
+    @test project(v, B, return_blade=false) == v
+    @test project(B, v, return_blade=false) == 0
+
+    # length(v) != dim(B)
+    B = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch project(v, B)
+    @test_throws DimensionMismatch project(B, v)
 
     # ------ project(v::Vector{<:Real}, B::Blade)
+    #        project(B::Blade, v::Vector{<:Real})
 
-    # ------ project(B::Blade, v::Vector{<:Real})
+    # grade(B) > 1, return_blade == true
+    B = Blade(randn(test_dim, 5))
+    projection_vectors = basis(B) * transpose(basis(B)) * v
+    @test project(v, B) ≈ Blade(projection_vectors)
+    @test project(B, v) == zero(B)
 
+    # grade(B) > 1, return_blade == false
+    @test project(v, B, return_blade=false) ≈ projection_vectors
+    @test project(B, v, return_blade=false) == 0
+
+    # grade(B) == 1, return_blade == true
+    B = Blade(randn(test_dim, 1))
+    projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
+    @test project(v, B) ≈ Blade(projection_vectors)
+
+    projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
+    @test project(B, v) ≈ Blade(projection_vectors)
+
+    # grade(B) == 1, return_blade == false
+    projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
+    @test project(v, B, return_blade=false) ≈ projection_vectors
+
+    projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
+    @test project(B, v, return_blade=false) ≈ projection_vectors
+
+    # dim(B) != dim(C)
+    B = Blade(randn(test_dim + 1, 3))
+    @test_throws DimensionMismatch project(v, B)
+    @test_throws DimensionMismatch project(B, v)
 end
 
 @testset "project(B, C): B or C isa Scalar" begin
@@ -447,7 +508,39 @@ end
 end
 
 @testset "project(B, C): B, C::Blade" begin
-    @test_skip 1
+    # --- Preparations
+
+    test_dim = 15
+
+    # --- Valid arguments
+
+    # ------ grade(B) < grade(C)
+
+    B = Blade(randn(test_dim, 5))
+    C = Blade(randn(test_dim, 7))
+
+    result = project(B, C)
+    @test result isa Blade
+    @test dim(result) == dim(B)
+    @test norm(result) <= norm(B)
+
+    # Check that project(B, C) is contained in C
+    projection_coefficients = transpose(basis(C)) * basis(result)
+    @test LinearAlgebra.norm(projection_coefficients)^2 ≈ grade(B)
+
+    # ------ grade(B) > grade(C)
+
+    B = Blade(randn(test_dim, 10))
+    C = Blade(randn(test_dim, 3))
+
+    @test project(B, C) == zero(B)
+
+    # --- Invalid arguments
+
+    # dim(B) != dim(C)
+    B = Blade(randn(test_dim + 1, 3))
+    C = Blade(randn(test_dim, 4))
+    @test_throws DimensionMismatch project(B, C)
 end
 
 @testset "dual(B) tests" begin
@@ -471,7 +564,7 @@ end
             Pseudoscalar(test_dim, value(B)) : Pseudoscalar(test_dim, -value(B))
         @test dual_B == expected_result
 
-        # Verify dual(dual_B) = (-1)^(test_dim * (test_dim - 1) / 2) B
+        # Check dual(dual_B) = (-1)^(test_dim * (test_dim - 1) / 2) B
         if mod(test_dim, 4) < 2
             @test dual(dual_B) ≈ B
         else
@@ -493,7 +586,7 @@ end
         expected_result = Scalar(value(B))
         @test dual_B == expected_result
 
-        # Verify dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+        # Check dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
         if mod(dim(B), 4) < 2
             @test dual(dual_B, dim(B)) ≈ B
         else
@@ -509,18 +602,18 @@ end
 
             dual_B = dual(B)
 
-            # --- Verify dim, grade, and norm
+            # --- Check dim, grade, and norm
 
             @test dim(dual_B) == dim_B
             @test grade(dual_B) == dim_B - grade_B
             @test norm(dual_B) == norm(B)
 
-            # --- Verify that B and dual(B) are orthogonal complements
+            # --- Check that B and dual(B) are orthogonal complements
 
             @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
                 10 * eps(Float64)
 
-            # --- Verify sign(dual(B))
+            # --- Check sign(dual(B))
 
             # Compute sign of I formed from basis(B) and basis(dual(B))
             sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
@@ -540,9 +633,7 @@ end
 
             @test sign(dual_B) == expected_sign
 
-            # --- Verify mathematical properties of dual
-
-            # dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+            # Check dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
             if mod(dim(B), 4) < 2
                 @test dual(dual_B) ≈ B
             else
@@ -640,7 +731,7 @@ end
     expected_result = Scalar(value(B))
     @test dual_B == expected_result
 
-    # Verify dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+    # Check dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
     if mod(grade(C), 4) < 2
         @test dual(dual_B, C) ≈ B
     else
@@ -672,7 +763,7 @@ end
         dual_B = dual(B, C)
         @test dual_B == dual(B)
 
-        # Verify dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        # Check dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
         if mod(grade(C), 4) < 2
             @test dual(dual_B, C) ≈ B
         else
@@ -707,18 +798,18 @@ end
 
         dual_B = dual(B, C)
 
-        # --- Verify dim, grade, and norm
+        # --- Check dim, grade, and norm
 
         @test dim(dual_B) == test_dim
         @test grade(dual_B) == grade(C) - grade_B
         @test norm(dual_B) == norm(B)
 
-        # --- Verify that B and dual(B) are orthogonal complements
+        # --- Check that B and dual(B) are orthogonal complements
 
         @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
             10 * eps(Float64)
 
-        # --- Verify sign(dual(B, C))
+        # --- Check sign(dual(B, C))
 
         # Compute sign of I_C formed from basis(B) and basis(dual(B, C))
         sign_Q = sign(LinearAlgebra.det(
@@ -739,7 +830,7 @@ end
 
         @test sign(dual_B) == expected_sign
 
-        # Verify dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        # Check dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
         if mod(grade(C), 4) < 2
             @test dual(dual_B, C) ≈ B
         else
