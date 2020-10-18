@@ -86,8 +86,6 @@ end
 
 @testset "==(B, C): B, C::Scalar" begin
     # Preparations
-    test_dim = 3
-
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
@@ -354,8 +352,6 @@ end
 
 @testset "≈(B, C): B, C::Scalar" begin
     # Preparations
-    test_dim = 5
-
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
