@@ -97,8 +97,8 @@ end
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             # ==(B, C)
-            B = Scalar(test_dim, precision_type1(test_value))
-            C = Scalar(test_dim, precision_type2(test_value))
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
             if precision_type1 == precision_type2
                 @test B == C
             elseif precision_type1 in float64_or_bigfloat &&
@@ -109,15 +109,10 @@ end
             end
 
             # value(B) != value(C)
-            B = Scalar(test_dim, precision_type1(test_value))
-            C = Scalar(test_dim, precision_type2(2 * test_value))
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(2 * test_value))
             @test B != C
         end
-
-        # dim(B) != dim(C)
-        B = Scalar(test_dim, precision_type1(test_value))
-        C = Scalar(test_dim + 1, precision_type1(test_value))
-        @test B != C
     end
 
     # B::Scalar, C::Real
@@ -126,7 +121,7 @@ end
         # B::Scalar, C::AbstractFloat
         # B::AbstractFloat, C::Scalar
         for value_type in subtypes(AbstractFloat)
-            B = Scalar(test_dim, precision_type(test_value))
+            B = Scalar(precision_type(test_value))
 
             # ==(B, C)
             if precision_type == value_type
@@ -150,7 +145,7 @@ end
         # B::Integer, C::Scalar
         int_value::Int = 3
         for value_type in subtypes(Signed)
-            B = Scalar(test_dim, precision_type(int_value))
+            B = Scalar(precision_type(int_value))
 
             # ==(B, C)
             @test B == value_type(int_value)
@@ -162,7 +157,7 @@ end
         end
 
         for value_type in subtypes(Unsigned)
-            B = Scalar(test_dim, precision_type(int_value))
+            B = Scalar(precision_type(int_value))
 
             # ==(B, C)
             @test B == value_type(int_value)
@@ -174,13 +169,13 @@ end
         end
 
         # Bool
-        B = Scalar(test_dim, precision_type(true))
+        B = Scalar(precision_type(true))
         @test B == 1
         @test 1 == B
         @test B != 0
         @test 0 != B
 
-        B = Scalar(test_dim, precision_type(false))
+        B = Scalar(precision_type(false))
         @test B == 0
         @test 0 == B
         @test B != 1
@@ -246,7 +241,7 @@ end
             # B::Blade, C::Scalar
             # B::Scalar, C::Blade
             B = Blade{precision_type1}(vectors)
-            C = Scalar{precision_type2}(test_dim, test_value)
+            C = Scalar{precision_type2}(test_value)
             @test B != C
             @test C != B
 
@@ -259,7 +254,7 @@ end
 
             # B::Scalar, C::Pseudoscalar
             # B::Pseudoscalar, C::Scalar
-            B = Scalar{precision_type1}(test_dim, test_value)
+            B = Scalar{precision_type1}(test_value)
             C = Pseudoscalar{precision_type2}(test_dim, test_value)
             @test B != C
             @test C != B
@@ -367,23 +362,17 @@ end
     # B::Scalar, C::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            # dim(B) == dim(C)
-            B = Scalar(test_dim, precision_type1(test_value))
-            C = Scalar(test_dim, precision_type2(test_value))
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
             @test B ≈ C
         end
-
-        # dim(B) != dim(C)
-        B = Scalar(test_dim, precision_type1(test_value))
-        C = Scalar(test_dim + 1, precision_type1(test_value))
-        @test B ≉ C
     end
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(test_value)
-        B = Scalar(test_dim, converted_value)
+        B = Scalar(converted_value)
         @test B ≈ converted_value
         @test converted_value ≈ B
     end
@@ -439,7 +428,7 @@ end
             # B::Blade, C::Scalar
             # B::Scalar, C::Blade
             B = Blade{precision_type1}(vectors)
-            C = Scalar{precision_type2}(test_dim, test_value)
+            C = Scalar{precision_type2}(test_value)
             @test B ≉ C
             @test C ≉ B
 
@@ -452,7 +441,7 @@ end
 
             # B::Scalar, C::Pseudoscalar
             # B::Pseudoscalar, C::Scalar
-            B = Scalar{precision_type1}(test_dim, test_value)
+            B = Scalar{precision_type1}(test_value)
             C = Pseudoscalar{precision_type2}(test_dim, test_value)
             @test B ≉ C
             @test C ≉ B
