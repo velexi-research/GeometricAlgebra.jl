@@ -265,11 +265,16 @@ function project(B::Blade, C::Blade)
         return zero(B)
     end
 
-    # Compute projection (using fact that projection is an outermorphism)
+    # Compute the projections of basis(B) onto basis(C)
     projections = Matrix{typeof(volume(B))}(undef, dim(B), grade(B))
     for i in 1:grade(B)
         projections[:, i] = project(basis(B)[:, i], C, return_blade=false)
     end
+
+    # Encode volume(B) in the first projection vector
+    projections[:, 1] *= volume(B)
+
+    # Compute projection (using fact that projection is an outermorphism)
     Blade(projections)
 end
 
@@ -455,7 +460,13 @@ reciprocal(B::Pseudoscalar) =
 
 Return the multiplicative inverse of `B`.
 """
-# TODO: implement
+reverse(B::Scalar) = B
+
+reverse(B::Blade) =
+    mod(grade(B), 4) < 2 ?  B : Blade(B, value=-value(B))
+
+reverse(B::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
 
 
 # --- Binary operations
@@ -486,19 +497,35 @@ Return the inner product (left contraction) of `B` and `C`.
 ⋅(B::Pseudoscalar, C::Scalar) = B * C
 
 # Inner products involving Pseudoscalars
-⋅(B::Pseudoscalar, C::Pseudoscalar) = B * C
 ⋅(B::Pseudoscalar, C::Blade) = zero(B)
 ⋅(B::Blade, C::Pseudoscalar) = dual(B, C)
+
+⋅(B::Pseudoscalar, C::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?
+        Scalar(value(B) * value(C)) :
+        Scalar(-value(B) * value(C))
 
 # Inner product between Blades
 function ⋅(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
     assert_dim_equal(B, C)
 
+    # (B ⋅ C) = 0 if grade(B) > grade(C)
     if grade(B) > grade(C)
         return zero(B)
     end
 
-    nothing  # TODO: implement
+    # --- Compute (B ⋅ C) = proj(B, C) * C = proj(B, C) / C
+
+    # Compute proj(B, C) = (B ⋅ C) / C
+    projection = project(B, C)
+
+    # Compute volume(B ⋅ C) = ±(norm(proj(B, C) * volume(C))
+    volume_B_dot_C = (mod(grade(C), 4) < 2) ?
+        volume(projection) * volume(C) :
+       -volume(projection) * volume(C)
+
+   # Construct blade representing dual of proj(B, C) scaled by volume(C)
+    Blade(dual(projection, C), volume=volume_B_dot_C, copy_basis=false)
 end
 
 # Inner products between vectors and Blades
@@ -507,18 +534,18 @@ function ⋅(v::Vector{<:Real}, B::Blade)
         throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
     end
 
-    basis_B = basis(B)
-    projection = zero(v)
-    projection_norm = 0
-    for k in 1:grade(B)
-        projection_coefficient = v ⋅ basis_B[:, k]
-        projection_norm += projection_coefficient ^ 2
-        projection = projection_coefficient * basis_B[:, k]
-    end
-    projection_norm = sqrt(projection_norm)
+    # --- Compute (v ⋅ B) = proj(v, B) * B = proj(v, B) / B
 
-    # TODO: fix sign
-    Blade(dual(Blade(projection), B), volume=projection_norm * volume(B))
+    # Compute proj(v, B) = (v ⋅ B) / B
+    projection = project(v, B, return_blade=false)
+
+    # Compute volume(v ⋅ B) = ±(norm(proj(v, B) * volume(B))
+    volume_v_dot_B = (mod(grade(B), 4) < 2) ?
+        LinearAlgebra.norm(projection) * volume(B) :
+       -LinearAlgebra.norm(projection) * volume(B)
+
+   # Construct blade representing dual of proj(v, B) scaled by volume(B)
+    Blade(dual(Blade(projection), B), volume=volume_v_dot_B, copy_basis=false)
 end
 
 ⋅(B::Blade, v::Vector{<:Real}) =

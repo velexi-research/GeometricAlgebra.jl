@@ -35,7 +35,7 @@ using GeometricAlgebra
     test_dim = 10
 
     # Blade vectors
-    vectors = randn(test_dim, 3)
+    vectors = rand(test_dim, 3)
 
     # --- x::Real, B::Scalar
     #     B::Scalar, x::Real
@@ -124,7 +124,7 @@ end
     test_dim = 10
 
     # Blade vectors
-    vectors = randn(test_dim, 3)
+    vectors = rand(test_dim, 3)
 
     # --- x::Real, B::Scalar
     #     B::Scalar, x::Real
@@ -222,7 +222,7 @@ end
     test_dim = 10
 
     # Blade vectors
-    vectors = randn(test_dim, 3)
+    vectors = rand(test_dim, 3)
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
@@ -324,7 +324,7 @@ end
     test_dim = 20
 
     # Test vector
-    v = Vector(randn(test_dim))
+    v = Vector(rand(test_dim))
 
     # Test value
     test_value = rand()
@@ -372,7 +372,7 @@ end
     #        project(B::Blade, v::Vector{<:Real})
 
     # grade(B) > 1, return_blade == true
-    B = Blade(randn(test_dim, 5))
+    B = Blade(rand(test_dim, 5))
     projection_vectors = basis(B) * transpose(basis(B)) * v
     @test project(v, B) ≈ Blade(projection_vectors)
     @test project(B, v) == zero(B)
@@ -382,7 +382,7 @@ end
     @test project(B, v, return_blade=false) == 0
 
     # grade(B) == 1, return_blade == true
-    B = Blade(randn(test_dim, 1))
+    B = Blade(rand(test_dim, 1))
     projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
     @test project(v, B) ≈ Blade(projection_vectors)
 
@@ -397,7 +397,7 @@ end
     @test project(B, v, return_blade=false) ≈ projection_vectors
 
     # dim(B) != dim(C)
-    B = Blade(randn(test_dim + 1, 3))
+    B = Blade(rand(test_dim + 1, 3))
     @test_throws DimensionMismatch project(v, B)
     @test_throws DimensionMismatch project(B, v)
 end
@@ -416,7 +416,7 @@ end
     test_dim = 10
 
     # Blade vectors
-    vectors = randn(test_dim, 3)
+    vectors = rand(test_dim, 3)
 
     # --- B::Scalar, C::Scalar
 
@@ -471,7 +471,7 @@ end
     test_dim = 10
 
     # Blade vectors
-    vectors = randn(test_dim, 3)
+    vectors = rand(test_dim, 3)
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
@@ -516,31 +516,43 @@ end
 
     # ------ grade(B) < grade(C)
 
-    B = Blade(randn(test_dim, 5))
-    C = Blade(randn(test_dim, 7))
+    B = Blade(rand(test_dim, 5))
+    C = Blade(rand(test_dim, 7))
 
-    result = project(B, C)
-    @test result isa Blade
-    @test dim(result) == dim(B)
-    @test norm(result) <= norm(B)
+    projection = project(B, C)
+    @test projection isa Blade
+    @test dim(projection) == dim(B)
+
+    # Check norm
+    norm_projection = norm(B) *
+        norm(Blade(basis(C) * transpose(basis(C)) * basis(B)))
+    @test norm(projection) ≈ norm_projection
 
     # Check that project(B, C) is contained in C
-    projection_coefficients = transpose(basis(C)) * basis(result)
+    projection_coefficients = transpose(basis(C)) * basis(projection)
     @test LinearAlgebra.norm(projection_coefficients)^2 ≈ grade(B)
 
+    # Check that norm(project(B, C)
+    #
     # ------ grade(B) > grade(C)
 
-    B = Blade(randn(test_dim, 10))
-    C = Blade(randn(test_dim, 3))
+    B = Blade(rand(test_dim, 10))
+    C = Blade(rand(test_dim, 3))
 
     @test project(B, C) == zero(B)
 
     # --- Invalid arguments
 
     # dim(B) != dim(C)
-    B = Blade(randn(test_dim + 1, 3))
-    C = Blade(randn(test_dim, 4))
+    B = Blade(rand(test_dim, 3))
+    C = Blade(rand(test_dim + 1, 4))
     @test_throws DimensionMismatch project(B, C)
+
+    # --- Check consistency with project(v::Vector, B::Blade)
+
+    v = Vector(rand(test_dim))
+    B = Blade(rand(test_dim, 3))
+    @test project(v, B) ≈ project(Blade(v), B)
 end
 
 @testset "dual(B) tests" begin
@@ -598,7 +610,7 @@ end
 
     for dim_B in 10:13
         for grade_B in 2:5
-            B = Blade(randn(dim_B, grade_B))
+            B = Blade(rand(dim_B, grade_B))
 
             dual_B = dual(B)
 
@@ -676,7 +688,7 @@ end
 
     # Exercise functionality and check results
     for grade_C in 1:4
-        C = Blade(randn(test_dim, grade_C))
+        C = Blade(rand(test_dim, grade_C))
 
         expected_result = mod(grade(C), 4) < 2 ?
             Blade(C, volume=value(B)) :
@@ -750,14 +762,14 @@ end
 
     # ------ dim(B) == dim(C)
 
-    B = Blade(randn(test_dim, 3))
+    B = Blade(rand(test_dim, 3))
     C = Pseudoscalar(test_dim, test_value_1)
 
     expected_result = zero(B)
     @test dual(C, B) == expected_result
 
     for grade_B in 2:5
-        B = Blade(randn(test_dim, grade_B))
+        B = Blade(rand(test_dim, grade_B))
         C = Pseudoscalar(test_dim, test_value_1)
 
         dual_B = dual(B, C)
@@ -774,7 +786,7 @@ end
     # ------ Error cases
 
     # dim(B) != dim(C)
-    B = Blade(randn(test_dim, 3))
+    B = Blade(rand(test_dim, 3))
     C = Pseudoscalar(test_dim + 1, test_value_1)
     @test_throws DimensionMismatch dual(B, C)
     @test_throws DimensionMismatch dual(C, B)
@@ -786,14 +798,14 @@ end
     # Dimension of embedding space
     test_dim = 20
 
-    C = Blade(randn(test_dim, 7))
+    C = Blade(rand(test_dim, 7))
 
     # --- Exercise functionality and check results
 
     # ------ dim(B) == dim(C), grade(B) < grade(C)
 
     for grade_B in 2:5
-        B_vectors = basis(C)[:, 1:grade_B] * randn(grade_B, grade_B)
+        B_vectors = basis(C)[:, 1:grade_B] * rand(grade_B, grade_B)
         B = Blade(B_vectors)
 
         dual_B = dual(B, C)
@@ -840,7 +852,7 @@ end
 
     # ------ dim(B) == dim(C), grade(B) == grade(C)
 
-    coefficients = randn(grade(C), grade(C))
+    coefficients = rand(grade(C), grade(C))
     B_vectors = basis(C) * coefficients
     B = Blade(B_vectors)
 
@@ -855,13 +867,13 @@ end
 
     for grade_B in 2:5
         # dim(B) != dim(C)
-        B = Blade(randn(test_dim + 1, grade_B))
+        B = Blade(rand(test_dim + 1, grade_B))
         @test_throws DimensionMismatch dual(B, C)
 
         # `B` not contained in `C`
-        B = Blade(randn(test_dim, grade_B))
+        B = Blade(rand(test_dim, grade_B))
         while LinearAlgebra.norm(rejection(basis(B), C)) < sqrt(eps(Float64))
-            B = Blade(randn(test_dim, grade_B))
+            B = Blade(rand(test_dim, grade_B))
         end
         @test_throws ErrorException dual(B, C)
     end
