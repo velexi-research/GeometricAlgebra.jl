@@ -51,7 +51,7 @@ using GeometricAlgebra
 
         test_basis = Matrix{precision_type}([3 -3; 4 -4; 0 1])
         normalized_basis = copy(test_basis)
-        for i in size(normalized_basis, 2)
+        for i in 1:size(normalized_basis, 2)
             normalized_basis[:, i] /= LinearAlgebra.norm(normalized_basis[:, i])
         end
 
@@ -66,7 +66,7 @@ using GeometricAlgebra
         @test B.grade == test_grade
         @test B.basis == normalized_basis
         @test B.basis !== normalized_basis
-        for i in size(B.basis, 2)
+        for i in 1:size(B.basis, 2)
             @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
         end
         @test B.volume == test_volume
@@ -77,10 +77,22 @@ using GeometricAlgebra
                                   test_volume, atol=abs(test_volume) + 1)
         @test B == zero(Blade{precision_type})
 
+        # dim == 0
+        B = Blade{precision_type}(0, test_grade,
+                                  Matrix{precision_type}(rand(0, test_grade)),
+                                  test_volume)
+        @test B == zero(Blade{precision_type})
+
+        # grade == 0
+        B = Blade{precision_type}(test_dim, 0,
+                                  Matrix{precision_type}(rand(test_dim, 0)),
+                                  test_volume)
+        @test B == zero(Blade{precision_type})
+
         # dim == grade, det(basis) > 0
         # default values for atol, enforce_constraints, copy_basis
         pseudoscalar_basis = Matrix{precision_type}([2 1; 4 3])
-        for i in size(pseudoscalar_basis, 2)
+        for i in 1:size(pseudoscalar_basis, 2)
             pseudoscalar_basis[:, i] /=
                 LinearAlgebra.norm(pseudoscalar_basis[:, i])
         end
@@ -93,7 +105,7 @@ using GeometricAlgebra
         # dim == grade, det(basis) < 0
         # default values for atol, enforce_constraints, copy_basis
         pseudoscalar_basis = Matrix{precision_type}([1 2; 3 4])
-        for i in size(pseudoscalar_basis, 2)
+        for i in 1:size(pseudoscalar_basis, 2)
             pseudoscalar_basis[:, i] /=
                 LinearAlgebra.norm(pseudoscalar_basis[:, i])
         end
@@ -106,7 +118,7 @@ using GeometricAlgebra
         # dim == grade, det(basis) == 0
         # default values for atol, enforce_constraints, copy_basis
         pseudoscalar_basis = Matrix{precision_type}([1 4; 2 8])
-        for i in size(pseudoscalar_basis, 2)
+        for i in 1:size(pseudoscalar_basis, 2)
             pseudoscalar_basis[:, i] /=
                 LinearAlgebra.norm(pseudoscalar_basis[:, i])
         end
@@ -123,15 +135,15 @@ using GeometricAlgebra
 
         # ------ enforce_constraints = true
 
-        # dim == 0
-        @test_throws ErrorException Blade{precision_type}(0,
+        # dim < 0
+        @test_throws ErrorException Blade{precision_type}(-5,
                                                           test_grade,
                                                           test_basis,
                                                           test_volume)
 
-        # dim < 0
-        @test_throws ErrorException Blade{precision_type}(-5,
-                                                          test_grade,
+        # grade < 0
+        @test_throws ErrorException Blade{precision_type}(test_dim,
+                                                          -1,
                                                           test_basis,
                                                           test_volume)
 
@@ -154,11 +166,6 @@ using GeometricAlgebra
                                                           test_volume)
 
         # ------ enforce_constraints = false
-
-        # dim == 0
-        B = Blade{precision_type}(0, test_grade, test_basis, test_volume,
-                                  enforce_constraints=false)
-        @test B.dim == 0
 
         # dim < 0
         B = Blade{precision_type}(-5, test_grade, test_basis, test_volume,
@@ -199,7 +206,7 @@ using GeometricAlgebra
             @test B.dim == 3
             @test B.grade == 2
             @test size(B.basis) == (3, 2)
-            for i in size(B.basis, 2)
+            for i in 1:size(B.basis, 2)
                 @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
             end
             @test B.volume ≈ 5
@@ -210,7 +217,7 @@ using GeometricAlgebra
             @test B.dim == 3
             @test B.grade == 2
             @test size(B.basis) == (3, 2)
-            for i in size(B.basis, 2)
+            for i in 1:size(B.basis, 2)
                 @test LinearAlgebra.norm(B.basis[:, i]) ≈ 1
             end
 
@@ -227,6 +234,12 @@ using GeometricAlgebra
             # norm(blade) < atol
             B = Blade{precision_type}(converted_vectors, atol=6)
             @test B == zero(Blade{precision_type})
+
+            # one of the dimensions of basis is 0
+            @test Blade{precision_type}(rand(0, test_dim)) ==
+                zero(Blade{precision_type})
+            @test Blade{precision_type}(rand(test_dim, 0)) ==
+                zero(Blade{precision_type})
 
             # number of vectors > dimension of column space
             special_case_vectors = Matrix{value_type}([1 2 3; 4 5 6])
@@ -435,6 +448,10 @@ using GeometricAlgebra
             B = Blade{precision_type}(
                 converted_vector,
                 atol=LinearAlgebra.norm(converted_vector) + 1)
+            @test B == zero(Blade{precision_type})
+
+            # length(vector) == 0
+            B = Blade{precision_type}(rand(0))
             @test B == zero(Blade{precision_type})
         end
 

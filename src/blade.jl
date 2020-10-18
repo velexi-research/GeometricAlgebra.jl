@@ -173,8 +173,12 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         # --- Enforce constraints
 
         if enforce_constraints
-            if dim <= 0
-                error("`dim` must be positive")
+            if dim < 0
+                error("`dim` must be nonnegative")
+            end
+
+            if grade < 0
+                error("`grade` must be nonnegative")
             end
 
             basis_size = size(basis)
@@ -191,9 +195,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
                 throw(DimensionMismatch(message))
             end
 
-            for i in basis_size[2]
-                if LinearAlgebra.norm(basis[:, i]) ≉ 1
-                    error("columns of `basis` not normalized")
+            if dim > 0 && grade > 0
+                for i in 1:grade
+                    if LinearAlgebra.norm(basis[:, i]) ≉ 1
+                        error("columns of `basis` not normalized")
+                    end
                 end
             end
         end
@@ -202,6 +208,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if abs(volume) < atol
+            return zero(Blade{T})
+        end
+
+        # Return zero if dim or grade is equal to 0
+        if dim == 0 || grade == 0
             return zero(Blade{T})
         end
 
@@ -249,8 +260,13 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             return zero(Blade{T})
         end
 
-        # number of vectors > dimension of column space
+        # number of vectors == 0
         dims = size(vectors)
+        if dims[1] == 0 || dims[2] == 0
+            return zero(Blade{T})
+        end
+
+        # number of vectors > dimension of column space
         if dims[2] > dims[1]
             if dims[1] == 1
                 # `vectors` is a single row vector, so convert it to a column
@@ -306,6 +322,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         # `volume` is effectively zero
         if volume != nothing && abs(volume) < atol
+            return zero(Blade{T})
+        end
+
+        # length(v) == 0
+        if length(v) == 0
             return zero(Blade{T})
         end
 
