@@ -892,6 +892,16 @@ end
     end
 end
 
+@testset "Blade: outer constructor - Scalar constructor" begin
+    # --- Preparations
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Exercise functionality and check results
+
+    @test Blade(test_value) == Scalar(test_value)
+end
 
 # --- Function tests
 

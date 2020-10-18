@@ -410,6 +410,13 @@ Blade(B::Blade;
       copy_basis=false) =
     Blade{typeof(B.volume)}(B, volume=volume, atol=atol, copy_basis=copy_basis)
 
+"""
+    Blade(x::Real)
+
+Convenience constructor that returns a Scalar with value `x`.
+"""
+Blade(x::Real) = Scalar(x)
+
 
 # Pseudoscalar
 """
