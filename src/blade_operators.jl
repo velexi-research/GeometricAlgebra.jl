@@ -23,31 +23,13 @@ export ∧, outer
 export project, dual
 
 """
-    *(B::Union{AbstractBlade}, C::Union{Scalar, Real})
-    *(B::Union{Scalar, Real}, C::Union{AbstractBlade})
+    ∧(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
+    ∧(B::Union{AbstractBlade, Vector}, x::Real)
+    ∧(x::Real, B::Union{AbstractBlade, Vector})
 
-Return the product of `B` and `C`.
-"""
-*(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
-*(B::Scalar, x::Real) = x * B
-*(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
-
-*(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
-*(B::Blade, x::Real) = x * B
-*(B::Scalar, C::Blade) = value(B) * C
-*(B::Blade, C::Scalar) = C * B
-
-*(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
-*(B::Pseudoscalar, x::Real) = x * B
-*(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
-*(B::Pseudoscalar, C::Scalar) = C * B
-
-"""
-    ∧(B::Union{AbstractBlade, Vector, Real},
-      C::Union{AbstractBlade, Vector, Real})
-
-    outer(B::Union{AbstractBlade, Vector, Real},
-          C::Union{AbstractBlade, Vector, Real})
+    outer(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
+    outer(B::Union{AbstractBlade, Vector}, x::Real)
+    outer(x::Real, B::Union{AbstractBlade, Vector})
 
 Return the outer product of `B` and `C`.
 """
@@ -85,12 +67,12 @@ function ∧(B::Blade, C::Blade)
     Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
 end
 
+# Outer product between vectors
+∧(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
+
 # Outer product between vectors and Blades
 ∧(v::Vector{<:Real}, B::Blade) = Blade(v) ∧ B
 ∧(B::Blade, v::Vector{<:Real}) = B ∧ Blade(v)
-
-# Outer product between vectors
-∧(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
 
 # Function aliases
 outer(x::AbstractBlade, y::AbstractBlade) = x ∧ y
@@ -206,6 +188,18 @@ end
 Return the dual `B` (relative to the space that the geometric algebra is
 extended from). Note that when `B` is a Scalar, the dimension of the embedding
 space must be explicitly specified.
+
+    dual(B::AbstractBlade, C::AbstractBlade)
+
+Return the dual `B` relative to the subspace represented by `C`.
+
+Notes
+-----
+* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+  vector spaces of the same dimension and (2) the subspace represented by `B`
+  is contained in subspace represented by `C`.
+
+* The volume of `C` is ignored.
 """
 dual(B::Scalar, dim::Integer) =
     mod(dim, 4) < 2 ?
@@ -247,19 +241,6 @@ function dual(B::Blade)
                              copy_basis=false)
 end
 
-"""
-    dual(B::AbstractBlade, C::AbstractBlade)
-
-Return the dual `B` relative to the subspace represented by `C`.
-
-Notes
------
-* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
-  vector spaces of the same dimension and (2) the subspace represented by `B`
-  is contained in subspace represented by `C`.
-
-* The volume of `C` is ignored.
-"""
 # Duals involving Scalars
 dual(B::Scalar, C::Scalar) = B
 
@@ -412,20 +393,28 @@ import LinearAlgebra.:(⋅), LinearAlgebra.dot
 export ⋅, dot
 
 """
-    ⋅(B::Union{AbstractBlade, Vector, Real},
-      C::Union{AbstractBlade, Vector, Real})
+    ⋅(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
+    ⋅(B::Union{AbstractBlade, Vector}, x::Real)
+    ⋅(x::Real, B::Union{AbstractBlade, Vector})
 
-    inner(B::Union{AbstractBlade, Vector, Real},
-          C::Union{AbstractBlade, Vector, Real})
+    dot(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
+    dot(B::Union{AbstractBlade, Vector}, x::Real)
+    dot(x::Real, B::Union{AbstractBlade, Vector})
 
 Return the inner product (left contraction) of `B` and `C`.
 """
 # Inner products involving Scalars
+⋅(x::Real, B::Scalar) = x * B
+⋅(B::Scalar, x::Real) = B * x
 ⋅(B::Scalar, C::Scalar) = B * C
-⋅(B::Scalar, C::Blade) = B * C
-⋅(B::Blade, C::Scalar) = B * C
+
 ⋅(x::Real, B::Blade) = x * B
 ⋅(B::Blade, x::Real) = B * x
+⋅(B::Scalar, C::Blade) = B * C
+⋅(B::Blade, C::Scalar) = B * C
+
+⋅(x::Real, B::Pseudoscalar) = x * B
+⋅(B::Pseudoscalar, x::Real) = B * x
 ⋅(B::Scalar, C::Pseudoscalar) = B * C
 ⋅(B::Pseudoscalar, C::Scalar) = B * C
 
@@ -457,8 +446,10 @@ function ⋅(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
         volume(projection) * volume(C) :
        -volume(projection) * volume(C)
 
-   # Construct blade representing dual of proj(B, C) scaled by volume(C)
-    Blade(dual(projection, C), volume=volume_B_dot_C, copy_basis=false)
+    # Construct blade representing dual of proj(B, C) scaled by volume(C)
+    grade(B) == grade(C) ?
+        volume(C) * Scalar(dual(projection, C)) :
+        volume(C) * Blade(dual(projection, C))
 end
 
 # Inner products between vectors and Blades
@@ -467,24 +458,21 @@ function ⋅(v::Vector{<:Real}, B::Blade)
         throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
     end
 
-    # --- Compute (v ⋅ B) = proj(v, B) * B = proj(v, B) / B
+    # --- Compute (v ⋅ B) = proj(v, B) * B = ± proj(v, B) / B
 
     # Compute proj(v, B) = (v ⋅ B) / B
-    projection = project(v, B, return_blade=false)
-
-    # Compute volume(v ⋅ B) = ±(norm(proj(v, B) * volume(B))
-    volume_v_dot_B = (mod(grade(B), 4) < 2) ?
-        LinearAlgebra.norm(projection) * volume(B) :
-       -LinearAlgebra.norm(projection) * volume(B)
+    projection = project(v, B)
 
    # Construct blade representing dual of proj(v, B) scaled by volume(B)
-    Blade(dual(Blade(projection), B), volume=volume_v_dot_B, copy_basis=false)
+    grade(B) == 1 ?
+        volume(B) * Scalar(dual(projection, B)) :
+        volume(B) * Blade(dual(Blade(projection), B), copy_basis=false)
 end
 
 ⋅(B::Blade, v::Vector{<:Real}) =
     length(v) != dim(B) ?
         throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        dim(B) > 1 ? zero(B) : basis(B) ⋅ v
+        grade(B) > 1 ? zero(B) : volume(B) * basis(B) ⋅ v
 
 # Function aliases
 dot(x::AbstractBlade, y::AbstractBlade) = x ⋅ y
@@ -492,26 +480,64 @@ dot(x::AbstractBlade, y::Union{Vector{<:Real}, Real}) = x ⋅ y
 dot(x::Union{Vector{<:Real}, Real}, y::AbstractBlade) = x ⋅ y
 
 """
-    *(B::Union{AbstractBlade}, C::Union{AbstractBlade})
+    *(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
 
 Return the geometric product of `B` and `C`.
-"""
-# Geometric products involving Pseudoscalars
-*(B::Pseudoscalar, C::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?
-        Scalar(value(B) * value(C)) :
-        Scalar(-value(B) * value(C))
 
+    *(B::Union{AbstractBlade}, C::Union{Scalar, Real})
+    *(B::Union{Scalar, Real}, C::Union{AbstractBlade})
+
+Return the product of `B` and `C` when at least one of the arguments is a
+scalar (i.e., scalar multiplication).
+"""
+# Geometric products involving scalars (i.e., scalar multiplication)
+*(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
+*(B::Scalar, x::Real) = x * B
+*(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
+
+*(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
+*(B::Blade, x::Real) = x * B
+*(B::Scalar, C::Blade) = value(B) * C
+*(B::Blade, C::Scalar) = C * B
+
+*(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
+*(B::Pseudoscalar, x::Real) = x * B
+*(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
+*(B::Pseudoscalar, C::Scalar) = C * B
+
+# Geometric products involving Pseudoscalars
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
 *(B::Pseudoscalar, C::Blade) = zero(B)
+
+*(B::Pseudoscalar, C::Pseudoscalar) = B ⋅ C
 
 # Geometric product between Blades
 function *(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
     assert_dim_equal(B, C)
-    nothing  # TODO: implement
+
+    # TODO: Implement. May need geometric product between vectors and
+    # multivectors.
+    nothing
 end
 
-# Geometric product between vectors Blades
+# Geometric product between vectors
+function *(v::Vector{<:Real}, w::Vector{<:Real})
+    if length(v) != length(w)
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
+    end
+    v_dot_B = v ⋅ B
+    v_wedge_B = v ∧ B
+
+    if v_dot_B == zero(B)
+        return v_wedge_B
+    elseif v_wedge_B == zero(B)
+        return v_dot_B
+    end
+
+    Multivector([v_dot_B, v_wedge_B])
+end
+
+# Geometric product between vectors and Blades
 function *(v::Vector{<:Real}, B::Blade)
     if length(v) != dim(B)
         throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
@@ -529,11 +555,6 @@ function *(v::Vector{<:Real}, B::Blade)
 end
 
 *(B::Blade, v::Vector{<:Real}) = B ∧ v
-
-*(v::Vector{<:Real}, w::Vector{<:Real}) =
-    length(v) != length(w) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        v ⋅ w
 
 
 # --- Utility functions
