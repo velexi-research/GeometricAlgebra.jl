@@ -16,6 +16,7 @@ module GeometricAlgebra
 
 include("blade.jl")
 include("multivector.jl")
+include("blade_comparison_operators.jl")
 include("blade_operators.jl")
 include("blade_operators_mgs.jl")
 
