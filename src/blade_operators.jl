@@ -426,7 +426,10 @@ function dual(B::Blade, C::Blade)
 
     # --- Construct Blade in embedding space
 
-    Blade(basis(C) * F.Q[:, grade(B) + 1:end], volume=dual_volume)
+    Blade{typeof(volume(B))}(dim(B), grade(C) - grade(B),
+                             basis(C) * F.Q[:, grade(B) + 1:end], dual_volume,
+                             enforce_constraints=false,
+                             copy_basis=false)
 end
 
 
