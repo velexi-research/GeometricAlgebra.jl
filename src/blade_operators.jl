@@ -524,18 +524,18 @@ end
 # Geometric product between vectors
 function *(v::Vector{<:Real}, w::Vector{<:Real})
     if length(v) != length(w)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
+        throw(DimensionMismatch("`dim(v)` not equal to `dim(w)`"))
     end
-    v_dot_B = v ⋅ B
-    v_wedge_B = v ∧ B
+    v_dot_w = Blade(v ⋅ w)
+    v_wedge_w = v ∧ w
 
-    if v_dot_B == zero(B)
-        return v_wedge_B
-    elseif v_wedge_B == zero(B)
-        return v_dot_B
+    if v_dot_w == zero(v_dot_w)
+        return v_wedge_w
+    elseif v_wedge_w == zero(v_wedge_w)
+        return v_dot_w
     end
 
-    Multivector([v_dot_B, v_wedge_B])
+    Multivector([v_dot_w, v_wedge_w])
 end
 
 # Geometric product between vectors and Blades
@@ -546,9 +546,9 @@ function *(v::Vector{<:Real}, B::Blade)
     v_dot_B = v ⋅ B
     v_wedge_B = v ∧ B
 
-    if v_dot_B == zero(B)
+    if v_dot_B == zero(v_dot_B)
         return v_wedge_B
-    elseif v_wedge_B == zero(B)
+    elseif v_wedge_B == zero(v_wedge_B)
         return v_dot_B
     end
 
