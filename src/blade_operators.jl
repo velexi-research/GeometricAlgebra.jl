@@ -18,9 +18,10 @@ import LinearAlgebra
 
 # --- Core Blade operations
 
-import Base.:(*)
 export ∧, outer
 export project, dual
+
+# Note: scalar multiplication is grouped with geometric product functions.
 
 """
     ∧(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
