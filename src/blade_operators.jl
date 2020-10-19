@@ -304,6 +304,12 @@ function dual(B::Blade)
     # standard basis
     dual_volume = volume(B) * sign(LinearAlgebra.det(F.Q))
 
+    # Account for orientation of first grade(B) columns of Q relative to
+    # orientation of basis(B)
+    if prod(LinearAlgebra.diag(F.R)) < 0
+        dual_volume = -dual_volume
+    end
+
     # Account for sign of I^{-1} relative to I
     if mod(dim(B), 4) >= 2
         dual_volume = -dual_volume
@@ -314,7 +320,10 @@ function dual(B::Blade)
         dual_volume = -dual_volume
     end
 
-    Blade(F.Q[:, grade(B) + 1:end], volume=dual_volume)
+    Blade{typeof(volume(B))}(dim(B), dim(B) - grade(B),
+                             F.Q[:, grade(B) + 1:end], dual_volume,
+                             enforce_constraints=false,
+                             copy_basis=false)
 end
 
 """
@@ -399,8 +408,8 @@ function dual(B::Blade, C::Blade)
     # Account for orientation of Q relative to orientation of basis(C)
     dual_volume = volume(B) * sign(LinearAlgebra.det(F.Q))
 
-    # Account for orientation of columns of Q that are the new basis for B
-    # relative to orientation of basis(B)
+    # Account for orientation of first grade(B) columns of Q relative to
+    # orientation of basis(B)
     if prod(LinearAlgebra.diag(F.R)) < 0
         dual_volume = -dual_volume
     end
