@@ -97,7 +97,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
         norm = 0  # TODO: implement
 
         # Return new Multivector
-        new(summands, false)
+        new(summands, norm, false)
     end
 end
 
@@ -128,6 +128,16 @@ Return the grades of the blades that the multivector is composed of. When
 """
 grades(M::Multivector; collect=true) =
     collect ? Base.collect(keys(M.summands)) : keys(M.summands)
+
+"""
+    getindex(M::Multivector, grade::Integer)
+
+Return multivectors of `M` with the specified `grade`.
+"""
+getindex(M::Multivector, grade::Integer) =
+    grade in grades(M) ?
+        M.summands[grade] :
+        error("`M` does not contain any multivectors of grade $grade")
 
 """
     summands(M::Multivector)
