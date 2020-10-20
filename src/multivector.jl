@@ -77,6 +77,12 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
     """
     function Multivector{T}(blades::Vector{<:AbstractBlade};
                             reduced::Bool=false) where {T<:AbstractFloat}
+        # --- Handle edge cases
+
+        # Return Scalar(0) if number of blades is 0.
+        if length(blades) == 0
+            return zero(Blade{T})
+        end
 
         # --- Construct Multivector
 
@@ -112,10 +118,15 @@ The precision of the Multivector is inferred from the precision of the first
 element of `blades`.
 """
 Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
-    Multivector{typeof(volume(blades[1]))}(blades, reduced=reduced)
+    length(blades) > 0 ?
+        Multivector{typeof(volume(blades[1]))}(blades, reduced=reduced) :
+        Multivector{Float64}(blades)
 
 
 # --- Basic Multivector functions
+
+# Imports
+import Base.getindex
 
 # Exports
 export grades, summands
@@ -135,9 +146,7 @@ grades(M::Multivector; collect=true) =
 Return multivectors of `M` with the specified `grade`.
 """
 getindex(M::Multivector, grade::Integer) =
-    grade in grades(M) ?
-        M.summands[grade] :
-        error("`M` does not contain any multivectors of grade $grade")
+    grade in grades(M) ?  M.summands[grade] : Vector{AbstractBlade}()
 
 """
     summands(M::Multivector)
