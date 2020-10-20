@@ -15,11 +15,12 @@ module GeometricAlgebra
 # --- Submodules
 
 include("blade.jl")
-include("multivector.jl")
-include("multivector_operators.jl")
 include("blade_comparison_operators.jl")
 include("blade_operators.jl")
 include("blade_operators_mgs.jl")
+
+include("multivector.jl")
+include("multivector_operators.jl")
 
 
 end  # End of GeometricAlgebra.jl module

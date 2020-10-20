@@ -30,6 +30,7 @@ Methods
     summands(M::AbstractMultivector)::SortedDict
     norm(M::AbstractMultivector)::AbstractFloat
     reduce(M::AbstractMultivector)::AbstractMultivector
+    getindex(M::AbstractMultivector, grade::Integer)::Vector{<:AbstractBlade}
 
 Unary Operations
 ----------------
