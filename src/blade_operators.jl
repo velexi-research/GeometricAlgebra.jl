@@ -38,7 +38,7 @@ export proj, dual
     outer(B::AbstractBlade, x::Real)
     outer(x::Real, B::AbstractBlade)
 
-Return the outer product of `B` and `C`.
+Return the outer product of the arguments.
 """
 # Outer products involving scalars
 ∧(x::Real, B::Scalar) = x * B
@@ -422,7 +422,8 @@ export ⋅, dot
     dot(B::AbstractBlade, x::Real)
     dot(x::Real, B::AbstractBlade)
 
-Return the inner product (left contraction) of `B` and `C`.
+Return the inner product (left contraction) of first argument with the second
+argument.
 """
 # Inner products involving Scalars
 ⋅(x::Real, B::Scalar) = x * B
@@ -517,12 +518,12 @@ dot(x::Real, B::AbstractBlade) = x ⋅ B
     *(B::AbstractBlade, v::Vector)
     *(v::Vector, B::AbstractBlade)
 
-Return the geometric product of `B` and `C`.
+Return the geometric product of the arguments.
 
     *(B::AbstractBlade, x::Union{Scalar, Real})
     *(x::Union{Scalar, Real}, B::AbstractBlade)
 
-Return the product of `B` and `C` when at least one of the arguments is a
+Return the product of the arguments when one (or both) of the arguments is a
 scalar (i.e., scalar multiplication).
 """
 # Geometric products involving scalars (i.e., scalar multiplication)
