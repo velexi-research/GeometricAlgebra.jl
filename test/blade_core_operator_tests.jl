@@ -106,6 +106,18 @@ using GeometricAlgebra
     expected_result = Pseudoscalar(test_dim, value(B) * value(C))
     @test B * C == expected_result
     @test C * B == expected_result
+
+    # --- B::Scalar, v::Vector
+    #     v::Vector, B::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+    v = Vector(rand(test_dim))
+
+    # Exercise functionality and check results
+    expected_result = Blade(v, volume=LinearAlgebra.norm(v) * value(B))
+    @test B * v == expected_result
+    @test v * B == expected_result
 end
 
 # --- ∧(B, C), outer(B, C)
@@ -206,6 +218,20 @@ end
     @test C ∧ B == expected_result
     @test outer(B, C) == expected_result
     @test outer(C, B) == expected_result
+
+    # --- B::Scalar, v::Vector
+    #     v::Vector, B::Scalar
+
+    # Preparations
+    B = Scalar(test_value_1)
+    v = Vector(rand(test_dim))
+
+    # Exercise functionality and check results
+    expected_result = Blade(v, volume=LinearAlgebra.norm(v) * value(B))
+    @test B ∧ v ≈ expected_result
+    @test v ∧ B ≈ expected_result
+    @test outer(B, v) ≈ expected_result
+    @test outer(v, B) ≈ expected_result
 end
 
 @testset "∧(B, C): B or C isa Pseudoscalar" begin
@@ -257,12 +283,28 @@ end
     C = Blade(vectors)
     @test_throws DimensionMismatch B ∧ C
     @test_throws DimensionMismatch C ∧ B
+
+    # --- B::Pseudoscalar, v::Vector
+    #     v::Vector, B::Pseudoscalar
+
+    B = Pseudoscalar(test_dim, test_value_1)
+    v = Vector(rand(test_dim))
+
+    expected_result = zero(B)
+    @test B ∧ v == expected_result
+    @test v ∧ B == expected_result
+    @test outer(B, v) == expected_result
+    @test outer(v, B) == expected_result
+
+    # dim(B) != length(v)
+    B = Pseudoscalar(test_dim + 1, test_value_1)
+    @test_throws DimensionMismatch B ∧ v
+    @test_throws DimensionMismatch v ∧ B
 end
 
 @testset "∧(B, C): B, C::{Blade, Vector}" begin
     # --- B::Blade, C::Blade
 
-    # Preparations
     B_vectors = hcat([1; 0; 0; 0; 0],
                      [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
@@ -315,9 +357,9 @@ end
     @test B_wedge_C == outer(B, C)
 end
 
-# --- project(B, C)
+# --- proj(B, C)
 
-@testset "project(B, C): B or C isa Vector" begin
+@testset "proj(B, C): B or C isa Vector" begin
     # --- Preparations
 
     # Dimension of embedding space
@@ -332,77 +374,77 @@ end
 
     # --- Exercise functionality and check results
 
-    # ------ project(v::Vector{<:Real}, B::Scalar)
+    # ------ proj(v::Vector{<:Real}, B::Scalar)
 
     # return_blade == true
     B = Scalar(test_value)
-    @test project(v, B) == zero(B)
+    @test proj(v, B) == zero(B)
 
     # return_blade == false
-    @test project(v, B, return_blade=false) == 0
+    @test proj(v, B, return_blade=false) == 0
 
-    # ------ project(B::Scalar, v::Vector{<:Real})
+    # ------ proj(B::Scalar, v::Vector{<:Real})
 
     # return_blade == true
     B = Scalar(test_value)
-    @test project(B, v) === B
+    @test proj(B, v) === B
 
     # return_blade == false
     B = Scalar(test_value)
-    @test project(B, v, return_blade=false) == value(B)
+    @test proj(B, v, return_blade=false) == value(B)
 
-    # ------ project(v::Vector{<:Real}, B::Pseudoscalar)
-    #        project(B::Pseudoscalar, v::Vector{<:Real})
+    # ------ proj(v::Vector{<:Real}, B::Pseudoscalar)
+    #        proj(B::Pseudoscalar, v::Vector{<:Real})
 
     # length(v) == dim(B), return_blade == true
     B = Pseudoscalar(test_dim, test_value)
-    @test project(v, B) == Blade(v)
-    @test project(B, v) == zero(B)
+    @test proj(v, B) == Blade(v)
+    @test proj(B, v) == zero(B)
 
     # length(v) == dim(B), return_blade == false
-    @test project(v, B, return_blade=false) == v
-    @test project(B, v, return_blade=false) == 0
+    @test proj(v, B, return_blade=false) == v
+    @test proj(B, v, return_blade=false) == 0
 
     # length(v) != dim(B)
     B = Pseudoscalar(test_dim + 1, test_value)
-    @test_throws DimensionMismatch project(v, B)
-    @test_throws DimensionMismatch project(B, v)
+    @test_throws DimensionMismatch proj(v, B)
+    @test_throws DimensionMismatch proj(B, v)
 
-    # ------ project(v::Vector{<:Real}, B::Blade)
-    #        project(B::Blade, v::Vector{<:Real})
+    # ------ proj(v::Vector{<:Real}, B::Blade)
+    #        proj(B::Blade, v::Vector{<:Real})
 
     # grade(B) > 1, return_blade == true
     B = Blade(rand(test_dim, 5))
     projection_vectors = basis(B) * transpose(basis(B)) * v
-    @test project(v, B) ≈ Blade(projection_vectors)
-    @test project(B, v) == zero(B)
+    @test proj(v, B) ≈ Blade(projection_vectors)
+    @test proj(B, v) == zero(B)
 
     # grade(B) > 1, return_blade == false
-    @test project(v, B, return_blade=false) ≈ projection_vectors
-    @test project(B, v, return_blade=false) == 0
+    @test proj(v, B, return_blade=false) ≈ projection_vectors
+    @test proj(B, v, return_blade=false) == 0
 
     # grade(B) == 1, return_blade == true
     B = Blade(rand(test_dim, 1))
     projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
-    @test project(v, B) ≈ Blade(projection_vectors)
+    @test proj(v, B) ≈ Blade(projection_vectors)
 
     projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
-    @test project(B, v) ≈ Blade(projection_vectors)
+    @test proj(B, v) ≈ Blade(projection_vectors)
 
     # grade(B) == 1, return_blade == false
     projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
-    @test project(v, B, return_blade=false) ≈ projection_vectors
+    @test proj(v, B, return_blade=false) ≈ projection_vectors
 
     projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
-    @test project(B, v, return_blade=false) ≈ projection_vectors
+    @test proj(B, v, return_blade=false) ≈ projection_vectors
 
     # dim(B) != dim(C)
     B = Blade(rand(test_dim + 1, 3))
-    @test_throws DimensionMismatch project(v, B)
-    @test_throws DimensionMismatch project(B, v)
+    @test_throws DimensionMismatch proj(v, B)
+    @test_throws DimensionMismatch proj(B, v)
 end
 
-@testset "project(B, C): B or C isa Scalar" begin
+@testset "proj(B, C): B or C isa Scalar" begin
     # --- Preparations
 
     # Test values
@@ -426,7 +468,7 @@ end
 
     # Exercise functionality and check results
     expected_result = Scalar(value(B))
-    @test project(B, C) == expected_result
+    @test proj(B, C) == expected_result
 
     # --- B::Scalar, C::Blade
     #     B::Blade, C::Scalar
@@ -437,10 +479,10 @@ end
 
     # Exercise functionality and check results
     expected_result = Scalar(value(B))
-    @test project(B, C) == expected_result
+    @test proj(B, C) == expected_result
 
     expected_result = zero(C)
-    @test project(C, B) == expected_result
+    @test proj(C, B) == expected_result
 
     # --- B::Scalar, C::Pseudoscalar
     #     B::Pseudoscalar, C::Scalar
@@ -451,13 +493,13 @@ end
 
     # Exercise functionality and check results
     expected_result = Scalar(value(B))
-    @test project(B, C) == expected_result
+    @test proj(B, C) == expected_result
 
     expected_result = zero(C)
-    @test project(C, B) == expected_result
+    @test proj(C, B) == expected_result
 end
 
-@testset "project(B, C): B or C isa Pseudoscalar" begin
+@testset "proj(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
     # Test values
@@ -480,12 +522,12 @@ end
     C = Pseudoscalar(test_dim, test_value_2)
 
     expected_result = B
-    @test project(B, C) == expected_result
+    @test proj(B, C) == expected_result
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim + 1, test_value_2)
-    @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch proj(B, C)
 
     # --- B::Pseudoscalar, C::Blade
     #     B::Blade, C::Pseudoscalar
@@ -495,19 +537,19 @@ end
     C = Blade(vectors)
 
     expected_result = zero(B)
-    @test project(B, C) == expected_result
+    @test proj(B, C) == expected_result
 
     expected_result = C
-    @test project(C, B) == expected_result
+    @test proj(C, B) == expected_result
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
     C = Blade(vectors)
-    @test_throws DimensionMismatch project(B, C)
-    @test_throws DimensionMismatch project(C, B)
+    @test_throws DimensionMismatch proj(B, C)
+    @test_throws DimensionMismatch proj(C, B)
 end
 
-@testset "project(B, C): B, C::Blade" begin
+@testset "proj(B, C): B, C::Blade" begin
     # --- Preparations
 
     test_dim = 15
@@ -519,7 +561,7 @@ end
     B = Blade(rand(test_dim, 5))
     C = Blade(rand(test_dim, 7))
 
-    projection = project(B, C)
+    projection = proj(B, C)
     @test projection isa Blade
     @test dim(projection) == dim(B)
 
@@ -528,31 +570,31 @@ end
         norm(Blade(basis(C) * transpose(basis(C)) * basis(B)))
     @test norm(projection) ≈ norm_projection
 
-    # Check that project(B, C) is contained in C
+    # Check that proj(B, C) is contained in C
     projection_coefficients = transpose(basis(C)) * basis(projection)
     @test LinearAlgebra.norm(projection_coefficients)^2 ≈ grade(B)
 
-    # Check that norm(project(B, C)
+    # Check that norm(proj(B, C)
     #
     # ------ grade(B) > grade(C)
 
     B = Blade(rand(test_dim, 10))
     C = Blade(rand(test_dim, 3))
 
-    @test project(B, C) == zero(B)
+    @test proj(B, C) == zero(B)
 
     # --- Invalid arguments
 
     # dim(B) != dim(C)
     B = Blade(rand(test_dim, 3))
     C = Blade(rand(test_dim + 1, 4))
-    @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch proj(B, C)
 
-    # --- Check consistency with project(v::Vector, B::Blade)
+    # --- Check consistency with proj(v::Vector, B::Blade)
 
     v = Vector(rand(test_dim))
     B = Blade(rand(test_dim, 3))
-    @test project(v, B) ≈ project(Blade(v), B)
+    @test proj(v, B) ≈ proj(Blade(v), B)
 end
 
 @testset "dual(B) tests" begin

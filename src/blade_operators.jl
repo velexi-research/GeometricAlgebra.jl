@@ -19,22 +19,28 @@ import LinearAlgebra
 # --- Core Blade operations
 
 export ∧, outer
-export project, dual
+export proj, dual
 
-# Note: scalar multiplication is grouped with geometric product functions.
+# Note: scalar multiplication is grouped with the geometric product functions.
 
 """
-    ∧(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
-    ∧(B::Union{AbstractBlade, Vector}, x::Real)
-    ∧(x::Real, B::Union{AbstractBlade, Vector})
+    ∧(B::AbstractBlade, C::AbstractBlade)
+    ∧(B::AbstractBlade, v::Vector)
+    ∧(v::Vector, B::AbstractBlade)
+    ∧(v::Vector, w::Vector)
+    ∧(B::AbstractBlade, x::Real)
+    ∧(x::Real, B::AbstractBlade)
 
-    outer(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
-    outer(B::Union{AbstractBlade, Vector}, x::Real)
-    outer(x::Real, B::Union{AbstractBlade, Vector})
+    outer(B::AbstractBlade, C::AbstractBlade)
+    outer(B::AbstractBlade, v::Vector)
+    outer(v::Vector, B::AbstractBlade)
+    outer(v::Vector, w::Vector)
+    outer(B::AbstractBlade, x::Real)
+    outer(x::Real, B::AbstractBlade)
 
 Return the outer product of `B` and `C`.
 """
-# Outer products involving Scalars
+# Outer products involving scalars
 ∧(x::Real, B::Scalar) = x * B
 ∧(B::Scalar, x::Real) = B * x
 ∧(B::Scalar, C::Scalar) = B * C
@@ -49,6 +55,9 @@ Return the outer product of `B` and `C`.
 ∧(B::Scalar, C::Pseudoscalar) = B * C
 ∧(B::Pseudoscalar, C::Scalar) = B * C
 
+∧(B::Scalar, v::Vector{<:Real}) =  Blade(value(B) * v)
+∧(v::Vector{<:Real}, B::Scalar) = B ∧ v
+
 # Outer products involving Pseudoscalars
 function ∧(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
@@ -59,8 +68,13 @@ function ∧(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
     zero(B)
 end
-
 ∧(B::Blade, C::Pseudoscalar) = C ∧ B
+
+function ∧(B::Pseudoscalar, v::Vector{<:Real})
+    assert_dim_equal(B, v)
+    zero(B)
+end
+∧(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
 
 # Outer product between Blades
 function ∧(B::Blade, C::Blade)
@@ -76,40 +90,47 @@ end
 ∧(B::Blade, v::Vector{<:Real}) = B ∧ Blade(v)
 
 # Function aliases
-outer(x::AbstractBlade, y::AbstractBlade) = x ∧ y
-outer(x::AbstractBlade, y::Union{Vector{<:Real}, Real}) = x ∧ y
-outer(x::Union{Vector{<:Real}, Real}, y::AbstractBlade) = x ∧ y
+outer(B::AbstractBlade, C::AbstractBlade) = B ∧ C
+outer(B::AbstractBlade{<:Real}, v::Vector{<:Real}) = B ∧ v
+outer(v::Vector{<:Real}, B::AbstractBlade{<:Real}) = v ∧ B
+outer(v::Vector{<:Real}, w::Vector{<:Real}) = v ∧ w
+outer(B::AbstractBlade, x::Real) = B ∧ x
+outer(x::Real, B::AbstractBlade) = x ∧ B
 
 """
-    project(v::Vector, B::AbstractBlade; return_blade::Bool=true)
-    project(B::AbstractBlade, v::Vector; return_blade::Bool=true)
+    proj(v::Vector, B::AbstractBlade; return_blade::Bool=true)
+    proj(B::AbstractBlade, v::Vector; return_blade::Bool=true)
 
 Return the projection of vector `v` onto the subspace represented by blade `B`.
 
 When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
 the return value is a Real (if the result is a scalar) or a Vector.
+
+    proj(B::AbstractBlade, C::AbstractBlade)
+
+Return the projection of `B` onto the subspace represented by blade `C`.
 """
-project(v::Vector{<:Real}, B::Scalar; return_blade::Bool=true) =
+proj(v::Vector{<:Real}, B::Scalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
 
-project(B::Scalar, v::Vector{<:Real}; return_blade::Bool=true) =
+proj(B::Scalar, v::Vector{<:Real}; return_blade::Bool=true) =
     return_blade ? B : value(B)
 
-project(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true) =
-    length(v) != dim(B) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        return_blade ? Blade(v) : v
+function proj(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true)
+    assert_dim_equal(v, B)
+    return_blade ? Blade(v) : v
+end
 
-project(B::Pseudoscalar, v::Vector{<:Real}; return_blade::Bool=true) =
-    length(v) != dim(B) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        return_blade ? zero(B) : 0
+function proj(B::Pseudoscalar, v::Vector{<:Real}; return_blade::Bool=true)
+    assert_dim_equal(v, B)
+    return_blade ? zero(B) : 0
+end
 
-function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
+function proj(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
+    # Check arguments
+    assert_dim_equal(v, B)
 
+    # Compute projection
     projection = (grade(B) == 1) ?
         basis(B) * LinearAlgebra.dot(v, basis(B)) :
         basis(B) * transpose(transpose(v) * basis(B))
@@ -117,48 +138,43 @@ function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
     return_blade ? Blade(projection) : projection
 end
 
-function project(B::Blade, v::Vector{<:Real}; return_blade::Bool=true)
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
+function proj(B::Blade, v::Vector{<:Real}; return_blade::Bool=true)
+    # Check arguments
+    assert_dim_equal(v, B)
 
+    # Compute projection
     projection = (grade(B) == 1) ?
         v * LinearAlgebra.dot(v, basis(B)) : 0
 
     return_blade ? Blade(projection) : projection
 end
 
-"""
-    project(B::AbstractBlade, C::AbstractBlade)
-
-Return the projection of `B` onto the subspace represented by blade `C`.
-"""
 # Projections involving Scalars
-project(B::Scalar, C::Scalar) = B
-project(B::Scalar, C::Blade) = B
-project(B::Blade, C::Scalar) = zero(B)
-project(B::Scalar, C::Pseudoscalar) = B
-project(B::Pseudoscalar, C::Scalar) = zero(B)
+proj(B::Scalar, C::Scalar) = B
+proj(B::Scalar, C::Blade) = B
+proj(B::Blade, C::Scalar) = zero(B)
+proj(B::Scalar, C::Pseudoscalar) = B
+proj(B::Pseudoscalar, C::Scalar) = zero(B)
 
 # Projections involving Pseudoscalars
-function project(B::Pseudoscalar, C::Pseudoscalar)
+function proj(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
     B
 end
 
-function project(B::Pseudoscalar, C::Blade)
+function proj(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
     zero(B)
 end
 
-function project(B::Blade, C::Pseudoscalar)
+function proj(B::Blade, C::Pseudoscalar)
     assert_dim_equal(B, C)
     B
 end
 
 # Projection of one Blade onto another Blade
-function project(B::Blade, C::Blade)
-    # --- Validate arguments
+function proj(B::Blade, C::Blade)
+    # --- Check arguments
 
     assert_dim_equal(B, C)
 
@@ -172,7 +188,7 @@ function project(B::Blade, C::Blade)
     # Compute the projections of basis(B) onto basis(C)
     projections = Matrix{typeof(volume(B))}(undef, dim(B), grade(B))
     for i in 1:grade(B)
-        projections[:, i] = project(basis(B)[:, i], C, return_blade=false)
+        projections[:, i] = proj(basis(B)[:, i], C, return_blade=false)
     end
 
     # Encode volume(B) in the first projection vector
@@ -277,7 +293,7 @@ end
 
 # Duals involving Blades
 function dual(B::Blade, C::Blade)
-    # --- Validate arguments
+    # --- Check arguments
 
     # Check that B and C are extended from the real vector spaces of the same
     # dimension
@@ -394,13 +410,17 @@ import LinearAlgebra.:(⋅), LinearAlgebra.dot
 export ⋅, dot
 
 """
-    ⋅(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
-    ⋅(B::Union{AbstractBlade, Vector}, x::Real)
-    ⋅(x::Real, B::Union{AbstractBlade, Vector})
+    ⋅(B::AbstractBlade, C::AbstractBlade)
+    ⋅(B::AbstractBlade, v::Vector)
+    ⋅(v::Vector, B::AbstractBlade)
+    ⋅(B::AbstractBlade, x::Real)
+    ⋅(x::Real, B::AbstractBlade)
 
-    dot(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
-    dot(B::Union{AbstractBlade, Vector}, x::Real)
-    dot(x::Real, B::Union{AbstractBlade, Vector})
+    dot(B::AbstractBlade, C::AbstractBlade)
+    dot(B::AbstractBlade, v::Vector)
+    dot(v::Vector, B::AbstractBlade)
+    dot(B::AbstractBlade, x::Real)
+    dot(x::Real, B::AbstractBlade)
 
 Return the inner product (left contraction) of `B` and `C`.
 """
@@ -410,14 +430,17 @@ Return the inner product (left contraction) of `B` and `C`.
 ⋅(B::Scalar, C::Scalar) = B * C
 
 ⋅(x::Real, B::Blade) = x * B
-⋅(B::Blade, x::Real) = B * x
+⋅(B::Blade, x::Real) = zero(B)
 ⋅(B::Scalar, C::Blade) = B * C
-⋅(B::Blade, C::Scalar) = B * C
+⋅(B::Blade, C::Scalar) = zero(B)
 
 ⋅(x::Real, B::Pseudoscalar) = x * B
-⋅(B::Pseudoscalar, x::Real) = B * x
+⋅(B::Pseudoscalar, x::Real) = zero(B)
 ⋅(B::Scalar, C::Pseudoscalar) = B * C
-⋅(B::Pseudoscalar, C::Scalar) = B * C
+⋅(B::Pseudoscalar, C::Scalar) = zero(B)
+
+⋅(B::Scalar, v::Vector{<:Real}) = B * C
+⋅(v::Vector{<:Real}, B::Scalar) = zero(B)
 
 # Inner products involving Pseudoscalars
 ⋅(B::Pseudoscalar, C::Blade) = zero(B)
@@ -428,9 +451,16 @@ Return the inner product (left contraction) of `B` and `C`.
         Scalar(value(B) * value(C)) :
         Scalar(-value(B) * value(C))
 
+⋅(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
+⋅(v::Vector{<:Real}, B::Pseudoscalar) = nothing  # TODO
+
 # Inner product between Blades
-function ⋅(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
+function ⋅(B::Blade{<:Real}, C::Blade{<:Real})
+    # --- Check arguments
+
     assert_dim_equal(B, C)
+
+    # --- Handle edge cases
 
     # (B ⋅ C) = 0 if grade(B) > grade(C)
     if grade(B) > grade(C)
@@ -440,7 +470,7 @@ function ⋅(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
     # --- Compute (B ⋅ C) = proj(B, C) * C = proj(B, C) / C
 
     # Compute proj(B, C) = (B ⋅ C) / C
-    projection = project(B, C)
+    projection = proj(B, C)
 
     # Compute volume(B ⋅ C) = ±(norm(proj(B, C) * volume(C))
     volume_B_dot_C = (mod(grade(C), 4) < 2) ?
@@ -455,14 +485,14 @@ end
 
 # Inner products between vectors and Blades
 function ⋅(v::Vector{<:Real}, B::Blade)
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
+    # --- Check arguments
+
+    assert_dim_equal(v, B)
 
     # --- Compute (v ⋅ B) = proj(v, B) * B = ± proj(v, B) / B
 
     # Compute proj(v, B) = (v ⋅ B) / B
-    projection = project(v, B)
+    projection = proj(v, B)
 
    # Construct blade representing dual of proj(v, B) scaled by volume(B)
     grade(B) == 1 ?
@@ -470,23 +500,27 @@ function ⋅(v::Vector{<:Real}, B::Blade)
         volume(B) * Blade(dual(Blade(projection), B), copy_basis=false)
 end
 
-⋅(B::Blade, v::Vector{<:Real}) =
-    length(v) != dim(B) ?
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`")) :
-        grade(B) > 1 ? zero(B) : volume(B) * basis(B) ⋅ v
+function ⋅(B::Blade, v::Vector{<:Real})
+    assert_dim_equal(v, B)
+    grade(B) > 1 ? zero(B) : volume(B) * basis(B) ⋅ v
+end
 
 # Function aliases
-dot(x::AbstractBlade, y::AbstractBlade) = x ⋅ y
-dot(x::AbstractBlade, y::Union{Vector{<:Real}, Real}) = x ⋅ y
-dot(x::Union{Vector{<:Real}, Real}, y::AbstractBlade) = x ⋅ y
+dot(B::AbstractBlade, C::AbstractBlade) = B ⋅ C
+dot(B::AbstractBlade{<:Real}, v::Vector{<:Real}) = B ⋅ v
+dot(v::Vector{<:Real}, B::AbstractBlade{<:Real}) = v ⋅ B
+dot(B::AbstractBlade, x::Real) = B ⋅ x
+dot(x::Real, B::AbstractBlade) = x ⋅ B
 
 """
-    *(B::Union{AbstractBlade, Vector}, C::Union{AbstractBlade, Vector})
+    *(B::AbstractBlade, C::AbstractBlade)
+    *(B::AbstractBlade, v::Vector)
+    *(v::Vector, B::AbstractBlade)
 
 Return the geometric product of `B` and `C`.
 
-    *(B::Union{AbstractBlade}, C::Union{Scalar, Real})
-    *(B::Union{Scalar, Real}, C::Union{AbstractBlade})
+    *(B::AbstractBlade, x::Union{Scalar, Real})
+    *(x::Union{Scalar, Real}, B::AbstractBlade)
 
 Return the product of `B` and `C` when at least one of the arguments is a
 scalar (i.e., scalar multiplication).
@@ -506,43 +540,47 @@ scalar (i.e., scalar multiplication).
 *(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
 *(B::Pseudoscalar, C::Scalar) = C * B
 
+*(B::Scalar, v::Vector{<:Real}) = B * Blade(v)
+*(v::Vector{<:Real}, B::Scalar) = Blade(v) * B
+
 # Geometric products involving Pseudoscalars
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
 *(B::Pseudoscalar, C::Blade) = zero(B)
 
 *(B::Pseudoscalar, C::Pseudoscalar) = B ⋅ C
 
+*(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
+*(v::Vector{<:Real}, B::Pseudoscalar) = Blade(v) * B
+
 # Geometric product between Blades
 function *(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
+    # --- Preparations
+
+    # Check arguments
     assert_dim_equal(B, C)
+
+    # Make sure that grade(B) <= grade(C)
+    if grade(B) > grade(C)
+        D = C; C = B; B = D
+    end
+
+    # --- Compute geometric product
 
     # TODO: Implement. May need geometric product between vectors and
     # multivectors.
-    nothing
-end
-
-# Geometric product between vectors
-function *(v::Vector{<:Real}, w::Vector{<:Real})
-    if length(v) != length(w)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(w)`"))
+    M = Multivector([C])
+    for i in 1:grade(B)
+        M = basis(B)[:, i] * M
     end
-    v_dot_w = Blade(v ⋅ w)
-    v_wedge_w = v ∧ w
-
-    if v_dot_w == zero(v_dot_w)
-        return v_wedge_w
-    elseif v_wedge_w == zero(v_wedge_w)
-        return v_dot_w
-    end
-
-    Multivector([v_dot_w, v_wedge_w])
+    M
 end
 
 # Geometric product between vectors and Blades
 function *(v::Vector{<:Real}, B::Blade)
-    if length(v) != dim(B)
-        throw(DimensionMismatch("`dim(v)` not equal to `dim(B)`"))
-    end
+    # Check arguments
+    assert_dim_equal(v, B)
+
+    # Compute geometric product
     v_dot_B = v ⋅ B
     v_wedge_B = v ∧ B
 
@@ -609,9 +647,21 @@ end
     dim_equal(B::AbstractBlade, C::AbstractBlade)
 
 Assert that the dimensions of `B` and `C` are the same.
+
+    dim_equal(B::AbstractBlade, v::Vector)
+    dim_equal(v::Vector, B::AbstractBlade)
+
+Assert that the dimensions of `B` and `v` are the same.
 """
 function assert_dim_equal(B::AbstractBlade, C::AbstractBlade)
     if dim(B) != dim(C)
         throw(DimensionMismatch("`dim(B)` not equal to `dim(C)`"))
     end
 end
+
+function assert_dim_equal(B::AbstractBlade, v::Vector)
+    if dim(B) != length(v)
+        throw(DimensionMismatch("`dim(B)` not equal to `length(v)`"))
+    end
+end
+assert_dim_equal(v::Vector, B::AbstractBlade) = assert_dim_equal(B, v)
