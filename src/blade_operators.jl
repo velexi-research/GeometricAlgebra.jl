@@ -406,6 +406,9 @@ reverse(B::Pseudoscalar) =
 import Base.:(*)
 import LinearAlgebra.:(⋅), LinearAlgebra.dot
 
+# Exports
+export ⋅, dot
+
 """
     ⋅(B::AbstractBlade, C::AbstractBlade)
     ⋅(B::AbstractBlade, v::Vector)
