@@ -354,7 +354,7 @@ end
     # Exercise functionality
     B_wedge_C = B_vector ∧ C_vector
     @test B_wedge_C ≈ expected_result
-    @test B_wedge_C == outer(B, C)
+    @test outer(B_vector, C_vector) == expected_result
 end
 
 # --- proj(B, C)
