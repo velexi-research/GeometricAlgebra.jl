@@ -18,52 +18,7 @@ import LinearAlgebra
 # --- Types
 
 # Exports
-export AbstractBlade, Scalar, Blade, Pseudoscalar
-
-# AbstractBlade
-"""
-    abstract type AbstractBlade{T<:AbstractFloat}
-
-Supertype for all blade types.
-
-For the AbstractBlade type, the norm and orientation are encoded by the `volume`
-of the blade.
-
-Methods
--------
-    dim(B)::Int
-    grade(B)::Int
-    basis(B)::Matrix{AbstractFloat}
-    volume(B)::AbstractFloat
-    norm(B)::AbstractFloat
-    sign(B)::Int8
-
-Unary Operations
-----------------
-    -(B)::AbstractBlade
-    dual(B)::AbstractBlade
-    reciprocal(B)::AbstractBlade
-    reverse(B)::AbstractBlade
-
-Binary Operations
-------------------
-    ∧(B, C)::AbstractBlade
-    outer(B, C)::AbstractBlade
-
-    ⋅(B, C)::AbstractBlade
-    inner(B, C)::AbstractBlade
-
-    *(B, C)::Union{AbstactBlade, AbstractMultivector}
-    /(B, C)::Union{AbstactBlade, AbstractMultivector}
-
-    +(B, C)::AbstractMultivector
-    -(B, C)::AbstractMultivector
-
-    project(A, B)::AbstractBlade
-    dual(A, B)::AbstractBlade
-"""
-abstract type AbstractBlade{T<:AbstractFloat} end
-
+export Scalar, Blade, Pseudoscalar
 
 # Scalar
 """
@@ -361,7 +316,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     of the `basis` of the original Blade; otherwise, the `basis` of the new
     Blade is reference to the `basis` of the original Blade.
     """
-    Blade{T}(B::Blade{<:AbstractFloat};
+    Blade{T}(B::Blade;
              volume::Real=volume(B),
              atol::Real=blade_atol(T),
              copy_basis::Bool=false) where {T<:AbstractFloat} =
@@ -508,25 +463,25 @@ Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
 import Base.zero, Base.one
 
 """
-    zero(B::AbstractBlade)
-    zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
+    zero(M::AbstractMultivector)
+    zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
 
 Return the additive identity 0.
 """
-zero(B::AbstractBlade) = Scalar{typeof(volume(B))}(0)
-zero(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = Scalar{T}(0)
+zero(M::AbstractMultivector) = Scalar{typeof(norm(M))}(0)
+zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Scalar{T}(0)
 
 """
-    one(B::AbstractBlade)
-    one(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat}
+    one(M::AbstractMultivector)
+    one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
 
 Return the multiplicative identity 1.
 """
-one(B::AbstractBlade) = Scalar{typeof(volume(B))}(1)
-one(::Type{<:AbstractBlade{T}}) where {T<:AbstractFloat} = Scalar{T}(1)
+one(M::AbstractMultivector) = Scalar{typeof(norm(M))}(1)
+one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Scalar{T}(1)
 
 
-# --- Core AbstractBlade functions
+# --- AbstractBlade interface functions: Scalar/Blade/Pseudoscalar
 
 # Imports
 import Base.sign
@@ -590,7 +545,7 @@ Return the sign of `B` relative to its unit basis.
 sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 
-# --- Core Scalar functions
+# --- Scalar/Pseudoscalar functions
 
 # Exports
 export value

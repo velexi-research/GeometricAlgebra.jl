@@ -14,6 +14,8 @@ module GeometricAlgebra
 
 # --- Submodules
 
+include("abstract_types.jl")
+
 include("blade.jl")
 include("blade_comparison_operators.jl")
 include("blade_operators.jl")

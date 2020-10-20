@@ -16,35 +16,7 @@ import DataStructures.SortedDict
 # --- Types
 
 # Exports
-export AbstractMultivector, Multivector
-
-# AbstractMultivector
-"""
-    abstract type AbstractMultivector
-
-Supertype for all multivector types.
-
-Methods
--------
-    grades(M::AbstractMultivector)::Vector
-    summands(M::AbstractMultivector)::SortedDict
-    norm(M::AbstractMultivector)::AbstractFloat
-    reduce(M::AbstractMultivector)::AbstractMultivector
-    getindex(M::AbstractMultivector, grade::Integer)::Vector{<:AbstractBlade}
-
-Unary Operations
-----------------
-    -(M::AbstractMultivector)::AbstractMultivector
-
-Binary Operations
-------------------
-    +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-"""
-abstract type AbstractMultivector end
-
+export Multivector
 
 # Multivector
 """
@@ -52,7 +24,7 @@ abstract type AbstractMultivector end
 
 Multivector represented with the floating-point precision of type `T`.
 """
-struct Multivector{T<:AbstractFloat} <: AbstractMultivector
+struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     #=
       Fields
       ------
@@ -69,9 +41,6 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
     reduced::Bool
 
     """
-        Multivector{T}(blades::Vector{AbstractBlade};
-                       reduced::Bool=false) where {T<:AbstractFloat}
-
     Construct a Multivector from a of vector of blades. When `reduced` is true,
     the summands are combined so that the multivectors of grade ``k`` form
     an orthogonal basis for the subspace of ``k``-vectors.
@@ -106,6 +75,15 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector
         # Return new Multivector
         new(summands, norm, false)
     end
+
+    """
+    Type conversion constructor. Construct a copy of the Multivector converted
+    to the specified precision.
+    """
+    Multivector{T}(M::Multivector) where {T<:AbstractFloat} =
+        T == typeof(norm(M)) ?
+            M :
+            Multivector{T}(reduce(vcat, values(summands(M))))
 end
 
 """
@@ -124,7 +102,7 @@ Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
         Multivector{Float64}(blades)
 
 
-# --- Basic Multivector functions
+# --- AbstractMultivector interface functions: Multivector
 
 # Imports
 import Base.getindex
@@ -176,5 +154,4 @@ import Base.convert
 Convert Blade to have the floating-point precision of type `T`.
 """
 convert(::Type{S}, M::Multivector) where {T<:AbstractFloat, S<:Multivector{T}} =
-    T == typeof(norm(M)) ?
-        M : Multivector{T}(reduce(vcat, values(summands(M))))
+    Multivector{T}(M)
