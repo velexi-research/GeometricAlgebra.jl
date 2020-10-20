@@ -406,9 +406,6 @@ reverse(B::Pseudoscalar) =
 import Base.:(*)
 import LinearAlgebra.:(⋅), LinearAlgebra.dot
 
-# Exports
-export ⋅, dot
-
 """
     ⋅(B::AbstractBlade, C::AbstractBlade)
     ⋅(B::AbstractBlade, v::Vector)
@@ -422,8 +419,8 @@ export ⋅, dot
     dot(B::AbstractBlade, x::Real)
     dot(x::Real, B::AbstractBlade)
 
-Return the inner product (left contraction) of first argument with the second
-argument.
+Return the inner product (left contraction) of the first argument with the
+second argument.
 """
 # Inner products involving Scalars
 ⋅(x::Real, B::Scalar) = x * B
