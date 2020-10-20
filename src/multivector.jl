@@ -64,6 +64,14 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
             push!(k_vectors, convert(AbstractBlade{T}, B))
         end
 
+        # Return AbstractBlade if there is only one term
+        if length(summands) == 1
+            k_vectors = first(values(summands))
+            if length(k_vectors) == 1
+                return first(k_vectors)
+            end
+        end
+
         # Reduce multivector
         if reduced
             # TODO: reduce k-vectors
