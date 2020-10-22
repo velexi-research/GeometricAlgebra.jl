@@ -71,14 +71,23 @@ end
 wedge(B::Scalar, v::Vector{<:Real}) =  Blade(value(B) * v)
 wedge(v::Vector{<:Real}, B::Scalar) = B ∧ v
 
-wedge(v::Vector{<:Real}, B::Blade) = Blade(v) ∧ B
-wedge(B::Blade, v::Vector{<:Real}) = B ∧ Blade(v)
+function wedge(v::Vector{<:Real}, B::Blade)
+    assert_dim_equal(v, B)
+    Blade(hcat(v, basis(B)), volume=LinearAlgebra.norm(v) * volume(B))
+end
+
+function wedge(B::Blade, v::Vector{<:Real})
+    assert_dim_equal(B, v)
+    Blade(hcat(basis(B), v), volume=LinearAlgebra.norm(v) * volume(B))
+end
 
 function wedge(B::Pseudoscalar, v::Vector{<:Real})
     assert_dim_equal(B, v)
     zero(B)
 end
+
 wedge(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
+
 wedge(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
 
 wedge(x::Real, B::Scalar) = x * B
@@ -110,16 +119,6 @@ proj(v::Vector{<:Real}, B::Scalar; return_blade::Bool=true) =
 proj(B::Scalar, v::Vector{<:Real}; return_blade::Bool=true) =
     return_blade ? B : value(B)
 
-function proj(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true)
-    assert_dim_equal(v, B)
-    return_blade ? Blade(v) : v
-end
-
-function proj(B::Pseudoscalar, v::Vector{<:Real}; return_blade::Bool=true)
-    assert_dim_equal(v, B)
-    return_blade ? zero(B) : 0
-end
-
 function proj(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
     # Check arguments
     assert_dim_equal(v, B)
@@ -143,30 +142,22 @@ function proj(B::Blade, v::Vector{<:Real}; return_blade::Bool=true)
     return_blade ? Blade(projection) : projection
 end
 
-# Projections involving Scalars
+function proj(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true)
+    assert_dim_equal(v, B)
+    return_blade ? Blade(v) : v
+end
+
+function proj(B::Pseudoscalar, v::Vector{<:Real}; return_blade::Bool=true)
+    assert_dim_equal(v, B)
+    return_blade ? zero(B) : 0
+end
+
 proj(B::Scalar, C::Scalar) = B
 proj(B::Scalar, C::Blade) = B
 proj(B::Blade, C::Scalar) = zero(B)
 proj(B::Scalar, C::Pseudoscalar) = B
 proj(B::Pseudoscalar, C::Scalar) = zero(B)
 
-# Projections involving Pseudoscalars
-function proj(B::Pseudoscalar, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    B
-end
-
-function proj(B::Pseudoscalar, C::Blade)
-    assert_dim_equal(B, C)
-    zero(B)
-end
-
-function proj(B::Blade, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    B
-end
-
-# Projection of one Blade onto another Blade
 function proj(B::Blade, C::Blade)
     # --- Check arguments
 
@@ -192,6 +183,21 @@ function proj(B::Blade, C::Blade)
     Blade(projections)
 end
 
+function proj(B::Pseudoscalar, C::Blade)
+    assert_dim_equal(B, C)
+    zero(B)
+end
+
+function proj(B::Blade, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    B
+end
+
+function proj(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    B
+end
+
 """
     dual(B)
 
@@ -203,8 +209,6 @@ Valid arguments
     dual(B::Blade)
     dual(B::Pseudoscalar)
 """
-dual(B::Pseudoscalar) = Scalar(value(B))
-
 function dual(B::Blade)
     # --- Extend basis(B) to an orthonormal basis for entire space.
 
@@ -237,6 +241,8 @@ function dual(B::Blade)
                              enforce_constraints=false,
                              copy_basis=false)
 end
+
+dual(B::Pseudoscalar) = Scalar(value(B))
 
 """
     dual(B, dim)
@@ -345,11 +351,6 @@ function dual(B::Blade, C::Blade)
                              copy_basis=false)
 end
 
-function dual(B::Pseudoscalar, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    Scalar(value(B))
-end
-
 function dual(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
     zero(B)
@@ -358,6 +359,11 @@ end
 function dual(B::Blade, C::Pseudoscalar)
     assert_dim_equal(B, C)
     dual(B)
+end
+
+function dual(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    Scalar(value(B))
 end
 
 
@@ -484,6 +490,7 @@ function dot(B::Blade{<:Real}, C::Blade{<:Real})
         volume(C) * Scalar(dual(projection, C)) :
         volume(C) * Blade(dual(projection, C))
 end
+
 dot(B::Pseudoscalar, C::Blade) = zero(B)
 dot(B::Blade, C::Pseudoscalar) = dual(B, C)
 
