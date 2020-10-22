@@ -475,20 +475,13 @@ function dot(B::Blade{<:Real}, C::Blade{<:Real})
         return zero(B)
     end
 
-    # --- Compute (B ⋅ C) = proj(B, C) * C = proj(B, C) / C
+    # --- Compute (B ⋅ C) = proj(B, C) * C = ±proj(B, C) / C
 
     # Compute proj(B, C) = (B ⋅ C) / C
     projection = proj(B, C)
 
-    # Compute volume(B ⋅ C) = ±(norm(proj(B, C) * volume(C))
-    volume_B_dot_C = (mod(grade(C), 4) < 2) ?
-        volume(projection) * volume(C) :
-       -volume(projection) * volume(C)
-
-    # Construct blade representing dual of proj(B, C) scaled by volume(C)
-    grade(B) == grade(C) ?
-        volume(C) * Scalar(dual(projection, C)) :
-        volume(C) * Blade(dual(projection, C))
+    # Construct blade representing the dual of proj(B, C) scaled by volume(C)
+    volume(C) * dual(projection, C)
 end
 
 dot(B::Pseudoscalar, C::Blade) = zero(B)
