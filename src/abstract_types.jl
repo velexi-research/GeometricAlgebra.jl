@@ -26,11 +26,16 @@ Supertype for all multivector types.
 
 Methods
 -------
-    grades(M::AbstractMultivector)::Vector
-    summands(M::AbstractMultivector)::SortedDict
+    grades(M::AbstractMultivector)::Vector{Int}
+    blades(M::AbstractMultivector)::Vector{<:AbstractBlade}
+
+    k_vectors(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
+    getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
+
     norm(M::AbstractMultivector)::AbstractFloat
+
+    TODO: review
     reduce(M::AbstractMultivector)::AbstractMultivector
-    getindex(M::AbstractMultivector, grade::Integer)::Vector{<:AbstractBlade}
 
 Unary Operations
 ----------------
@@ -93,26 +98,35 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 # --- AbstractMultivector interface functions: AbstractBlade
 
+export grades, blades, k_vectors
+
 """
     grades(B::AbstractBlade)
 
-Return a Vector containing the grade of `B`.
+Return a Vector containing the grade of the blade `B`.
 """
 grades(B::AbstractBlade) = Vector([grade(B)])
 
 """
-    summands(B::AbstractBlade)
+    blades(B::AbstractBlade)
 
-Return the a SortedDict containing the `B`.
+Return a Vector containing the blade `B`.
 """
-summands(B::AbstractBlade) =
-    SortedDict{Int, Vector{AbstractBlade}}([(grade(B), [B])])
+blades(B::AbstractBlade) = Vector([B])
 
 """
-    getindex(B::AbstractBlade, k::Integer)
+    k_vectors(B::AbstractBlade, k::Int)
 
-When grade(`B`) is equal to `k`, return a Vector containing `B`. Otherwise,
-return an empty vector.
+Return the `k`-vector component of blade `B`. When grade(`B`) is equal to `k`,
+return a Vector containing `B`. Otherwise, return an empty vector.
 """
-getindex(B::AbstractBlade, k::Integer) =
+k_vectors(B::AbstractBlade, k::Int) =
     k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
+
+"""
+    getindex(B::AbstractBlade, k::Int)
+
+Return the `k`-vector component of blade `B`. When grade(`B`) is equal to `k`,
+return a Vector containing `B`. Otherwise, return an empty vector.
+"""
+Base.getindex(B::AbstractBlade, k::Int) = k_vectors(B)
