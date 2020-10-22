@@ -275,15 +275,21 @@ end
 
     # grade(B) == 1, grade(C) > 1
     B = Blade(test_vector_1)
-    C = Blade(test_basis_2)
 
-    F = LinearAlgebra.qr(test_basis_2)
-    Q = Matrix(F.Q)
-    projection = Blade(Q * transpose(Q) * test_vector_1)
-    expected_volume_C = prod(LinearAlgebra.diag(F.R))
-    expected_result = expected_volume_C * dual(projection, C)
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+    for test_grade in 5:8
+        C = Blade(test_basis_2)
+
+        F = LinearAlgebra.qr(test_basis_2)
+        Q = Matrix(F.Q)
+        projection = Blade(Q * transpose(Q) * test_vector_1)
+        expected_volume_C = prod(LinearAlgebra.diag(F.R))
+        expected_result = mod(grade(C), 4) < 2 ?
+            expected_volume_C * dual(projection, C) :
+           -expected_volume_C * dual(projection, C)
+
+        @test dot(B, C) ≈ expected_result
+        @test B ⋅ C ≈ expected_result
+    end
 
     # grade(B) > 1, grade(C) == 1
     B = Blade(test_basis_1)
@@ -294,16 +300,16 @@ end
     @test B ⋅ C ≈ expected_result
 
     # grade(B) == grade(C) > 1
-    B = Blade(test_basis_1)
-    C = Blade(rand(test_dim, test_grade_1))
+    for test_grade in 5:8
+        B = Blade(rand(test_dim, test_grade))
+        C = Blade(rand(test_dim, test_grade))
 
-    expected_result = volume(B) * volume(C) *
-        LinearAlgebra.det(transpose(basis(B)) * basis(C))
-    expected_result = mod(grade(C), 4) < 2 ?
-        expected_result : -expected_result
+        expected_result = volume(B) * volume(C) *
+            LinearAlgebra.det(transpose(basis(B)) * basis(C))
 
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+        @test dot(B, C) ≈ expected_result
+        @test B ⋅ C ≈ expected_result
+    end
 
     # grade(B) < grade(C), grade(B) > 1, grade(C) > 1,
     B = Blade(test_basis_1)
@@ -316,7 +322,10 @@ end
         Q = Matrix(F.Q)
         projection = Blade(Q * transpose(Q) * test_basis_1)
         expected_volume_C = prod(LinearAlgebra.diag(F.R))
-        expected_result = expected_volume_C * dual(projection, C)
+        expected_result = mod(grade(C), 4) < 2 ?
+            expected_volume_C * dual(projection, C) :
+           -expected_volume_C * dual(projection, C)
+
         @test dot(B, C) ≈ expected_result
         @test B ⋅ C ≈ expected_result
     end
