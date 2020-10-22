@@ -24,6 +24,9 @@ using GeometricAlgebra
 @testset "*(B, C): B or C isa {Scalar, Real}" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -31,11 +34,8 @@ using GeometricAlgebra
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Blade vectors
-    vectors = rand(test_dim, 3)
+    # Test vectors
+    test_vectors = rand(test_dim, 3)
 
     # --- x::Real, B::Scalar
     #     B::Scalar, x::Real
@@ -64,7 +64,7 @@ using GeometricAlgebra
 
     # Preparations
     x = test_value_1
-    B = Blade(vectors)
+    B = Blade(test_vectors)
 
     # Exercise functionality and check results
     expected_result = Blade(basis(B), volume=x * volume(B))
@@ -76,7 +76,7 @@ using GeometricAlgebra
 
     # Preparations
     B = Scalar(test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
 
     # Exercise functionality and check results
     expected_result = Blade(basis(C), volume=value(B) * volume(C))
@@ -125,6 +125,9 @@ end
 @testset "wedge(B, C): B or C isa {Scalar, Real}" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -132,11 +135,8 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Blade vectors
-    vectors = rand(test_dim, 3)
+    # Test vectors
+    test_vectors = rand(test_dim, 3)
 
     # --- x::Real, B::Scalar
     #     B::Scalar, x::Real
@@ -168,7 +168,7 @@ end
 
     # Preparations
     x = test_value_1
-    B = Blade(vectors)
+    B = Blade(test_vectors)
 
     # Exercise functionality and check results
     expected_result = Blade(basis(B), volume=x * volume(B))
@@ -182,7 +182,7 @@ end
 
     # Preparations
     B = Scalar(test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
 
     # Exercise functionality and check results
     expected_result = Blade(basis(C), volume=value(B) * volume(C))
@@ -237,6 +237,9 @@ end
 @testset "wedge(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -244,11 +247,8 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Blade vectors
-    vectors = rand(test_dim, 3)
+    # Test vectors
+    test_vectors = rand(test_dim, 3)
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
@@ -270,7 +270,7 @@ end
 
     # dim(B) == dim(C)
     B = Pseudoscalar(test_dim, test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
 
     expected_result = zero(B)
     @test wedge(B, C) == expected_result
@@ -280,7 +280,7 @@ end
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
     @test_throws DimensionMismatch B ∧ C
     @test_throws DimensionMismatch C ∧ B
 
@@ -447,6 +447,9 @@ end
 @testset "proj(B, C): B or C isa Scalar" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -454,11 +457,8 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Blade vectors
-    vectors = rand(test_dim, 3)
+    # Test vectors
+    test_vectors = rand(test_dim, 3)
 
     # --- B::Scalar, C::Scalar
 
@@ -475,7 +475,7 @@ end
 
     # Preparations
     B = Scalar(test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
 
     # Exercise functionality and check results
     expected_result = Scalar(value(B))
@@ -502,6 +502,9 @@ end
 @testset "proj(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -509,11 +512,8 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Blade vectors
-    vectors = rand(test_dim, 3)
+    # Test vectors
+    test_vectors = rand(test_dim, 3)
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
@@ -534,7 +534,7 @@ end
 
     # dim(B) == dim(C)
     B = Pseudoscalar(test_dim, test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
 
     expected_result = zero(B)
     @test proj(B, C) == expected_result
@@ -544,7 +544,7 @@ end
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
-    C = Blade(vectors)
+    C = Blade(test_vectors)
     @test_throws DimensionMismatch proj(B, C)
     @test_throws DimensionMismatch proj(C, B)
 end
@@ -702,15 +702,15 @@ end
 @testset "dual(B, C): B or C isa Scalar" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
 
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    # Dimension of embedding space
-    test_dim = 10
 
     # --- B::Scalar, C::Scalar
 
@@ -764,14 +764,15 @@ end
 @testset "dual(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
+    # Dimension of embedding space
+    test_dim = 10
+
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
 
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    test_dim = 10
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
