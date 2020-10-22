@@ -909,7 +909,7 @@ end
     end
 end
 
-@testset "Blade: outer constructor - Scalar constructor" begin
+@testset "Blade: outer constructor - Scalar constructors" begin
     # --- Preparations
 
     test_value = rand() + 1  # add 1 to avoid 0
@@ -918,6 +918,7 @@ end
     # --- Exercise functionality and check results
 
     @test Blade(test_value) == Scalar(test_value)
+    @test Blade(Scalar(test_value)) == Scalar(test_value)
 end
 
 # --- Function tests

@@ -388,10 +388,12 @@ Blade(B::Blade;
 
 """
     Blade(x::Real)
+    Blade(x::Scalar)
 
-Convenience constructor that returns a Scalar with value `x`.
+Convenience constructors that return a Scalar with value `x`.
 """
 Blade(x::Real) = Scalar(x)
+Blade(x::Scalar) = Scalar(x)
 
 
 # Pseudoscalar
