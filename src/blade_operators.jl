@@ -464,10 +464,6 @@ dot(B::Scalar, C::Pseudoscalar) = B * C
 dot(B::Pseudoscalar, C::Scalar) = zero(B)
 
 function dot(B::Blade{<:Real}, C::Blade{<:Real})
-    # --- Check arguments
-
-    assert_dim_equal(B, C)
-
     # --- Handle edge cases
 
     # (B ⋅ C) = 0 if grade(B) > grade(C)
@@ -485,12 +481,15 @@ function dot(B::Blade{<:Real}, C::Blade{<:Real})
 end
 
 dot(B::Pseudoscalar, C::Blade) = zero(B)
-dot(B::Blade, C::Pseudoscalar) = dual(B, C)
+dot(B::Blade, C::Pseudoscalar) = dual(B, C) * volume(C)
 
-dot(B::Pseudoscalar, C::Pseudoscalar) =
+function dot(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+
     mod(grade(B), 4) < 2 ?
         Scalar(value(B) * value(C)) :
         Scalar(-value(B) * value(C))
+end
 
 dot(B::Scalar, v::Vector{<:Real}) = B * C
 dot(v::Vector{<:Real}, B::Scalar) = zero(B)
