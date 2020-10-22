@@ -18,12 +18,26 @@ import LinearAlgebra
 
 # --- Core Blade operations
 
-export ∧, outer
+export wedge, ∧
 export proj, dual
 
 # Note: scalar multiplication is grouped with the geometric product functions.
 
 """
+    wedge(B, C)
+    B ∧ C
+
+Return the outer product of the arguments.
+
+Valid arguments
+---------------
+    wedge(B::AbstractBlade, C::AbstractBlade)
+    wedge(B::AbstractBlade, v::Vector)
+    wedge(v::Vector, B::AbstractBlade)
+    wedge(v::Vector, w::Vector)
+    wedge(B::AbstractBlade, x::Real)
+    wedge(x::Real, B::AbstractBlade)
+
     ∧(B::AbstractBlade, C::AbstractBlade)
     ∧(B::AbstractBlade, v::Vector)
     ∧(v::Vector, B::AbstractBlade)
@@ -31,84 +45,64 @@ export proj, dual
     ∧(B::AbstractBlade, x::Real)
     ∧(x::Real, B::AbstractBlade)
 
-    outer(B::AbstractBlade, C::AbstractBlade)
-    outer(B::AbstractBlade, v::Vector)
-    outer(v::Vector, B::AbstractBlade)
-    outer(v::Vector, w::Vector)
-    outer(B::AbstractBlade, x::Real)
-    outer(x::Real, B::AbstractBlade)
-
-Return the outer product of the arguments.
 """
-# Outer products involving scalars
-∧(x::Real, B::Scalar) = x * B
-∧(B::Scalar, x::Real) = B * x
-∧(B::Scalar, C::Scalar) = B * C
+wedge(B::Scalar, C::Scalar) = B * C
+wedge(B::Scalar, C::Blade) = B * C
+wedge(B::Blade, C::Scalar) = B * C
+wedge(B::Scalar, C::Pseudoscalar) = B * C
+wedge(B::Pseudoscalar, C::Scalar) = B * C
 
-∧(x::Real, B::Blade) = x * B
-∧(B::Blade, x::Real) = B * x
-∧(B::Scalar, C::Blade) = B * C
-∧(B::Blade, C::Scalar) = B * C
-
-∧(x::Real, B::Pseudoscalar) = x * B
-∧(B::Pseudoscalar, x::Real) = B * x
-∧(B::Scalar, C::Pseudoscalar) = B * C
-∧(B::Pseudoscalar, C::Scalar) = B * C
-
-∧(B::Scalar, v::Vector{<:Real}) =  Blade(value(B) * v)
-∧(v::Vector{<:Real}, B::Scalar) = B ∧ v
-
-# Outer products involving Pseudoscalars
-function ∧(B::Pseudoscalar, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    zero(B)
-end
-
-function ∧(B::Pseudoscalar, C::Blade)
-    assert_dim_equal(B, C)
-    zero(B)
-end
-∧(B::Blade, C::Pseudoscalar) = C ∧ B
-
-function ∧(B::Pseudoscalar, v::Vector{<:Real})
-    assert_dim_equal(B, v)
-    zero(B)
-end
-∧(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
-
-# Outer product between Blades
-function ∧(B::Blade, C::Blade)
+function wedge(B::Blade, C::Blade)
     assert_dim_equal(B, C)
     Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
 end
 
-# Outer product between vectors
-∧(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
+function wedge(B::Pseudoscalar, C::Blade)
+    assert_dim_equal(B, C)
+    zero(B)
+end
+wedge(B::Blade, C::Pseudoscalar) = C ∧ B
 
-# Outer product between vectors and Blades
-∧(v::Vector{<:Real}, B::Blade) = Blade(v) ∧ B
-∧(B::Blade, v::Vector{<:Real}) = B ∧ Blade(v)
+function wedge(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    zero(B)
+end
 
-# Function aliases
-outer(B::AbstractBlade, C::AbstractBlade) = B ∧ C
-outer(B::AbstractBlade{<:Real}, v::Vector{<:Real}) = B ∧ v
-outer(v::Vector{<:Real}, B::AbstractBlade{<:Real}) = v ∧ B
-outer(v::Vector{<:Real}, w::Vector{<:Real}) = v ∧ w
-outer(B::AbstractBlade, x::Real) = B ∧ x
-outer(x::Real, B::AbstractBlade) = x ∧ B
+wedge(B::Scalar, v::Vector{<:Real}) =  Blade(value(B) * v)
+wedge(v::Vector{<:Real}, B::Scalar) = B ∧ v
+
+wedge(v::Vector{<:Real}, B::Blade) = Blade(v) ∧ B
+wedge(B::Blade, v::Vector{<:Real}) = B ∧ Blade(v)
+
+function wedge(B::Pseudoscalar, v::Vector{<:Real})
+    assert_dim_equal(B, v)
+    zero(B)
+end
+wedge(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
+wedge(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
+
+wedge(x::Real, B::Scalar) = x * B
+wedge(B::Scalar, x::Real) = B * x
+wedge(x::Real, B::Blade) = x * B
+wedge(B::Blade, x::Real) = B * x
+wedge(x::Real, B::Pseudoscalar) = x * B
+wedge(B::Pseudoscalar, x::Real) = B * x
+
+const ∧ = wedge
 
 """
-    proj(v::Vector, B::AbstractBlade; return_blade::Bool=true)
-    proj(B::AbstractBlade, v::Vector; return_blade::Bool=true)
+    proj(B, C; return_blade=true)
 
-Return the projection of vector `v` onto the subspace represented by blade `B`.
+Return the projection of blade `B` onto the subspace represented by blade `C`.
 
 When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
 the return value is a Real (if the result is a scalar) or a Vector.
 
-    proj(B::AbstractBlade, C::AbstractBlade)
-
-Return the projection of `B` onto the subspace represented by blade `C`.
+Valid arguments
+---------------
+    proj(B::AbstractBlade, C::AbstractBlade; return_blade::Bool)
+    proj(v::Vector, B::AbstractBlade; return_blade::Bool)
+    proj(B::AbstractBlade, v::Vector; return_blade::Bool)
 """
 proj(v::Vector{<:Real}, B::Scalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
@@ -199,30 +193,16 @@ function proj(B::Blade, C::Blade)
 end
 
 """
-    dual(B::Union{Blade, Pseudoscalar})
-    dual(B::Scalar, dim::Integer)
+    dual(B)
 
 Return the dual `B` (relative to the space that the geometric algebra is
-extended from). Note that when `B` is a Scalar, the dimension of the embedding
-space must be explicitly specified.
+extended from).
 
-    dual(B::AbstractBlade, C::AbstractBlade)
-
-Return the dual `B` relative to the subspace represented by `C`.
-
-Notes
------
-* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
-  vector spaces of the same dimension and (2) the subspace represented by `B`
-  is contained in subspace represented by `C`.
-
-* The volume of `C` is ignored.
+Valid arguments
+---------------
+    dual(B::Blade)
+    dual(B::Pseudoscalar)
 """
-dual(B::Scalar, dim::Integer) =
-    mod(dim, 4) < 2 ?
-        Pseudoscalar(dim, value(B)) :
-        Pseudoscalar(dim, -value(B))
-
 dual(B::Pseudoscalar) = Scalar(value(B))
 
 function dual(B::Blade)
@@ -258,7 +238,38 @@ function dual(B::Blade)
                              copy_basis=false)
 end
 
-# Duals involving Scalars
+"""
+    dual(B, dim)
+
+Return the dual of `B` when `B` is a Scalar. Note that the dimension of the
+embedding space must be explicitly specified.
+
+Valid arguments
+---------------
+    dual(B::Scalar, dim::Integer)
+"""
+dual(B::Scalar, dim::Integer) =
+    mod(dim, 4) < 2 ?
+        Pseudoscalar(dim, value(B)) :
+        Pseudoscalar(dim, -value(B))
+
+"""
+    dual(B, C)
+
+Return the dual `B` relative to the subspace represented by `C`.
+
+Valid arguments
+---------------
+    dual(B::AbstractBlade, C::AbstractBlade)
+
+Notes
+-----
+* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+  vector spaces of the same dimension and (2) the subspace represented by `B`
+  is contained in subspace represented by `C`.
+
+* The volume of `C` is ignored.
+"""
 dual(B::Scalar, C::Scalar) = B
 
 dual(B::Scalar, C::Blade) =
@@ -275,23 +286,6 @@ dual(B::Scalar, C::Pseudoscalar) =
 
 dual(B::Pseudoscalar, C::Scalar) = zero(B)
 
-# Duals involving Pseudoscalars
-function dual(B::Pseudoscalar, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    Scalar(value(B))
-end
-
-function dual(B::Pseudoscalar, C::Blade)
-    assert_dim_equal(B, C)
-    zero(B)
-end
-
-function dual(B::Blade, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    dual(B)
-end
-
-# Duals involving Blades
 function dual(B::Blade, C::Blade)
     # --- Check arguments
 
@@ -351,6 +345,21 @@ function dual(B::Blade, C::Blade)
                              copy_basis=false)
 end
 
+function dual(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    Scalar(value(B))
+end
+
+function dual(B::Pseudoscalar, C::Blade)
+    assert_dim_equal(B, C)
+    zero(B)
+end
+
+function dual(B::Blade, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    dual(B)
+end
+
 
 # --- Unary operations
 
@@ -361,18 +370,26 @@ import Base.:(-)
 export reciprocal, reverse
 
 """
-    -(B::AbstractBlade)
+    -B
 
 Return the additive inverse of `B`.
+
+Valid arguments
+---------------
+    -(B::AbstractBlade)
 """
 -(B::Scalar) = Scalar(B, value=-value(B))
 -(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B))
 -(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
 
 """
-    reciprocal(B::AbstractBlade)
+    reciprocal(B)
 
 Return the multiplicative inverse of `B`.
+
+Valid arguments
+---------------
+    reciprocal(B::AbstractBlade)
 """
 reciprocal(B::Scalar) = Scalar(B, value=1 / value(B))
 
@@ -387,9 +404,13 @@ reciprocal(B::Pseudoscalar) =
         Pseudoscalar(B, value=-1 / value(B))
 
 """
-    reverse(B::AbstractBlade)
+    reverse(B)
 
 Return the multiplicative inverse of `B`.
+
+Valid arguments
+---------------
+    reverse(B::AbstractBlade)
 """
 reverse(B::Scalar) = B
 
@@ -404,59 +425,39 @@ reverse(B::Pseudoscalar) =
 
 # Imports
 import Base.:(*)
-import LinearAlgebra.:(⋅), LinearAlgebra.dot
+import LinearAlgebra.dot
 
 # Exports
-export ⋅, dot
+export dot, ⋅
 
 """
-    ⋅(B::AbstractBlade, C::AbstractBlade)
-    ⋅(B::AbstractBlade, v::Vector)
-    ⋅(v::Vector, B::AbstractBlade)
-    ⋅(B::AbstractBlade, x::Real)
-    ⋅(x::Real, B::AbstractBlade)
+    dot(B, C)
+    B ⋅ C
 
+Return the inner product (left contraction) of the first argument with the
+second argument.
+
+Valid arguments
+---------------
     dot(B::AbstractBlade, C::AbstractBlade)
     dot(B::AbstractBlade, v::Vector)
     dot(v::Vector, B::AbstractBlade)
     dot(B::AbstractBlade, x::Real)
     dot(x::Real, B::AbstractBlade)
 
-Return the inner product (left contraction) of the first argument with the
-second argument.
+    ⋅(B::AbstractBlade, C::AbstractBlade)
+    ⋅(B::AbstractBlade, v::Vector)
+    ⋅(v::Vector, B::AbstractBlade)
+    ⋅(B::AbstractBlade, x::Real)
+    ⋅(x::Real, B::AbstractBlade)
 """
-# Inner products involving Scalars
-⋅(x::Real, B::Scalar) = x * B
-⋅(B::Scalar, x::Real) = B * x
-⋅(B::Scalar, C::Scalar) = B * C
+dot(B::Scalar, C::Scalar) = B * C
+dot(B::Scalar, C::Blade) = B * C
+dot(B::Blade, C::Scalar) = zero(B)
+dot(B::Scalar, C::Pseudoscalar) = B * C
+dot(B::Pseudoscalar, C::Scalar) = zero(B)
 
-⋅(x::Real, B::Blade) = x * B
-⋅(B::Blade, x::Real) = zero(B)
-⋅(B::Scalar, C::Blade) = B * C
-⋅(B::Blade, C::Scalar) = zero(B)
-
-⋅(x::Real, B::Pseudoscalar) = x * B
-⋅(B::Pseudoscalar, x::Real) = zero(B)
-⋅(B::Scalar, C::Pseudoscalar) = B * C
-⋅(B::Pseudoscalar, C::Scalar) = zero(B)
-
-⋅(B::Scalar, v::Vector{<:Real}) = B * C
-⋅(v::Vector{<:Real}, B::Scalar) = zero(B)
-
-# Inner products involving Pseudoscalars
-⋅(B::Pseudoscalar, C::Blade) = zero(B)
-⋅(B::Blade, C::Pseudoscalar) = dual(B, C)
-
-⋅(B::Pseudoscalar, C::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?
-        Scalar(value(B) * value(C)) :
-        Scalar(-value(B) * value(C))
-
-⋅(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
-⋅(v::Vector{<:Real}, B::Pseudoscalar) = nothing  # TODO
-
-# Inner product between Blades
-function ⋅(B::Blade{<:Real}, C::Blade{<:Real})
+function dot(B::Blade{<:Real}, C::Blade{<:Real})
     # --- Check arguments
 
     assert_dim_equal(B, C)
@@ -483,9 +484,18 @@ function ⋅(B::Blade{<:Real}, C::Blade{<:Real})
         volume(C) * Scalar(dual(projection, C)) :
         volume(C) * Blade(dual(projection, C))
 end
+dot(B::Pseudoscalar, C::Blade) = zero(B)
+dot(B::Blade, C::Pseudoscalar) = dual(B, C)
 
-# Inner products between vectors and Blades
-function ⋅(v::Vector{<:Real}, B::Blade)
+dot(B::Pseudoscalar, C::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?
+        Scalar(value(B) * value(C)) :
+        Scalar(-value(B) * value(C))
+
+dot(B::Scalar, v::Vector{<:Real}) = B * C
+dot(v::Vector{<:Real}, B::Scalar) = zero(B)
+
+function dot(v::Vector{<:Real}, B::Blade)
     # --- Check arguments
 
     assert_dim_equal(v, B)
@@ -501,82 +511,76 @@ function ⋅(v::Vector{<:Real}, B::Blade)
         volume(B) * Blade(dual(Blade(projection), B), copy_basis=false)
 end
 
-function ⋅(B::Blade, v::Vector{<:Real})
+function dot(B::Blade, v::Vector{<:Real})
     assert_dim_equal(v, B)
-    grade(B) > 1 ? zero(B) : volume(B) * basis(B) ⋅ v
+    grade(B) > 1 ? zero(B) : Scalar(volume(B) * basis(B) ⋅ v)
 end
 
-# Function aliases
-dot(B::AbstractBlade, C::AbstractBlade) = B ⋅ C
-dot(B::AbstractBlade{<:Real}, v::Vector{<:Real}) = B ⋅ v
-dot(v::Vector{<:Real}, B::AbstractBlade{<:Real}) = v ⋅ B
-dot(B::AbstractBlade, x::Real) = B ⋅ x
-dot(x::Real, B::AbstractBlade) = x ⋅ B
+dot(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
+dot(v::Vector{<:Real}, B::Pseudoscalar) = nothing  # TODO
+
+dot(x::Real, B::Scalar) = x * B
+dot(B::Scalar, x::Real) = B * x
+dot(x::Real, B::Blade) = x * B
+dot(B::Blade, x::Real) = zero(B)
+dot(x::Real, B::Pseudoscalar) = x * B
+dot(B::Pseudoscalar, x::Real) = zero(B)
 
 """
+    B * C
+
+Return the geometric product of the arguments.
+TODO: define a geometric product function
+
+Valid arguments
+---------------
     *(B::AbstractBlade, C::AbstractBlade)
     *(B::AbstractBlade, v::Vector)
     *(v::Vector, B::AbstractBlade)
-
-Return the geometric product of the arguments.
-
-    *(B::AbstractBlade, x::Union{Scalar, Real})
-    *(x::Union{Scalar, Real}, B::AbstractBlade)
-
-Return the product of the arguments when one (or both) of the arguments is a
-scalar (i.e., scalar multiplication).
+    *(B::AbstractBlade, x::Real)
+    *(x::Real, B::AbstractBlade)
 """
-# Geometric products involving scalars (i.e., scalar multiplication)
-*(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
-*(B::Scalar, x::Real) = x * B
 *(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
-
-*(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
-*(B::Blade, x::Real) = x * B
 *(B::Scalar, C::Blade) = value(B) * C
 *(B::Blade, C::Scalar) = C * B
-
-*(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
-*(B::Pseudoscalar, x::Real) = x * B
 *(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
 *(B::Pseudoscalar, C::Scalar) = C * B
 
-*(B::Scalar, v::Vector{<:Real}) = B * Blade(v)
-*(v::Vector{<:Real}, B::Scalar) = Blade(v) * B
-
-# Geometric products involving Pseudoscalars
-*(B::Blade, C::Pseudoscalar) = B ⋅ C
-*(B::Pseudoscalar, C::Blade) = zero(B)
-
-*(B::Pseudoscalar, C::Pseudoscalar) = B ⋅ C
-
-*(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
-*(v::Vector{<:Real}, B::Pseudoscalar) = Blade(v) * B
-
-# Geometric product between Blades
 function *(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
     # --- Preparations
 
     # Check arguments
     assert_dim_equal(B, C)
 
-    # Make sure that grade(B) <= grade(C)
-    if grade(B) > grade(C)
-        D = C; C = B; B = D
-    end
-
     # --- Compute geometric product
 
-    # TODO: Implement. May need geometric product between vectors and
-    # multivectors.
-    M = Multivector([C])
-    for i in 1:grade(B)
-        M = basis(B)[:, i] * M
+    if grade(B) < grade(C)
+        println("GOT HERE B")
+        M = C
+        for i in grade(B):-1:1
+            M = basis(B)[:, i] * M
+        end
+        M = volume(B) * M
+    else
+        M = B
+        for i in 1:grade(C)
+            M = M * basis(C)[:, i]
+        end
+        M = volume(C) * M
     end
+
     M
 end
 
-# Geometric product between vectors and Blades
+*(B::Blade, C::Pseudoscalar) = B ⋅ C
+*(B::Pseudoscalar, C::Blade) = zero(B)
+*(B::Pseudoscalar, C::Pseudoscalar) = B ⋅ C
+
+*(B::Scalar, v::Vector{<:Real}) = B * Blade(v)
+*(v::Vector{<:Real}, B::Scalar) = Blade(v) * B
+*(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
+*(v::Vector{<:Real}, B::Pseudoscalar) = Blade(v) * B
+
 function *(v::Vector{<:Real}, B::Blade)
     # Check arguments
     assert_dim_equal(v, B)
@@ -594,7 +598,31 @@ function *(v::Vector{<:Real}, B::Blade)
     Multivector([v_dot_B, v_wedge_B])
 end
 
-*(B::Blade, v::Vector{<:Real}) = B ∧ v
+function *(B::Blade, v::Vector{<:Real})
+    # Check arguments
+    assert_dim_equal(v, B)
+
+    # Compute geometric product
+    B_dot_v = B ⋅ v
+    B_wedge_v = B ∧ v
+
+    if B_dot_v == zero(B_dot_v)
+        return B_wedge_v
+    elseif B_wedge_v == zero(B_wedge_v)
+        return B_dot_v
+    end
+
+    println(B_dot_v)
+    println(B_wedge_v)
+    Multivector([B_dot_v, B_wedge_v])
+end
+
+*(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
+*(B::Scalar, x::Real) = x * B
+*(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
+*(B::Blade, x::Real) = x * B
+*(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
+*(B::Pseudoscalar, x::Real) = x * B
 
 
 # --- Utility functions
@@ -602,10 +630,14 @@ end
 export rejection
 
 """
-    rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
+    rejection(vectors, B; normalize=false)
 
 Compute rejections of `vectors` from `B`. When `normalize` is true, the
 rejection vectors are normalized.
+
+Valid arguments
+---------------
+    rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
 """
 function rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
     # --- Validate arguments
@@ -645,14 +677,15 @@ end
 # --- Non-exported utility functions
 
 """
-    dim_equal(B::AbstractBlade, C::AbstractBlade)
+    dim_equal(B, C)
 
 Assert that the dimensions of `B` and `C` are the same.
 
+Valid arguments
+---------------
+    dim_equal(B::AbstractBlade, C::AbstractBlade)
     dim_equal(B::AbstractBlade, v::Vector)
     dim_equal(v::Vector, B::AbstractBlade)
-
-Assert that the dimensions of `B` and `v` are the same.
 """
 function assert_dim_equal(B::AbstractBlade, C::AbstractBlade)
     if dim(B) != dim(C)
