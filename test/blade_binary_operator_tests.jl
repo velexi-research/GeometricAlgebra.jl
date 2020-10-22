@@ -192,6 +192,60 @@ end
     @test B ⋅ x == expected_result
 end
 
+@testset "dot(B, C): B or C isa Pseudoscalar" begin
+    # --- Preparations
+
+    # Dimension of embedding space
+    test_dim = 10
+    test_grade = 3
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # Test vectors
+    test_vector = rand(test_dim)
+
+    # Test bases
+    test_basis = rand(test_dim, test_grade)
+
+    # --- B::Pseudoscalar, C::Blade
+
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Blade(test_basis)
+
+    expected_result = zero(B)
+    @test dot(B, C) ≈ expected_result
+    @test B ⋅ C ≈ expected_result
+
+    # --- B::Blade, C::Pseudoscalar
+
+    B = Blade(rand(test_dim, test_grade))
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    expected_result = value(C) * dual(B)
+
+    @test dot(B, C) ≈ expected_result
+    @test B ⋅ C ≈ expected_result
+
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
+    for test_dim in 10:13
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = Pseudoscalar(test_dim, test_value_2)
+
+        expected_result = mod(grade(C), 4) < 2 ?
+            Scalar(value(B) * value(C)) :
+            Scalar(-value(B) * value(C))
+
+        @test dot(B, C) == expected_result
+        @test B ⋅ C == expected_result
+    end
+end
+
 @testset "dot(B, C): B, C::Blade" begin
     # --- Preparations
 
@@ -243,8 +297,8 @@ end
     B = Blade(test_basis_1)
     C = Blade(rand(test_dim, test_grade_1))
 
-    expected_result =
-        volume(B) * volume(C) * volume(Blade(transpose(basis(B)) * basis(C)))
+    expected_result = volume(B) * volume(C) *
+        LinearAlgebra.det(transpose(basis(B)) * basis(C))
     expected_result = mod(grade(C), 4) < 2 ?
         expected_result : -expected_result
 
@@ -253,15 +307,19 @@ end
 
     # grade(B) < grade(C), grade(B) > 1, grade(C) > 1,
     B = Blade(test_basis_1)
-    C = Blade(test_basis_2)
 
-    F = LinearAlgebra.qr(test_basis_2)
-    Q = Matrix(F.Q)
-    projection = Blade(Q * transpose(Q) * test_basis_1)
-    expected_volume_C = prod(LinearAlgebra.diag(F.R))
-    expected_result = expected_volume_C * dual(projection, C)
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+    for test_grade in 5:8
+        test_basis_C = rand(test_dim, test_grade)
+        C = Blade(test_basis_C)
+
+        F = LinearAlgebra.qr(test_basis_C)
+        Q = Matrix(F.Q)
+        projection = Blade(Q * transpose(Q) * test_basis_1)
+        expected_volume_C = prod(LinearAlgebra.diag(F.R))
+        expected_result = expected_volume_C * dual(projection, C)
+        @test dot(B, C) ≈ expected_result
+        @test B ⋅ C ≈ expected_result
+    end
 
     # grade(B) > grade(C), grade(B) > 1, grade(C) > 1,
     B = Blade(test_basis_2)
@@ -297,22 +355,6 @@ end
 
     # --- v::vector, B::Scalar
     #     B::Scalar, v::vector
-
-    # TODO
-end
-
-@testset "dot(B, C): B or C isa Pseudoscalar" begin
-    # --- Preparations
-
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Test vectors
-    v = rand(test_dim)
-    w = rand(test_dim)
-
-    # --- v::vector, B::Pseudoscalar
-    #     B::Pseudoscalar, v::vector
 
     # TODO
 end
