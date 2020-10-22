@@ -29,7 +29,6 @@ Methods
     grades(M::AbstractMultivector)::Vector{Int}
     blades(M::AbstractMultivector)::Vector{<:AbstractBlade}
 
-    k_vectors(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
     getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
 
     norm(M::AbstractMultivector)::AbstractFloat
@@ -98,7 +97,7 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 # --- AbstractMultivector interface functions: AbstractBlade
 
-export grades, blades, k_vectors
+export grades, blades
 
 """
     grades(B::AbstractBlade)
@@ -115,18 +114,10 @@ Return a Vector containing the blade `B`.
 blades(B::AbstractBlade) = Vector([B])
 
 """
-    k_vectors(B::AbstractBlade, k::Int)
-
-Return the `k`-vector component of blade `B`. When grade(`B`) is equal to `k`,
-return a Vector containing `B`. Otherwise, return an empty vector.
-"""
-k_vectors(B::AbstractBlade, k::Int) =
-    k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
-
-"""
     getindex(B::AbstractBlade, k::Int)
 
 Return the `k`-vector component of blade `B`. When grade(`B`) is equal to `k`,
 return a Vector containing `B`. Otherwise, return an empty vector.
 """
-Base.getindex(B::AbstractBlade, k::Int) = k_vectors(B)
+Base.getindex(B::AbstractBlade, k::Int) =
+    k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
