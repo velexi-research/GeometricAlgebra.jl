@@ -20,7 +20,7 @@ export AbstractMultivector, AbstractBlade
 
 # AbstractMultivector
 """
-    abstract type AbstractMultivector
+    AbstractMultivector{<:AbstractFloat}
 
 Supertype for all multivector types.
 
@@ -53,7 +53,7 @@ abstract type AbstractMultivector{T<:AbstractFloat} end
 
 # AbstractBlade
 """
-    abstract type AbstractBlade{T<:AbstractFloat}
+    AbstractBlade{<:AbstractFloat}
 
 Supertype for all blade types.
 
