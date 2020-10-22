@@ -53,10 +53,10 @@ using GeometricAlgebra
 
         # default value for `reduced`
         M = Multivector{precision_type}(blades)
-        @test length(M.summands) == length(blades)
+        @test length(M.parts) == length(blades)
         for B in blades
-            @test haskey(M.summands, grade(B))
-            @test length(M.summands[grade(B)]) == 1
+            @test haskey(M.parts, grade(B))
+            @test length(M.parts[grade(B)]) == 1
         end
     end
 end
@@ -114,20 +114,30 @@ end
         scalar = Scalar{precision_type}(test_value)
         one_blade = Blade{precision_type}(one_vector)
         pseudoscalar = Pseudoscalar{precision_type}(test_dim, test_value)
-        blades = Vector([scalar, one_blade, pseudoscalar])
-        M = Multivector{precision_type}(blades)
+        expected_blades = Vector([scalar, one_blade, pseudoscalar])
+        M = Multivector{precision_type}(expected_blades)
 
-        expected_summands = SortedDict(0=>Vector([scalar]),
-                                       1=>Vector([one_blade]),
-                                       test_dim=>Vector([pseudoscalar]))
+        expected_parts = SortedDict(0=>Vector([scalar]),
+                                    1=>Vector([one_blade]),
+                                    test_dim=>Vector([pseudoscalar]))
+        expected_blades = reduce(vcat, values(expected_parts))
 
         # grades()
         @test grades(M) == [0, 1, 3]
         @test grades(M, collect=false) isa SDMKeyIteration
 
-        # summands()
-        @test summands(M) isa SortedDict{Int, Vector{AbstractBlade}}
-        @test summands(M) == expected_summands
+        # blades()
+        @test blades(M) isa Vector{AbstractBlade}
+        @test blades(M) == expected_blades
+
+        # getindex()
+        for k in 1:test_dim
+            if k in grades(M)
+                k_vectors = M[k]
+                @test k_vectors isa Vector{AbstractBlade}
+                @test k_vectors == expected_parts[k]
+            end
+        end
 
         # norm()
         @test_skip norm(M) == 0

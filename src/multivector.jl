@@ -28,21 +28,20 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     #=
       Fields
       ------
-      * `summands`: collection of blades that sum to the value of the
-        multivector
+      * `parts`: collection of k-vectors that sum to the multivector
 
-      * `norm`: norm of multivector
+      * `norm`: norm of the multivector
 
-      * `reduced`: True if multivector is guaranteed to be reduced to a sum
-        of orthogonal blades; False otherwise.
+      * `reduced`: True if the multivector is guaranteed to be reduced to a
+        sum of orthogonal blades; False otherwise.
     =#
-    summands::SortedDict{Int, Vector{AbstractBlade}}
+    parts::SortedDict{Int, Vector{AbstractBlade}}
     norm::T
     reduced::Bool
 
     """
-    Construct a Multivector from a of vector of blades. When `reduced` is true,
-    the summands are combined so that the multivectors of grade ``k`` form
+    Construct a Multivector from a of vector of blades. For each grade ``k``,
+    the blades used to represent the ``k``-vector part of the multivector form
     an orthogonal basis for the subspace of ``k``-vectors.
     """
     function Multivector{T}(blades::Vector{<:AbstractBlade};
@@ -56,17 +55,21 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
 
         # --- Construct Multivector
 
-        # Construct `summands`. Sort blades by grade.
-        summands = SortedDict{Int, Vector{AbstractBlade}}()
+        # Construct `parts`. Sort blades by grade.
+        parts = SortedDict{Int, Vector{AbstractBlade}}()
         for B in blades
-            k = grade(B)
-            k_vectors = get!(summands, k, [])
+            # Ignore Scalar(0)
+            if volume(B) == 0
+                continue
+            end
+
+            k_vectors = get!(parts, grade(B), [])
             push!(k_vectors, convert(AbstractBlade{T}, B))
         end
 
         # Return AbstractBlade if there is only one term
-        if length(summands) == 1
-            k_vectors = first(values(summands))
+        if length(parts) == 1
+            k_vectors = first(values(parts))
             if length(k_vectors) == 1
                 return first(k_vectors)
             end
@@ -81,7 +84,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
         norm = 0  # TODO: implement
 
         # Return new Multivector
-        new(summands, norm, false)
+        new(parts, norm, false)
     end
 
     """
@@ -91,14 +94,14 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     Multivector{T}(M::Multivector) where {T<:AbstractFloat} =
         T == typeof(norm(M)) ?
             M :
-            Multivector{T}(reduce(vcat, values(summands(M))))
+            Multivector{T}(reduce(vcat, blades(M)))
 end
 
 """
     Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false)
 
-Construct a Multivector from a of vector of blades. When `reduced` is true, the
-summands are combined so that the multivectors of grade ``k`` form an
+Construct a Multivector from a of vector of blades. For each grade ``k``, the
+blades used to represent the ``k``-vector part of the multivector form an
 orthogonal basis for the subspace of ``k``-vectors.
 
 The precision of the Multivector is inferred from the precision of the first
@@ -109,43 +112,48 @@ Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
         Multivector{typeof(volume(blades[1]))}(blades, reduced=reduced) :
         Multivector{Float64}(blades)
 
+Multivector(multivectors::Vector{<:AbstractMultivector}; reduced::Bool=false) =
+    length(multivectors) > 0 ?
+        Multivector(reduce(vcat, map(blades, multivectors)), reduced=reduced) :
+        Multivector{Float64}(Vector{AbstractBlade}())
+
+
 
 # --- AbstractMultivector interface functions: Multivector
 
-# Imports
-import Base.getindex
-
 # Exports
-export grades, summands
+export grades, blades
 
 """
     grades(M::Multivector; collect=true)
 
-Return the grades of the blades that the multivector is composed of. When
-`collect` is `false`, an iterator over the keys is returned.
+Return the grades of the blades that multivector `M` is composed of. When
+`collect` is `false`, an iterator over the grades is returned.
 """
 grades(M::Multivector; collect=true) =
-    collect ? Base.collect(keys(M.summands)) : keys(M.summands)
+    collect ?
+        Base.collect(keys(M.parts)) :
+        keys(M.parts)
 
 """
-    getindex(M::Multivector, grade::Integer)
+    blades(M::Multivector)
 
-Return multivectors of `M` with the specified `grade`.
+Return the blades that the multivector `M` is composed of.
 """
-getindex(M::Multivector, grade::Integer) =
-    grade in grades(M) ?  M.summands[grade] : Vector{AbstractBlade}()
+blades(M::Multivector) = reduce(vcat, values(M.parts))
 
 """
-    summands(M::Multivector)
+    getindex(M::Multivector, k::Int)
 
-Return the blades that the multivector is composed of.
+Return the `k`-vector component of multivector `M`.
 """
-summands(M::Multivector) = M.summands
+Base.getindex(M::Multivector, k::Int) =
+    k in grades(M) ?  M.parts[k] : Vector{AbstractBlade}()
 
 """
     norm(M::Multivector)
 
-Return the norm of the multivector.
+Return the norm of the multivector `M`.
 """
 norm(M::Multivector) = M.norm
 
