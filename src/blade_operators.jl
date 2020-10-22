@@ -471,13 +471,21 @@ function dot(B::Blade{<:Real}, C::Blade{<:Real})
         return zero(B)
     end
 
-    # --- Compute (B ⋅ C) = proj(B, C) * C = ±proj(B, C) / C
+    # --- Compute (B ⋅ C) = proj(B, C) * C
+    #     = volume(C) dual(proj(B, C), C) * I_C
+    #     = (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) proj(B, C) / I_C
+    #     = (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) dual(proj(B, C), C)
+    #
+    #     where I_C is the unit blade for the subspace represented by blade `C`
+    #     that has the same orientation as basis(C).
 
     # Compute proj(B, C) = (B ⋅ C) / C
     projection = proj(B, C)
 
-    # Construct blade representing the dual of proj(B, C) scaled by volume(C)
-    volume(C) * dual(projection, C)
+    # Compute (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) dual(proj(B, C), C)
+    mod(grade(C), 4) < 2 ?
+        volume(C) * dual(projection, C) :
+       -volume(C) * dual(projection, C)
 end
 
 dot(B::Pseudoscalar, C::Blade) = zero(B)
@@ -504,7 +512,7 @@ function dot(v::Vector{<:Real}, B::Blade)
     # Compute proj(v, B) = (v ⋅ B) / B
     projection = proj(v, B)
 
-   # Construct blade representing dual of proj(v, B) scaled by volume(B)
+    # Construct blade representing dual of proj(v, B) scaled by volume(B)
     grade(B) == 1 ?
         volume(B) * Scalar(dual(projection, B)) :
         volume(B) * Blade(dual(Blade(projection), B), copy_basis=false)
@@ -516,7 +524,13 @@ function dot(B::Blade, v::Vector{<:Real})
 end
 
 dot(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
-dot(v::Vector{<:Real}, B::Pseudoscalar) = nothing  # TODO
+
+function dot(v::Vector{<:Real}, B::Pseudoscalar)
+    assert_dim_equal(v, B)
+    mod(grade(C), 4) < 2 ?
+        norm(B) * dual(Blade(v)) :
+       -norm(B) * dual(Blade(v))
+end
 
 dot(x::Real, B::Scalar) = x * B
 dot(B::Scalar, x::Real) = B * x
