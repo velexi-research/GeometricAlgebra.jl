@@ -313,10 +313,14 @@ end
                      [0; 0; 0; 4; 0])
     C = Blade(C_vectors)
 
-    # Exercise functionality
+    # dim(B) == dim(C)
     B_wedge_C = wedge(B, C)
     @test B_wedge_C ≈ Blade(hcat(B_vectors, C_vectors))
     @test B_wedge_C == B ∧ C
+
+    # dim(B) != dim(C)
+    C = Blade(rand(dim(B) + 1, 2))
+    @test_throws DimensionMismatch wedge(B, C)
 
     # --- B::Blade, C::Vector
     #     B::Vector, C::Blade
@@ -329,9 +333,9 @@ end
     C_vector = [0; 0; 3; 0; 0]
     C = Blade(C_vector)
 
+    # dim(B) == dim(C)
     expected_result = Blade(hcat(B_vectors, C_vector))
 
-    # Exercise functionality
     B_wedge_C = wedge(B, C_vector)
     @test B_wedge_C ≈ expected_result
     @test B_wedge_C == B ∧ C_vector
@@ -339,6 +343,11 @@ end
     C_wedge_B = wedge(C_vector, B)
     @test C_wedge_B ≈ (-1)^(grade(B)) * expected_result
     @test C_wedge_B == C_vector ∧ B
+
+    # dim(B) != dim(C)
+    C = Vector(rand(dim(B) + 1))
+    @test_throws DimensionMismatch wedge(B, C)
+    @test_throws DimensionMismatch wedge(C, B)
 
     # --- B::Vector, C::Vector
 
@@ -349,12 +358,16 @@ end
     C_vector = [0; 0; 3; 0; 0]
     C = Blade(C_vector)
 
-    expected_result = Blade(hcat(B_vector, C_vector))
-
-    # Exercise functionality
+    # dim(B) == dim(C)
     B_wedge_C = wedge(B_vector, C_vector)
+    expected_result = Blade(hcat(B_vector, C_vector))
     @test B_wedge_C ≈ expected_result
     @test B_vector ∧ C_vector ≈ expected_result
+
+    # dim(B) != dim(C)
+    C_vector = Vector(rand(dim(B) + 1))
+    @test_throws DimensionMismatch wedge(B_vector, C_vector)
+    @test_throws DimensionMismatch wedge(C_vector, B_vector)
 end
 
 # --- proj(B, C)
@@ -438,7 +451,7 @@ end
     projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
     @test proj(B, v, return_blade=false) ≈ projection_vectors
 
-    # dim(B) != dim(C)
+    # length(v) != dim(B)
     B = Blade(rand(test_dim + 1, 3))
     @test_throws DimensionMismatch proj(v, B)
     @test_throws DimensionMismatch proj(B, v)
