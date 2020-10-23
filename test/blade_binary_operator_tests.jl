@@ -195,10 +195,6 @@ end
 @testset "dot(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
-    # Dimension of embedding space
-    test_dim = 10
-    test_grade = 3
-
     # Test values
     test_value_1 = rand()
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -206,13 +202,12 @@ end
     test_value_2 = rand()
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # Test vectors
-    test_vector = rand(test_dim)
-
-    # Test bases
-    test_basis = rand(test_dim, test_grade)
-
     # --- B::Pseudoscalar, C::Blade
+
+    # dim(B) == dim(C)
+    test_dim = 10
+    test_grade = 5
+    test_basis = rand(test_dim, test_grade)
 
     B = Pseudoscalar(test_dim, test_value_1)
     C = Blade(test_basis)
@@ -221,18 +216,37 @@ end
     @test dot(B, C) ≈ expected_result
     @test B ⋅ C ≈ expected_result
 
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim + 1, test_value_1)
+    C = Blade(test_basis)
+    @test_throws DimensionMismatch dot(B, C)
+    @test_throws DimensionMismatch B ⋅ C
+
     # --- B::Blade, C::Pseudoscalar
 
-    B = Blade(rand(test_dim, test_grade))
-    C = Pseudoscalar(test_dim, test_value_2)
+    # dim(B) == dim(C)
+    test_grade = 3
+    for test_dim in 10:13
+        B = Blade(rand(test_dim, test_grade))
+        C = Pseudoscalar(test_dim, test_value_2)
 
-    expected_result = value(C) * dual(B)
+        expected_result = mod(test_dim, 4) < 2 ?
+            value(C) * dual(B) :
+           -value(C) * dual(B)
 
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+        @test dot(B, C) ≈ expected_result
+        @test B ⋅ C ≈ expected_result
+    end
+
+    # dim(B) != dim(C)
+    B = Blade(test_basis)
+    C = Pseudoscalar(test_dim + 1, test_value_2)
+    @test_throws DimensionMismatch dot(B, C)
+    @test_throws DimensionMismatch B ⋅ C
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
+    # dim(B) == dim(C)
     for test_dim in 10:13
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
@@ -244,6 +258,12 @@ end
         @test dot(B, C) == expected_result
         @test B ⋅ C == expected_result
     end
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Pseudoscalar(test_dim + 1, test_value_2)
+    @test_throws DimensionMismatch dot(B, C)
+    @test_throws DimensionMismatch B ⋅ C
 end
 
 @testset "dot(B, C): B, C::Blade" begin
@@ -337,35 +357,125 @@ end
     expected_result = zero(B)
     @test dot(B, C) == expected_result
     @test B ⋅ C == expected_result
+
+    # dim(B) != dim(C)
+    B = Blade(rand(test_dim, 3))
+    C = Blade(rand(test_dim + 1, 4))
+    @test_throws DimensionMismatch dot(B, C)
+    @test_throws DimensionMismatch B ⋅ C
 end
 
 @testset "dot(B, C): B or C isa Vector" begin
+    # Notes: these tests are based on the assumption that dot(B, C) is
+    #        correct when B and C are both AbstractBlades.
+
     # --- Preparations
 
     # Dimension of embedding space
     test_dim = 10
+    test_grade = 3
+
+    # Test value
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
 
     # Test vectors
-    v = rand(test_dim)
-    w = rand(test_dim)
-
-    # --- v::vector, B::Blade
-    #     B::Blade, v::vector
-
-    # Preparations
-    B = Blade(w)
-
-    # Exercise functionality and check results
-    expected_result = LinearAlgebra.dot(v, w)
-    @test v ⋅ B ≈ expected_result
-    @test B ⋅ v ≈ expected_result
-    @test dot(v, B) ≈ expected_result
-    @test dot(B, v) ≈ expected_result
+    test_vector = rand(test_dim)
 
     # --- v::vector, B::Scalar
     #     B::Scalar, v::vector
 
-    # TODO
+    v = test_vector
+    B = Scalar(test_value)
+
+    expected_result = zero(B)
+    @test dot(v, B) == expected_result
+    @test v ⋅ B == expected_result
+
+    expected_result = Blade(v, volume=norm(v) * test_value)
+    @test dot(B, v) == expected_result
+    @test B ⋅ v == expected_result
+
+    # --- grade(B) == 1
+    #     v::vector, B::Blade
+    #     B::Blade, v::vector
+
+    v = test_vector
+
+    test_vector_B = rand(test_dim)
+    B = Blade(test_vector_B)
+    expected_result = LinearAlgebra.dot(test_vector, test_vector_B)
+    @test dot(v, B) ≈ expected_result
+    @test dot(B, v) ≈ expected_result
+    @test v ⋅ B ≈ expected_result
+    @test B ⋅ v ≈ expected_result
+
+    # length(v) != dim(B)
+    v = test_vector
+    B = Blade(rand(test_dim + 1))
+    @test_throws DimensionMismatch dot(v, B)
+    @test_throws DimensionMismatch v ⋅ B
+    @test_throws DimensionMismatch dot(B, v)
+    @test_throws DimensionMismatch B ⋅ v
+
+    # --- grade(B) > 1
+    #     v::vector, B::Blade
+    #     B::Blade, v::vector
+
+    v = test_vector
+    for test_grade in 5:8
+        B = Blade(rand(test_dim, test_grade))
+
+        expected_result = dot(Blade(v), B)
+        @test dot(v, B) ≈ expected_result
+        @test v ⋅ B ≈ expected_result
+
+        expected_result = zero(B)
+        @test dot(B, v) == expected_result
+        @test B ⋅ v == expected_result
+    end
+
+    # length(v) != dim(B)
+    v = test_vector
+    B = Blade(rand(test_dim + 1, 3))
+    @test_throws DimensionMismatch dot(v, B)
+    @test_throws DimensionMismatch v ⋅ B
+    @test_throws DimensionMismatch dot(B, v)
+    @test_throws DimensionMismatch B ⋅ v
+
+    # --- v::vector, B::Pseudoscalar
+
+    # dim(v) == dim(B)
+    for test_dim in 5:8
+        v = Vector(rand(test_dim))
+        B = Pseudoscalar(test_dim, test_value)
+        expected_result = dot(Blade(v), B)
+        @test v ⋅ B ≈ expected_result
+        @test dot(v, B) ≈ expected_result
+    end
+
+    # dim(v) != dim(B)
+    v = test_vector
+    B = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch dot(v, B)
+    @test_throws DimensionMismatch v ⋅ B
+
+    # --- B::Pseudoscalar, v::vector
+
+    # dim(v) == dim(B)
+    for test_dim in 5:8
+        v = Vector(rand(test_dim))
+        B = Pseudoscalar(test_dim, test_value)
+        expected_result = zero(B)
+        @test B ⋅ v == expected_result
+        @test dot(B, v) == expected_result
+    end
+
+    # dim(v) != dim(B)
+    v = test_vector
+    B = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch dot(B, v)
+    @test_throws DimensionMismatch B ⋅ v
 end
 
 # --- *(B, C)

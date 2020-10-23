@@ -37,14 +37,6 @@ Valid arguments
     wedge(v::Vector, w::Vector)
     wedge(B::AbstractBlade, x::Real)
     wedge(x::Real, B::AbstractBlade)
-
-    ∧(B::AbstractBlade, C::AbstractBlade)
-    ∧(B::AbstractBlade, v::Vector)
-    ∧(v::Vector, B::AbstractBlade)
-    ∧(v::Vector, w::Vector)
-    ∧(B::AbstractBlade, x::Real)
-    ∧(x::Real, B::AbstractBlade)
-
 """
 wedge(B::Scalar, C::Scalar) = B * C
 wedge(B::Scalar, C::Blade) = B * C
@@ -280,8 +272,8 @@ dual(B::Scalar, C::Scalar) = B
 
 dual(B::Scalar, C::Blade) =
     mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B)) :
-        Blade(C, volume=-value(B))
+        Blade(C, volume=value(B), copy_basis=false) :
+        Blade(C, volume=-value(B), copy_basis=false)
 
 dual(B::Blade, C::Scalar) = zero(B)
 
@@ -385,7 +377,7 @@ Valid arguments
     -(B::AbstractBlade)
 """
 -(B::Scalar) = Scalar(B, value=-value(B))
--(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B))
+-(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B), copy_basis=false)
 -(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
 
 """
@@ -401,8 +393,8 @@ reciprocal(B::Scalar) = Scalar(B, value=1 / value(B))
 
 reciprocal(B::Blade) =
     mod(grade(B), 4) < 2 ?
-        Blade(B, volume=1 / norm(B)) :
-        Blade(B, volume=-1 / norm(B))
+        Blade(B, volume=1 / norm(B), copy_basis=false) :
+        Blade(B, volume=-1 / norm(B), copy_basis=false)
 
 reciprocal(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
@@ -421,7 +413,7 @@ Valid arguments
 reverse(B::Scalar) = B
 
 reverse(B::Blade) =
-    mod(grade(B), 4) < 2 ?  B : Blade(B, value=-value(B))
+    mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
 
 reverse(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
@@ -450,12 +442,6 @@ Valid arguments
     dot(v::Vector, B::AbstractBlade)
     dot(B::AbstractBlade, x::Real)
     dot(x::Real, B::AbstractBlade)
-
-    ⋅(B::AbstractBlade, C::AbstractBlade)
-    ⋅(B::AbstractBlade, v::Vector)
-    ⋅(v::Vector, B::AbstractBlade)
-    ⋅(B::AbstractBlade, x::Real)
-    ⋅(x::Real, B::AbstractBlade)
 """
 dot(B::Scalar, C::Scalar) = B * C
 dot(B::Scalar, C::Blade) = B * C
@@ -464,6 +450,10 @@ dot(B::Scalar, C::Pseudoscalar) = B * C
 dot(B::Pseudoscalar, C::Scalar) = zero(B)
 
 function dot(B::Blade{<:Real}, C::Blade{<:Real})
+    # --- Check arguments
+
+    assert_dim_equal(B, C)
+
     # --- Handle edge cases
 
     # (B ⋅ C) = 0 if grade(B) > grade(C)
@@ -488,8 +478,18 @@ function dot(B::Blade{<:Real}, C::Blade{<:Real})
        -volume(C) * dual(projection, C)
 end
 
-dot(B::Pseudoscalar, C::Blade) = zero(B)
-dot(B::Blade, C::Pseudoscalar) = dual(B, C) * volume(C)
+function dot(B::Pseudoscalar, C::Blade)
+    assert_dim_equal(B, C)
+    zero(B)
+end
+
+function dot(B::Blade, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+
+    mod(grade(C), 4) < 2 ?
+        dual(B, C) * volume(C) :
+       -dual(B, C) * volume(C)
+end
 
 function dot(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
@@ -499,7 +499,7 @@ function dot(B::Pseudoscalar, C::Pseudoscalar)
         Scalar(-value(B) * value(C))
 end
 
-dot(B::Scalar, v::Vector{<:Real}) = B * C
+dot(B::Scalar, v::Vector{<:Real}) = B * v
 dot(v::Vector{<:Real}, B::Scalar) = zero(B)
 
 function dot(v::Vector{<:Real}, B::Blade)
@@ -507,15 +507,21 @@ function dot(v::Vector{<:Real}, B::Blade)
 
     assert_dim_equal(v, B)
 
-    # --- Compute (v ⋅ B) = proj(v, B) * B = ± proj(v, B) / B
+    # --- Compute (v ⋅ B) = proj(v, B) * B
+    #     = volume(B) dual(proj(v, B), B) * I_B
+    #     = (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) proj(v, B) / I_B
+    #     = (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) dual(proj(v, B), B)
+    #
+    #     where I_B is the unit blade for the subspace represented by blade `B`
+    #     that has the same orientation as basis(B).
 
     # Compute proj(v, B) = (v ⋅ B) / B
     projection = proj(v, B)
 
-    # Construct blade representing dual of proj(v, B) scaled by volume(B)
-    grade(B) == 1 ?
-        volume(B) * Scalar(dual(projection, B)) :
-        volume(B) * Blade(dual(Blade(projection), B), copy_basis=false)
+    # Compute (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) dual(proj(v, B), B)
+    mod(grade(B), 4) < 2 ?
+        volume(B) * dual(projection, B) :
+       -volume(B) * dual(projection, B)
 end
 
 function dot(B::Blade, v::Vector{<:Real})
@@ -523,13 +529,16 @@ function dot(B::Blade, v::Vector{<:Real})
     grade(B) > 1 ? zero(B) : Scalar(volume(B) * basis(B) ⋅ v)
 end
 
-dot(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
+function dot(B::Pseudoscalar, v::Vector{<:Real})
+    assert_dim_equal(v, B)
+    zero(B)
+end
 
 function dot(v::Vector{<:Real}, B::Pseudoscalar)
     assert_dim_equal(v, B)
-    mod(grade(C), 4) < 2 ?
-        norm(B) * dual(Blade(v)) :
-       -norm(B) * dual(Blade(v))
+    mod(grade(B), 4) < 2 ?
+        value(B) * dual(Blade(v)) :
+       -value(B) * dual(Blade(v))
 end
 
 dot(x::Real, B::Scalar) = x * B
@@ -632,7 +641,7 @@ end
 
 *(x::Real, B::Scalar) = Scalar(B, value=x * value(B))
 *(B::Scalar, x::Real) = x * B
-*(x::Real, B::Blade) = Blade(B, volume=x * volume(B))
+*(x::Real, B::Blade) = Blade(B, volume=x * volume(B), copy_basis=false)
 *(B::Blade, x::Real) = x * B
 *(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
 *(B::Pseudoscalar, x::Real) = x * B
