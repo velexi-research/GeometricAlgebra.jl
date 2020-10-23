@@ -91,21 +91,21 @@ end
     B = Blade(vectors)
     expected_reciprocal = Blade(B, volume=-1 / volume(B))
     @test reciprocal(B) ≈ expected_reciprocal
-    @test_skip B * reciprocal(B) ≈ 1
+    @test B * reciprocal(B) ≈ 1
 
     # mod(grade, 4) == 3
     vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
     B = Blade(vectors)
     expected_reciprocal = Blade(B, volume=-1 / volume(B))
     @test reciprocal(B) ≈ expected_reciprocal
-    @test_skip B * reciprocal(B) ≈ 1
+    @test B * reciprocal(B) ≈ 1
 
     # mod(grade, 4) == 0
     vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
     expected_reciprocal = Blade(B, volume=1 / volume(B))
     @test reciprocal(B) ≈ expected_reciprocal
-    @test_skip B * reciprocal(B) ≈ 1
+    @test B * reciprocal(B) ≈ 1
 end
 
 
@@ -198,19 +198,19 @@ end
     vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
     B = Blade(vectors)
     @test reverse(B) == -B
-    @test_skip B * reverse(B) ≈ norm(B)^2
+    @test B * reverse(B) ≈ norm(B)^2
 
     # mod(grade, 4) == 3
     vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
     B = Blade(vectors)
     @test reverse(B) == -B
-    @test_skip B * reverse(B) ≈ norm(B)^2
+    @test B * reverse(B) ≈ norm(B)^2
 
     # mod(grade, 4) == 0
     vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
     @test reverse(B) === B
-    @test_skip B * reverse(B) ≈ norm(B)^2
+    @test B * reverse(B) ≈ norm(B)^2
 end
 
 
