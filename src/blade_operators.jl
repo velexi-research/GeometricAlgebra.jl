@@ -46,7 +46,13 @@ wedge(B::Pseudoscalar, C::Scalar) = B * C
 
 function wedge(B::Blade, C::Blade)
     assert_dim_equal(B, C)
-    Blade(hcat(basis(B), basis(C)), volume=volume(B) * volume(C))
+
+    # Incorporate volume(B) and volume(C) into the norm of the first vector of
+    # basis(B)
+    basis_B = basis(B)
+    basis_B[:, 1] *= volume(B) * volume(C)
+
+    Blade(hcat(basis(B), basis(C)))
 end
 
 function wedge(B::Pseudoscalar, C::Blade)
@@ -65,12 +71,16 @@ wedge(v::Vector{<:Real}, B::Scalar) = B ∧ v
 
 function wedge(v::Vector{<:Real}, B::Blade)
     assert_dim_equal(v, B)
-    Blade(hcat(v, basis(B)), volume=LinearAlgebra.norm(v) * volume(B))
+
+    # Note: volume(B) is incorporated into the norm of `v`
+    Blade(hcat(volume(B) * v, basis(B)))
 end
 
 function wedge(B::Blade, v::Vector{<:Real})
     assert_dim_equal(B, v)
-    Blade(hcat(basis(B), v), volume=LinearAlgebra.norm(v) * volume(B))
+
+    # Note: volume(B) is incorporated into the norm of `v`
+    Blade(hcat(basis(B), volume(B) * v))
 end
 
 function wedge(B::Pseudoscalar, v::Vector{<:Real})
@@ -168,7 +178,7 @@ function proj(B::Blade, C::Blade)
         projections[:, i] = proj(basis(B)[:, i], C, return_blade=false)
     end
 
-    # Encode volume(B) in the first projection vector
+    # Incorporate volume(B) into the norm of the first projection vector
     projections[:, 1] *= volume(B)
 
     # Compute projection (using fact that projection is an outermorphism)
@@ -423,7 +433,7 @@ reciprocal(B::Pseudoscalar) =
 
 # Imports
 import Base.:(*)
-import LinearAlgebra.dot
+import LinearAlgebra.dot, LinearAlgebra.:(⋅)
 
 # Exports
 export dot, ⋅
@@ -552,7 +562,6 @@ dot(B::Pseudoscalar, x::Real) = zero(B)
     B * C
 
 Return the geometric product of the arguments.
-TODO: define a geometric product function
 
 Valid arguments
 ---------------
@@ -577,7 +586,6 @@ function *(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
     # --- Compute geometric product
 
     if grade(B) < grade(C)
-        println("GOT HERE B")
         M = C
         for i in grade(B):-1:1
             M = basis(B)[:, i] * M
