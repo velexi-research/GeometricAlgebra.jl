@@ -305,11 +305,11 @@ end
 @testset "wedge(B, C): B, C::{Blade, Vector}" begin
     # --- B::Blade, C::Blade
 
-    B_vectors = hcat([1; 0; 0; 0; 0],
+    B_vectors = hcat([1; 1; 0; 0; 0],
                      [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
 
-    C_vectors = hcat([0; 0; 3; 0; 0],
+    C_vectors = hcat([0; 1; 3; 0; 0],
                      [0; 0; 0; 4; 0])
     C = Blade(C_vectors)
 
@@ -330,7 +330,7 @@ end
                      [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
 
-    C_vector = [0; 0; 3; 0; 0]
+    C_vector = [0; 1; 3; 0; 0]
     C = Blade(C_vector)
 
     # dim(B) == dim(C)
@@ -352,10 +352,10 @@ end
     # --- B::Vector, C::Vector
 
     # Preparations
-    B_vector = Vector{Float64}([0, 2, 0, 0, 0])
+    B_vector = Vector{Float64}([1, 2, 3, 0, 0])
     B = Blade(B_vector)
 
-    C_vector = [0; 0; 3; 0; 0]
+    C_vector = [0; 1; 3; 0; 0]
     C = Blade(C_vector)
 
     # dim(B) == dim(C)
