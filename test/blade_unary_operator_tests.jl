@@ -79,100 +79,200 @@ end
 # --- reciprocal(B)
 
 @testset "reciprocal(B): B::Blade" begin
-    for precision_type in subtypes(AbstractFloat)
-        # mod(grade, 4) == 1
-        vectors = Vector{precision_type}([3; 4; 0; 0; 0])
-        B = Blade(vectors)
-        expected_reciprocal = Blade(B, volume=1 / precision_type(5))
-        @test reciprocal(B) ≈ expected_reciprocal
+    # mod(grade, 4) == 1
+    vectors = Vector([3; 4; 0; 0; 0])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
 
-        # mod(grade, 4) == 2
-        vectors = Matrix{precision_type}([3 3; 4 4; 0 1; 0 0; 0 0])
-        B = Blade(vectors)
-        expected_reciprocal = Blade(B, volume=-1 / precision_type(5))
-        @test reciprocal(B) ≈ expected_reciprocal
+    # mod(grade, 4) == 2
+    vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=-1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test_skip B * reciprocal(B) ≈ 1
 
-        # mod(grade, 4) == 3
-        vectors = Matrix{precision_type}([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
-        B = Blade(vectors)
-        expected_reciprocal = Blade(B, volume=-1 / precision_type(5))
-        @test reciprocal(B) ≈ expected_reciprocal
+    # mod(grade, 4) == 3
+    vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=-1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test_skip B * reciprocal(B) ≈ 1
 
-        # mod(grade, 4) == 0
-        vectors = Matrix{precision_type}(
-            [3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
-        B = Blade(vectors)
-        expected_reciprocal = Blade(B, volume=1 / precision_type(5))
-        @test reciprocal(B) ≈ expected_reciprocal
-    end
+    # mod(grade, 4) == 0
+    vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test_skip B * reciprocal(B) ≈ 1
 end
+
 
 @testset "reciprocal(B): B::Scalar" begin
-    # Preparations
+    # --- Preparations
+
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    # Exercise functionality and check results
-    for precision_type in subtypes(AbstractFloat)
-        # Preparations
-        converted_value = precision_type(test_value)
+    # --- Exercise functionality and check results
 
-        # value > 0
-        S = Scalar{precision_type}(converted_value)
-        @test reciprocal(S) == Scalar{precision_type}(1 / converted_value)
+    # value > 0
+    B = Scalar(test_value)
+    @test reciprocal(B) == Scalar(1 / test_value)
+    @test B * reciprocal(B) ≈ 1
 
-        # value < 0
-        negative_value = -(abs(converted_value))
-        S = Scalar{precision_type}(negative_value)
-        @test reciprocal(S) == Scalar{precision_type}(1 / negative_value)
+    # value < 0
+    negative_value = -(abs(test_value))
+    B = Scalar(negative_value)
+    @test reciprocal(B) == Scalar(1 / negative_value)
+    @test B * reciprocal(B) ≈ 1
 
-        # value = 0
-        S = zero(S)
-        @test reciprocal(S) == Scalar{precision_type}(Inf)
+    # value = 0
+    B = zero(B)
+    @test reciprocal(B) == Scalar(Inf)
 
-        # value == 1
-        S = one(S)
-        @test reciprocal(S) == S
+    # value == 1
+    B = one(B)
+    @test reciprocal(B) == B
+    @test B * reciprocal(B) ≈ 1
 
-        # value = Inf
-        S = Scalar{precision_type}(Inf)
-        @test reciprocal(S) == zero(S)
+    # value = Inf
+    B = Scalar(Inf)
+    @test reciprocal(B) == zero(B)
 
-        # value = -Inf
-        S = Scalar{precision_type}(-Inf)
-        @test reciprocal(S) == zero(S)
-    end
+    # value = -Inf
+    B = Scalar(-Inf)
+    @test reciprocal(B) == zero(B)
 end
 
+
 @testset "reciprocal(B): B::Pseudoscalar" begin
-    # Preparations
+    # --- Preparations
+
     test_value = rand() + 1  # add 1 to avoid 0
     test_value = rand() > 0.5 ? test_value : -test_value
 
-    # Exercise functionality and check results
-    for precision_type in subtypes(AbstractFloat)
-        # mod(dim, 4) == 1
-        dim = 5
-        B = Pseudoscalar(dim, test_value)
-        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(test_value))
-        @test reciprocal(B) ≈ expected_reciprocal
+    # --- Exercise functionality and check results
 
-        # mod(dim, 4) == 2
-        dim = 6
-        B = Pseudoscalar(dim, test_value)
-        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(test_value))
-        @test reciprocal(B) ≈ expected_reciprocal
+    # mod(dim, 4) == 1
+    dim = 5
+    B = Pseudoscalar(dim, test_value)
+    expected_reciprocal = Pseudoscalar(dim, 1 / test_value)
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
 
-        # mod(dim, 4) == 3
-        dim = 7
-        B = Pseudoscalar(dim, test_value)
-        expected_reciprocal = Pseudoscalar(dim, -1 / precision_type(test_value))
-        @test reciprocal(B) ≈ expected_reciprocal
+    # mod(dim, 4) == 2
+    dim = 6
+    B = Pseudoscalar(dim, test_value)
+    expected_reciprocal = Pseudoscalar(dim, -1 / test_value)
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
 
-        # mod(dim, 4) == 0
-        dim = 8
-        B = Pseudoscalar(dim, test_value)
-        expected_reciprocal = Pseudoscalar(dim, 1 / precision_type(test_value))
-        @test reciprocal(B) ≈ expected_reciprocal
-    end
+    # mod(dim, 4) == 3
+    dim = 7
+    B = Pseudoscalar(dim, test_value)
+    expected_reciprocal = Pseudoscalar(dim, -1 / test_value)
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
+
+    # mod(dim, 4) == 0
+    dim = 8
+    B = Pseudoscalar(dim, test_value)
+    expected_reciprocal = Pseudoscalar(dim, 1 / test_value)
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
+end
+
+
+# --- reverse(B)
+
+@testset "reverse(B): B::Blade" begin
+    # mod(grade, 4) == 1
+    vectors = Vector([3; 4; 0; 0; 0])
+    B = Blade(vectors)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(grade, 4) == 2
+    vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
+    B = Blade(vectors)
+    @test reverse(B) == -B
+    @test_skip B * reverse(B) ≈ norm(B)^2
+
+    # mod(grade, 4) == 3
+    vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+    B = Blade(vectors)
+    @test reverse(B) == -B
+    @test_skip B * reverse(B) ≈ norm(B)^2
+
+    # mod(grade, 4) == 0
+    vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    @test reverse(B) === B
+    @test_skip B * reverse(B) ≈ norm(B)^2
+end
+
+
+@testset "reverse(B): B::Scalar" begin
+    # --- Preparations
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Exercise functionality and check results
+
+    # value != 0
+    B = Scalar(test_value)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # value = 0
+    B = zero(B)
+    @test reverse(B) === B
+
+    # value == 1
+    B = one(B)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # value = Inf
+    B = Scalar(Inf)
+    @test reverse(B) === B
+
+    # value = -Inf
+    B = Scalar(-Inf)
+    @test reverse(B) === B
+end
+
+
+@testset "reverse(B): B::Pseudoscalar" begin
+    # --- Preparations
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # mod(dim, 4) == 1
+    dim = 5
+    B = Pseudoscalar(dim, test_value)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(dim, 4) == 2
+    dim = 6
+    B = Pseudoscalar(dim, test_value)
+    @test reverse(B) == -B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(dim, 4) == 3
+    dim = 7
+    B = Pseudoscalar(dim, test_value)
+    @test reverse(B) == -B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(dim, 4) == 0
+    dim = 8
+    B = Pseudoscalar(dim, test_value)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
 end
