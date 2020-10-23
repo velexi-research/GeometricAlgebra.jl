@@ -362,10 +362,10 @@ end
 # --- Unary operations
 
 # Imports
-import Base.:(-)
+import Base.:(-), Base.reverse
 
 # Exports
-export reciprocal, reverse
+export reciprocal
 
 """
     -B
@@ -393,8 +393,8 @@ reciprocal(B::Scalar) = Scalar(B, value=1 / value(B))
 
 reciprocal(B::Blade) =
     mod(grade(B), 4) < 2 ?
-        Blade(B, volume=1 / norm(B), copy_basis=false) :
-        Blade(B, volume=-1 / norm(B), copy_basis=false)
+        Blade(B, volume=1 / volume(B), copy_basis=false) :
+        Blade(B, volume=-1 / volume(B), copy_basis=false)
 
 reciprocal(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
