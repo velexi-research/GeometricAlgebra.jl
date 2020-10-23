@@ -381,6 +381,23 @@ Valid arguments
 -(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
 
 """
+    reverse(B)
+
+Return the multiplicative inverse of `B`.
+
+Valid arguments
+---------------
+    reverse(B::AbstractBlade)
+"""
+reverse(B::Scalar) = B
+
+reverse(B::Blade) =
+    mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
+
+reverse(B::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
+
+"""
     reciprocal(B)
 
 Return the multiplicative inverse of `B`.
@@ -400,23 +417,6 @@ reciprocal(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
         Pseudoscalar(B, value=1 / value(B)) :
         Pseudoscalar(B, value=-1 / value(B))
-
-"""
-    reverse(B)
-
-Return the multiplicative inverse of `B`.
-
-Valid arguments
----------------
-    reverse(B::AbstractBlade)
-"""
-reverse(B::Scalar) = B
-
-reverse(B::Blade) =
-    mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
-
-reverse(B::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
 
 
 # --- Binary operations
