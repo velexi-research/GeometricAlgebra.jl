@@ -49,10 +49,11 @@ function wedge(B::Blade, C::Blade)
 
     # Incorporate volume(B) and volume(C) into the norm of the first vector of
     # basis(B)
-    basis_B = basis(B)
+    basis_B = copy(basis(B))
     basis_B[:, 1] *= volume(B) * volume(C)
 
-    Blade(hcat(basis(B), basis(C)))
+    # Construct new Blade
+    Blade(hcat(basis_B, basis(C)))
 end
 
 function wedge(B::Pseudoscalar, C::Blade)
@@ -297,8 +298,7 @@ dual(B::Pseudoscalar, C::Scalar) = zero(B)
 function dual(B::Blade, C::Blade)
     # --- Check arguments
 
-    # Check that B and C are extended from the real vector spaces of the same
-    # dimension
+    # Check that B and C are from the same real vector space
     assert_dim_equal(B, C)
 
     # Check that B is contained in C
@@ -578,28 +578,15 @@ Valid arguments
 *(B::Pseudoscalar, C::Scalar) = C * B
 
 function *(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
-    # --- Preparations
-
     # Check arguments
     assert_dim_equal(B, C)
 
-    # --- Compute geometric product
-
-    if grade(B) < grade(C)
-        M = C
-        for i in grade(B):-1:1
-            M = basis(B)[:, i] * M
-        end
-        M = volume(B) * M
-    else
-        M = B
-        for i in 1:grade(C)
-            M = M * basis(C)[:, i]
-        end
-        M = volume(C) * M
+    # Compute geometric product
+    M = C
+    for i in grade(B):-1:1
+        M = basis(B)[:, i] * M
     end
-
-    M
+    M = volume(B) * M
 end
 
 *(B::Blade, C::Pseudoscalar) = B ⋅ C
@@ -629,8 +616,15 @@ function *(v::Vector{<:Real}, B::Blade)
 end
 
 function *(B::Blade, v::Vector{<:Real})
-    # Check arguments
+    # --- Check arguments
+
+    # Check that B and v are from the same real vector space
     assert_dim_equal(v, B)
+
+    # Check that grade(B) == 1. B * v is not defined when grade(B) > 1
+    if grade(B) > 1
+        error("Geometric product B * v is not defined when grade(B) > 1")
+    end
 
     # Compute geometric product
     B_dot_v = B ⋅ v
@@ -642,8 +636,6 @@ function *(B::Blade, v::Vector{<:Real})
         return B_dot_v
     end
 
-    println(B_dot_v)
-    println(B_wedge_v)
     Multivector([B_dot_v, B_wedge_v])
 end
 
