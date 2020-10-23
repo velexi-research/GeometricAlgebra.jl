@@ -46,9 +46,10 @@ using GeometricAlgebra
     B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
+    B_dot_C = dot(B, C)
     expected_result = Scalar(value(B) * value(C))
-    @test dot(B, C) == expected_result
-    @test B ⋅ C == expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 
     # --- B::Scalar, C::Blade
 
@@ -56,17 +57,19 @@ using GeometricAlgebra
     B = Scalar(test_value_1)
     C = Blade(test_vector)
 
+    B_dot_C = dot(B, C)
     expected_result = Blade(basis(C), volume=value(B) * volume(C))
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+    @test B_dot_C ≈ expected_result
+    @test B ⋅ C == B_dot_C
 
     # grade(C) > 1
     B = Scalar(test_value_1)
     C = Blade(test_basis)
 
+    B_dot_C = dot(B, C)
     expected_result = Blade(basis(C), volume=value(B) * volume(C))
     @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+    @test B ⋅ C == B_dot_C
 
     # --- B::Blade, C::Scalar
 
@@ -74,35 +77,39 @@ using GeometricAlgebra
     B = Blade(test_vector)
     C = Scalar(test_value_2)
 
+    B_dot_C = dot(B, C)
     expected_result = zero(B)
-    @test dot(B, C) == expected_result
-    @test B ⋅ C == expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 
     # grade(C) > 1
     B = Blade(test_basis)
     C = Scalar(test_value_2)
 
+    B_dot_C = dot(B, C)
     expected_result = zero(B)
-    @test dot(B, C) == expected_result
-    @test B ⋅ C == expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 
     # --- B::Scalar, C::Pseudoscalar
 
     B = Scalar(test_value_1)
     C = Pseudoscalar(test_dim, test_value_2)
 
+    B_dot_C = dot(B, C)
     expected_result = Pseudoscalar(test_dim, value(B) * value(C))
-    @test dot(B, C) == expected_result
-    @test B ⋅ C == expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 
     # --- B::Pseudoscalar, C::Scalar
 
     B = Pseudoscalar(test_dim, test_value_1)
     C = Scalar(test_value_2)
 
+    B_dot_C = dot(B, C)
     expected_result = zero(B)
-    @test dot(B, C) == expected_result
-    @test B ⋅ C == expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 end
 
 @testset "dot(B, C): B or C isa Real" begin
@@ -131,11 +138,15 @@ end
     x = test_value_1
     B = Scalar(test_value_2)
 
+    x_dot_B = dot(x, B)
     expected_result = Scalar(x * value(B))
-    @test dot(x, B) == expected_result
-    @test dot(B, x) == expected_result
-    @test x ⋅ B == expected_result
-    @test B ⋅ x == expected_result
+    @test x_dot_B == expected_result
+    @test x ⋅ B == x_dot_B
+
+    B_dot_x = dot(B, x)
+    expected_result = Scalar(x * value(B))
+    @test B_dot_x == expected_result
+    @test B ⋅ x == B_dot_x
 
     # --- dot(x::Real, B::Blade)
 
@@ -143,17 +154,19 @@ end
     x = test_value_1
     B = Blade(test_vector)
 
+    x_dot_B = dot(x, B)
     expected_result = Blade(basis(B), volume=x * volume(B))
-    @test dot(x, B) ≈ expected_result
-    @test x ⋅ B ≈ expected_result
+    @test x_dot_B ≈ expected_result
+    @test x ⋅ B == x_dot_B
 
     # grade(B) > 1
     x = test_value_1
     B = Blade(test_basis)
 
+    x_dot_B = dot(x, B)
     expected_result = Blade(basis(B), volume=x * volume(B))
-    @test dot(x, B) ≈ expected_result
-    @test x ⋅ B ≈ expected_result
+    @test x_dot_B ≈ expected_result
+    @test x ⋅ B == x_dot_B
 
     # --- dot(B::Blade, x::Real)
 
@@ -161,35 +174,39 @@ end
     B = Blade(test_vector)
     x = test_value_2
 
+    B_dot_x = dot(B, x)
     expected_result = zero(B)
-    @test dot(B, x) ≈ expected_result
-    @test B ⋅ x ≈ expected_result
+    @test B_dot_x == expected_result
+    @test B ⋅ x == B_dot_x
 
     # grade(B) > 1
     B = Blade(test_basis)
     x = test_value_2
 
+    B_dot_x = dot(B, x)
     expected_result = zero(B)
-    @test dot(B, x) ≈ expected_result
-    @test B ⋅ x ≈ expected_result
+    @test B_dot_x == expected_result
+    @test B ⋅ x == B_dot_x
 
     # --- dot(x::Real, B::Pseudoscalar)
 
     x = test_value_1
     B = Pseudoscalar(test_dim, test_value_2)
 
+    x_dot_B = dot(x, B)
     expected_result = Pseudoscalar(test_dim, x * value(B))
-    @test dot(x, B) == expected_result
-    @test x ⋅ B == expected_result
+    @test x_dot_B == expected_result
+    @test x ⋅ B == x_dot_B
 
     # --- dot(B::Pseudoscalar, x::Real)
 
     B = Pseudoscalar(test_dim, test_value_1)
     x = test_value_2
 
+    B_dot_x = dot(B, x)
     expected_result = zero(B)
-    @test dot(B, x) == expected_result
-    @test B ⋅ x == expected_result
+    @test B_dot_x == expected_result
+    @test B ⋅ x == B_dot_x
 end
 
 @testset "dot(B, C): B or C isa Pseudoscalar" begin
@@ -212,9 +229,10 @@ end
     B = Pseudoscalar(test_dim, test_value_1)
     C = Blade(test_basis)
 
+    B_dot_C = dot(B, C)
     expected_result = zero(B)
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
@@ -230,12 +248,14 @@ end
         B = Blade(rand(test_dim, test_grade))
         C = Pseudoscalar(test_dim, test_value_2)
 
+        B_dot_C = dot(B, C)
+
         expected_result = mod(test_dim, 4) < 2 ?
             value(C) * dual(B) :
            -value(C) * dual(B)
 
-        @test dot(B, C) ≈ expected_result
-        @test B ⋅ C ≈ expected_result
+        @test B_dot_C ≈ expected_result
+        @test B ⋅ C == B_dot_C
     end
 
     # dim(B) != dim(C)
@@ -251,12 +271,14 @@ end
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
+        B_dot_C = dot(B, C)
+
         expected_result = mod(grade(C), 4) < 2 ?
             Scalar(value(B) * value(C)) :
             Scalar(-value(B) * value(C))
 
-        @test dot(B, C) == expected_result
-        @test B ⋅ C == expected_result
+        @test B_dot_C == expected_result
+        @test B ⋅ C == B_dot_C
     end
 
     # dim(B) != dim(C)
@@ -290,8 +312,10 @@ end
 
     expected_result =
         Scalar(LinearAlgebra.dot(basis(B), basis(C)) * volume(B) * volume(C))
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+
+    B_dot_C = dot(B, C)
+    @test B_dot_C ≈ expected_result
+    @test B ⋅ C == B_dot_C
 
     # grade(B) == 1, grade(C) > 1
     B = Blade(test_vector_1)
@@ -307,17 +331,19 @@ end
             expected_volume_C * dual(projection, C) :
            -expected_volume_C * dual(projection, C)
 
-        @test dot(B, C) ≈ expected_result
-        @test B ⋅ C ≈ expected_result
+        B_dot_C = dot(B, C)
+        @test B_dot_C ≈ expected_result
+        @test B ⋅ C == B_dot_C
     end
 
     # grade(B) > 1, grade(C) == 1
     B = Blade(test_basis_1)
     C = Blade(test_vector_2)
 
+    B_dot_C = dot(B, C)
     expected_result = zero(B)
-    @test dot(B, C) ≈ expected_result
-    @test B ⋅ C ≈ expected_result
+    @test dot(B, C) == expected_result
+    @test B ⋅ C == B_dot_C
 
     # grade(B) == grade(C) > 1
     for test_grade in 5:8
@@ -327,8 +353,9 @@ end
         expected_result = volume(B) * volume(C) *
             LinearAlgebra.det(transpose(basis(B)) * basis(C))
 
-        @test dot(B, C) ≈ expected_result
-        @test B ⋅ C ≈ expected_result
+        B_dot_C = dot(B, C)
+        @test B_dot_C ≈ expected_result
+        @test B ⋅ C == B_dot_C
     end
 
     # grade(B) < grade(C), grade(B) > 1, grade(C) > 1,
@@ -346,17 +373,19 @@ end
             expected_volume_C * dual(projection, C) :
            -expected_volume_C * dual(projection, C)
 
-        @test dot(B, C) ≈ expected_result
-        @test B ⋅ C ≈ expected_result
+        B_dot_C = dot(B, C)
+        @test B_dot_C ≈ expected_result
+        @test B ⋅ C == B_dot_C
     end
 
     # grade(B) > grade(C), grade(B) > 1, grade(C) > 1,
     B = Blade(test_basis_2)
     C = Blade(test_basis_1)
 
+    B_dot_C = dot(B, C)
     expected_result = zero(B)
-    @test dot(B, C) == expected_result
-    @test B ⋅ C == expected_result
+    @test B_dot_C == expected_result
+    @test B ⋅ C == B_dot_C
 
     # dim(B) != dim(C)
     B = Blade(rand(test_dim, 3))
@@ -388,13 +417,15 @@ end
     v = test_vector
     B = Scalar(test_value)
 
+    v_dot_B = dot(v, B)
     expected_result = zero(B)
-    @test dot(v, B) == expected_result
-    @test v ⋅ B == expected_result
+    @test v_dot_B == expected_result
+    @test v ⋅ B == v_dot_B
 
+    B_dot_v = dot(B, v)
     expected_result = Blade(v, volume=norm(v) * test_value)
-    @test dot(B, v) == expected_result
-    @test B ⋅ v == expected_result
+    @test B_dot_v == expected_result
+    @test B ⋅ v == B_dot_v
 
     # --- grade(B) == 1
     #     v::vector, B::Blade
@@ -404,11 +435,16 @@ end
 
     test_vector_B = rand(test_dim)
     B = Blade(test_vector_B)
+
     expected_result = LinearAlgebra.dot(test_vector, test_vector_B)
-    @test dot(v, B) ≈ expected_result
-    @test dot(B, v) ≈ expected_result
-    @test v ⋅ B ≈ expected_result
-    @test B ⋅ v ≈ expected_result
+
+    B_dot_v = dot(B, v)
+    @test B_dot_v ≈ expected_result
+    @test B ⋅ v == B_dot_v
+
+    v_dot_B = dot(v, B)
+    @test v_dot_B ≈ expected_result
+    @test v ⋅ B == v_dot_B
 
     # length(v) != dim(B)
     v = test_vector
@@ -426,13 +462,15 @@ end
     for test_grade in 5:8
         B = Blade(rand(test_dim, test_grade))
 
+        v_dot_B = dot(v, B)
         expected_result = dot(Blade(v), B)
-        @test dot(v, B) ≈ expected_result
-        @test v ⋅ B ≈ expected_result
+        @test v_dot_B ≈ expected_result
+        @test v ⋅ B == v_dot_B
 
+        B_dot_v = dot(B, v)
         expected_result = zero(B)
-        @test dot(B, v) == expected_result
-        @test B ⋅ v == expected_result
+        @test B_dot_v == expected_result
+        @test B ⋅ v == B_dot_v
     end
 
     # length(v) != dim(B)
@@ -449,9 +487,11 @@ end
     for test_dim in 5:8
         v = Vector(rand(test_dim))
         B = Pseudoscalar(test_dim, test_value)
+
+        v_dot_B = dot(v, B)
         expected_result = dot(Blade(v), B)
-        @test v ⋅ B ≈ expected_result
-        @test dot(v, B) ≈ expected_result
+        @test v_dot_B ≈ expected_result
+        @test v ⋅ B == v_dot_B
     end
 
     # dim(v) != dim(B)
@@ -466,9 +506,11 @@ end
     for test_dim in 5:8
         v = Vector(rand(test_dim))
         B = Pseudoscalar(test_dim, test_value)
+
+        B_dot_v = dot(B, v)
         expected_result = zero(B)
-        @test B ⋅ v == expected_result
-        @test dot(B, v) == expected_result
+        @test B_dot_v == expected_result
+        @test B ⋅ v == B_dot_v
     end
 
     # dim(v) != dim(B)
