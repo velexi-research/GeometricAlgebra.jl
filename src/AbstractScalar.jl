@@ -26,7 +26,7 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 # --- AbstractMultivector interface functions for AbstractScalar
 
 import LinearAlgebra.norm
-export dim, norm, grade, basis, volume
+export dim, norm
 
 """
     dim(B::AbstractScalar)
@@ -43,6 +43,8 @@ Return asbolute value of `B`.
 norm(B::AbstractScalar) = abs(value(B))
 
 # --- AbstractBlade interface functions for AbstractScalar
+
+export grade, basis, volume
 
 """
     grade(B::AbstractScalar)
@@ -72,3 +74,17 @@ volume(B::AbstractScalar) = value(B)
 Return the sign of the value of `B`.
 """
 Base.sign(B::AbstractScalar)::Int8 = Base.sign(value(B))
+
+# --- Utility functions
+
+import Base.convert
+
+"""
+    convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat,
+                                                 S<:AbstractMultivector{T}}
+
+Convert AbstractScalar to have the floating-point precision of type `T`.
+"""
+convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat,
+                                             S<:AbstractMultivector{T}} =
+    T == typeof(value(B)) ? B : Scalar{T}(value(B))

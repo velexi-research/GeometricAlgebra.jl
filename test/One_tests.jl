@@ -25,122 +25,126 @@ using GeometricAlgebra
     # --- Inner constructor
 
     for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        @test B isa One{precision_type}
-        @test B === One{precision_type}()
+        S = One{precision_type}()
+        @test S isa One{precision_type}
+        @test S === One{precision_type}()
     end
 
     # --- Outer constructor
 
-    B = One()
-    @test B isa One{Float64}
+    S = One()
+    @test S isa One{Float64}
 end
 
 @testset "one()" begin
-    # one(B::AbstractMultivector)
+    # one(M::AbstractMultivector)
     for precision_type in subtypes(AbstractFloat)
-        # --- B::AbstractScalar
+        # --- M::AbstractScalar
 
-        # B::Zero
-        B = one(Zero{precision_type}())
-        @test B isa One{precision_type}
+        # M::Zero
+        S = one(Zero{precision_type}())
+        @test S isa One{precision_type}
 
-        # B::One
-        B = one(One{precision_type}())
-        @test B isa One{precision_type}
+        # M::One
+        S = one(One{precision_type}())
+        @test S isa One{precision_type}
 
-        # B::Scalar
-        B = one(Scalar{precision_type}(5))
-        @test B isa One{precision_type}
+        # M::Scalar
+        S = one(Scalar{precision_type}(5))
+        @test S isa One{precision_type}
 
-        # --- B::AbstractBlade
+        # --- M::AbstractBlade
 
-        # B::Blade
-        B = one(Blade{precision_type}([1 2 3]))
-        @test B isa One{precision_type}
+        # M::Blade
+        S = one(Blade{precision_type}([1 2 3]))
+        @test S isa One{precision_type}
 
-        # B::Pseudoscalar
-        B = one(Pseudoscalar{precision_type}(10, 5))
-        @test B isa One{precision_type}
+        # M::Pseudoscalar
+        S = one(Pseudoscalar{precision_type}(10, 5))
+        @test S isa One{precision_type}
 
-        # --- B::AbstractMultivector
+        # --- M::AbstractMultivector
 
-        # B::Multivector
-        B = one(Multivector{precision_type}([Scalar(3)]))
-        @test B isa One{precision_type}
+        # M::Multivector
+        S = one(Multivector{precision_type}([Scalar(3)]))
+        @test S isa One{precision_type}
     end
 
     # one(::Type{<:AbstractMultivector{T}})
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 
-        B = one(AbstractScalar{precision_type})
-        @test B isa One{precision_type}
+        S = one(AbstractScalar{precision_type})
+        @test S isa One{precision_type}
 
-        B = one(Zero{precision_type})
-        @test B isa One{precision_type}
+        S = one(Zero{precision_type})
+        @test S isa One{precision_type}
 
-        B = one(One{precision_type})
-        @test B isa One{precision_type}
+        S = one(One{precision_type})
+        @test S isa One{precision_type}
 
-        B = one(Scalar{precision_type})
-        @test B isa One{precision_type}
+        S = one(Scalar{precision_type})
+        @test S isa One{precision_type}
 
         # --- Type{<:AbstractBlade{T}}
 
-        B = one(AbstractBlade{precision_type})
-        @test B isa One{precision_type}
+        S = one(AbstractBlade{precision_type})
+        @test S isa One{precision_type}
 
-        B = one(Blade{precision_type})
-        @test B isa One{precision_type}
+        S = one(Blade{precision_type})
+        @test S isa One{precision_type}
 
-        B = one(Pseudoscalar{precision_type})
-        @test B isa One{precision_type}
+        S = one(Pseudoscalar{precision_type})
+        @test S isa One{precision_type}
 
         # --- Type{<:AbstractMultivector{T}}
 
-        B = one(AbstractMultivector{precision_type})
-        @test B isa One{precision_type}
+        S = one(AbstractMultivector{precision_type})
+        @test S isa One{precision_type}
 
-        B = one(Multivector{precision_type})
-        @test B isa One{precision_type}
+        S = one(Multivector{precision_type})
+        @test S isa One{precision_type}
     end
 end
 
 @testset "One: AbstractMultivector interface functions" begin
-    # --- Preparations
-
     for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        @test dim(B) == 0
-        @test grades(B) == [0]
-        @test blades(B) == [B]
-        @test B[0] == [B]
-        @test B[1] == []
-        @test norm(B) == 1
-        @test norm(B) isa precision_type
+        S = One{precision_type}()
+        @test dim(S) == 0
+        @test grades(S) == [0]
+        @test blades(S) == [S]
+        @test S[0] == [S]
+        @test S[1] == []
+        @test norm(S) isa precision_type
+        @test norm(S) == 1
     end
 end
 
 @testset "One: AbstractBlade interface functions" begin
-    # --- Preparations
-
     for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        @test grade(B) == 0
-        @test basis(B) == 1
-        @test volume(B) == 1
-        @test volume(B) isa precision_type
-        @test sign(B) == 1
+        S = One{precision_type}()
+        @test grade(S) == 0
+        @test basis(S) == 1
+        @test volume(S) isa precision_type
+        @test volume(S) == 1
+        @test sign(S) == 1
     end
 end
 
 @testset "One: AbstractScalar interface functions" begin
-    # --- Preparations
-
     for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        @test value(B) == 1
-        @test value(B) isa precision_type
+        S = One{precision_type}()
+        @test value(S) isa precision_type
+        @test value(S) == 1
+    end
+end
+
+@testset "One: convert(S)" begin
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            S = One{precision_type_src}()
+            S_converted = convert(AbstractScalar{precision_type_converted}, S)
+            @test S_converted isa One{precision_type_converted}
+        end
     end
 end

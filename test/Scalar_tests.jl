@@ -31,16 +31,25 @@ using GeometricAlgebra
 
     # --- Scalar{T}(value::Real)
 
-    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
             converted_test_value = value_type(test_value)
 
+            # value != 0, value != 1
             S = Scalar{precision_type}(converted_test_value)
             @test S.value isa precision_type
             @test S.value == precision_type(converted_test_value)
+
+            # value = 0
+            S = Scalar{precision_type}(value_type(0))
+            @test S === Zero{precision_type}()
+
+            # value = 1
+            S = Scalar{precision_type}(value_type(1))
+            @test S === One{precision_type}()
         end
     end
 
@@ -53,28 +62,44 @@ using GeometricAlgebra
         for value_type in subtypes(Signed)
             converted_test_value = value_type(test_value)
 
+            # value != 0, value != 1
             S = Scalar{precision_type}(converted_test_value)
             @test S.value isa precision_type
             @test S.value == precision_type(converted_test_value)
+
+            # value = 0
+            S = Scalar{precision_type}(value_type(0))
+            @test S === Zero{precision_type}()
+
+            # value = 1
+            S = Scalar{precision_type}(value_type(1))
+            @test S === One{precision_type}()
         end
 
         # subtypes(Unsigned)
         for value_type in subtypes(Unsigned)
             converted_test_value = value_type(abs(test_value))
 
+            # value != 0, value != 1
             S = Scalar{precision_type}(converted_test_value)
             @test S.value isa precision_type
             @test S.value == precision_type(converted_test_value)
+
+            # value = 0
+            S = Scalar{precision_type}(value_type(0))
+            @test S === Zero{precision_type}()
+
+            # value = 1
+            S = Scalar{precision_type}(value_type(1))
+            @test S === One{precision_type}()
         end
 
         # Bool
         S = Scalar{precision_type}(true)
-        @test S.value isa precision_type
-        @test S.value == precision_type(1)
+        @test S === One{precision_type}()
 
         S = Scalar{precision_type}(false)
-        @test S.value isa precision_type
-        @test S.value == precision_type(0)
+        @test S === Zero{precision_type}()
     end
 end
 
@@ -88,13 +113,24 @@ end
 
     # --- Scalar(value::AbstractFloat)
 
-    test_value = rand()
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
 
     for precision_type in subtypes(AbstractFloat)
+        # value != 0, value != 1
         converted_test_value = precision_type(test_value)
         S = Scalar(converted_test_value)
         @test S isa Scalar{precision_type}
+
+        # value = 0
+        converted_test_value = precision_type(0)
+        S = Scalar(converted_test_value)
+        @test S === Zero{precision_type}()
+
+        # value = 1
+        converted_test_value = precision_type(1)
+        S = Scalar(converted_test_value)
+        @test S === One{precision_type}()
     end
 
     # --- Scalar(value::Integer)
@@ -103,22 +139,44 @@ end
 
     # subtypes(Signed)
     for value_type in subtypes(Signed)
+        # value != 0, value != 1
         S = Scalar(value_type(test_value))
         @test S isa Scalar{Float64}
+
+        # value = 0
+        converted_test_value = value_type(0)
+        S = Scalar(converted_test_value)
+        @test S === Zero{Float64}()
+
+        # value = 1
+        converted_test_value = value_type(1)
+        S = Scalar(converted_test_value)
+        @test S === One{Float64}()
     end
 
     # subtypes(Unsigned)
     for value_type in subtypes(Unsigned)
+        # value != 0, value != 1
         S = Scalar(value_type(abs(test_value)))
         @test S isa Scalar{Float64}
+
+        # value = 0
+        converted_test_value = value_type(0)
+        S = Scalar(converted_test_value)
+        @test S === Zero{Float64}()
+
+        # value = 1
+        converted_test_value = value_type(1)
+        S = Scalar(converted_test_value)
+        @test S === One{Float64}()
     end
 
     # Bool
     S = Scalar(true)
-    @test S isa Scalar{Float64}
+    @test S === One{Float64}()
 
     S = Scalar(false)
-    @test S isa Scalar{Float64}
+    @test S === Zero{Float64}()
 end
 
 @testset "Scalar: outer constructor - copy constructor" begin
@@ -133,22 +191,51 @@ end
 
     # --- Preparations
 
-    test_value = rand()
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
 
-    # --- Scalar(S::Scalar, value::Real)
+    # --- Scalar(S::Scalar)
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         converted_test_value = precision_type(test_value)
-        S = Scalar(converted_test_value)
 
-        # Construct a Scalar representing the same scalar as `S`
+        # value != 0, value != 1
+        S = Scalar(converted_test_value)
         S_copy = Scalar(S)
         @test S_copy isa Scalar{precision_type}
 
-        # Construct a Scalar representing the same space as `S` with a
-        # different value.
+        # value = 0
+        S = Scalar(precision_type(0))
+        S_copy = Scalar(S)
+        @test S_copy === Zero{precision_type}()
+
+        # value = 1
+        S = Scalar(precision_type(1))
+        S_copy = Scalar(S)
+        @test S_copy === One{precision_type}()
+    end
+
+    # --- Scalar(S::Scalar; value::Real)
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_test_value = precision_type(test_value)
+
+        # value != 0, value != 1
+        S = Scalar(converted_test_value)
+        S_copy = Scalar(S, value=converted_test_value + 1)
+        @test S_copy isa Scalar{precision_type}
+        @test value(S_copy) == converted_test_value + 1
+
+        # value = 0
+        S = Scalar(precision_type(0))
+        S_copy = Scalar(S, value=converted_test_value + 1)
+        @test S_copy isa Scalar{precision_type}
+        @test value(S_copy) == converted_test_value + 1
+
+        # value = 1
+        S = Scalar(precision_type(1))
         S_copy = Scalar(S, value=converted_test_value + 1)
         @test S_copy isa Scalar{precision_type}
         @test value(S_copy) == converted_test_value + 1
@@ -157,11 +244,53 @@ end
 
 # --- Function tests
 
-@testset "AbstractBlade interface: S::Scalar" begin
+@testset "Scalar: AbstractMultivector interface functions" begin
     # Preparations
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
 
+    # Exercise functionality and check results
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_test_value = precision_type(test_value)
+
+        # value > 0
+        positive_test_value = converted_test_value > 0 ?
+            converted_test_value : -converted_test_value
+        S = Scalar{precision_type}(positive_test_value)
+        @test dim(S) == 0
+        @test grades(S) == [0]
+        @test blades(S) == [S]
+        @test S[0] == [S]
+        @test S[1] == []
+        @test norm(S) isa precision_type
+        @test norm(S) == abs(converted_test_value)
+
+        # value < 0
+        negative_test_value = converted_test_value < 0 ?
+            converted_test_value : -converted_test_value
+        S = Scalar{precision_type}(negative_test_value)
+        @test norm(S) isa precision_type
+        @test norm(S) == abs(converted_test_value)
+
+        # value = Inf
+        S = Scalar(precision_type(Inf))
+        @test norm(S) isa precision_type
+        @test norm(S) == Inf
+
+        # value = -Inf
+        S = Scalar(precision_type(-Inf))
+        @test norm(S) isa precision_type
+        @test norm(S) == Inf
+    end
+end
+
+@testset "Scalar: AbstractBlade interface functions" begin
+    # Preparations
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         converted_test_value = precision_type(test_value)
@@ -170,68 +299,40 @@ end
         positive_test_value = converted_test_value > 0 ?
             converted_test_value : -converted_test_value
         S = Scalar(positive_test_value)
-        @test dim(S) == 0
         @test grade(S) == 0
         @test basis(S) == 1
         @test volume(S) isa precision_type
         @test volume(S) == positive_test_value
-        @test norm(S) isa precision_type
-        @test norm(S) == positive_test_value
         @test sign(S) == 1
 
         # value < 0
         negative_test_value = converted_test_value > 0 ?
             -converted_test_value : converted_test_value
         S = Scalar(negative_test_value)
-        @test dim(S) == 0
-        @test grade(S) == 0
-        @test basis(S) == 1
         @test volume(S) isa precision_type
         @test volume(S) == negative_test_value
-        @test norm(S) isa precision_type
-        @test norm(S) == abs(negative_test_value)
         @test sign(S) == -1
-
-        # value = 0
-        S = Scalar(precision_type(0))
-        @test dim(S) == 0
-        @test grade(S) == 0
-        @test basis(S) == 1
-        @test volume(S) isa precision_type
-        @test volume(S) == 0
-        @test norm(S) isa precision_type
-        @test norm(S) == 0
-        @test sign(S) == 0
 
         # value = Inf
         S = Scalar(precision_type(Inf))
-        @test dim(S) == 0
-        @test grade(S) == 0
-        @test basis(S) == 1
         @test volume(S) isa precision_type
         @test volume(S) == precision_type(Inf)
-        @test norm(S) isa precision_type
-        @test norm(S) == Inf
         @test sign(S) == 1
 
         # value = -Inf
         S = Scalar(precision_type(-Inf))
-        @test dim(S) == 0
-        @test grade(S) == 0
-        @test basis(S) == 1
         @test volume(S) isa precision_type
         @test volume(S) == precision_type(-Inf)
-        @test norm(S) isa precision_type
-        @test norm(S) == Inf
         @test sign(S) == -1
     end
 end
 
-@testset "Scalar: Scalar interface" begin
+@testset "Scalar: AbstractScalar interface functions" begin
     # Preparations
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
 
+    # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         converted_test_value = precision_type(test_value)
@@ -250,11 +351,6 @@ end
         @test value(S) isa precision_type
         @test value(S) == negative_test_value
 
-        # value = 0
-        S = Scalar(precision_type(0))
-        @test value(S) isa precision_type
-        @test value(S) == 0
-
         # value = Inf
         S = Scalar(precision_type(Inf))
         @test value(S) isa precision_type
@@ -267,23 +363,18 @@ end
     end
 end
 
-@testset "convert(S): S::Scalar" begin
+@testset "Scalar: convert(S)" begin
     # Preparations
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
 
-    # Tests
+    # Exercise functionality and check results
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
-            # Preparations
             converted_test_value = precision_type_src(test_value)
             S = Scalar{precision_type_src}(converted_test_value)
-
-            # Exercise functionality and check results
-            S_converted = convert(Scalar{precision_type_converted}, S)
-
+            S_converted = convert(AbstractScalar{precision_type_converted}, S)
             @test S_converted isa Scalar{precision_type_converted}
-
             if precision_type_src == precision_type_converted
                 @test S_converted === S
             else
