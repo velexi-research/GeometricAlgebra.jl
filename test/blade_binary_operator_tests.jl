@@ -521,3 +521,6 @@ end
 end
 
 # --- *(B, C)
+
+# TODO: @test_throws for Blade * vector and grade(B) > 1
+# TODO: @test_throws for Pseudoscalar * vector
