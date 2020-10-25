@@ -25,15 +25,15 @@ using GeometricAlgebra
     # --- Inner constructor
 
     for precision_type in subtypes(AbstractFloat)
-        S = Zero{precision_type}()
-        @test S isa Zero{precision_type}
-        @test S === Zero{precision_type}()
+        B = Zero{precision_type}()
+        @test B isa Zero{precision_type}
+        @test B === Zero{precision_type}()
     end
 
     # --- Outer constructor
 
-    S = Zero()
-    @test S isa Zero{Float64}
+    B = Zero()
+    @test B isa Zero{Float64}
 end
 
 @testset "zero()" begin
@@ -42,109 +42,109 @@ end
         # --- M::AbstractScalar
 
         # M::Zero
-        S = zero(Zero{precision_type}())
-        @test S isa Zero{precision_type}
+        B = zero(Zero{precision_type}())
+        @test B isa Zero{precision_type}
 
         # M::One
-        S = zero(One{precision_type}())
-        @test S isa Zero{precision_type}
+        B = zero(One{precision_type}())
+        @test B isa Zero{precision_type}
 
         # M::Scalar
-        S = zero(Scalar{precision_type}(5))
-        @test S isa Zero{precision_type}
+        B = zero(Scalar{precision_type}(5))
+        @test B isa Zero{precision_type}
 
         # --- M::AbstractBlade
 
         # M::Blade
-        S = zero(Blade{precision_type}([1 2 3]))
-        @test S isa Zero{precision_type}
+        B = zero(Blade{precision_type}([1 2 3]))
+        @test B isa Zero{precision_type}
 
         # M::Pseudoscalar
-        S = zero(Pseudoscalar{precision_type}(10, 5))
-        @test S isa Zero{precision_type}
+        B = zero(Pseudoscalar{precision_type}(10, 5))
+        @test B isa Zero{precision_type}
 
         # --- M::AbstractMultivector
 
         # M::Multivector
-        S = zero(Multivector{precision_type}([Scalar(3)]))
-        @test S isa Zero{precision_type}
+        B = zero(Multivector{precision_type}([Scalar(3)]))
+        @test B isa Zero{precision_type}
     end
 
     # zero(::Type{<:AbstractMultivector{T}})
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 
-        S = zero(AbstractScalar{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(AbstractScalar{precision_type})
+        @test B isa Zero{precision_type}
 
-        S = zero(Zero{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(Zero{precision_type})
+        @test B isa Zero{precision_type}
 
-        S = zero(One{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(One{precision_type})
+        @test B isa Zero{precision_type}
 
-        S = zero(Scalar{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(Scalar{precision_type})
+        @test B isa Zero{precision_type}
 
         # --- Type{<:AbstractBlade{T}}
 
-        S = zero(AbstractBlade{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(AbstractBlade{precision_type})
+        @test B isa Zero{precision_type}
 
-        S = zero(Blade{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(Blade{precision_type})
+        @test B isa Zero{precision_type}
 
-        S = zero(Pseudoscalar{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(Pseudoscalar{precision_type})
+        @test B isa Zero{precision_type}
 
         # --- Type{<:AbstractMultivector{T}}
 
-        S = zero(AbstractMultivector{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(AbstractMultivector{precision_type})
+        @test B isa Zero{precision_type}
 
-        S = zero(Multivector{precision_type})
-        @test S isa Zero{precision_type}
+        B = zero(Multivector{precision_type})
+        @test B isa Zero{precision_type}
     end
 end
 
 @testset "Zero: AbstractMultivector interface functions" begin
     for precision_type in subtypes(AbstractFloat)
-        S = Zero{precision_type}()
-        @test dim(S) == 0
-        @test grades(S) == [0]
-        @test blades(S) == [S]
-        @test S[0] == [S]
-        @test S[1] == []
-        @test norm(S) isa precision_type
-        @test norm(S) == 0
+        B = Zero{precision_type}()
+        @test dim(B) == 0
+        @test grades(B) == [0]
+        @test blades(B) == [B]
+        @test B[0] == [B]
+        @test B[1] == []
+        @test norm(B) isa precision_type
+        @test norm(B) == 0
     end
 end
 
 @testset "Zero: AbstractBlade interface functions" begin
     for precision_type in subtypes(AbstractFloat)
-        S = Zero{precision_type}()
-        @test grade(S) == 0
-        @test basis(S) == 1
-        @test volume(S) isa precision_type
-        @test volume(S) == 0
-        @test sign(S) == 0
+        B = Zero{precision_type}()
+        @test grade(B) == 0
+        @test basis(B) == 1
+        @test volume(B) isa precision_type
+        @test volume(B) == 0
+        @test sign(B) == 0
     end
 end
 
 @testset "Zero: AbstractScalar interface functions" begin
     for precision_type in subtypes(AbstractFloat)
-        S = Zero{precision_type}()
-        @test value(S) isa precision_type
-        @test value(S) == 0
+        B = Zero{precision_type}()
+        @test value(B) isa precision_type
+        @test value(B) == 0
     end
 end
 
-@testset "Zero: convert(S)" begin
+@testset "Zero: convert(B)" begin
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
-            S = Zero{precision_type_src}()
-            S_converted = convert(AbstractScalar{precision_type_converted}, S)
-            @test S_converted isa Zero{precision_type_converted}
+            B = Zero{precision_type_src}()
+            B_converted = convert(AbstractScalar{precision_type_converted}, B)
+            @test B_converted isa Zero{precision_type_converted}
         end
     end
 end
