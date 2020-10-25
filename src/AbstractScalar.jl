@@ -19,7 +19,7 @@ Supertype for all scalar types.
 
 Methods
 -------
-    value(B)::AbstractFloat
+    value(B::AbstractScalar)::AbstractFloat
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
@@ -28,6 +28,7 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 import LinearAlgebra.norm
 export dim, norm
 
+# Basic functions
 """
     dim(B::AbstractScalar)
 
@@ -38,9 +39,34 @@ dim(B::AbstractScalar) = 0
 """
     norm(B::AbstractScalar)
 
-Return asbolute value of `B`.
+Return absolute value of `B`.
 """
 norm(B::AbstractScalar) = abs(value(B))
+
+# Unary operators
+"""
+    reverse(B::AbstractScalar)
+
+Return `B` (the reverse of a scalar is itself).
+"""
+reverse(B::AbstractScalar) = B
+
+"""
+    dual(B::AbstractScalar; dim::Integer)
+
+Compute the dual of `B`. Note that the dimension of the embedding space must
+be explicitly specified.
+"""
+function dual(B::AbstractScalar; dim::Union{Integer, Nothing}=nothing)
+    if dim === nothing
+        error("The dual of a scalar is not well-defined if `dim` is not " *
+              "specified")
+    end
+
+    mod(dim, 4) < 2 ?
+        Pseudoscalar(dim, value(B)) :
+        Pseudoscalar(dim, -value(B))
+end
 
 # --- AbstractBlade interface functions for AbstractScalar
 
