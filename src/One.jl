@@ -55,7 +55,7 @@ value(B::One{T}) where {T<:AbstractFloat} = T(1)
 import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
 
--(B::One{T}) where {T<:AbstractFloat} = Scalar{T}(-1)
+-(B::One) = Scalar(-value(B))
 reciprocal(B::One) = B
 
 +(B::One, M::AbstractMultivector) = Multivector(vcat([B], blades(M)))

@@ -56,7 +56,8 @@ import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
 
 -(B::Zero) = B
-reciprocal(B::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(Inf)
+dual(B::Zero) = error("The dual of Zero is not well-defined")
+reciprocal(B::Zero) = Scalar(1 / value(B))
 
 +(M::AbstractMultivector, B::Zero) = M
 +(B::Zero, M::AbstractMultivector) = M
