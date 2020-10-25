@@ -34,6 +34,11 @@ Unary Operators
 
 Binary Operators
 ----------------
+    +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
     wedge(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     ∧(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
@@ -50,9 +55,6 @@ Binary Operators
               N::AbstractMultivector)::AbstractMultivector
     >(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-    +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    dual(M::AbstractMultivector, C::AbstractBlade)::AbstractMultivector
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
