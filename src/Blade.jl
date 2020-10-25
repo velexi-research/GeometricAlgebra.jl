@@ -1,5 +1,5 @@
 """
-The blade.jl submodule defines Blade types.
+Blade.jl defines the Blade type and basic functions
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -18,54 +18,7 @@ import LinearAlgebra
 # --- Types
 
 # Exports
-export Scalar, Blade, Pseudoscalar
-
-# Scalar
-"""
-    struct Scalar{T<:AbstractFloat} <: AbstractBlade{T}
-
-Scalar (0-blade) represented with the floating-point precision of type `T`. The
-`basis` and `volume` of a Scalar are `1` and the value of the Scalar,
-respectively.
-"""
-struct Scalar{T<:AbstractFloat} <: AbstractBlade{T}
-    #=
-      Fields
-      ------
-      * `value`: the value of the scalar
-    =#
-    value::T
-
-    """
-    Construct a Scalar having the specified `value`.
-    """
-    Scalar{T}(value::Real) where {T<:AbstractFloat} = new(T(value))
-end
-
-"""
-    Scalar(value::Real)
-
-Construct a Scalar having the specified `value`.
-
-When the precision is not specified, the following rules are applied to set
-the precision of the Scalar.
-
-* If `value` is a floating-point value, the precision of the Scalar is inferred
-  from the precision of `value`.
-
-* If `value` is an integer, the precision of the Scalar defaults to `Float64`.
-"""
-Scalar(value::AbstractFloat) = Scalar{typeof(value)}(value)
-Scalar(value::Integer) = Scalar(Float64(value))
-
-"""
-    Scalar(B::Scalar; value::Real=value(B))
-
-Copy constructor. Construct a Scalar with the same precision as `B` having the
-specified `value`.
-"""
-Scalar(B::Scalar; value::Real=value(B)) = Scalar{typeof(B.value)}(value)
-
+export Blade, Pseudoscalar
 
 # Blade
 """
@@ -459,31 +412,7 @@ Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
     Pseudoscalar{typeof(B.value)}(dim(B), value)
 
 
-# --- Special number functions
-
-# Imports
-import Base.zero, Base.one
-
-"""
-    zero(M::AbstractMultivector)
-    zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
-
-Return the additive identity 0.
-"""
-zero(M::AbstractMultivector) = Scalar{typeof(norm(M))}(0)
-zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Scalar{T}(0)
-
-"""
-    one(M::AbstractMultivector)
-    one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
-
-Return the multiplicative identity 1.
-"""
-one(M::AbstractMultivector) = Scalar{typeof(norm(M))}(1)
-one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Scalar{T}(1)
-
-
-# --- AbstractBlade interface functions: Scalar/Blade/Pseudoscalar
+# --- AbstractBlade interface functions: Blade/Pseudoscalar
 
 # Imports
 import Base.sign
@@ -497,7 +426,6 @@ export dim, grade, basis, volume, norm
 
 Return dimension of space that `B` is embedded in.
 """
-dim(B::Scalar) = 0
 dim(B::Blade) = B.dim
 dim(B::Pseudoscalar) = B.dim
 
@@ -506,7 +434,6 @@ dim(B::Pseudoscalar) = B.dim
 
 Return the grade of the dimension of the space spanned by `B`.
 """
-grade(B::Scalar) = 0
 grade(B::Blade) = B.grade
 grade(B::Pseudoscalar) = B.dim
 
@@ -514,10 +441,9 @@ grade(B::Pseudoscalar) = B.dim
     basis(B::AbstractBlade)
 
 When `B` is a Blade, return an orthonormal basis for the space spanned by the
-blade. When `B` is a Scalar, return 1. When `B` is a Pseudoscalar, return
+blade. When `B` is a Pseudoscalar, return
 LinearAlgebra.I.
 """
-basis(B::Scalar) = 1
 basis(B::Blade) = B.basis
 basis(B::Pseudoscalar) = LinearAlgebra.I
 
@@ -525,10 +451,8 @@ basis(B::Pseudoscalar) = LinearAlgebra.I
     volume(B::AbstractBlade)::Real
 
 Return the volume of `B`. For Blades, `volume(B)` is the signed norm of the
-blade relative to its unit basis. For Scalars, `volume(B)` is the value of the
-scalar (note that the basis for Scalars is 1).
+blade relative to its unit basis.
 """
-volume(B::Scalar) = B.value
 volume(B::Blade) = B.volume
 volume(B::Pseudoscalar) = B.value
 
@@ -547,18 +471,16 @@ Return the sign of `B` relative to its unit basis.
 sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 
-# --- Scalar/Pseudoscalar functions
+# --- Pseudoscalar functions
 
 # Exports
 export value
 
 """
-    value(B::Scalar)::Real
     value(B::Pseudoscalar)::Real
 
 Return the value of `B`.
 """
-value(B::Scalar) = B.value
 value(B::Pseudoscalar) = B.value
 
 
@@ -569,14 +491,6 @@ import Base.convert
 
 # Exports
 export blade_atol
-
-"""
-    convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:Scalar{T}}
-
-Convert Scalar to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, B::Scalar) where {T<:AbstractFloat, S<:AbstractBlade{T}} =
-    T == typeof(value(B)) ? B : Scalar{T}(value(B))
 
 """
     convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
