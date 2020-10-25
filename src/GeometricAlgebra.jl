@@ -15,8 +15,12 @@ module GeometricAlgebra
 # --- Submodules
 
 include("AbstractMultivector.jl")
+
 include("AbstractBlade.jl")
+include("AbstractBlade_operators.jl")
+
 include("AbstractScalar.jl")
+include("AbstractScalar_operators.jl")
 
 include("Zero.jl")
 include("One.jl")
