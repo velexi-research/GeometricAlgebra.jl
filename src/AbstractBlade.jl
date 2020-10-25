@@ -34,7 +34,6 @@ Unary Operators
 Binary Operators
 ----------------
     proj(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-    dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
