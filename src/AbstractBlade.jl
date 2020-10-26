@@ -39,6 +39,9 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 # --- AbstractMultivector interface functions for AbstractBlade type
 
+import Base.sign
+import LinearAlgebra.norm
+
 export grades, blades
 
 # Notes: dim() are implemented by subtypes of AbstractBlade.
