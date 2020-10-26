@@ -41,7 +41,7 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 export grades, blades
 
-# Notes: dim() and norm() are implemented by subtypes of AbstractBlade.
+# Notes: dim() are implemented by subtypes of AbstractBlade.
 
 """
     grades(B::AbstractBlade)
@@ -65,3 +65,19 @@ return a Vector containing `B`. Otherwise, return an empty vector.
 """
 Base.getindex(B::AbstractBlade, k::Int) =
     k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
+
+"""
+    norm(B::AbstractBlade)::Real
+
+Return the norm of `B`.
+"""
+norm(B::AbstractBlade) = abs(volume(B))
+
+# --- AbstractBlade interface functions
+
+"""
+    sign(B::AbstractBlade)::Int8
+
+Return the sign of `B` relative to its unit basis.
+"""
+sign(B::AbstractBlade)::Int8 = sign(volume(B))
