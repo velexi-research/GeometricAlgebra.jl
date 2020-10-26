@@ -23,16 +23,22 @@ include("AbstractScalar.jl")
 include("AbstractScalar_operators.jl")
 
 include("Zero.jl")
+include("Zero_operators.jl")
+
 include("One.jl")
+include("One_operators.jl")
+
 include("Scalar.jl")
 
-include("blade.jl")
-include("blade_comparison_operators.jl")
-include("blade_operators.jl")
-include("blade_operators_mgs.jl")
+include("Pseudoscalar.jl")
 
-include("multivector.jl")
-include("multivector_operators.jl")
+include("Blade.jl")
+include("Blade_comparison_operators.jl")
+include("Blade_operators.jl")
+include("Blade_operators_mgs.jl")
+
+include("Multivector.jl")
+include("Multivector_operators.jl")
 
 
 end  # End of GeometricAlgebra.jl module
