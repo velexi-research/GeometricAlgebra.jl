@@ -78,3 +78,16 @@ reciprocal(B::Zero) = Scalar(1 / value(B))
 -(B::Zero, C::Zero) = B
 *(B::Zero, C::Zero) = B
 /(B::Zero{T}, C::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(NaN)
+
+# Operators between Zero and AbstractScalar instances
++(B::AbstractScalar, C::Zero) = B
++(B::Zero, C::AbstractScalar) = C
+
+-(B::AbstractScalar, C::Zero) = B
+-(B::Zero, C::AbstractScalar) = -C
+
+*(B::AbstractScalar, C::Zero) = C
+*(B::Zero, C::AbstractScalar) = B
+
+/(B::AbstractScalar, C::Zero) = Scalar{typeof(norm(B))}(Inf)
+/(B::Zero, C::AbstractScalar) = B

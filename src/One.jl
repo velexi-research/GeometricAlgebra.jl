@@ -48,7 +48,7 @@ export value
 
 Return 1 (with the same precision of `B`).
 """
-value(B::One{T}) where {T<:AbstractFloat} = T(1) 
+value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
 
@@ -97,3 +97,9 @@ reciprocal(B::One) = B
 
 -(B::AbstractScalar, C::One) = B + -C
 -(B::One, C::AbstractScalar) = B + -C
+
+*(B::AbstractScalar, C::One) = B
+*(B::One, C::AbstractScalar) = C
+
+/(B::AbstractScalar, C::One) = B
+/(B::One, C::AbstractScalar) = Scalar(C, value=1 / value(C))
