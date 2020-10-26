@@ -114,27 +114,3 @@ Convert AbstractScalar to have the floating-point precision of type `T`.
 convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat,
                                              S<:AbstractMultivector{T}} =
     T == typeof(value(B)) ? B : Scalar{T}(value(B))
-
-# --- Operators from the AbstractMultivector and AbstractBlade interfaces
-
-import Base.:(+), Base.:(-)
-import Base.:(*), Base.:(/)
-
-+(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) + value(C))
--(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) - value(C))
-*(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) * value(C))
-/(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) / value(C))
-
-# --- Operators between AbstractScalar and Real types
-
-+(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) + C)
-+(B::Real, C::AbstractScalar) = C + B
-
--(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) - C)
--(B::Real, C::AbstractScalar) = Scalar(C, value=B - value(C))
-
-*(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) * C)
-*(B::Real, C::AbstractScalar) = C * B
-
-/(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) / C)
-/(B::Real, C::AbstractScalar) = Scalar(C, value=B / value(C))

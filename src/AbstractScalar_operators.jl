@@ -10,6 +10,30 @@ except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
 
+# --- Operators from the AbstractMultivector and AbstractBlade interfaces
+
+import Base.:(+), Base.:(-)
+import Base.:(*), Base.:(/)
+
++(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) + value(C))
+-(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) - value(C))
+*(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) * value(C))
+/(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) / value(C))
+
+# --- Operators between AbstractScalar and Real types
+
++(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) + C)
++(B::Real, C::AbstractScalar) = C + B
+
+-(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) - C)
+-(B::Real, C::AbstractScalar) = Scalar(C, value=B - value(C))
+
+*(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) * C)
+*(B::Real, C::AbstractScalar) = C * B
+
+/(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) / C)
+/(B::Real, C::AbstractScalar) = Scalar(C, value=B / value(C))
+
 # --- Comparison operators
 
 import Base.:(==), Base.:(≈)
