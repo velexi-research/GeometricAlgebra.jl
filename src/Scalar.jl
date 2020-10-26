@@ -12,7 +12,6 @@ except according to the terms contained in the LICENSE file.
 
 export Scalar
 
-# Scalar
 """
     struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
 
@@ -66,7 +65,7 @@ specified `value`.
 """
 Scalar(B::AbstractScalar; value::Real=value(B)) = Scalar{typeof(value)}(value)
 
-# --- AbstractScalar interface functions for Scalar
+# --- AbstractScalar interface functions for Scalar type
 
 export value
 
@@ -76,24 +75,3 @@ export value
 Return the value of `B` (with the same precision of `B`).
 """
 value(B::Scalar) = B.value
-
-# --- Operators from the AbstractMultivector and AbstractBlade interfaces
-
-+(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) + value(C))
--(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) - value(C))
-*(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) * value(C))
-/(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) / value(C))
-
-# --- Operators between AbstractScalar and Real types
-
-+(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) + C)
-+(B::Real, C::AbstractScalar) = C + B
-
--(B::AbstractScalar, C::Real) = B + -C
--(B::Real, C::AbstractScalar) = B + -C
-
-*(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) * C)
-*(B::Real, C::AbstractScalar) = C * B
-
-/(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) / C)
-/(B::Real, C::AbstractScalar) = Scalar(B, value=B / value(C))
