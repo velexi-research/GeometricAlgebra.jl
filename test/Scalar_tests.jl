@@ -250,7 +250,7 @@ end
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
 
-    # --- Basic functions
+    # --- Tests
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -285,31 +285,6 @@ end
         @test norm(S) isa precision_type
         @test norm(S) == Inf
     end
-
-    # --- Unary operators
-
-    for precision_type in subtypes(AbstractFloat)
-        B = Scalar{precision_type}(test_value)
-        minus_B = -B
-        @test minus_B isa Scalar{precision_type}
-        @test minus_B == Scalar{precision_type}(-test_value)
-
-        for test_dim in 5:8
-            dual_B = dual(B, dim=test_dim)
-            @test dual_B isa Pseudoscalar{precision_type}
-
-            expected_dual = mod(test_dim, 4) < 2 ?
-                Pseudoscalar{precision_type}(test_dim,
-                                             precision_type(test_value)) :
-                Pseudoscalar{precision_type}(test_dim,
-                                             precision_type(-test_value))
-            @test dual_B == expected_dual
-        end
-
-        expected_message = "The dual of a scalar is not well-defined if " *
-                           "`dim` is not specified"
-        @test_throws ErrorException(expected_message) dual(B)
-    end
 end
 
 @testset "Scalar: AbstractBlade interface functions" begin
@@ -318,7 +293,7 @@ end
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
 
-    # --- Basic functions
+    # --- Tests
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -353,16 +328,6 @@ end
         @test volume(S) isa precision_type
         @test volume(S) == precision_type(-Inf)
         @test sign(S) == -1
-    end
-
-    # --- Unary operators
-
-    for precision_type in subtypes(AbstractFloat)
-        B = Scalar{precision_type}(test_value)
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B isa Scalar{precision_type}
-        @test reciprocal_B ==
-            Scalar{precision_type}(1 / precision_type(test_value))
     end
 end
 
