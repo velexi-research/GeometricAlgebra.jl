@@ -17,7 +17,7 @@ import Base.:(*), Base.:(/)
 
 -(B::Zero) = B
 dual(B::Zero) = error("The dual of Zero is not well-defined")
-reciprocal(B::Zero) = Scalar(1 / value(B))
+reciprocal(B::Zero) = 1 / B
 
 +(M::AbstractMultivector, B::Zero) = M
 +(B::Zero, M::AbstractMultivector) = M
