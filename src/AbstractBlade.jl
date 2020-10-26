@@ -37,7 +37,7 @@ Binary Operators
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
-# --- AbstractMultivector interface functions for AbstractBlade
+# --- AbstractMultivector interface functions for AbstractBlade type
 
 export grades, blades
 

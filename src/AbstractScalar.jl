@@ -23,7 +23,7 @@ Methods
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
-# --- AbstractMultivector interface functions for AbstractScalar
+# --- AbstractMultivector interface functions for AbstractScalar type
 
 import LinearAlgebra.norm
 export dim, norm
@@ -68,7 +68,7 @@ function dual(B::AbstractScalar; dim::Union{Integer, Nothing}=nothing)
         Pseudoscalar(dim, -value(B))
 end
 
-# --- AbstractBlade interface functions for AbstractScalar
+# --- AbstractBlade interface functions for AbstractScalar type
 
 export grade, basis, volume
 
