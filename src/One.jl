@@ -83,7 +83,7 @@ reciprocal(B::One) = B
 +(B::One, C::Zero) = B
 
 -(B::Zero, C::One) = -C
--(B::One, C::Zero) = -B
+-(B::One, C::Zero) = B
 
 *(B::Zero, C::One) = B
 *(B::One, C::Zero) = C

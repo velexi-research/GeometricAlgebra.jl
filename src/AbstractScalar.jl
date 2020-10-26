@@ -131,10 +131,10 @@ import Base.:(*), Base.:(/)
 +(B::Real, C::AbstractScalar) = C + B
 
 -(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) - C)
--(B::Real, C::AbstractScalar) = Scalar(B, value=B - value(C))
+-(B::Real, C::AbstractScalar) = Scalar(C, value=B - value(C))
 
 *(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) * C)
 *(B::Real, C::AbstractScalar) = C * B
 
 /(B::AbstractScalar, C::Real) = Scalar(B, value=value(B) / C)
-/(B::Real, C::AbstractScalar) = Scalar(B, value=B / value(C))
+/(B::Real, C::AbstractScalar) = Scalar(C, value=B / value(C))
