@@ -9,11 +9,55 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Imports
 
+# Standard library
+import InteractiveUtils.subtypes
 using Test
+
+# GeometricAlgebra.jl
 using GeometricAlgebra
 
-# Tests
+# --- Tests
+
+@testset "-(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+
+        minus_B = -B
+        @test minus_B isa Scalar{precision_type}
+        @test minus_B == Scalar{precision_type}(-1)
+    end
+end
+
+@testset "dual(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+
+        for test_dim in 5:8
+            dual_B = dual(B, dim=test_dim)
+            @test dual_B isa Pseudoscalar{precision_type}
+
+            expected_dual = mod(test_dim, 4) < 2 ?
+                Pseudoscalar{precision_type}(test_dim, 1) :
+                Pseudoscalar{precision_type}(test_dim, -1)
+            @test dual_B == expected_dual
+        end
+
+        expected_message = "The dual of a scalar is not well-defined if " *
+                           "`dim` is not specified"
+        @test_throws ErrorException(expected_message) dual(B)
+    end
+end
+
+@testset "reciprocal(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B === B
+    end
+end
 
 @testset "+(B, C)" begin
     # --- Preparations

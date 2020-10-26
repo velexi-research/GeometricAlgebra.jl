@@ -18,7 +18,6 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-
 # --- Tests
 
 @testset "Zero: constructor tests" begin
@@ -119,15 +118,6 @@ end
         @test norm(B) isa precision_type
         @test norm(B) == 0
     end
-
-    # Unary operators
-    for precision_type in subtypes(AbstractFloat)
-        B = Zero{precision_type}()
-        @test -B === B
-
-        expected_message = "The dual of Zero is not well-defined"
-        @test_throws ErrorException(expected_message) dual(B)
-    end
 end
 
 @testset "Zero: AbstractBlade interface functions" begin
@@ -139,14 +129,6 @@ end
         @test volume(B) isa precision_type
         @test volume(B) == 0
         @test sign(B) == 0
-    end
-
-    # Unary operators
-    for precision_type in subtypes(AbstractFloat)
-        B = Zero{precision_type}()
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B isa Scalar{precision_type}
-        @test reciprocal_B == Scalar{precision_type}(Inf)
     end
 end
 

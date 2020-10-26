@@ -9,11 +9,43 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Imports
 
+# Standard library
+import InteractiveUtils.subtypes
 using Test
+
+# GeometricAlgebra.jl
 using GeometricAlgebra
 
-# Tests
+# --- Tests
+
+@testset "-(B)" begin  # from AbstractMultivector interface
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+
+        @test -B === B
+    end
+end
+
+@testset "dual(B)" begin  # from AbstractMultivector interface
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+
+        expected_message = "The dual of Zero is not well-defined"
+        @test_throws ErrorException(expected_message) dual(B)
+    end
+end
+
+@testset "reciprocal(B)" begin  # from AbstractBlade interface
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B isa Scalar{precision_type}
+        @test reciprocal_B == Scalar{precision_type}(Inf)
+    end
+end
 
 @testset "+(B, C)" begin
     # --- Preparations
