@@ -18,9 +18,10 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+
 # --- Tests
 
-@testset "-(B)" begin
+@testset "-(B)" begin  # from AbstractMultivector interface
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
@@ -30,7 +31,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "dual(B)" begin
+@testset "dual(B)" begin  # from AbstractMultivector interface
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
@@ -50,7 +51,7 @@ end
     end
 end
 
-@testset "reciprocal(B)" begin
+@testset "reciprocal(B)" begin  # from AbstractBlade interface
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 

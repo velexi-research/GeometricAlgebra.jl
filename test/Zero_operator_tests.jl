@@ -18,6 +18,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+
 # --- Tests
 
 @testset "-(B)" begin  # from AbstractMultivector interface
