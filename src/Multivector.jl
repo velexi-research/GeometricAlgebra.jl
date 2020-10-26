@@ -9,16 +9,11 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# --- Imports
 
-import DataStructures.SortedDict
+using DataStructures: SortedDict
 
-# --- Types
-
-# Exports
 export Multivector
 
-# Multivector
 """
     struct Multivector{T<:AbstractFloat} <: AbstractMultivector
 
@@ -31,21 +26,19 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
       * `parts`: collection of k-vectors that sum to the multivector
 
       * `norm`: norm of the multivector
-
-      * `reduced`: True if the multivector is guaranteed to be reduced to a
-        sum of orthogonal blades; False otherwise.
     =#
+    dim::Int
     parts::SortedDict{Int, Vector{AbstractBlade}}
     norm::T
-    reduced::Bool
 
     """
     Construct a Multivector from a of vector of blades. For each grade ``k``,
     the blades used to represent the ``k``-vector part of the multivector form
     an orthogonal basis for the subspace of ``k``-vectors.
     """
-    function Multivector{T}(blades::Vector{<:AbstractBlade};
-                            reduced::Bool=false) where {T<:AbstractFloat}
+    function Multivector{T}(
+            blades::Vector{<:AbstractBlade}) where {T<:AbstractFloat}
+
         # --- Handle edge cases
 
         # Return Scalar(0) if number of blades is 0.
@@ -54,6 +47,8 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
         end
 
         # --- Construct Multivector
+
+        dim_ = dim(blades[1])
 
         # Construct `parts`. Sort blades by grade.
         parts = SortedDict{Int, Vector{AbstractBlade}}()
@@ -75,16 +70,22 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
             end
         end
 
-        # Reduce multivector
-        if reduced
-            # TODO: reduce k-vectors
+        # --- Reduce multivector
+
+        # Reduce scalar, vector, and pseudoscalar parts
+        for k in [0, 1, dim_]
+            if k in keys(parts)
+                parts[k] = [reduce(+, parts[k])]
+            end
         end
+
+        # TODO: reduce remaining k-vectors
 
         # Compute norm
         norm = 0  # TODO: implement
 
         # Return new Multivector
-        new(parts, norm, false)
+        new(dim_, parts, norm)
     end
 
     """
@@ -98,7 +99,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
 end
 
 """
-    Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false)
+    Multivector(blades::Vector{<:AbstractBlade})
 
 Construct a Multivector from a of vector of blades. For each grade ``k``, the
 blades used to represent the ``k``-vector part of the multivector form an
@@ -107,21 +108,22 @@ orthogonal basis for the subspace of ``k``-vectors.
 The precision of the Multivector is inferred from the precision of the first
 element of `blades`.
 """
-Multivector(blades::Vector{<:AbstractBlade}; reduced::Bool=false) =
+Multivector(blades::Vector{<:AbstractBlade}) =
     length(blades) > 0 ?
-        Multivector{typeof(volume(blades[1]))}(blades, reduced=reduced) :
+        Multivector{typeof(volume(blades[1]))}(blades) :
         Multivector{Float64}(blades)
 
-Multivector(multivectors::Vector{<:AbstractMultivector}; reduced::Bool=false) =
+Multivector(multivectors::Vector{<:AbstractMultivector}) =
     length(multivectors) > 0 ?
-        Multivector(reduce(vcat, map(blades, multivectors)), reduced=reduced) :
+        Multivector(reduce(vcat, map(blades, multivectors))) :
         Multivector{Float64}(Vector{AbstractBlade}())
 
 
 
-# --- AbstractMultivector interface functions: Multivector
+# --- AbstractMultivector interface functions for Multivector type
 
-# Exports
+import LinearAlgebra.norm
+
 export grades, blades
 
 """
@@ -160,7 +162,6 @@ norm(M::Multivector) = M.norm
 
 # --- Utility functions
 
-# Imports
 import Base.convert
 
 """
