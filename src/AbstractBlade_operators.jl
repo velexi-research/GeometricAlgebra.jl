@@ -11,7 +11,8 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Comparison operators
 
-# Note: comparison operators default to false.
+# Note: the comparison operators defined here ensure that arbitrary
+#       AbstractBlade instances can be compared
 
 import Base.:(==), Base.:(≈)
 
