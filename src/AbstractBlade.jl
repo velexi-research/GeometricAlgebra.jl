@@ -20,19 +20,25 @@ Supertype for all blade types.
 For the AbstractBlade type, the norm and orientation are encoded by the `volume`
 of the blade.
 
-Methods
--------
+Interface
+---------
+
+Note: the return value of all methods should preserve the precision of the
+AbstractBlade instance (when possible).
+
+### Methods
+
     grade(B::AbstractBlade)::Int
     basis(B::AbstractBlade; normalized::Bool=true)::Matrix{AbstractFloat}
-    volume(B::AbstractBlade)::AbstractFloat
+    volume(B::AbstractBlade{T)::T where {T<:AbstractFloat}
     sign(B::AbstractBlade)::Int8
 
-Unary Operators
----------------
+### Unary Operators
+
     reciprocal(B::AbstractBlade)::AbstractBlade
 
-Binary Operators
-----------------
+### Binary Operators
+
     proj(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end

@@ -17,9 +17,15 @@ export AbstractScalar
 
 Supertype for all scalar types.
 
-Methods
--------
-    value(B::AbstractScalar)::AbstractFloat
+Interface
+---------
+
+Note: the return value of all methods should preserve the precision of the
+AbstractScalar instance (when possible).
+
+### Methods
+
+    value(B::AbstractScalar{T})::T where {T<:AbstractFloat}
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 

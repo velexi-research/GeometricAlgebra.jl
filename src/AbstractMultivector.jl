@@ -17,23 +17,29 @@ export AbstractMultivector
 
 Supertype for all multivector types.
 
-Methods
--------
+Interface
+---------
+
+Note: the return value of all methods should preserve the precision of the
+AbstractMultivector instance (when possible).
+
+### Methods
+
     dim(M::AbstractMultivector)::Int
     grades(M::AbstractMultivector)::Vector{Int}
     blades(M::AbstractMultivector)::Vector{<:AbstractBlade}
     getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
 
-    norm(M::AbstractMultivector)::AbstractFloat
+    norm(M::AbstractMultivector{T})::T where {T<:AbstractFloat}
 
-Unary Operators
----------------
+### Unary Operators
+
     -(M::AbstractMultivector)::AbstractMultivector
     reverse(M::AbstractMultivector)::AbstractMultivector
     dual(M::AbstractMultivector)::AbstractMultivector
 
-Binary Operators
-----------------
+### Binary Operators
+
     +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
