@@ -61,6 +61,32 @@ AbstractMultivector instance (when possible).
               N::AbstractMultivector)::AbstractMultivector
     >(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-    dual(M::AbstractMultivector, C::AbstractBlade)::AbstractMultivector
+    dual(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
+
+# --- Utility functions
+
+"""
+    assert_dim_equal(M, N)
+
+Assert that the dimensions of `M` and `N` are the same.
+
+Valid arguments
+---------------
+    assert_dim_equal(M::AbstractMultivector, N::AbstractMultivector)
+    assert_dim_equal(M::AbstractMultivector, v::Vector)
+    assert_dim_equal(v::Vector, M::AbstractMultivector)
+"""
+function assert_dim_equal(M::AbstractMultivector, N::AbstractMultivector)
+    if dim(M) != dim(N)
+        throw(DimensionMismatch("`dim(M)` not equal to `dim(N)`"))
+    end
+end
+
+function assert_dim_equal(M::AbstractMultivector, v::Vector)
+    if dim(M) != length(v)
+        throw(DimensionMismatch("`dim(M)` not equal to `length(v)`"))
+    end
+end
+assert_dim_equal(v::Vector, M::AbstractMultivector) = assert_dim_equal(M, v)
