@@ -37,11 +37,11 @@ end
 
         for test_dim in 5:8
             dual_B = dual(B, dim=test_dim)
-            @test dual_B isa Pseudoscalar{precision_type}
 
             expected_dual = mod(test_dim, 4) < 2 ?
                 Pseudoscalar{precision_type}(test_dim, 1) :
                 Pseudoscalar{precision_type}(test_dim, -1)
+            @test dual_B isa Pseudoscalar{precision_type}
             @test dual_B == expected_dual
         end
 
