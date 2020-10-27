@@ -15,8 +15,12 @@ except according to the terms contained in the LICENSE file.
 import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
 
+# ------ Unary operators
+
 -(B::One) = Scalar(-value(B))
 reciprocal(B::One) = B
+
+# ------ Binary operators
 
 +(B::One, M::AbstractMultivector) = Multivector(vcat([B], blades(M)))
 +(M::AbstractMultivector, B::One) = B + M

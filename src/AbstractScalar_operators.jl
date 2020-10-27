@@ -14,6 +14,38 @@ except according to the terms contained in the LICENSE file.
 import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
 
+# ------ Unary operators
+
+-(B::AbstractScalar) = Scalar(-value(B))
+
+"""
+    reverse(B::AbstractScalar)
+
+Return `B` (the reverse of a scalar is itself).
+"""
+reverse(B::AbstractScalar) = B
+
+"""
+    dual(B::AbstractScalar; dim::Integer)
+
+Compute the dual of `B`. Note that the dimension of the embedding space must
+be explicitly specified.
+"""
+function dual(B::AbstractScalar; dim::Union{Integer, Nothing}=nothing)
+    if dim === nothing
+        error("The dual of a scalar is not well-defined if `dim` is not " *
+              "specified")
+    end
+
+    mod(dim, 4) < 2 ?
+        Pseudoscalar(dim, value(B)) :
+        Pseudoscalar(dim, -value(B))
+end
+
+reciprocal(B::AbstractScalar) = Scalar(1 / value(B))
+
+# ------ Binary operators
+
 +(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) + value(C))
 -(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) - value(C))
 *(B::AbstractScalar, C::AbstractScalar) = Scalar(B, value=value(B) * value(C))

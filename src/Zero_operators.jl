@@ -15,9 +15,13 @@ except according to the terms contained in the LICENSE file.
 import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
 
+# ------ Unary operators
+
 -(B::Zero) = B
 dual(B::Zero) = error("The dual of Zero is not well-defined")
 reciprocal(B::Zero) = 1 / B
+
+# ------ Binary operators
 
 +(M::AbstractMultivector, B::Zero) = M
 +(B::Zero, M::AbstractMultivector) = M
