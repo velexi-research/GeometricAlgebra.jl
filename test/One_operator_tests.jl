@@ -118,15 +118,17 @@ end
 
     # --- Tests
 
-    # B::One, C::One
+    # ------ B::One, C::One
+
     B = One()
     C = One()
 
     expected_result = Zero()
     @test B - C === expected_result
 
-    # B::One, C::Scalar
-    # B::Scalar, C::One
+    # ------ B::One, C::Scalar
+    #        B::Scalar, C::One
+
     B = One()
     C = Scalar(test_value)
 
@@ -140,8 +142,10 @@ end
     @test C_minus_B isa Scalar
     @test C_minus_B == expected_result
 
-    # B::One, C::Real
-    # B::Real, C::One
+    # ------ B::One, C::Real
+    #        B::Real, C::One
+
+    # B != C
     B = One()
     C = test_value
 
@@ -154,6 +158,18 @@ end
     expected_result = test_value - 1
     @test C_minus_B isa Scalar
     @test C_minus_B == expected_result
+
+    # B == C
+    B = One()
+    C = 1
+
+    expected_result = Zero()
+
+    B_minus_C = B - C
+    @test B_minus_C === expected_result
+
+    C_minus_B = C - B
+    @test C_minus_B === expected_result
 end
 
 @testset "*(B, C)" begin

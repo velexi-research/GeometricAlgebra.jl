@@ -123,12 +123,14 @@ end
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = abs(test_value_1) + rand() + 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
     # --- Tests
 
-    # B::Scalar, C::Scalar
+    # ------ B::Scalar, C::Scalar
+
+    # B != C
     B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
@@ -137,8 +139,18 @@ end
     @test B_minus_C isa Scalar
     @test B_minus_C == expected_result
 
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
+    # B == C
+    B = Scalar(test_value_1)
+    C = Scalar(test_value_1)
+
+    B_minus_C = B - C
+    expected_result = Zero()
+    @test B_minus_C === expected_result
+
+    # ------ B::Scalar, C::Real
+    #        B::Real, C::Scalar
+
+    # B != C
     B = Scalar(test_value_1)
     C = test_value_2
 
@@ -151,6 +163,18 @@ end
     expected_result = test_value_2 - test_value_1
     @test C_minus_B isa Scalar
     @test C_minus_B == expected_result
+
+    # B == C
+    B = Scalar(test_value_1)
+    C = test_value_1
+
+    B_minus_C = B - C
+    expected_result = Zero()
+    @test B_minus_C === expected_result
+
+    C_minus_B = C - B
+    expected_result = Zero()
+    @test C_minus_B === expected_result
 end
 
 @testset "*(B, C)" begin
