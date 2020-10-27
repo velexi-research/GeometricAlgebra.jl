@@ -9,10 +9,18 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-
 # --- Comparison operators
 
-import Base.:(≈)
+# Note: comparison operators default to false.
+
+import Base.:(==), Base.:(≈)
+
+"""
+    ==(B::AbstractBlade, C::AbstractBlade)
+
+Return true if B and C are equal; otherwise, return false.
+"""
+==(B::AbstractBlade, C::AbstractBlade) = false
 
 """
     ≈(B::AbstractBlade, C::AbstractBlade)
