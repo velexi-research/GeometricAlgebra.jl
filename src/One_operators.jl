@@ -56,7 +56,7 @@ reciprocal(B::One) = B
 /(B::One, C::Zero) = reciprocal(C)
 
 # Operators between One and AbstractScalar instances
-+(B::AbstractScalar, C::One) = Scalar(B, value=value(B) + 1)
++(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
 +(B::One, C::AbstractScalar) = C + B
 
 -(B::AbstractScalar, C::One) = B + -C
@@ -66,4 +66,4 @@ reciprocal(B::One) = B
 *(B::One, C::AbstractScalar) = C
 
 /(B::AbstractScalar, C::One) = B
-/(B::One, C::AbstractScalar) = Scalar(C, value=1 / value(C))
+/(B::One, C::AbstractScalar) = Scalar{typeof(value(C))}(1 / value(C))
