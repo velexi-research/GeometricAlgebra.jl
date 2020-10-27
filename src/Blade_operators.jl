@@ -1,6 +1,5 @@
 """
-The blade_operators.jl submodule defines operations on subtypes of
-AbstractBlade.
+Blade_operators.jl defines operations for the Blade type
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -10,13 +9,11 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# --- Imports
+# --- Core Blade operations
 
 # Standard library
-import LinearAlgebra
-
-
-# --- Core Blade operations
+import LinearAlgebra.dot
+using LinearAlgebra: det, diag, qr
 
 export wedge, ∧
 export proj, dual
@@ -27,7 +24,7 @@ export proj, dual
     wedge(B, C)
     B ∧ C
 
-Return the outer product of the arguments.
+Compute the outer product of the arguments.
 
 Valid arguments
 ---------------
@@ -105,7 +102,7 @@ const ∧ = wedge
 """
     proj(B, C; return_blade=true)
 
-Return the projection of blade `B` onto the subspace represented by blade `C`.
+Compute the projection of blade `B` onto the subspace represented by blade `C`.
 
 When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
 the return value is a Real (if the result is a scalar) or a Vector.
@@ -204,7 +201,7 @@ end
 """
     dual(B)
 
-Return the dual `B` (relative to the space that the geometric algebra is
+Compute the dual `B` (relative to the space that the geometric algebra is
 extended from).
 
 Valid arguments
@@ -215,17 +212,17 @@ Valid arguments
 function dual(B::Blade)
     # --- Extend basis(B) to an orthonormal basis for entire space.
 
-    F = LinearAlgebra.qr(basis(B))
+    F = qr(basis(B))
 
     # --- Compute volume of dual
 
     # Account for orientation of Q relative to orientation of I formed from
     # standard basis
-    dual_volume = volume(B) * sign(LinearAlgebra.det(F.Q))
+    dual_volume = volume(B) * sign(det(F.Q))
 
     # Account for orientation of first grade(B) columns of Q relative to
     # orientation of basis(B)
-    if prod(LinearAlgebra.diag(F.R)) < 0
+    if prod(diag(F.R)) < 0
         dual_volume = -dual_volume
     end
 
@@ -250,22 +247,23 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 """
     dual(B, dim)
 
-Return the dual of `B` when `B` is a Scalar. Note that the dimension of the
+Compute the dual of `B` when `B` is a Scalar. Note that the dimension of the
 embedding space must be explicitly specified.
 
 Valid arguments
 ---------------
     dual(B::Scalar, dim::Integer)
 """
-dual(B::Scalar, dim::Integer) =
-    mod(dim, 4) < 2 ?
-        Pseudoscalar(dim, value(B)) :
-        Pseudoscalar(dim, -value(B))
+# MOVED
+# dual(B::Scalar, dim::Integer) =
+#    mod(dim, 4) < 2 ?
+#        Pseudoscalar(dim, value(B)) :
+#        Pseudoscalar(dim, -value(B))
 
 """
     dual(B, C)
 
-Return the dual `B` relative to the subspace represented by `C`.
+Compute the dual `B` relative to the subspace represented by `C`.
 
 Valid arguments
 ---------------
@@ -313,7 +311,7 @@ function dual(B::Blade, C::Blade)
     if grade(B) == grade(C)
         dual_sign = mod(grade(B), 4) < 2 ? 1 : -1
 
-        dual_volume = LinearAlgebra.det(projection_coefficients) > 0 ?
+        dual_volume = det(projection_coefficients) > 0 ?
             dual_sign * volume(B) : -dual_sign * volume(B)
 
         return Scalar{typeof(volume(B))}(dual_volume)
@@ -322,16 +320,16 @@ function dual(B::Blade, C::Blade)
     # --- Extend basis(B) to an orthonormal basis for entire subspace
     #     represented by basis(C)
 
-    F = LinearAlgebra.qr(projection_coefficients)
+    F = qr(projection_coefficients)
 
     # --- Compute volume of dual
 
     # Account for orientation of Q relative to orientation of basis(C)
-    dual_volume = volume(B) * sign(LinearAlgebra.det(F.Q))
+    dual_volume = volume(B) * sign(det(F.Q))
 
     # Account for orientation of first grade(B) columns of Q relative to
     # orientation of basis(B)
-    if prod(LinearAlgebra.diag(F.R)) < 0
+    if prod(diag(F.R)) < 0
         dual_volume = -dual_volume
     end
 
@@ -371,46 +369,44 @@ end
 
 # --- Unary operations
 
-# Imports
-import Base.:(-), Base.reverse
+import Base.:(-)
 
-# Exports
 export reciprocal
 
 """
     -B
 
-Return the additive inverse of `B`.
+Compute the additive inverse of `B`.
 
 Valid arguments
 ---------------
     -(B::AbstractBlade)
 """
 -(B::Scalar) = Scalar(B, value=-value(B))
--(B::Blade{<:AbstractFloat}) = Blade(B, volume=-volume(B), copy_basis=false)
+-(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
 -(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
 
 """
     reverse(B)
 
-Return the multiplicative inverse of `B`.
+Compute the multiplicative inverse of `B`.
 
 Valid arguments
 ---------------
     reverse(B::AbstractBlade)
 """
-reverse(B::Scalar) = B
+Base.reverse(B::Scalar) = B
 
-reverse(B::Blade) =
+Base.reverse(B::Blade) =
     mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
 
-reverse(B::Pseudoscalar) =
+Base.reverse(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
 
 """
     reciprocal(B)
 
-Return the multiplicative inverse of `B`.
+Compute the multiplicative inverse of `B`.
 
 Valid arguments
 ---------------
@@ -431,18 +427,16 @@ reciprocal(B::Pseudoscalar) =
 
 # --- Binary operations
 
-# Imports
-import Base.:(*)
+import Base.:(*), Base.:(+)
 import LinearAlgebra.dot, LinearAlgebra.:(⋅)
 
-# Exports
 export dot, ⋅
 
 """
     dot(B, C)
     B ⋅ C
 
-Return the inner product (left contraction) of the first argument with the
+Compute the inner product (left contraction) of the first argument with the
 second argument.
 
 Valid arguments
@@ -561,7 +555,7 @@ dot(B::Pseudoscalar, x::Real) = zero(B)
 """
     B * C
 
-Return the geometric product of the arguments.
+Compute the geometric product of the arguments.
 
 Valid arguments
 ---------------
@@ -571,13 +565,12 @@ Valid arguments
     *(B::AbstractBlade, x::Real)
     *(x::Real, B::AbstractBlade)
 """
-*(B::Scalar, C::Scalar) = Scalar(B, value=value(B) * value(C))
 *(B::Scalar, C::Blade) = value(B) * C
 *(B::Blade, C::Scalar) = C * B
 *(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
 *(B::Pseudoscalar, C::Scalar) = C * B
 
-function *(B::Blade{<:AbstractFloat}, C::Blade{<:AbstractFloat})
+function *(B::Blade, C::Blade)
     # Check arguments
     assert_dim_equal(B, C)
 
@@ -646,6 +639,38 @@ end
 *(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
 *(B::Pseudoscalar, x::Real) = x * B
 
+"""
+    sum(B, C...)
+    B + C + ...
+
+Compute the sum the Blades .
+
+Valid arguments
+---------------
+    *(B::AbstractBlade, C::AbstractBlade)
+    *(B::AbstractBlade, v::Vector)
+    *(v::Vector, B::AbstractBlade)
+    *(B::AbstractBlade, x::Real)
+    *(x::Real, B::AbstractBlade)
+"""
++(B::Scalar, C::Scalar) = Scalar(B, value=value(B) + value(C))
+
+#sum(B::Scalar, C::Blade) = nothing  # TODO
+#sum(B::Blade, C::Scalar) = C + B
+#sum(B::Scalar, C::Pseudoscalar) = nothing  # TODO
+#sum(B::Pseudoscalar, C::Scalar) = C + B
+
+function +(B::Blade, C::Blade)
+    # Check arguments
+    assert_dim_equal(B, C)
+
+    if grade(B) == grade(C) == 1
+        v = Blade(volume(B) * basis(B) + volume(C) * basis(C))
+    else
+        # TODO
+    end
+end
+
 
 # --- Utility functions
 
@@ -695,8 +720,37 @@ function rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
     return rejections
 end
 
+# --- Comparison operators
 
-# --- Non-exported utility functions
+import Base.:(==), Base.:(≈)
+using LinearAlgebra: det
+
+==(B::Blade, C::Blade) =
+    dim(B) == dim(C) && grade(B) == grade(C) &&
+    volume(B) == volume(C) && basis(B) == basis(C)
+
+function ≈(B::Blade{T1}, C::Blade{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat}
+    # Check dim, grade, and norm are equal
+    if dim(B) != dim(C) || grade(B) != grade(C) ||
+        ≉(norm(B), norm(C), atol=atol, rtol=rtol)
+
+        return false
+    end
+
+    # Check that B and C represent the same space
+    projection = det(transpose(basis(B)) * basis(C))
+    if ≉(abs(projection), 1, atol=atol, rtol=rtol)
+        return false
+    end
+
+    # Check that B and C have the same orientation
+    return sign(B) * sign(C) == sign(projection)
+end
+
+# --- Utility functions
 
 """
     dim_equal(B, C)

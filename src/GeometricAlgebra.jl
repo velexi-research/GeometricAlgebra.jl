@@ -33,7 +33,6 @@ include("Scalar.jl")
 include("Pseudoscalar.jl")
 
 include("Blade.jl")
-include("Blade_comparison_operators.jl")
 include("Blade_operators.jl")
 include("Blade_operators_mgs.jl")
 
