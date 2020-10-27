@@ -31,6 +31,7 @@ include("One_operators.jl")
 include("Scalar.jl")
 
 include("Pseudoscalar.jl")
+include("Pseudoscalar_operators.jl")
 
 include("Blade.jl")
 include("Blade_operators.jl")
