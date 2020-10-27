@@ -9,7 +9,6 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
 
 import Base.:(+), Base.:(-)
@@ -38,24 +37,10 @@ import Base.:(*), Base.:(/)
 
 import Base.:(==), Base.:(≈)
 
-"""
-    ==(B::AbstractScalar, C::AbstractScalar)
-    ==(B::AbstractScalar, x::Real)
-    ==(x::Real, B::AbstractScalar)
-
-Return true if B and C are equal; otherwise, return false.
-"""
 ==(B::AbstractScalar, C::AbstractScalar) = (value(B) == value(C))
 ==(B::AbstractScalar, x::Real) = (x == value(B))
 ==(x::Real, B::AbstractScalar) = (value(B) == x)
 
-"""
-    ≈(B::AbstractScalar, C::AbstractScalar)
-    ≈(B::AbstractScalar, x::Real)
-    ≈(x::Real, B::AbstractScalar)
-
-Return true if B and C are approximatly equal; otherwise, return false.
-"""
 ≈(B::AbstractScalar{T1}, C::AbstractScalar{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
