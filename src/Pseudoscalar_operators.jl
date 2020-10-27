@@ -9,6 +9,38 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Operators from the AbstractMultivector and AbstractBlade interfaces
+
+import Base.:(+), Base.:(-)
+import Base.:(*), Base.:(/)
+
+# ------ Unary operators
+
+reciprocal(B::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?
+        Pseudoscalar(B, value=1 / value(B)) :
+        Pseudoscalar(B, value=-1 / value(B))
+
+# ------ Binary operators
+
+import LinearAlgebra.dot, LinearAlgebra.:(⋅)
+
+function dot(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+
+    mod(grade(B), 4) < 2 ?
+        Scalar(value(B) * value(C)) :
+        Scalar(-value(B) * value(C))
+end
+
++(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B, value=value(B) + value(C))
+-(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B, value=value(B) - value(C))
+
+*(B::Pseudoscalar, C::Pseudoscalar) = dot(B, C)
+
+/(B::Pseudoscalar, C::Pseudoscalar) =
+    Scalar{typeof(value(B))}(value(B) / value(C))
+
 # --- Comparison operators
 
 import Base.:(==), Base.:(≈)
