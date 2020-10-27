@@ -70,7 +70,7 @@ Base.getindex(B::AbstractBlade, k::Int) =
     k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
 
 """
-    norm(B::AbstractBlade)::Real
+    norm(B::AbstractBlade)
 
 Return the norm of `B`.
 """
