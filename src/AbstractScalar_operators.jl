@@ -9,6 +9,29 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+
+# --- Comparison operators
+
+import Base.:(==), Base.:(≈)
+
+==(B::AbstractScalar, C::AbstractScalar) = (value(B) == value(C))
+==(B::AbstractScalar, x::Real) = (x == value(B))
+==(x::Real, B::AbstractScalar) = (value(B) == x)
+
+≈(B::AbstractScalar{T1}, C::AbstractScalar{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    ≈(value(B), value(C), atol=atol, rtol=rtol)
+
+≈(B::AbstractScalar{T}, x::Real;
+  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
+    ≈(x, value(B), atol=atol, rtol=rtol)
+
+≈(x::Real, B::AbstractScalar{T};
+  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
+    ≈(B, x, atol=atol, rtol=rtol)
+
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
 
 # ------ Unary operators
@@ -61,12 +84,10 @@ import Base.:(*), Base.:(/)
     Scalar{typeof(value(B))}(value(B) / value(C))
 
 # wedge()
-wedge(M::AbstractMultivector, B::AbstractScalar) = M * B
-wedge(B::AbstractScalar, M::AbstractMultivector) = B * M
+wedge(B::AbstractScalar, C::AbstractScalar) = B * C
 
 # dot()
-dot(M::AbstractMultivector, B::AbstractScalar; left=true) = contractl(M, B)
-dot(B::AbstractScalar, M::AbstractMultivector; left=true) = contractl(B, M)
+dot(B::AbstractScalar, C::AbstractScalar) = B * C
 
 # contraction operators
 import Base.:(<)
@@ -81,8 +102,47 @@ proj(B::AbstractScalar, C::AbstractScalar) = B
 # dual(B, C)
 dual(B::AbstractScalar, C::Scalar) = B
 
-# --- Operators between AbstractScalar and Real types
+# --- Special cases
 
+# Operations involving Zero
++(B::Zero, C::AbstractScalar) = C
++(B::AbstractScalar, C::Zero) = B
+
+-(B::Zero, C::AbstractScalar) = -C
+-(B::AbstractScalar, C::Zero) = B
+
+*(B::Zero, C::AbstractScalar) = B
+*(B::AbstractScalar, C::Zero) = C
+
+/(B::Zero, C::AbstractScalar) = B
+/(B::AbstractScalar, C::Zero) =
+    sign(B) > 0 ?
+        Scalar{typeof(norm(B))}(Inf) :
+        Scalar{typeof(norm(B))}(-Inf)
+
+wedge(B::Zero, C::AbstractScalar) = B
+wedge(B::AbstractScalar, C::Zero) = C
+
+dot(B::Zero, C::AbstractScalar) = B
+dot(B::AbstractScalar, C::Zero) = C
+
+contractl(B::Zero, C::AbstractScalar) = B
+contractl(B::AbstractScalar, C::Zero) = C
+
+# Operations involving One
++(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
++(B::One, C::AbstractScalar) = C + B
+
+-(B::AbstractScalar, C::One) = B + -C
+-(B::One, C::AbstractScalar) = B + -C
+
+*(B::AbstractScalar, C::One) = B
+*(B::One, C::AbstractScalar) = C
+
+/(B::AbstractScalar, C::One) = B
+/(B::One, C::AbstractScalar) = Scalar{typeof(value(C))}(1 / value(C))
+
+# Operations involving Real
 +(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) + C)
 +(B::Real, C::AbstractScalar) = C + B
 
@@ -94,25 +154,3 @@ dual(B::AbstractScalar, C::Scalar) = B
 
 /(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) / C)
 /(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B / value(C))
-
-# --- Comparison operators
-
-import Base.:(==), Base.:(≈)
-
-==(B::AbstractScalar, C::AbstractScalar) = (value(B) == value(C))
-==(B::AbstractScalar, x::Real) = (x == value(B))
-==(x::Real, B::AbstractScalar) = (value(B) == x)
-
-≈(B::AbstractScalar{T1}, C::AbstractScalar{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    ≈(value(B), value(C), atol=atol, rtol=rtol)
-
-≈(B::AbstractScalar{T}, x::Real;
-  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
-    ≈(x, value(B), atol=atol, rtol=rtol)
-
-≈(x::Real, B::AbstractScalar{T};
-  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
-    ≈(B, x, atol=atol, rtol=rtol)

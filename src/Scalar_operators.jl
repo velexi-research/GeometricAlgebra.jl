@@ -9,6 +9,7 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
 
 # ------ Binary operators
@@ -22,3 +23,9 @@ import Base.:(<)
 export contractl
 contractl(B::Scalar, C::Scalar) = B * C
 <(B::Scalar, C::Scalar) = contract(B, C)
+
+# --- Special cases
+
+# Operations involving One
+dot(B::One, C::Scalar) = C
+dot(B::Scalar, C::One) = B
