@@ -14,6 +14,7 @@ except according to the terms contained in the LICENSE file.
 
 import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
+import LinearAlgebra.dot, LinearAlgebra.:(⋅)
 
 # ------ Unary operators
 
@@ -21,38 +22,49 @@ reciprocal(B::One) = B
 
 # --- Special cases
 
+# Operations involving AbstractMultivector instances
++(M::AbstractMultivector, B::One) = Multivector(vcat([B], blades(M)))
++(B::One, M::AbstractMultivector) = B + M
+
+-(M::AbstractMultivector, B::One) = Multivector(vcat([-B], blades(M)))
+-(B::One, M::AbstractMultivector) = -(M - B)
+
+*(M::AbstractMultivector, B::One) = M
+*(B::One, M::AbstractMultivector) = M
+
+/(M::AbstractMultivector, B::One) = M
+/(B::One, M::AbstractMultivector) = nothing  # TODO
+
+wedge(M::AbstractMultivector, B::One) = M
+wedge(B::One, M::AbstractMultivector) = M
+
+contractl(M::AbstractMultivector, B::One) = nothing  # TODO
+contractl(B::One, M::AbstractMultivector) = nothing  # TODO
+
+# Operations involving Scalar instances
++(B::Scalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
++(B::One, C::Scalar) = C + B
+
+-(B::Scalar, C::One) = Scalar{typeof(value(B))}(value(B) - 1)
+-(B::One, C::Scalar) = -(C - B)
+
+*(B::Scalar, C::One) = B
+*(B::One, C::Scalar) = C
+
+/(B::Scalar, C::One) = B
+/(B::One, C::Scalar) = reciprocal(C)
+
+wedge(B::Scalar, C::One) = B
+wedge(B::One, C::Scalar) = C
+
+contractl(B::Scalar, C::One) = B
+contractl(B::One, C::Scalar) = C
+
 # Operations between One instances
-+(B::One{T}, C::One{T}) where {T<:AbstractFloat} = Scalar{T}(2)
--(B::One{T}, C::One{T}) where {T<:AbstractFloat} = Zero{T}()
++(B::One, C::One) = Scalar{typeof(value(B))}(2)
+-(B::One, C::One) = Zero{typeof(value(B))}()
 *(B::One, C::One) = B
 /(B::One, C::One) = B
 
 wedge(B::One, C::One) = B
-
-dot(B::One, C::One) = contractl(B, C)
-
-export contractl
 contractl(B::One, C::One) = B
-
-# Operations involving Zero
-+(B::One, C::Zero) = B
-+(B::Zero, C::One) = C
-
--(B::One, C::Zero) = B
--(B::Zero, C::One) = -C
-
-*(B::One, C::Zero) = C
-*(B::Zero, C::One) = B
-
-/(B::One, C::Zero) = reciprocal(C)
-/(B::Zero, C::One) = B
-
-wedge(B::One, C::Zero) = C
-wedge(B::Zero, C::One) = B
-
-dot(B::One, C::Zero) = contractl(B, C)
-dot(B::Zero, C::One) = contractl(C, B)
-
-export contractl
-contractl(B::One, C::Zero) = C
-contractl(B::Zero, C::One) = B

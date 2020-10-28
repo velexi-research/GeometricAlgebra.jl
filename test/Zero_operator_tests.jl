@@ -285,3 +285,131 @@ end
     @test C_slash_B isa Scalar
     @test C_slash_B == expected_result
 end
+
+@testset "wedge(B, C), B ∧ C" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # B::Zero, C::Zero
+    B = Zero()
+    C = Zero()
+
+    B_wedge_C = wedge(B, C)
+    expected_result = Zero()
+    @test B_wedge_C === expected_result
+    @test B ∧ C === B_wedge_C
+
+    # B::Zero, C::One
+    # B::One, C::Zero
+    B = Zero()
+    C = One()
+
+    B_wedge_C = wedge(B, C)
+    expected_result = Zero()
+    @test B_wedge_C === expected_result
+    @test B ∧ C === B_wedge_C
+
+    C_wedge_B = wedge(C, B)
+    expected_result = Zero()
+    @test C_wedge_B === expected_result
+    @test C ∧ B === C_wedge_B
+
+    # B::Zero, C::Scalar
+    # B::Scalar, C::Zero
+    B = Zero()
+    C = Scalar(test_value)
+
+    B_wedge_C = wedge(B, C)
+    expected_result = Zero()
+    @test B_wedge_C === expected_result
+    @test B ∧ C === B_wedge_C
+
+    C_wedge_B = wedge(C, B)
+    expected_result = Zero()
+    @test C_wedge_B === expected_result
+    @test C ∧ B === C_wedge_B
+
+    # B::Zero, C::Real
+    # B::Real, C::Zero
+    B = Zero()
+    C = test_value
+
+    B_wedge_C = wedge(B, C)
+    expected_result = Zero()
+    @test B_wedge_C === expected_result
+    @test B ∧ C === B_wedge_C
+
+    C_wedge_B = wedge(C, B)
+    expected_result = Zero()
+    @test C_wedge_B === expected_result
+    @test C ∧ B === C_wedge_B
+end
+
+@testset "contractl(B, C), B < C" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # B::Zero, C::Zero
+    B = Zero()
+    C = Zero()
+
+    B_left_contract_C = contractl(B, C)
+    expected_result = Zero()
+    @test B_left_contract_C === expected_result
+    @test (B < C) === B_left_contract_C
+
+    # B::Zero, C::One
+    # B::One, C::Zero
+    B = Zero()
+    C = One()
+
+    B_left_contract_C = contractl(B, C)
+    expected_result = Zero()
+    @test B_left_contract_C === expected_result
+    @test (B < C) === B_left_contract_C
+
+    C_left_contract_B = contractl(C, B)
+    expected_result = Zero()
+    @test C_left_contract_B === expected_result
+    @test (C < B) === C_left_contract_B
+
+    # B::Zero, C::Scalar
+    # B::Scalar, C::Zero
+    B = Zero()
+    C = Scalar(test_value)
+
+    B_left_contract_C = contractl(B, C)
+    expected_result = Zero()
+    @test B_left_contract_C === expected_result
+    @test (B < C) === B_left_contract_C
+
+    C_left_contract_B = contractl(C, B)
+    expected_result = Zero()
+    @test C_left_contract_B === expected_result
+    @test (C < B) === C_left_contract_B
+
+    # B::Zero, C::Real
+    # B::Real, C::Zero
+    B = Zero()
+    C = test_value
+
+    B_left_contract_C = contractl(B, C)
+    expected_result = Zero()
+    @test B_left_contract_C === expected_result
+    @test (B < C) === B_left_contract_C
+
+    C_left_contract_B = contractl(C, B)
+    expected_result = Zero()
+    @test C_left_contract_B === expected_result
+    @test (C < B) === C_left_contract_B
+end

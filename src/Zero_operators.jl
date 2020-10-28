@@ -23,14 +23,71 @@ dual(B::Zero; dim::Union{Integer, Nothing}=nothing) =
 
 # --- Special cases
 
+# Operations involving AbstractMultivector instances
++(B::Zero, M::AbstractMultivector) = M
++(M::AbstractMultivector, B::Zero) = M
+
+-(B::Zero, M::AbstractMultivector) = -M
+-(M::AbstractMultivector, B::Zero) = M
+
+*(B::Zero, M::AbstractMultivector) = B
+*(M::AbstractMultivector, B::Zero) = B
+
+/(B::Zero, M::AbstractMultivector) = B
+/(M::AbstractMultivector, B::Zero) = Scalar{typeof(norm(M))}(Inf)
+
+wedge(B::Zero, M::AbstractMultivector) = B
+wedge(M::AbstractMultivector, B::Zero) = B
+
+contractl(B::Zero, M::AbstractMultivector) = B
+contractl(M::AbstractMultivector, B::Zero) = B
+
+# Operations involving Scalar instances
++(B::Zero, C::Scalar) = C
++(B::Scalar, C::Zero) = B
+
+-(B::Zero, C::Scalar) = -C
+-(B::Scalar, C::Zero) = B
+
+*(B::Zero, C::Scalar) = B
+*(B::Scalar, C::Zero) = C
+
+/(B::Zero, C::Scalar) = B
+/(B::Scalar, C::Zero) =
+    sign(B) > 0 ?
+        Scalar{typeof(norm(B))}(Inf) :
+        Scalar{typeof(norm(B))}(-Inf)
+
+wedge(B::Zero, C::Scalar) = B
+wedge(B::Scalar, C::Zero) = C
+
+contractl(B::Zero, C::Scalar) = B
+contractl(B::Scalar, C::Zero) = C
+
+# Operations involving One instances
++(B::Zero, C::One) = C
++(B::One, C::Zero) = B
+
+-(B::Zero, C::One) = -C
+-(B::One, C::Zero) = B
+
+*(B::Zero, C::One) = B
+*(B::One, C::Zero) = C
+
+/(B::Zero, C::One) = B
+/(B::One, C::Zero) = reciprocal(C)
+
+wedge(B::Zero, C::One) = B
+wedge(B::One, C::Zero) = C
+
+contractl(B::Zero, C::One) = B
+contractl(B::One, C::Zero) = C
+
 # Operations between Zero instances
 +(B::Zero, C::Zero) = B
 -(B::Zero, C::Zero) = B
 *(B::Zero, C::Zero) = B
-/(B::Zero{T}, C::Zero{T}) where {T<:AbstractFloat} = Scalar{T}(NaN)
+/(B::Zero, C::Zero) = Scalar{typeof(value(B))}(NaN)
 
 wedge(B::Zero, C::Zero) = B
-
-dot(B::Zero, C::Zero) = contractl(B, C)
 contractl(B::Zero, C::Zero) = B
-<(B::Zero, C::Zero) = contractl(B, C)
