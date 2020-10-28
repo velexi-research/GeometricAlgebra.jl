@@ -42,6 +42,7 @@ AbstractMultivector instance (when possible).
 
     +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
     *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
@@ -62,6 +63,8 @@ AbstractMultivector instance (when possible).
     >(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
     dual(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
+
+    proj(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
 

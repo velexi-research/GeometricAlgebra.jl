@@ -36,10 +36,6 @@ AbstractBlade instance (when possible).
 ### Unary Operators
 
     reciprocal(B::AbstractBlade)::AbstractBlade
-
-### Binary Operators
-
-    proj(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
