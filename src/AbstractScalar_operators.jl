@@ -1,5 +1,5 @@
 """
-AbstractScalar_operators.jl defines the AbstractScalar type
+AbstractScalar_operators.jl defines operators for the AbstractScalar type
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -11,10 +11,9 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
 
-import Base.:(+), Base.:(-)
-import Base.:(*), Base.:(/)
-
 # ------ Unary operators
+
+import Base.:(-)
 
 -(B::AbstractScalar) = Scalar(-value(B))
 
@@ -23,7 +22,7 @@ import Base.:(*), Base.:(/)
 
 Return `B` (the reverse of a scalar is itself).
 """
-reverse(B::AbstractScalar) = B
+Base.reverse(B::AbstractScalar) = B
 
 """
     dual(B::AbstractScalar; dim::Integer)
@@ -42,9 +41,12 @@ function dual(B::AbstractScalar; dim::Union{Integer, Nothing}=nothing)
         Pseudoscalar(dim, -value(B))
 end
 
-reciprocal(B::AbstractScalar) = Scalar(1 / value(B))
+reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ Binary operators
+
+import Base.:(+), Base.:(-)
+import Base.:(*), Base.:(/)
 
 +(B::AbstractScalar, C::AbstractScalar) =
     Scalar{typeof(value(B))}(value(B) + value(C))
@@ -57,6 +59,27 @@ reciprocal(B::AbstractScalar) = Scalar(1 / value(B))
 
 /(B::AbstractScalar, C::AbstractScalar) =
     Scalar{typeof(value(B))}(value(B) / value(C))
+
+# wedge()
+wedge(M::AbstractMultivector, B::AbstractScalar) = M * B
+wedge(B::AbstractScalar, M::AbstractMultivector) = B * M
+
+# dot()
+dot(M::AbstractMultivector, B::AbstractScalar; left=true) = contractl(M, B)
+dot(B::AbstractScalar, M::AbstractMultivector; left=true) = contractl(B, M)
+
+# contraction operators
+import Base.:(<)
+contractl(B::AbstractScalar, M::AbstractMultivector) = B * M
+contractl(M::AbstractMultivector, B::AbstractScalar) = M * B
+<(M::AbstractMultivector, B::AbstractScalar) = contractl(B, M)
+<(B::AbstractScalar, M::AbstractMultivector) = contractl(M, B)
+
+# proj(B, C)
+proj(B::AbstractScalar, C::AbstractScalar) = B
+
+# dual(B, C)
+dual(B::AbstractScalar, C::Scalar) = B
 
 # --- Operators between AbstractScalar and Real types
 
