@@ -255,3 +255,83 @@ end
     @test C_slash_B isa Scalar
     @test C_slash_B == expected_result
 end
+
+@testset "wedge(B, C), B ∧ C" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # --- Tests
+
+    # B::Scalar, C::Scalar
+    B = Scalar(test_value_1)
+    C = Scalar(test_value_2)
+
+    B_wedge_C = wedge(B, C)
+    expected_result = test_value_1 * test_value_2
+    @test B_wedge_C isa Scalar
+    @test B_wedge_C == expected_result
+    @test B ∧ C === B_wedge_C
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    B = Scalar(test_value_1)
+    C = test_value_2
+
+    B_wedge_C = wedge(B, C)
+    expected_result = test_value_1 * test_value_2
+    @test B_wedge_C isa Scalar
+    @test B_wedge_C == expected_result
+    @test B ∧ C === B_wedge_C
+
+    C_wedge_B = wedge(C, B)
+    expected_result = test_value_1 * test_value_2
+    @test C_wedge_B isa Scalar
+    @test C_wedge_B == expected_result
+    @test C ∧ B === C_wedge_B
+end
+
+@testset "contractl(B, C), B < C" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # --- Tests
+
+    # B::Scalar, C::Scalar
+    B = Scalar(test_value_1)
+    C = Scalar(test_value_2)
+
+    B_left_contract_C = contractl(B, C)
+    expected_result = test_value_1 * test_value_2
+    @test B_left_contract_C isa Scalar
+    @test B_left_contract_C == expected_result
+    @test (B < C) === B_left_contract_C
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    B = Scalar(test_value_1)
+    C = test_value_2
+
+    B_left_contract_C = contractl(B, C)
+    expected_result = test_value_1 * test_value_2
+    @test B_left_contract_C isa Scalar
+    @test B_left_contract_C == expected_result
+    @test (B < C) === B_left_contract_C
+
+    C_left_contract_B = contractl(C, B)
+    expected_result = test_value_1 * test_value_2
+    @test C_left_contract_B isa Scalar
+    @test C_left_contract_B == expected_result
+    @test (C < B) === C_left_contract_B
+end
