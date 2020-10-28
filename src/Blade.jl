@@ -10,7 +10,7 @@ except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
 
-import LinearAlgebra.norm
+import LinearAlgebra
 using LinearAlgebra: det, diag, qr
 
 export Blade
@@ -364,8 +364,7 @@ grade(B::Blade) = B.grade
     basis(B::AbstractBlade)
 
 When `B` is a Blade, return an orthonormal basis for the space spanned by the
-blade. When `B` is a Pseudoscalar, return
-LinearAlgebra.I.
+blade.
 """
 basis(B::Blade) = B.basis
 
