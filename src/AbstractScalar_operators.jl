@@ -9,10 +9,7 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-
 # --- Comparison operators
-
-import Base.:(==), Base.:(≈)
 
 ==(B::AbstractScalar, C::AbstractScalar) = (value(B) == value(C))
 ==(B::AbstractScalar, x::Real) = (x == value(B))
@@ -35,8 +32,6 @@ import Base.:(==), Base.:(≈)
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
 
 # ------ Unary operators
-
-import Base.:(-)
 
 -(B::AbstractScalar) = Scalar(-value(B))
 

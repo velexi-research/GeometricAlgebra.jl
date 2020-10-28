@@ -9,8 +9,13 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exported types and interface methods
 
+# Types
 export AbstractScalar
+
+# Methods
+export value
 
 """
     AbstractScalar{<:AbstractFloat}
@@ -31,9 +36,6 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
 # --- AbstractMultivector interface functions for AbstractScalar type
 
-import LinearAlgebra.norm
-export dim, norm
-
 # Basic functions
 """
     dim(B::AbstractScalar)
@@ -50,8 +52,6 @@ Return absolute value of `B`.
 norm(B::AbstractScalar) = abs(value(B))
 
 # --- AbstractBlade interface functions for AbstractScalar type
-
-export grade, basis, volume
 
 """
     grade(B::AbstractScalar)

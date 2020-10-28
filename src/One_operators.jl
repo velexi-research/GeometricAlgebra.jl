@@ -9,11 +9,7 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-
 # --- Operators from the AbstractMultivector and AbstractBlade interfaces
-
-import Base.:(+), Base.:(-)
-import Base.:(*), Base.:(/)
 
 # ------ Unary operators
 

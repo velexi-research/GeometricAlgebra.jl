@@ -9,8 +9,13 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exported types and interface methods
 
+# Types
 export One
+
+# Methods
+import Base.one
 
 """
     struct One{T<:AbstractFloat} <: AbstractScalar{T}
@@ -28,8 +33,6 @@ One() = One{Float64}()
 
 # --- Basic functions
 
-import Base.one
-
 """
     one(M::AbstractMultivector)
     one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
@@ -40,8 +43,6 @@ one(M::AbstractMultivector) = One{typeof(norm(M))}()
 one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = One{T}()
 
 # --- AbstractScalar interface functions for One
-
-export value
 
 """
     value(B::One)
