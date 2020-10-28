@@ -23,7 +23,7 @@ dual(B::Zero; dim::Union{Integer, Nothing}=nothing) =
 
 # --- Special cases
 
-# Operations involving AbstractMultivector instances
+# Operations involving AbstractMultivectors
 +(B::Zero, M::AbstractMultivector) = M
 +(M::AbstractMultivector, B::Zero) = M
 
@@ -42,7 +42,7 @@ wedge(M::AbstractMultivector, B::Zero) = B
 contractl(B::Zero, M::AbstractMultivector) = B
 contractl(M::AbstractMultivector, B::Zero) = B
 
-# Operations involving Scalar instances
+# Operations involving Scalars
 +(B::Zero, C::Scalar) = C
 +(B::Scalar, C::Zero) = B
 
@@ -64,7 +64,7 @@ wedge(B::Scalar, C::Zero) = C
 contractl(B::Zero, C::Scalar) = B
 contractl(B::Scalar, C::Zero) = C
 
-# Operations involving One instances
+# Operations involving Ones
 +(B::Zero, C::One) = C
 +(B::One, C::Zero) = B
 
@@ -83,7 +83,7 @@ wedge(B::One, C::Zero) = C
 contractl(B::Zero, C::One) = B
 contractl(B::One, C::Zero) = C
 
-# Operations between Zero instances
+# Operations between Zeros
 +(B::Zero, C::Zero) = B
 -(B::Zero, C::Zero) = B
 *(B::Zero, C::Zero) = B

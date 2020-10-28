@@ -14,7 +14,6 @@ except according to the terms contained in the LICENSE file.
 
 import Base.:(+), Base.:(-)
 import Base.:(*), Base.:(/)
-import LinearAlgebra.dot, LinearAlgebra.:(⋅)
 
 # ------ Unary operators
 
@@ -22,7 +21,7 @@ reciprocal(B::One) = B
 
 # --- Special cases
 
-# Operations involving AbstractMultivector instances
+# Operations involving AbstractMultivector
 +(M::AbstractMultivector, B::One) = Multivector(vcat([B], blades(M)))
 +(B::One, M::AbstractMultivector) = B + M
 
@@ -41,7 +40,7 @@ wedge(B::One, M::AbstractMultivector) = M
 contractl(M::AbstractMultivector, B::One) = nothing  # TODO
 contractl(B::One, M::AbstractMultivector) = nothing  # TODO
 
-# Operations involving Scalar instances
+# Operations involving Scalar
 +(B::Scalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
 +(B::One, C::Scalar) = C + B
 
@@ -60,7 +59,7 @@ wedge(B::One, C::Scalar) = C
 contractl(B::Scalar, C::One) = B
 contractl(B::One, C::Scalar) = C
 
-# Operations between One instances
+# Operations between Ones
 +(B::One, C::One) = Scalar{typeof(value(B))}(2)
 -(B::One, C::One) = Zero{typeof(value(B))}()
 *(B::One, C::One) = B
