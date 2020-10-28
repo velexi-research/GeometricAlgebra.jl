@@ -14,31 +14,27 @@ module GeometricAlgebra
 
 # --- Submodules
 
+# Types
 include("AbstractMultivector.jl")
-
 include("AbstractBlade.jl")
-include("AbstractBlade_operators.jl")
-
 include("AbstractScalar.jl")
-include("AbstractScalar_operators.jl")
-
 include("Zero.jl")
-include("Zero_operators.jl")
-
 include("One.jl")
-include("One_operators.jl")
-
 include("Scalar.jl")
-
-include("Pseudoscalar.jl")
-include("Pseudoscalar_operators.jl")
-
 include("Blade.jl")
+include("Pseudoscalar.jl")
+include("Multivector.jl")
+
+# Operators
+include("AbstractMultivector_operators.jl")
+include("AbstractBlade_operators.jl")
+include("AbstractScalar_operators.jl")
+include("Zero_operators.jl")
+include("One_operators.jl")
+include("Scalar_operators.jl")
 include("Blade_operators.jl")
 include("Blade_operators_mgs.jl")
-
-include("Multivector.jl")
+include("Pseudoscalar_operators.jl")
 include("Multivector_operators.jl")
-
 
 end  # End of GeometricAlgebra.jl module
