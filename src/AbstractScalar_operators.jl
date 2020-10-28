@@ -66,83 +66,19 @@ end
 
 reciprocal(B::AbstractScalar) = 1 / B
 
-# ------ Binary operators
-
-import Base.:(+), Base.:(-)
-import Base.:(*), Base.:(/)
-
-+(B::AbstractScalar, C::AbstractScalar) =
-    Scalar{typeof(value(B))}(value(B) + value(C))
-
--(B::AbstractScalar, C::AbstractScalar) =
-    Scalar{typeof(value(B))}(value(B) - value(C))
-
-*(B::AbstractScalar, C::AbstractScalar) =
-    Scalar{typeof(value(B))}(value(B) * value(C))
-
-/(B::AbstractScalar, C::AbstractScalar) =
-    Scalar{typeof(value(B))}(value(B) / value(C))
-
-# wedge()
-wedge(B::AbstractScalar, C::AbstractScalar) = B * C
-
-# dot()
-dot(B::AbstractScalar, C::AbstractScalar) = B * C
-
-# contraction operators
-import Base.:(<)
-contractl(B::AbstractScalar, M::AbstractMultivector) = B * M
-contractl(M::AbstractMultivector, B::AbstractScalar) = M * B
-<(M::AbstractMultivector, B::AbstractScalar) = contractl(B, M)
-<(B::AbstractScalar, M::AbstractMultivector) = contractl(M, B)
-
-# proj(B, C)
-proj(B::AbstractScalar, C::AbstractScalar) = B
-
-# dual(B, C)
-dual(B::AbstractScalar, C::Scalar) = B
-
 # --- Special cases
 
-# Operations involving Zero
-+(B::Zero, C::AbstractScalar) = C
-+(B::AbstractScalar, C::Zero) = B
+# Operations involving AbstractMultivectors
+*(B::Scalar, M::AbstractMultivector) = value(B) * M
+*(M::AbstractMultivector, B::Scalar) = B * M
 
--(B::Zero, C::AbstractScalar) = -C
--(B::AbstractScalar, C::Zero) = B
+contractl(B::Scalar, M::AbstractMultivector) = B * M
+contractl(M::AbstractMultivector, B::Scalar) =
+    length(M[0]) > 0 ?
+        Scalar(value(M[0][1]) * B) :
+        zero(Scalar{typeof(norm(M))})
 
-*(B::Zero, C::AbstractScalar) = B
-*(B::AbstractScalar, C::Zero) = C
-
-/(B::Zero, C::AbstractScalar) = B
-/(B::AbstractScalar, C::Zero) =
-    sign(B) > 0 ?
-        Scalar{typeof(norm(B))}(Inf) :
-        Scalar{typeof(norm(B))}(-Inf)
-
-wedge(B::Zero, C::AbstractScalar) = B
-wedge(B::AbstractScalar, C::Zero) = C
-
-dot(B::Zero, C::AbstractScalar) = B
-dot(B::AbstractScalar, C::Zero) = C
-
-contractl(B::Zero, C::AbstractScalar) = B
-contractl(B::AbstractScalar, C::Zero) = C
-
-# Operations involving One
-+(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
-+(B::One, C::AbstractScalar) = C + B
-
--(B::AbstractScalar, C::One) = B + -C
--(B::One, C::AbstractScalar) = B + -C
-
-*(B::AbstractScalar, C::One) = B
-*(B::One, C::AbstractScalar) = C
-
-/(B::AbstractScalar, C::One) = B
-/(B::One, C::AbstractScalar) = Scalar{typeof(value(C))}(1 / value(C))
-
-# Operations involving Real
+# Operations involving Reals
 +(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) + C)
 +(B::Real, C::AbstractScalar) = C + B
 
@@ -154,3 +90,15 @@ contractl(B::AbstractScalar, C::Zero) = C
 
 /(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) / C)
 /(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B / value(C))
+
+wedge(B::AbstractScalar, C::Real) = B * C
+wedge(B::Real, C::AbstractScalar) = B * C
+
+contractl(B::AbstractScalar, C::Real) = B * C
+contractl(B::Real, C::AbstractScalar) = B * C
+
+proj(B::AbstractScalar, C::Real) = B
+proj(B::Real, C::AbstractScalar) = B
+
+dual(B::AbstractScalar, C::Real) = B
+dual(B::Real, C::AbstractScalar) = B

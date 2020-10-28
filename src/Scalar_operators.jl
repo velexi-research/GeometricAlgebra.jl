@@ -10,22 +10,18 @@ except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
 
-# --- Operators from the AbstractMultivector and AbstractBlade interfaces
-
-# ------ Binary operators
-
-# dot(B, C)
-import LinearAlgebra.dot, LinearAlgebra.:(⋅)
-dot(B::Scalar, C::Scalar; left=true) = contractl(B, C)
-
-# contraction operators
-import Base.:(<)
-export contractl
-contractl(B::Scalar, C::Scalar) = B * C
-<(B::Scalar, C::Scalar) = contract(B, C)
-
 # --- Special cases
 
-# Operations involving One
-dot(B::One, C::Scalar) = C
-dot(B::Scalar, C::One) = B
+# Operations between Scalars
+import Base.:(+), Base.:(-), Base.:(*), Base.:(/)
+
++(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) + value(C))
+-(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) - value(C))
+*(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) * value(C))
+/(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) / value(C))
+
+wedge(B::Scalar, C::Scalar) = B * C
+contractl(B::Scalar, C::Scalar) = B * C
+proj(B::Scalar, C::Scalar) = B
+dual(B::Scalar, C::Scalar) = B
+
