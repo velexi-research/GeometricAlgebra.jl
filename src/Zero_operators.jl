@@ -14,6 +14,7 @@ except according to the terms contained in the LICENSE file.
 # ------ Unary operators
 
 -(B::Zero) = B
+
 dual(B::Zero; dim::Union{Integer, Nothing}=nothing) =
     error("The dual of Zero is not well-defined")
 
