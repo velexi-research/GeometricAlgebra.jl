@@ -179,6 +179,7 @@ end
     @test S === Zero{Float64}()
 end
 
+#= DEPRECATED
 @testset "Scalar: outer constructor - copy constructor" begin
     #=
       Notes
@@ -241,6 +242,7 @@ end
         @test value(S_copy) == converted_test_value + 1
     end
 end
+=#
 
 # --- Function tests
 
