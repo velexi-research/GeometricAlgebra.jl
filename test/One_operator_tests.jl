@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "-(B)" begin  # from AbstractMultivector interface
+@testset "-(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
@@ -31,7 +31,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "dual(B)" begin  # from AbstractMultivector interface
+@testset "dual(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
@@ -51,7 +51,7 @@ end
     end
 end
 
-@testset "reciprocal(B)" begin  # from AbstractBlade interface
+@testset "reciprocal(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
@@ -366,4 +366,101 @@ end
     @test C_left_contract_B isa Scalar
     @test C_left_contract_B == expected_result
     @test (C < B) === C_left_contract_B
+end
+
+@testset "proj(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # B::One, C::One
+    B = One()
+    C = One()
+
+    B_proj_C = proj(B, C)
+    expected_result = One()
+    @test B_proj_C === expected_result
+    @test (B < C) === B_proj_C
+
+    # B::Scalar, C::One
+    # B::One, C::Scalar
+    B = Scalar(test_value)
+    C = One()
+
+    B_proj_C = proj(B, C)
+    expected_result = B
+    @test B_proj_C === expected_result
+    @test (B < C) === B_proj_C
+
+    C_proj_B = proj(C, B)
+    expected_result = B
+    @test C_proj_B === expected_result
+    @test (C < B) === C_proj_B
+
+    # B::One, C::Real
+    # B::Real, C::One
+    B = One()
+    C = test_value
+
+    B_proj_C = proj(B, C)
+    expected_result = C
+    @test B_proj_C isa Scalar
+    @test B_proj_C == expected_result
+    @test (B < C) === B_proj_C
+
+    C_proj_B = proj(C, B)
+    expected_result = C
+    @test C_proj_B isa Scalar
+    @test C_proj_B == expected_result
+    @test (C < B) === C_proj_B
+end
+
+@testset "dual(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    B = One()
+
+    # C::One
+    C = One()
+    B_dual_C = dual(B, C)
+    expected_result = C
+    @test B_dual_C === expected_result
+
+    # C::Scalar
+    C = Scalar(test_value)
+    B_dual_C = dual(B, C)
+    expected_result = C
+    @test B_dual_C === expected_result
+
+    # C::Blade
+    test_dim = 10
+    for test_grade in 5:8
+        C = Blade(randn(test_dim, test_grade))
+        B_dual_C = dual(B, C)
+        expected_result = mod(grade(C), 4) < 2 ? C : -C
+        @test B_dual_C == expected_result
+    end
+
+    # C::Pseudoscalar
+    for test_dim in 5:8
+        C = Pseudoscalar(test_dim, test_value)
+        B_dual_C = dual(B, C)
+        expected_result = mod(grade(C), 4) < 2 ? C : -C
+        @test B_dual_C === expected_result
+    end
+
+    # C::Real
+    C = test_value
+    B_dual_C = dual(B, C)
+    expected_result = C
+    @test B_dual_C isa Scalar
+    @test B_dual_C == expected_result
 end

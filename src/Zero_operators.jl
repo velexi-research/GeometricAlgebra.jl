@@ -116,3 +116,14 @@ contractl(B::Scalar, C::Zero) = C
 # Operations involving Ones
 contractl(B::Zero, C::One) = B
 contractl(B::One, C::Zero) = C
+
+# ------ dual(B, C)
+
+dual(B::Zero, C::Zero) = error("The dual of Zero is not well-defined")
+
+# Special cases
+dual(B::Zero, C::Blade) = error("The dual of Zero is not well-defined")
+dual(B::Zero, C::Pseudoscalar) = error("The dual of Zero is not well-defined")
+dual(B::Zero, C::Scalar) = error("The dual of Zero is not well-defined")
+dual(B::Zero, C::One) = error("The dual of Zero is not well-defined")
+dual(B::Zero, C::Real) = error("The dual of Zero is not well-defined")

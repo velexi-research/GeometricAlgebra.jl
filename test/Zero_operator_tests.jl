@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "-(B)" begin  # from AbstractMultivector interface
+@testset "-(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
 
@@ -29,16 +29,13 @@ using GeometricAlgebra
     end
 end
 
-@testset "dual(B)" begin  # from AbstractMultivector interface
-    for precision_type in subtypes(AbstractFloat)
-        B = Zero{precision_type}()
-
-        expected_message = "The dual of Zero is not well-defined"
-        @test_throws ErrorException(expected_message) dual(B)
-    end
+@testset "dual(B)" begin
+    B = Zero()
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B)
 end
 
-@testset "reciprocal(B)" begin  # from AbstractBlade interface
+@testset "reciprocal(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
 
@@ -412,4 +409,108 @@ end
     expected_result = Zero()
     @test C_left_contract_B === expected_result
     @test (C < B) === C_left_contract_B
+end
+
+@testset "proj(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # B::Zero, C::Zero
+    B = Zero()
+    C = Zero()
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+    @test (B < C) === B_proj_C
+
+    # B::Zero, C::One
+    # B::One, C::Zero
+    B = Zero()
+    C = One()
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+    @test (B < C) === B_proj_C
+
+    C_proj_B = proj(C, B)
+    expected_result = Zero()
+    @test C_proj_B === expected_result
+    @test (C < B) === C_proj_B
+
+    # B::Zero, C::Scalar
+    # B::Scalar, C::Zero
+    B = Zero()
+    C = Scalar(test_value)
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+    @test (B < C) === B_proj_C
+
+    C_proj_B = proj(C, B)
+    expected_result = Zero()
+    @test C_proj_B === expected_result
+    @test (C < B) === C_proj_B
+
+    # B::Zero, C::Real
+    # B::Real, C::Zero
+    B = Zero()
+    C = test_value
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+    @test (B < C) === B_proj_C
+
+    C_proj_B = proj(C, B)
+    expected_result = Zero()
+    @test C_proj_B === expected_result
+    @test (C < B) === C_proj_B
+end
+
+@testset "dual(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    B = Zero()
+
+    # C::Zero
+    C = Zero()
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B, C)
+
+    # C::One
+    C = One()
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B, C)
+
+    # C::Scalar
+    C = Scalar(test_value)
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B, C)
+
+    # C::Blade
+    C = Blade(randn(4, 3))
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B, C)
+
+    # C::Pseudoscalar
+    C = Pseudoscalar(5, test_value)
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B, C)
+
+    # C::Real
+    C = test_value
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B, C)
 end
