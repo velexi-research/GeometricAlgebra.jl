@@ -9,11 +9,18 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exports
+
+# Types
+export Blade
+
+# Utility methods
+export blade_atol
+
+# --- Types
 
 import LinearAlgebra
 using LinearAlgebra: det, diag, qr
-
-export Blade
 
 """
     struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
@@ -340,11 +347,9 @@ Blade(B::Blade;
 Convenience constructors that return a Scalar with value `x`.
 """
 Blade(x::Real) = Scalar(x)
-Blade(x::Scalar) = Scalar(x)
+Blade(x::AbstractScalar) = Scalar(value(x))
 
 # --- AbstractBlade interface functions for Blade type
-
-export dim, grade, basis, volume
 
 """
     dim(B::AbstractBlade)::Integer
@@ -377,10 +382,6 @@ blade relative to its unit basis.
 volume(B::Blade) = B.volume
 
 # --- Utility functions
-
-import Base.convert
-
-export blade_atol
 
 """
     convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
