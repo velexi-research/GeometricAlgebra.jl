@@ -9,8 +9,12 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exports
 
+# Types
 export Scalar
+
+# --- Type definitions
 
 """
     struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
@@ -57,6 +61,7 @@ the precision of the Scalar.
 Scalar(value::AbstractFloat) = Scalar{typeof(value)}(value)
 Scalar(value::Integer) = Scalar(Float64(value))
 
+#= DEPRECATED
 """
     Scalar(B::AbstractScalar; value::Real=value(B))
 
@@ -64,10 +69,9 @@ Copy constructor. Construct a Scalar with the same precision as `B` having the
 specified `value`.
 """
 Scalar(B::AbstractScalar; value::Real=value(B)) = Scalar{typeof(value)}(value)
+=#
 
 # --- AbstractScalar interface functions for Scalar type
-
-export value
 
 """
     value(B::Scalar)
