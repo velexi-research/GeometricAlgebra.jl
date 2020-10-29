@@ -71,6 +71,10 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ +(B, C)
 
+# Operations involving One
++(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
++(B::One, C::AbstractScalar) = C + B
+
 # Operations involving Zero
 +(B::AbstractScalar, C::Zero) = B
 +(B::Zero, C::AbstractScalar) = C
@@ -81,6 +85,10 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ -(B, C)
 
+# Operations involving One
+-(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) - 1)
+-(B::One, C::AbstractScalar) = -(C - B)
+
 # Operations involving Zero
 -(B::AbstractScalar, C::Zero) = B
 -(B::Zero, C::AbstractScalar) = -C
@@ -90,6 +98,10 @@ reciprocal(B::AbstractScalar) = 1 / B
 -(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B - value(C))
 
 # ------ *(B, C)
+
+# Operations involving One
+*(B::AbstractScalar, C::One) = B
+*(B::One, C::AbstractScalar) = C
 
 # Operations involving Zero
 *(B::AbstractScalar, C::Zero) = C
@@ -113,6 +125,10 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ /(B, C)
 
+# Operations involving One
+/(B::AbstractScalar, C::One) = B
+/(B::One, C::AbstractScalar) = reciprocal(C)
+
 # Operations involving Zero
 /(B::AbstractScalar, C::Zero) =
     sign(B) > 0 ?
@@ -127,6 +143,10 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ wedge(B, C)
 
+# Operations involving One
+wedge(B::AbstractScalar, C::One) = B
+wedge(B::One, C::AbstractScalar) = C
+
 # Operations involving Zero
 wedge(B::AbstractScalar, C::Zero) = C
 wedge(B::Zero, C::AbstractScalar) = B
@@ -140,6 +160,10 @@ wedge(B::AbstractScalar, C::Real) = B * C
 wedge(B::Real, C::AbstractScalar) = B * C
 
 # ------ contractl(B, C)
+
+# Operations involving One
+contractl(B::AbstractScalar, C::One) = B
+contractl(B::One, C::AbstractScalar) = C
 
 # Operations involving Zero
 contractl(B::AbstractScalar, C::Zero) = C
