@@ -396,7 +396,7 @@ end
     for test_grade in 5:8
         C = Blade(randn(test_dim, test_grade))
         B_dual_C = dual(B, C)
-        expected_result = mod(grade(C), 4) < 2 ?
+        expected_result = mod(test_grade, 4) < 2 ?
             Blade(C, volume=test_value_1) :
             Blade(C, volume=-test_value_1)
         @test B_dual_C isa Blade
@@ -407,7 +407,7 @@ end
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_2)
         B_dual_C = dual(B, C)
-        expected_result = mod(grade(C), 4) < 2 ?
+        expected_result = mod(test_dim, 4) < 2 ?
             Pseudoscalar(test_dim, test_value_1) :
             Pseudoscalar(test_dim, -test_value_1)
         @test B_dual_C isa Pseudoscalar
