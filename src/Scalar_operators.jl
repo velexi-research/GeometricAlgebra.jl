@@ -11,10 +11,26 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Binary operators from the AbstractMultivector and AbstractBlade interfaces
 
+# ------ +(B, C)
+
 +(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) + value(C))
+
+# ------ -(B, C)
+
 -(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) - value(C))
+
+# ------ *(B, C)
+
 *(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) * value(C))
+
+# ------ /(B, C)
+
 /(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) / value(C))
 
+# ------ wedge(B, C)
+
 wedge(B::Scalar, C::Scalar) = B * C
+
+# ------ contractl(B, C)
+
 contractl(B::Scalar, C::Scalar) = B * C

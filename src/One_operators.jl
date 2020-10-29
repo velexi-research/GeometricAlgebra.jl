@@ -19,70 +19,70 @@ reciprocal(B::One) = B
 
 +(B::One, C::One) = Scalar{typeof(value(B))}(2)
 
-# Operations involving AbstractMultivector
-+(M::AbstractMultivector, B::One) = Multivector(vcat([B], blades(M)))
-+(B::One, M::AbstractMultivector) = B + M
-
 # Operations involving Scalar
 +(B::Scalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
 +(B::One, C::Scalar) = C + B
+
+# Operations involving Zero
++(B::One, C::Zero) = B
++(B::Zero, C::One) = C
 
 # ------ -(B, C)
 
 -(B::One, C::One) = Zero{typeof(value(B))}()
 
-# Operations involving AbstractMultivector
--(M::AbstractMultivector, B::One) = Multivector(vcat([-B], blades(M)))
--(B::One, M::AbstractMultivector) = -(M - B)
-
 # Operations involving Scalar
 -(B::Scalar, C::One) = Scalar{typeof(value(B))}(value(B) - 1)
 -(B::One, C::Scalar) = -(C - B)
+
+# Operations involving Zero
+-(B::One, C::Zero) = B
+-(B::Zero, C::One) = -C
 
 # ------ *(B, C)
 
 *(B::One, C::One) = B
 
-# Operations involving AbstractMultivector
-*(M::AbstractMultivector, B::One) = M
-*(B::One, M::AbstractMultivector) = M
-
 # Operations involving Scalar
 *(B::Scalar, C::One) = B
 *(B::One, C::Scalar) = C
+
+# Operations involving Zero
+*(B::One, C::Zero) = C
+*(B::Zero, C::One) = B
 
 # ------ /(B, C)
 
 /(B::One, C::One) = B
 
-# Operations involving AbstractMultivector
-/(M::AbstractMultivector, B::One) = M
-/(B::One, M::AbstractMultivector) = nothing  # TODO
-
 # Operations involving Scalar
 /(B::Scalar, C::One) = B
 /(B::One, C::Scalar) = reciprocal(C)
+
+# Operations involving Zero
+/(B::One, C::Zero) = reciprocal(C)
+/(B::Zero, C::One) = B
 
 # ------ wedge(B, C)
 
 wedge(B::One, C::One) = B
 
-# Operations involving AbstractMultivector
-wedge(M::AbstractMultivector, B::One) = M
-wedge(B::One, M::AbstractMultivector) = M
-
 # Operations involving Scalar
 wedge(B::Scalar, C::One) = B
 wedge(B::One, C::Scalar) = C
+
+# Operations involving Zero
+wedge(B::One, C::Zero) = C
+wedge(B::Zero, C::One) = B
 
 # ------ contractl(B, C)
 
 contractl(B::One, C::One) = B
 
-# Operations involving AbstractMultivector
-contractl(M::AbstractMultivector, B::One) = nothing  # TODO
-contractl(B::One, M::AbstractMultivector) = nothing  # TODO
-
 # Operations involving Scalar
 contractl(B::Scalar, C::One) = B
 contractl(B::One, C::Scalar) = C
+
+# Operations involving Zero
+contractl(B::One, C::Zero) = C
+contractl(B::Zero, C::One) = B

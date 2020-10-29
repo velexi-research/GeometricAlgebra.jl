@@ -59,23 +59,6 @@ end
 
     @test B + C === Zero()
 
-    # B::Zero, C::One
-    # B::One, C::Zero
-    B = Zero()
-    C = One()
-
-    expected_result = One()
-    @test B + C === expected_result
-    @test C + B === expected_result
-
-    # B::Zero, C::Scalar
-    # B::Scalar, C::Zero
-    B = Zero()
-    C = Scalar(test_value)
-
-    @test B + C === C
-    @test C + B === C
-
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
@@ -107,30 +90,6 @@ end
     C = Zero()
 
     @test B - C === Zero()
-
-    # ------ B::Zero, C::One
-    #        B::One, C::Zero
-
-    B = Zero()
-    C = One()
-
-    B_minus_C = B - C
-    @test B_minus_C isa Scalar
-    @test B_minus_C == -1
-
-    @test C - B === One()
-
-    # ------ B::Zero, C::Scalar
-    #        B::Scalar, C::Zero
-
-    B = Zero()
-    C = Scalar(test_value)
-
-    B_minus_C = B - C
-    @test B_minus_C isa Scalar
-    @test B_minus_C == -test_value
-
-    @test C - B === C
 
     # ------ B::Zero, C::Real
     #        B::Real, C::Zero
@@ -176,24 +135,6 @@ end
     expected_result = Zero()
     @test B * C === expected_result
 
-    # B::Zero, C::One
-    # B::One, C::Zero
-    B = Zero()
-    C = One()
-
-    expected_result = Zero()
-    @test B * C === expected_result
-    @test C * B === expected_result
-
-    # B::Zero, C::Scalar
-    # B::Scalar, C::Zero
-    B = Zero()
-    C = Scalar(test_value)
-
-    expected_result = Zero()
-    @test B * C === expected_result
-    @test C * B === expected_result
-
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
@@ -220,43 +161,6 @@ end
     B_slash_C = B / C
     @test B_slash_C isa Scalar
     @test isnan(value(B_slash_C))
-
-    # B::Zero, C::One
-    # B::One, C::Zero
-    B = Zero()
-    C = One()
-
-    B_slash_C = B / C
-    expected_result = Zero()
-    @test B_slash_C === expected_result
-
-    C_slash_B = C / B
-    expected_result = Inf
-    @test C_slash_B isa Scalar
-    @test C_slash_B == expected_result
-
-    # B::Zero, C::Scalar
-    # B::Scalar, C::Zero
-    B = Zero()
-    C = Scalar(test_value)
-
-    B_slash_C = B / C
-    expected_result = Zero()
-    @test B_slash_C === expected_result
-
-    # C > 0
-    C = Scalar(abs(test_value))
-    C_slash_B = C / B
-    expected_result = Inf
-    @test C_slash_B isa Scalar
-    @test C_slash_B == expected_result
-
-    # C < 0
-    C = Scalar(-abs(test_value))
-    C_slash_B = C / B
-    expected_result = -Inf
-    @test C_slash_B isa Scalar
-    @test C_slash_B == expected_result
 
     # B::Zero, C::Real
     # B::Real, C::Zero
@@ -300,36 +204,6 @@ end
     @test B_wedge_C === expected_result
     @test B ∧ C === B_wedge_C
 
-    # B::Zero, C::One
-    # B::One, C::Zero
-    B = Zero()
-    C = One()
-
-    B_wedge_C = wedge(B, C)
-    expected_result = Zero()
-    @test B_wedge_C === expected_result
-    @test B ∧ C === B_wedge_C
-
-    C_wedge_B = wedge(C, B)
-    expected_result = Zero()
-    @test C_wedge_B === expected_result
-    @test C ∧ B === C_wedge_B
-
-    # B::Zero, C::Scalar
-    # B::Scalar, C::Zero
-    B = Zero()
-    C = Scalar(test_value)
-
-    B_wedge_C = wedge(B, C)
-    expected_result = Zero()
-    @test B_wedge_C === expected_result
-    @test B ∧ C === B_wedge_C
-
-    C_wedge_B = wedge(C, B)
-    expected_result = Zero()
-    @test C_wedge_B === expected_result
-    @test C ∧ B === C_wedge_B
-
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
@@ -364,36 +238,6 @@ end
     @test B_contractl_C === expected_result
     @test (B < C) === B_contractl_C
 
-    # B::Zero, C::One
-    # B::One, C::Zero
-    B = Zero()
-    C = One()
-
-    B_contractl_C = contractl(B, C)
-    expected_result = Zero()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Zero()
-    @test C_contractl_B === expected_result
-    @test (C < B) === C_contractl_B
-
-    # B::Zero, C::Scalar
-    # B::Scalar, C::Zero
-    B = Zero()
-    C = Scalar(test_value)
-
-    B_contractl_C = contractl(B, C)
-    expected_result = Zero()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Zero()
-    @test C_contractl_B === expected_result
-    @test (C < B) === C_contractl_B
-
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
@@ -426,32 +270,6 @@ end
     B_proj_C = proj(B, C)
     expected_result = Zero()
     @test B_proj_C === expected_result
-
-    # B::Zero, C::One
-    # B::One, C::Zero
-    B = Zero()
-    C = One()
-
-    B_proj_C = proj(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = proj(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
-
-    # B::Zero, C::Scalar
-    # B::Scalar, C::Zero
-    B = Zero()
-    C = Scalar(test_value)
-
-    B_proj_C = proj(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = proj(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
 
     # B::Zero, C::Real
     # B::Real, C::Zero

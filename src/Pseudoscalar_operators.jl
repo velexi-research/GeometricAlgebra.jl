@@ -67,6 +67,21 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 /(B::Pseudoscalar, C::Pseudoscalar) =
     Scalar{typeof(value(B))}(value(B) / value(C))
 
+# ------ wedge(B, C)
+
+function wedge(B::Pseudoscalar, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    zero(B)
+end
+
+# Operations involving Vectors
+function wedge(B::Pseudoscalar, v::Vector{<:Real})
+    assert_dim_equal(B, v)
+    zero(B)
+end
+
+wedge(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
+
 # ------ contractl(B, C)
 
 function contractl(B::Pseudoscalar, C::Pseudoscalar)

@@ -22,124 +22,38 @@ dual(B::Zero; dim::Union{Integer, Nothing}=nothing) =
 
 +(B::Zero, C::Zero) = B
 
-# Operations involving AbstractMultivectors
-+(B::Zero, M::AbstractMultivector) = M
-+(M::AbstractMultivector, B::Zero) = M
-
-# Operations involving Scalars
-+(B::Zero, C::Scalar) = C
-+(B::Scalar, C::Zero) = B
-
-# Operations involving Ones
-+(B::Zero, C::One) = C
-+(B::One, C::Zero) = B
-
 # ------ -(B, C)
 
 -(B::Zero, C::Zero) = B
-
-# Operations involving AbstractMultivectors
--(B::Zero, M::AbstractMultivector) = -M
--(M::AbstractMultivector, B::Zero) = M
-
-# Operations involving Scalars
--(B::Zero, C::Scalar) = -C
--(B::Scalar, C::Zero) = B
-
-# Operations involving Ones
--(B::Zero, C::One) = -C
--(B::One, C::Zero) = B
 
 # ------ *(B, C)
 
 *(B::Zero, C::Zero) = B
 
-# Operations involving AbstractMultivectors
-*(B::Zero, M::AbstractMultivector) = B
-*(M::AbstractMultivector, B::Zero) = B
-
-# Operations involving Scalars
-*(B::Zero, C::Scalar) = B
-*(B::Scalar, C::Zero) = C
-
-# Operations involving Ones
-*(B::Zero, C::One) = B
-*(B::One, C::Zero) = C
-
 # ------ /(B, C)
 
 /(B::Zero, C::Zero) = Scalar{typeof(value(B))}(NaN)
-
-# Operations involving AbstractMultivectors
-/(B::Zero, M::AbstractMultivector) = B
-/(M::AbstractMultivector, B::Zero) = Scalar{typeof(norm(M))}(Inf)
-
-# Operations involving Scalars
-/(B::Zero, C::Scalar) = B
-/(B::Scalar, C::Zero) =
-    sign(B) > 0 ?
-        Scalar{typeof(norm(B))}(Inf) :
-        Scalar{typeof(norm(B))}(-Inf)
-
-# Operations involving Ones
-/(B::Zero, C::One) = B
-/(B::One, C::Zero) = reciprocal(C)
 
 # ------ wedge(B, C)
 
 wedge(B::Zero, C::Zero) = B
 
-# Operations involving AbstractMultivectors
-wedge(B::Zero, M::AbstractMultivector) = B
-wedge(M::AbstractMultivector, B::Zero) = B
-
-# Operations involving Scalars
-wedge(B::Zero, C::Scalar) = B
-wedge(B::Scalar, C::Zero) = C
-
-# Operations involving Ones
-wedge(B::Zero, C::One) = B
-wedge(B::One, C::Zero) = C
-
 # ------ contractl(B, C)
 
 contractl(B::Zero, C::Zero) = B
 
-# Operations involving AbstractMultivectors
-contractl(B::Zero, M::AbstractMultivector) = B
-contractl(M::AbstractMultivector, B::Zero) = B
-
-# Operations involving Scalars
-contractl(B::Zero, C::Scalar) = B
-contractl(B::Scalar, C::Zero) = C
-
-# Operations involving Ones
-contractl(B::Zero, C::One) = B
-contractl(B::One, C::Zero) = C
-
 # ------ proj(B, C)
-
-proj(B::Zero, C::Zero) = B
-
-# Operations involving AbstractMultivectors
-proj(B::AbstractMultivector, C::Zero) = C
-
-# Operations involving Scalars
-proj(B::Scalar, C::Zero) = C
-
-# Operations involving Ones
-proj(B::One, C::Zero) = C
 
 # Operations involving Reals
 proj(B::Real, C::Zero) = C
 
 # ------ dual(B, C)
 
-dual(B::Zero, C::Zero) = error("The dual of Zero is not well-defined")
+dual(B::Zero, C::Zero) = dual(B)
 
 # Special cases
-dual(B::Zero, C::Blade) = error("The dual of Zero is not well-defined")
-dual(B::Zero, C::Pseudoscalar) = error("The dual of Zero is not well-defined")
-dual(B::Zero, C::Scalar) = error("The dual of Zero is not well-defined")
-dual(B::Zero, C::One) = error("The dual of Zero is not well-defined")
-dual(B::Zero, C::Real) = error("The dual of Zero is not well-defined")
+dual(B::Zero, C::Blade) = dual(B)
+dual(B::Zero, C::Pseudoscalar) = dual(B)
+dual(B::Zero, C::Scalar) = dual(B)
+dual(B::Zero, C::One) = dual(B)
+dual(B::Zero, C::Real) = dual(B)

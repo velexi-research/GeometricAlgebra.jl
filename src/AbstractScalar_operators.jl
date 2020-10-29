@@ -71,11 +71,19 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ +(B, C)
 
+# Operations involving Zero
++(B::AbstractScalar, C::Zero) = B
++(B::Zero, C::AbstractScalar) = C
+
 # Operations involving Reals
 +(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) + C)
 +(B::Real, C::AbstractScalar) = C + B
 
 # ------ -(B, C)
+
+# Operations involving Zero
+-(B::AbstractScalar, C::Zero) = B
+-(B::Zero, C::AbstractScalar) = -C
 
 # Operations involving Reals
 -(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) - C)
@@ -83,9 +91,9 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ *(B, C)
 
-# Operations involving AbstractMultivectors
-*(B::Scalar, M::AbstractMultivector) = value(B) * M
-*(M::AbstractMultivector, B::Scalar) = B * M
+# Operations involving Zero
+*(B::AbstractScalar, C::Zero) = C
+*(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Reals
 *(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) * C)
@@ -105,15 +113,23 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 # ------ /(B, C)
 
+# Operations involving Zero
+/(B::AbstractScalar, C::Zero) =
+    sign(B) > 0 ?
+        Scalar{typeof(norm(B))}(Inf) :
+        Scalar{typeof(norm(B))}(-Inf)
+
+/(B::Zero, C::AbstractScalar) = B
+
 # Operations involving Reals
 /(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) / C)
 /(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B / value(C))
 
 # ------ wedge(B, C)
 
-# Operations involving AbstractBlades
-wedge(B::AbstractScalar, C::AbstractBlade) = B * C
-wedge(B::AbstractBlade, C::AbstractScalar) = B * C
+# Operations involving Zero
+wedge(B::AbstractScalar, C::Zero) = C
+wedge(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Vectors
 wedge(B::AbstractScalar, v::Vector{<:Real}) =  Blade(value(B) * v)
@@ -125,12 +141,9 @@ wedge(B::Real, C::AbstractScalar) = B * C
 
 # ------ contractl(B, C)
 
-# Operations involving AbstractMultivectors
-contractl(B::Scalar, M::AbstractMultivector) = B * M
-contractl(M::AbstractMultivector, B::Scalar) =
-    length(M[0]) > 0 ?
-        Scalar(value(M[0][1]) * B) :
-        zero(Scalar{typeof(norm(M))})
+# Operations involving Zero
+contractl(B::AbstractScalar, C::Zero) = C
+contractl(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Reals
 contractl(B::AbstractScalar, C::Real) = B * C
@@ -140,23 +153,26 @@ contractl(B::Real, C::AbstractScalar) = B * C
 
 proj(B::AbstractScalar, C::AbstractScalar) = B
 
+# Operations involving Zero
+proj(B::AbstractScalar, C::Zero) = C
+
 # Operations involving Reals
 proj(B::AbstractScalar, C::Real) = B
 proj(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B)
 
+#= REVIEW
 # Operations involving Blades
-#=
 proj(B::AbstractScalar, C::Blade) = B
 proj(B::Blade, C::AbstractScalar) = zero(B)
 =#
 
-#=
+#= REVIEW
 # Operations involving Pseudoscalars
 proj(B::AbstractScalar, C::Pseudoscalar) = B
 proj(B::Pseudoscalar, C::AbstractScalar) = zero(B)
 =#
 
-#=
+#= REVIEW
 # Operations involving Vectors
 proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
@@ -167,7 +183,6 @@ proj(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
 
 # ------ dual(B, C)
 
-# Operations involving AbstractBlades
 dual(B::AbstractScalar, C::AbstractScalar) = B
 
 # Operations involving Blades
