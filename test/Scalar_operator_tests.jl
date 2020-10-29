@@ -311,28 +311,28 @@ end
     B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = test_value_1 * test_value_2
-    @test B_left_contract_C isa Scalar
-    @test B_left_contract_C == expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C isa Scalar
+    @test B_contractl_C == expected_result
+    @test (B < C) === B_contractl_C
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar
     B = Scalar(test_value_1)
     C = test_value_2
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = test_value_1 * test_value_2
-    @test B_left_contract_C isa Scalar
-    @test B_left_contract_C == expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C isa Scalar
+    @test B_contractl_C == expected_result
+    @test (B < C) === B_contractl_C
 
-    C_left_contract_B = contractl(C, B)
+    C_contractl_B = contractl(C, B)
     expected_result = test_value_1 * test_value_2
-    @test C_left_contract_B isa Scalar
-    @test C_left_contract_B == expected_result
-    @test (C < B) === C_left_contract_B
+    @test C_contractl_B isa Scalar
+    @test C_contractl_B == expected_result
+    @test (C < B) === C_contractl_B
 end
 
 @testset "proj(B, C)" begin

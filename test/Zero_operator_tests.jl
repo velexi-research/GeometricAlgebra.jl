@@ -359,55 +359,55 @@ end
     B = Zero()
     C = Zero()
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = Zero()
-    @test B_left_contract_C === expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C === expected_result
+    @test (B < C) === B_contractl_C
 
     # B::Zero, C::One
     # B::One, C::Zero
     B = Zero()
     C = One()
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = Zero()
-    @test B_left_contract_C === expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C === expected_result
+    @test (B < C) === B_contractl_C
 
-    C_left_contract_B = contractl(C, B)
+    C_contractl_B = contractl(C, B)
     expected_result = Zero()
-    @test C_left_contract_B === expected_result
-    @test (C < B) === C_left_contract_B
+    @test C_contractl_B === expected_result
+    @test (C < B) === C_contractl_B
 
     # B::Zero, C::Scalar
     # B::Scalar, C::Zero
     B = Zero()
     C = Scalar(test_value)
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = Zero()
-    @test B_left_contract_C === expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C === expected_result
+    @test (B < C) === B_contractl_C
 
-    C_left_contract_B = contractl(C, B)
+    C_contractl_B = contractl(C, B)
     expected_result = Zero()
-    @test C_left_contract_B === expected_result
-    @test (C < B) === C_left_contract_B
+    @test C_contractl_B === expected_result
+    @test (C < B) === C_contractl_B
 
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
     C = test_value
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = Zero()
-    @test B_left_contract_C === expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C === expected_result
+    @test (B < C) === B_contractl_C
 
-    C_left_contract_B = contractl(C, B)
+    C_contractl_B = contractl(C, B)
     expected_result = Zero()
-    @test C_left_contract_B === expected_result
-    @test (C < B) === C_left_contract_B
+    @test C_contractl_B === expected_result
+    @test (C < B) === C_contractl_B
 end
 
 @testset "proj(B, C)" begin

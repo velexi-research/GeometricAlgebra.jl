@@ -327,44 +327,44 @@ end
     B = One()
     C = One()
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = One()
-    @test B_left_contract_C === expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C === expected_result
+    @test (B < C) === B_contractl_C
 
     # B::One, C::Scalar
     # B::Scalar, C::One
     B = One()
     C = Scalar(test_value)
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = C
-    @test B_left_contract_C isa Scalar
-    @test B_left_contract_C == expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C isa Scalar
+    @test B_contractl_C == expected_result
+    @test (B < C) === B_contractl_C
 
-    C_left_contract_B = contractl(C, B)
+    C_contractl_B = contractl(C, B)
     expected_result = C
-    @test C_left_contract_B isa Scalar
-    @test C_left_contract_B == expected_result
-    @test (C < B) === C_left_contract_B
+    @test C_contractl_B isa Scalar
+    @test C_contractl_B == expected_result
+    @test (C < B) === C_contractl_B
 
     # B::One, C::Real
     # B::Real, C::One
     B = One()
     C = test_value
 
-    B_left_contract_C = contractl(B, C)
+    B_contractl_C = contractl(B, C)
     expected_result = C
-    @test B_left_contract_C isa Scalar
-    @test B_left_contract_C == expected_result
-    @test (B < C) === B_left_contract_C
+    @test B_contractl_C isa Scalar
+    @test B_contractl_C == expected_result
+    @test (B < C) === B_contractl_C
 
-    C_left_contract_B = contractl(C, B)
+    C_contractl_B = contractl(C, B)
     expected_result = C
-    @test C_left_contract_B isa Scalar
-    @test C_left_contract_B == expected_result
-    @test (C < B) === C_left_contract_B
+    @test C_contractl_B isa Scalar
+    @test C_contractl_B == expected_result
+    @test (C < B) === C_contractl_B
 end
 
 @testset "proj(B, C)" begin
