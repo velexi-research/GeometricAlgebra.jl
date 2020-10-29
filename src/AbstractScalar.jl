@@ -77,13 +77,6 @@ Return the value of `B`.
 """
 volume(B::AbstractScalar) = value(B)
 
-"""
-    sign(B::AbstractScalar)
-
-Return the sign of the value of `B`.
-"""
-Base.sign(B::AbstractScalar)::Int8 = Base.sign(value(B))
-
 # --- Utility functions
 
 import Base.convert
