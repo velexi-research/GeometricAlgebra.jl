@@ -1,7 +1,7 @@
 """
-The operators_mgs.jl submodule defines versions of operations on subtypes of
-AbstractBlade based on modified Gram-Schmidt orthogonalization (as opposed to
-Householder triangularization).
+Blade_operators_mgs.jl defines versions of operations on the Blade type based
+on modified Gram-Schmidt orthogonalization (as opposed to Householder
+triangularization).
 
 Notes
 -----
@@ -18,20 +18,17 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# --- Imports
+# --- Exports
 
-# Standard library
-import LinearAlgebra
-
-
-# --- Binary operations
-
-# Exports
-export outer_mgs
+export wedge_mgs
 export dual_mgs
 
+# --- Binary operators from the AbstractMultivector and AbstractBlade interfaces
+
+using LinearAlgebra: norm
+
 """
-    outer_mgs(B::Blade, C::Blade)
+    wedge_mgs(B::Blade, C::Blade)
 
 Return the outer product of `B` and `C`.
 
@@ -40,7 +37,7 @@ Notes
 * The extension of the basis of `B` to a basis for span(B, C) is computed
   using modified Gram-Schmidt orthogonalization.
 """
-function outer_mgs(B::Blade, C::Blade)
+function wedge_mgs(B::Blade, C::Blade)
     # Compute the rejections of the basis of `C` from the subspace represented
     # by `B`
     rejections = rejection(basis(C), B)
