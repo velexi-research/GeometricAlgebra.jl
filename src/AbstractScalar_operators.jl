@@ -11,19 +11,23 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Comparison operators
 
-# ==(B, C)
+# ------ ==(B, C)
+
 ==(B::AbstractScalar, C::AbstractScalar) = (value(B) == value(C))
 
+# Operations involving Reals
 ==(B::AbstractScalar, x::Real) = (x == value(B))
 ==(x::Real, B::AbstractScalar) = (value(B) == x)
 
-# ≈B, C)
+# ------ ≈(B, C)
+
 ≈(B::AbstractScalar{T1}, C::AbstractScalar{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
                                                           T2<:AbstractFloat} =
     ≈(value(B), value(C), atol=atol, rtol=rtol)
 
+# Operations involving Reals
 ≈(B::AbstractScalar{T}, x::Real;
   atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
     ≈(x, value(B), atol=atol, rtol=rtol)
