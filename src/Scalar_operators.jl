@@ -9,11 +9,7 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-
-# --- Special cases
-
-# Operations between Scalars
-import Base.:(+), Base.:(-), Base.:(*), Base.:(/)
+# --- Binary operators from the AbstractMultivector and AbstractBlade interfaces
 
 +(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) + value(C))
 -(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) - value(C))
