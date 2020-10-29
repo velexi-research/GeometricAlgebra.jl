@@ -20,7 +20,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "-(B)" begin  # from AbstractMultivector interface
+@testset "Scalar: -(B)" begin  # from AbstractMultivector interface
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -35,7 +35,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "dual(B)" begin  # from AbstractMultivector interface
+@testset "Scalar: dual(B)" begin  # from AbstractMultivector interface
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -62,7 +62,7 @@ end
     end
 end
 
-@testset "reciprocal(B)" begin  # from AbstractBlade interface
+@testset "Scalar: reciprocal(B)" begin  # from AbstractBlade interface
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -78,7 +78,7 @@ end
     end
 end
 
-@testset "+(B, C)" begin
+@testset "Scalar: +(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -115,7 +115,7 @@ end
     @test C_plus_B == expected_result
 end
 
-@testset "-(B, C)" begin
+@testset "Scalar: -(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -176,7 +176,7 @@ end
     @test C_minus_B === expected_result
 end
 
-@testset "*(B, C)" begin
+@testset "Scalar: *(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -218,7 +218,7 @@ end
     @test C_times_B == expected_result
 end
 
-@testset "/(B, C)" begin
+@testset "Scalar: /(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -255,7 +255,7 @@ end
     @test C_slash_B == expected_result
 end
 
-@testset "wedge(B, C), B ∧ C" begin
+@testset "Scalar: wedge(B, C), B ∧ C" begin
     # --- Preparations
 
     # Test values
@@ -295,7 +295,7 @@ end
     @test C ∧ B === C_wedge_B
 end
 
-@testset "contractl(B, C), B < C" begin
+@testset "Scalar: contractl(B, C), B < C" begin
     # --- Preparations
 
     # Test values
@@ -335,7 +335,7 @@ end
     @test (C < B) === C_contractl_B
 end
 
-@testset "proj(B, C)" begin
+@testset "Scalar: proj(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -372,7 +372,7 @@ end
     @test C_proj_B == expected_result
 end
 
-@testset "dual(B, C)" begin
+@testset "Scalar: dual(B, C)" begin
     # --- Preparations
 
     # Test values

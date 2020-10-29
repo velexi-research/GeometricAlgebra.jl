@@ -20,7 +20,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "-(B)" begin  # from AbstractMultivector interface
+@testset "Pseudoscalar: -(B)" begin  # from AbstractMultivector interface
     # Preparations
     test_dim = 5
 
@@ -37,7 +37,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "dual(B)" begin  # from AbstractMultivector interface
+@testset "Pseudoscalar: dual(B)" begin  # from AbstractMultivector interface
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -55,7 +55,7 @@ end
     end
 end
 
-@testset "reciprocal(B)" begin  # from AbstractBlade interface
+@testset "Pseudoscalar: reciprocal(B)" begin  # from AbstractBlade interface
     # Preparations
     test_dim = 5
 
@@ -74,7 +74,7 @@ end
     end
 end
 
-@testset "+(B, C)" begin
+@testset "Pseudoscalar: +(B, C)" begin
     # --- Preparations
 
     # Test dimension
@@ -99,7 +99,7 @@ end
     @test B_plus_C == expected_result
 end
 
-@testset "-(B, C)" begin
+@testset "Pseudoscalar: -(B, C)" begin
     # --- Preparations
 
     # Test dimension
@@ -134,7 +134,7 @@ end
     @test B_minus_C === expected_result
 end
 
-@testset "*(B, C)" begin
+@testset "Pseudoscalar: *(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -161,7 +161,7 @@ end
     end
 end
 
-@testset "/(B, C)" begin
+@testset "Pseudoscalar: /(B, C)" begin
     # --- Preparations
 
     # Test dimension
@@ -186,7 +186,7 @@ end
     @test B_slash_C == expected_result
 end
 
-@testset "wedge(B, C)" begin
+@testset "Pseudoscalar: wedge(B, C)" begin
     # --- Preparations
 
     # Test dimension
@@ -211,7 +211,7 @@ end
     @test B ∧ C === B_wedge_C
 end
 
-@testset "contractl(B, C), B < C" begin
+@testset "Pseudoscalar: contractl(B, C), B < C" begin
     # --- Preparations
 
     # Test dimension
@@ -237,7 +237,7 @@ end
     @test (B < C) === B_contractl_C
 end
 
-@testset "proj(B, C)" begin
+@testset "Pseudoscalar: proj(B, C)" begin
     # --- Preparations
 
     # Test values
@@ -260,7 +260,7 @@ end
     end
 end
 
-@testset "dual(B, C)" begin
+@testset "Pseudoscalar: dual(B, C)" begin
     # --- Preparations
 
     # Test values
