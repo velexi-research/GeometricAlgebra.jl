@@ -117,6 +117,22 @@ contractl(B::Scalar, C::Zero) = C
 contractl(B::Zero, C::One) = B
 contractl(B::One, C::Zero) = C
 
+# ------ proj(B, C)
+
+proj(B::Zero, C::Zero) = B
+
+# Operations involving AbstractMultivectors
+proj(B::AbstractMultivector, C::Zero) = C
+
+# Operations involving Scalars
+proj(B::Scalar, C::Zero) = C
+
+# Operations involving Ones
+proj(B::One, C::Zero) = C
+
+# Operations involving Reals
+proj(B::Real, C::Zero) = C
+
 # ------ dual(B, C)
 
 dual(B::Zero, C::Zero) = error("The dual of Zero is not well-defined")
