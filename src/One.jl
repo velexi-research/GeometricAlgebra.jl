@@ -17,6 +17,8 @@ export One
 # Methods
 import Base.one
 
+# --- Type definitions
+
 """
     struct One{T<:AbstractFloat} <: AbstractScalar{T}
 

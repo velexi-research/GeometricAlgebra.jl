@@ -40,6 +40,8 @@ import Base.:(<)
 # Utility methods
 import Base.convert
 
+# --- Type definitions
+
 """
     AbstractMultivector{<:AbstractFloat}
 

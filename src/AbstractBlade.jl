@@ -21,6 +21,8 @@ import Base.sign
 # Operators
 export reciprocal
 
+# --- Type definitions
+
 """
     AbstractBlade{<:AbstractFloat}
 

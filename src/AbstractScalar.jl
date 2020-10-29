@@ -17,6 +17,8 @@ export AbstractScalar
 # Methods
 export value
 
+# --- Type definitions
+
 """
     AbstractScalar{<:AbstractFloat}
 

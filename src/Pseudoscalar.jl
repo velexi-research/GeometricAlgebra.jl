@@ -14,6 +14,8 @@ except according to the terms contained in the LICENSE file.
 # Types
 export Pseudoscalar
 
+# --- Type definitions
+
 """
     struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
 

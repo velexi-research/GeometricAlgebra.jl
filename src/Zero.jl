@@ -17,6 +17,8 @@ export Zero
 # Methods
 import Base.zero
 
+# --- Type definitions
+
 """
     struct Zero{T<:AbstractFloat} <: AbstractScalar{T}
 

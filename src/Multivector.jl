@@ -14,7 +14,7 @@ except according to the terms contained in the LICENSE file.
 # Types
 export Multivector
 
-# --- Imports
+# --- Type definitions
 
 using DataStructures: SortedDict
 
