@@ -18,6 +18,3 @@ except according to the terms contained in the LICENSE file.
 
 wedge(B::Scalar, C::Scalar) = B * C
 contractl(B::Scalar, C::Scalar) = B * C
-proj(B::Scalar, C::Scalar) = B
-dual(B::Scalar, C::Scalar) = B
-
