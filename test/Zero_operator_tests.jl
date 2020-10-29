@@ -427,7 +427,6 @@ end
     B_proj_C = proj(B, C)
     expected_result = Zero()
     @test B_proj_C === expected_result
-    @test (B < C) === B_proj_C
 
     # B::Zero, C::One
     # B::One, C::Zero
@@ -437,12 +436,10 @@ end
     B_proj_C = proj(B, C)
     expected_result = Zero()
     @test B_proj_C === expected_result
-    @test (B < C) === B_proj_C
 
     C_proj_B = proj(C, B)
     expected_result = Zero()
     @test C_proj_B === expected_result
-    @test (C < B) === C_proj_B
 
     # B::Zero, C::Scalar
     # B::Scalar, C::Zero
@@ -452,12 +449,10 @@ end
     B_proj_C = proj(B, C)
     expected_result = Zero()
     @test B_proj_C === expected_result
-    @test (B < C) === B_proj_C
 
     C_proj_B = proj(C, B)
     expected_result = Zero()
     @test C_proj_B === expected_result
-    @test (C < B) === C_proj_B
 
     # B::Zero, C::Real
     # B::Real, C::Zero
@@ -467,12 +462,10 @@ end
     B_proj_C = proj(B, C)
     expected_result = Zero()
     @test B_proj_C === expected_result
-    @test (B < C) === B_proj_C
 
     C_proj_B = proj(C, B)
     expected_result = Zero()
     @test C_proj_B === expected_result
-    @test (C < B) === C_proj_B
 end
 
 @testset "dual(B, C)" begin

@@ -335,3 +335,90 @@ end
     @test C_left_contract_B == expected_result
     @test (C < B) === C_left_contract_B
 end
+
+@testset "proj(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # --- Tests
+
+    # B::Scalar, C::Scalar
+    B = Scalar(test_value_1)
+    C = Scalar(test_value_2)
+
+    B_proj_C = proj(B, C)
+    expected_result = test_value_1
+    @test B_proj_C isa Scalar
+    @test B_proj_C == expected_result
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    B = Scalar(test_value_1)
+    C = test_value_2
+
+    B_proj_C = proj(B, C)
+    expected_result = test_value_1
+    @test B_proj_C isa Scalar
+    @test B_proj_C == expected_result
+
+    C_proj_B = proj(C, B)
+    expected_result = test_value_2
+    @test C_proj_B isa Scalar
+    @test C_proj_B == expected_result
+end
+
+@testset "dual(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    B = Scalar(test_value_1)
+
+    # C::Scalar
+    C = Scalar(test_value_2)
+    B_dual_C = dual(B, C)
+    expected_result = test_value_1
+    @test B_dual_C isa Scalar
+    @test B_dual_C == expected_result
+
+    # C::Blade
+    test_dim = 10
+    for test_grade in 5:8
+        C = Blade(randn(test_dim, test_grade))
+        B_dual_C = dual(B, C)
+        expected_result = mod(grade(C), 4) < 2 ?
+            Blade(C, volume=test_value_1) :
+            Blade(C, volume=-test_value_1)
+        @test B_dual_C isa Blade
+        @test B_dual_C == expected_result
+    end
+
+    # C::Pseudoscalar
+    for test_dim in 5:8
+        C = Pseudoscalar(test_dim, test_value_2)
+        B_dual_C = dual(B, C)
+        expected_result = mod(grade(C), 4) < 2 ?
+            Pseudoscalar(test_dim, test_value_1) :
+            Pseudoscalar(test_dim, -test_value_1)
+        @test B_dual_C isa Pseudoscalar
+        @test B_dual_C == expected_result
+    end
+
+    # C::Real
+    C = test_value_2
+    B_dual_C = dual(B, C)
+    expected_result = test_value_1
+    @test B_dual_C isa Scalar
+    @test B_dual_C == expected_result
+end
