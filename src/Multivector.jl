@@ -9,10 +9,14 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exports
+
+# Types
+export Multivector
+
+# --- Imports
 
 using DataStructures: SortedDict
-
-export Multivector
 
 """
     struct Multivector{T<:AbstractFloat} <: AbstractMultivector
@@ -122,10 +126,6 @@ Multivector(multivectors::Vector{<:AbstractMultivector}) =
 
 # --- AbstractMultivector interface functions for Multivector type
 
-import LinearAlgebra.norm
-
-export grades, blades
-
 """
     grades(M::Multivector; collect=true)
 
@@ -158,11 +158,6 @@ Base.getindex(M::Multivector, k::Int) =
 Return the norm of the multivector `M`.
 """
 norm(M::Multivector) = M.norm
-
-
-# --- Utility functions
-
-import Base.convert
 
 """
     convert(::Type{S}, M::Multivector) where {T<:AbstractFloat,

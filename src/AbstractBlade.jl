@@ -9,8 +9,17 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exports
 
+# Types
 export AbstractBlade
+
+# Methods
+export grade, basis, volume
+import Base.sign
+
+# Operators
+export reciprocal
 
 """
     AbstractBlade{<:AbstractFloat}
@@ -40,11 +49,6 @@ AbstractBlade instance (when possible).
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 # --- AbstractMultivector interface functions for AbstractBlade type
-
-import Base.sign
-import LinearAlgebra.norm
-
-export grades, blades
 
 # Notes: dim() are implemented by subtypes of AbstractBlade.
 

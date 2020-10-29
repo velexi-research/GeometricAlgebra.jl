@@ -9,7 +9,9 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exports
 
+# Types
 export Pseudoscalar
 
 """
@@ -62,7 +64,6 @@ Pseudoscalar(dim::Integer, value::AbstractFloat) =
 
 Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
 
-
 """
     Pseudoscalar(B::Pseudoscalar{T};
                  value::Real=value(B)) where {T<:AbstractFloat}
@@ -75,8 +76,6 @@ Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
 
 # --- AbstractMultivector interface functions for Pseudoscalar type
 
-export dim
-
 """
     dim(B::Pseudoscalar)
 
@@ -87,8 +86,6 @@ dim(B::Pseudoscalar) = B.dim
 # --- AbstractBlade interface functions for Pseudoscalar type
 
 import LinearAlgebra.I
-
-export grade, basis, volume
 
 """
     grade(B::Pseudoscalar)
@@ -113,8 +110,6 @@ volume(B::Pseudoscalar) = value(B)
 
 # --- Pseudoscalar functions
 
-export value
-
 """
     value(B::Pseudoscalar)::Real
 
@@ -123,8 +118,6 @@ Return the value of `B`.
 value(B::Pseudoscalar) = B.value
 
 # --- Utility functions
-
-import Base.convert
 
 """
     convert(::Type{S}, B::Pseudoscalar)

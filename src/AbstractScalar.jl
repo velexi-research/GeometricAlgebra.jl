@@ -9,7 +9,7 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# --- Exported types and interface methods
+# --- Exports types and interface methods
 
 # Types
 export AbstractScalar

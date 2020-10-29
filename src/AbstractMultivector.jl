@@ -9,8 +9,36 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Exports
 
+# Types
 export AbstractMultivector
+
+# Methods
+export dim, grades, blades
+import Base.getindex
+import LinearAlgebra.norm
+export norm
+
+# Comparison operators
+import Base.:(==), Base.:(≈)
+
+# Unary operators
+import Base.:(-)
+export reverse, dual
+
+# Binary operators
+import Base.:(+), Base.:(-), Base.:(*), Base.:(/)
+export wedge, contractl, proj, dual
+
+# Operator aliases
+export ∧
+import LinearAlgebra.dot
+export dot
+import Base.:(<)
+
+# Utility methods
+import Base.convert
 
 """
     AbstractMultivector{<:AbstractFloat}
