@@ -168,13 +168,13 @@ end
         for test_dim in 5:8
             dual_B = dual(B, dim=test_dim)
 
-            expected_dual = mod(test_dim, 4) < 2 ?
+            expected_result = mod(test_dim, 4) < 2 ?
                 Pseudoscalar{precision_type}(test_dim,
                                              precision_type(test_value)) :
                 Pseudoscalar{precision_type}(test_dim,
                                              precision_type(-test_value))
             @test dual_B isa Pseudoscalar{precision_type}
-            @test dual_B == expected_dual
+            @test dual_B == expected_result
         end
 
         expected_message = "The dual of a scalar is not well-defined if " *
@@ -702,14 +702,21 @@ end
 
     B = Scalar(test_value_1)
 
-    # C::Scalar
+    # B::Scalar, C::Scalar
     C = Scalar(test_value_2)
     B_dual_C = dual(B, C)
     expected_result = test_value_1
     @test B_dual_C isa Scalar
     @test B_dual_C == expected_result
 
-    # C::Blade
+    # B::Scalar, C::Real
+    C = test_value_2
+    B_dual_C = dual(B, C)
+    expected_result = test_value_1
+    @test B_dual_C isa Scalar
+    @test B_dual_C == expected_result
+
+    # B::Scalar, C::Blade
     test_dim = 10
     for test_grade in 5:8
         C = Blade(randn(test_dim, test_grade))
@@ -721,7 +728,7 @@ end
         @test B_dual_C == expected_result
     end
 
-    # C::Pseudoscalar
+    # B::Scalar, C::Pseudoscalar
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_2)
         B_dual_C = dual(B, C)
@@ -731,11 +738,4 @@ end
         @test B_dual_C isa Pseudoscalar
         @test B_dual_C == expected_result
     end
-
-    # C::Real
-    C = test_value_2
-    B_dual_C = dual(B, C)
-    expected_result = test_value_1
-    @test B_dual_C isa Scalar
-    @test B_dual_C == expected_result
 end

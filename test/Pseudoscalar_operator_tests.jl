@@ -127,9 +127,16 @@ end
             B = Pseudoscalar{precision_type}(test_dim, test_value)
 
             dual_B = dual(B)
-            expected_dual = Scalar{precision_type}(precision_type(test_value))
+            expected_result = Scalar{precision_type}(precision_type(test_value))
             @test dual_B isa Scalar{precision_type}
-            @test dual_B == expected_dual
+            @test dual_B == expected_result
+
+            # Check dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+            if mod(dim(B), 4) < 2
+                @test dual(dual_B, dim=dim(B)) == B
+            else
+                @test dual(dual_B, dim=dim(B)) == -B
+            end
         end
     end
 end
@@ -216,6 +223,9 @@ end
 @testset "Pseudoscalar: *(B, C)" begin
     # --- Preparations
 
+    # Test dimension
+    test_dim = 10
+
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -238,6 +248,24 @@ end
         @test B_times_C isa Scalar
         @test B_times_C == expected_result
     end
+
+    # B::Pseudoscalar, C::Scalar
+    # B::Scalar, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Scalar(test_value_2)
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test B * C == expected_result
+    @test C * B == expected_result
+
+    # B::Pseudoscalar, C::Real
+    # C::Real, B::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = test_value_2
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test B * C == expected_result
+    @test C * B == expected_result
 end
 
 @testset "Pseudoscalar: /(B, C)" begin
@@ -280,14 +308,42 @@ end
 
     # --- Tests
 
-    # B::Pseudoscalar, C::Pseudoscalar
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
+    # dim(B) == dim(C)
     B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim, test_value_2)
 
-    B_wedge_C = wedge(B, C)
     expected_result = zero(B)
-    @test B_wedge_C === expected_result
-    @test B ∧ C === B_wedge_C
+    @test wedge(B, C) == expected_result
+    @test B ∧ C == expected_result
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Pseudoscalar(test_dim + 1, test_value_2)
+    @test_throws DimensionMismatch B ∧ C
+
+    # --- B::Pseudoscalar, C::Scalar
+    #     B::Scalar, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Scalar(test_value_2)
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test wedge(B, C) == expected_result
+    @test wedge(C, B) == expected_result
+    @test B ∧ C == expected_result
+    @test C ∧ B == expected_result
+
+    # --- B::Pseudoscalar, C::Real
+    #     B::Real, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = test_value_2
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test wedge(B, C) == expected_result
+    @test wedge(C, B) == expected_result
+    @test B ∧ C == expected_result
+    @test C ∧ B == expected_result
 end
 
 @testset "Pseudoscalar: contractl(B, C), B < C" begin
@@ -319,6 +375,9 @@ end
 @testset "Pseudoscalar: proj(B, C)" begin
     # --- Preparations
 
+    # Test dimension
+    test_dim = 5
+
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -328,19 +387,44 @@ end
 
     # --- Tests
 
-    # B::Pseudoscalar, C::Pseudoscalar
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
     for test_dim in 5:8
+        # dim(B) == dim(C)
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
         B_proj_C = proj(B, C)
         expected_result = B
         @test B_proj_C === expected_result
+
+        # dim(B) != dim(C)
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = Pseudoscalar(test_dim + 1, test_value_2)
+        @test_throws DimensionMismatch proj(B, C)
     end
+
+    # --- B::Pseudoscalar, C::Scalar
+    #     B::Scalar, C::Pseudoscalar
+
+    B = Scalar(test_value_1)
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    expected_result = test_value_1
+    B_proj_C = proj(B, C)
+    @test B_proj_C isa AbstractScalar
+    @test B_proj_C == expected_result
+
+    expected_result = zero(C)
+    C_proj_B = proj(C, B)
+    @test C_proj_B === expected_result
 end
 
 @testset "Pseudoscalar: dual(B, C)" begin
     # --- Preparations
+
+    # Test dimension
+    test_dim = 5
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -349,13 +433,46 @@ end
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # C::Pseudoscalar
-    for test_dim in 5:8
+    # --- B::Pseudoscalar, C::Pseudoscalar
+
+    # dim(B) === dim(C)
+    for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
-        B_dual_C = dual(B, C)
+        dual_B = dual(B, C)
         expected_result = test_value_1
-        @test B_dual_C isa Scalar
-        @test B_dual_C == expected_result
+        @test dual_B isa Scalar
+        @test dual_B == expected_result
+
+        # Check dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        if mod(grade(C), 4) < 2
+            @test dual(dual_B, C) == B
+        else
+            @test dual(dual_B, C) == -B
+        end
+    end
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Pseudoscalar(test_dim + 1, test_value_2)
+    @test_throws DimensionMismatch dual(B, C)
+
+    # --- B::Pseudoscalar, C::Scalar
+    #     B::Scalar, C::Pseudoscalar
+
+    # Preparations
+    C = Scalar(test_value_2)
+
+    # Exercise functionality and check results
+    for dim_B in test_dim:test_dim + 3
+        B = Pseudoscalar(dim_B, test_value_1)
+
+        expected_result = zero(B)
+        @test dual(B, C) == expected_result
+
+        expected_result = mod(grade(B), 4) < 2 ?
+            Pseudoscalar(dim_B, test_value_2) :
+            Pseudoscalar(dim_B, -test_value_2)
+        @test dual(C, B) === expected_result
     end
 end
