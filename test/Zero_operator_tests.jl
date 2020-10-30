@@ -28,6 +28,13 @@ using GeometricAlgebra
     end
 end
 
+@testset "Zero: reverse(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        @test reverse(B) === B
+    end
+end
+
 @testset "Zero: dual(B)" begin
     B = Zero()
     expected_message = "The dual of Zero is not well-defined"

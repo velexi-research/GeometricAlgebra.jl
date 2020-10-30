@@ -30,6 +30,15 @@ using GeometricAlgebra
     end
 end
 
+@testset "One: reverse(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+        reverse_B = reverse(B)
+        @test reverse_B === B
+        @test B * reverse_B == norm(B)^2
+    end
+end
+
 @testset "One: dual(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()

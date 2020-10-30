@@ -156,6 +156,29 @@ end
     end
 end
 
+@testset "Scalar: reverse(B)" begin
+    # --- Preparations
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Exercise functionality and check results
+
+    # value != 0
+    B = Scalar(test_value)
+    reverse_B = reverse(B)
+    @test reverse_B === B
+    @test B * reverse_B ≈ norm(B)^2
+
+    # value = Inf
+    B = Scalar(Inf)
+    @test reverse(B) === B
+
+    # value = -Inf
+    B = Scalar(-Inf)
+    @test reverse(B) === B
+end
+
 @testset "Scalar: dual(B)" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
@@ -190,12 +213,30 @@ end
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
-        B = Scalar{precision_type}(test_value)
+        converted_value = precision_type(test_value)
 
+        # value > 0
+        B = Scalar(abs(converted_value))
         reciprocal_B = reciprocal(B)
         @test reciprocal_B isa Scalar{precision_type}
-        @test reciprocal_B ==
-            Scalar{precision_type}(1 / precision_type(test_value))
+        @test reciprocal_B == Scalar(1 / abs(converted_value))
+        @test B * reciprocal_B ≈ 1
+
+        # value < 0
+        negative_value = -(abs(converted_value))
+        B = Scalar(negative_value)
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B isa Scalar{precision_type}
+        @test reciprocal_B == Scalar(1 / negative_value)
+        @test B * reciprocal_B ≈ 1
+
+        # value = Inf
+        B = Scalar(precision_type(Inf))
+        @test reciprocal(B) === Zero{precision_type}()
+
+        # value = -Inf
+        B = Scalar(precision_type(-Inf))
+        @test reciprocal(B) === Zero{precision_type}()
     end
 end
 

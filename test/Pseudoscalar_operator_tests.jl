@@ -116,6 +116,26 @@ end
     end
 end
 
+@testset "Pseudoscalar: reverse(B)" begin
+    # --- Preparations
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type in subtypes(AbstractFloat)
+        for test_dim in 5:8
+            B = Pseudoscalar(test_dim, test_value)
+            reverse_B = reverse(B)
+            expected_result = mod(test_dim, 4) < 2 ?
+                Pseudoscalar(test_dim, test_value) :
+                Pseudoscalar(test_dim, -test_value)
+            @test reverse(B) === expected_result
+
+            @test B * reverse(B) ≈ norm(B)^2
+        end
+    end
+end
+
 @testset "Pseudoscalar: dual(B)" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
@@ -143,20 +163,26 @@ end
 
 @testset "Pseudoscalar: reciprocal(B)" begin
     # Preparations
-    test_dim = 5
-
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
-        B = Pseudoscalar{precision_type}(test_dim, test_value)
+        converted_value = precision_type(test_value)
 
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B isa Pseudoscalar{precision_type}
-        @test reciprocal_B ==
-            Pseudoscalar{precision_type}(test_dim,
-                                         1 / precision_type(test_value))
+        for test_dim = 5:8
+            B = Pseudoscalar(test_dim, converted_value)
+
+            reciprocal_B = reciprocal(B)
+            @test reciprocal_B isa Pseudoscalar{precision_type}
+
+            expected_result = mod(test_dim, 4) < 2 ?
+                Pseudoscalar{precision_type}(test_dim, 1 / converted_value) :
+                Pseudoscalar{precision_type}(test_dim, -1 / converted_value)
+            @test reciprocal_B == expected_result
+
+            @test B * reciprocal_B ≈ 1
+        end
     end
 end
 
