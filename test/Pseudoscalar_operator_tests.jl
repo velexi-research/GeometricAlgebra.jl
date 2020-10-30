@@ -20,7 +20,86 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "Pseudoscalar: -(B)" begin  # from AbstractMultivector interface
+@testset "Pseudoscalar: ==(B, C)" begin
+    # Preparations
+    dim = 10
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # dim(B) == dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value))
+            if precision_type1 == precision_type2
+                @test B == C
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B == C
+            else
+                @test B != C
+            end
+        end
+    end
+
+    # dim(B) != dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim + 1, precision_type2(test_value))
+            @test B != C
+        end
+    end
+
+    # dim(B) == dim(C), value(B) != value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value) + 1)
+            @test B != C
+        end
+    end
+end
+
+@testset "Pseudoscalar: ≈(B, C)" begin
+    # Preparations
+    dim = 10
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # dim(B) == dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value))
+            @test B ≈ C
+        end
+    end
+
+    # dim(B) != dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim + 1, precision_type2(test_value))
+            @test B ≉ C
+        end
+    end
+
+    # dim(B) == dim(C), value(B) != value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value) + 1)
+            @test B ≉ C
+        end
+    end
+end
+
+@testset "Pseudoscalar: -(B)" begin
     # Preparations
     test_dim = 5
 
@@ -37,7 +116,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Pseudoscalar: dual(B)" begin  # from AbstractMultivector interface
+@testset "Pseudoscalar: dual(B)" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -55,7 +134,7 @@ end
     end
 end
 
-@testset "Pseudoscalar: reciprocal(B)" begin  # from AbstractBlade interface
+@testset "Pseudoscalar: reciprocal(B)" begin
     # Preparations
     test_dim = 5
 

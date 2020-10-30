@@ -20,7 +20,128 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "Scalar: -(B)" begin  # from AbstractMultivector interface
+@testset "Scalar: ==(B, C)" begin
+    # Preparations
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # B::Scalar, C::Scalar
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            # ==(B, C)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
+            if precision_type1 == precision_type2
+                @test B == C
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B == C
+            else
+                @test B != C
+            end
+
+            # value(B) != value(C)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(2 * test_value))
+            @test B != C
+        end
+    end
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        # B::Scalar, C::AbstractFloat
+        # B::AbstractFloat, C::Scalar
+        for value_type in subtypes(AbstractFloat)
+            B = Scalar(precision_type(test_value))
+
+            # ==(B, C)
+            if precision_type == value_type
+                @test B == value_type(test_value)
+                @test value_type(test_value) == B
+            elseif precision_type in float64_or_bigfloat &&
+                   value_type in float64_or_bigfloat
+                @test B == value_type(test_value)
+                @test value_type(test_value) == B
+            else
+                @test B != value_type(test_value)
+                @test value_type(test_value) != B
+            end
+
+            # !=(x,y)
+            @test B != value_type(2 * test_value)
+            @test value_type(2 * test_value) != B
+        end
+
+        # B::Scalar, C::Integer
+        # B::Integer, C::Scalar
+        int_value::Int = 3
+        for value_type in subtypes(Signed)
+            B = Scalar(precision_type(int_value))
+
+            # ==(B, C)
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
+
+            # !=(x,y)
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
+        end
+
+        for value_type in subtypes(Unsigned)
+            B = Scalar(precision_type(int_value))
+
+            # ==(B, C)
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
+
+            # !=(x,y)
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
+        end
+
+        # Bool
+        B = Scalar(precision_type(true))
+        @test B == 1
+        @test 1 == B
+        @test B != 0
+        @test 0 != B
+
+        B = Scalar(precision_type(false))
+        @test B == 0
+        @test 0 == B
+        @test B != 1
+        @test 1 != B
+    end
+end
+
+@testset "Scalar: ≈(B, C)" begin
+    # Preparations
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # B::Scalar, C::Scalar
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
+            @test B ≈ C
+        end
+    end
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(test_value)
+        B = Scalar(converted_value)
+        @test B ≈ converted_value
+        @test converted_value ≈ B
+    end
+end
+
+@testset "Scalar: -(B)" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -35,7 +156,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Scalar: dual(B)" begin  # from AbstractMultivector interface
+@testset "Scalar: dual(B)" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -62,7 +183,7 @@ end
     end
 end
 
-@testset "Scalar: reciprocal(B)" begin  # from AbstractBlade interface
+@testset "Scalar: reciprocal(B)" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
