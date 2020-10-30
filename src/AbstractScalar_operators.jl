@@ -151,13 +151,13 @@ wedge(B::One, C::AbstractScalar) = C
 wedge(B::AbstractScalar, C::Zero) = C
 wedge(B::Zero, C::AbstractScalar) = B
 
-# Operations involving Vectors
-wedge(B::AbstractScalar, v::Vector{<:Real}) =  Blade(value(B) * v)
-wedge(v::Vector{<:Real}, B::AbstractScalar) = wedge(B, v)
-
 # Operations involving Reals
 wedge(B::AbstractScalar, C::Real) = B * C
 wedge(B::Real, C::AbstractScalar) = B * C
+
+# Operations involving Vectors
+wedge(B::AbstractScalar, v::Vector{<:Real}) =  Blade(value(B) * v)
+wedge(v::Vector{<:Real}, B::AbstractScalar) = wedge(B, v)
 
 # ------ contractl(B, C)
 
