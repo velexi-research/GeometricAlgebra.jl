@@ -301,33 +301,61 @@ end
 
     B = Zero()
 
-    # B::Zero, C::Zero
+    expected_error = "The dual of Zero is not well-defined"
+
+    # C::Zero
     C = Zero()
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B, C)
+    @test_throws ErrorException(expected_error) dual(B, C)
 
-    # B::Zero, C::One
-    C = One()
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B, C)
-
-    # B::Zero, C::Scalar
-    C = Scalar(test_value)
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B, C)
-
-    # B::Zero, C::Blade
+    # C::Blade
     C = Blade(randn(4, 3))
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B, C)
+    @test_throws ErrorException(expected_error) dual(B, C)
 
-    # B::Zero, C::Pseudoscalar
+    # C::Pseudoscalar
     C = Pseudoscalar(5, test_value)
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B, C)
+    @test_throws ErrorException(expected_error) dual(B, C)
 
-    # B::Zero, C::Real
+    # C::Scalar
+    C = Scalar(test_value)
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::One
+    C = One()
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::Real
     C = test_value
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B, C)
+    @test_throws ErrorException(expected_error) dual(B, C)
+end
+
+@testset "Zero: dual(B, C::Zero)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    C = Zero()
+
+    expected_error = "The dual of anything relative to Zero is not well-defined"
+
+    # B::Blade
+    B = Blade(randn(4, 3))
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Pseudoscalar
+    B = Pseudoscalar(5, test_value)
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Scalar
+    B = Scalar(test_value)
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::One
+    B = One()
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Real
+    B = test_value
+    @test_throws ErrorException(expected_error) dual(B, C)
 end
