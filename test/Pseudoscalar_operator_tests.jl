@@ -446,7 +446,7 @@ end
     @test C_proj_B === expected_result
 end
 
-@testset "Pseudoscalar: dual(B, C)" begin
+@testset "Pseudoscalar: dual(B::Pseudoscalar, C)" begin
     # --- Preparations
 
     # Test dimension
@@ -484,7 +484,6 @@ end
     @test_throws DimensionMismatch dual(B, C)
 
     # --- B::Pseudoscalar, C::Scalar
-    #     B::Scalar, C::Pseudoscalar
 
     # Preparations
     C = Scalar(test_value_2)
@@ -492,13 +491,7 @@ end
     # Exercise functionality and check results
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(dim_B, test_value_1)
-
         expected_result = zero(B)
         @test dual(B, C) == expected_result
-
-        expected_result = mod(grade(B), 4) < 2 ?
-            Pseudoscalar(dim_B, test_value_2) :
-            Pseudoscalar(dim_B, -test_value_2)
-        @test dual(C, B) === expected_result
     end
 end

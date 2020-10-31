@@ -731,7 +731,7 @@ end
     @test C_proj_B == expected_result
 end
 
-@testset "Scalar: dual(B, C)" begin
+@testset "Scalar: dual(B::Scalar, C)" begin
     # --- Preparations
 
     # Test values

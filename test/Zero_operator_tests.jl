@@ -292,7 +292,7 @@ end
     @test C_proj_B === expected_result
 end
 
-@testset "Zero: dual(B, C)" begin
+@testset "Zero: dual(B::Zero, C)" begin
     # --- Preparations
 
     # Test values
@@ -301,32 +301,32 @@ end
 
     B = Zero()
 
-    # C::Zero
+    # B::Zero, C::Zero
     C = Zero()
     expected_message = "The dual of Zero is not well-defined"
     @test_throws ErrorException(expected_message) dual(B, C)
 
-    # C::One
+    # B::Zero, C::One
     C = One()
     expected_message = "The dual of Zero is not well-defined"
     @test_throws ErrorException(expected_message) dual(B, C)
 
-    # C::Scalar
+    # B::Zero, C::Scalar
     C = Scalar(test_value)
     expected_message = "The dual of Zero is not well-defined"
     @test_throws ErrorException(expected_message) dual(B, C)
 
-    # C::Blade
+    # B::Zero, C::Blade
     C = Blade(randn(4, 3))
     expected_message = "The dual of Zero is not well-defined"
     @test_throws ErrorException(expected_message) dual(B, C)
 
-    # C::Pseudoscalar
+    # B::Zero, C::Pseudoscalar
     C = Pseudoscalar(5, test_value)
     expected_message = "The dual of Zero is not well-defined"
     @test_throws ErrorException(expected_message) dual(B, C)
 
-    # C::Real
+    # B::Zero, C::Real
     C = test_value
     expected_message = "The dual of Zero is not well-defined"
     @test_throws ErrorException(expected_message) dual(B, C)

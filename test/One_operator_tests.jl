@@ -406,7 +406,7 @@ end
     @test C_proj_B == expected_result
 end
 
-@testset "One: dual(B, C)" begin
+@testset "One: dual(B::One, C)" begin
     # --- Preparations
 
     # Test values
@@ -415,19 +415,19 @@ end
 
     B = One()
 
-    # C::One
+    # B::One, C::One
     C = One()
     B_dual_C = dual(B, C)
     expected_result = B
     @test B_dual_C === expected_result
 
-    # C::Scalar
+    # B::One, C::Scalar
     C = Scalar(test_value)
     B_dual_C = dual(B, C)
     expected_result = B
     @test B_dual_C === expected_result
 
-    # C::Blade
+    # B::One, C::Blade
     test_dim = 10
     for test_grade in 5:8
         C = Blade(randn(test_dim, test_grade))
@@ -439,7 +439,7 @@ end
         @test B_dual_C == expected_result
     end
 
-    # C::Pseudoscalar
+    # B::One, C::Pseudoscalar
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value)
         B_dual_C = dual(B, C)
@@ -450,7 +450,7 @@ end
         @test B_dual_C == expected_result
     end
 
-    # C::Real
+    # B::One, C::Real
     C = test_value
     B_dual_C = dual(B, C)
     expected_result = B
