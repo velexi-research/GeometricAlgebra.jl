@@ -303,8 +303,16 @@ end
 
     expected_error = "The dual of Zero is not well-defined"
 
-    # C::Zero
-    C = Zero()
+    # C::One
+    C = One()
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::Scalar
+    C = Scalar(test_value)
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::Real
+    C = test_value
     @test_throws ErrorException(expected_error) dual(B, C)
 
     # C::Blade
@@ -313,18 +321,6 @@ end
 
     # C::Pseudoscalar
     C = Pseudoscalar(5, test_value)
-    @test_throws ErrorException(expected_error) dual(B, C)
-
-    # C::Scalar
-    C = Scalar(test_value)
-    @test_throws ErrorException(expected_error) dual(B, C)
-
-    # C::One
-    C = One()
-    @test_throws ErrorException(expected_error) dual(B, C)
-
-    # C::Real
-    C = test_value
     @test_throws ErrorException(expected_error) dual(B, C)
 end
 
@@ -339,23 +335,27 @@ end
 
     expected_error = "The dual of anything relative to Zero is not well-defined"
 
-    # B::Blade
-    B = Blade(randn(4, 3))
-    @test_throws ErrorException(expected_error) dual(B, C)
-
-    # B::Pseudoscalar
-    B = Pseudoscalar(5, test_value)
-    @test_throws ErrorException(expected_error) dual(B, C)
-
-    # B::Scalar
-    B = Scalar(test_value)
+    # B::Zero
+    B = Zero()
     @test_throws ErrorException(expected_error) dual(B, C)
 
     # B::One
     B = One()
     @test_throws ErrorException(expected_error) dual(B, C)
 
+    # B::Scalar
+    B = Scalar(test_value)
+    @test_throws ErrorException(expected_error) dual(B, C)
+
     # B::Real
     B = test_value
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Blade
+    B = Blade(randn(4, 3))
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Pseudoscalar
+    B = Pseudoscalar(5, test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
 end

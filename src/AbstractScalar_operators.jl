@@ -203,21 +203,22 @@ proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
 proj(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
     return_blade ? B : value(B)
 
-# ------ dual(B, C)
+# ------ dual(B::AbstractScalar, C)
 
-dual(B::AbstractScalar, C::AbstractScalar) = B
-
-# Operations involving Blades
+# C::Blade
 dual(B::AbstractScalar, C::Blade) =
     mod(grade(C), 4) < 2 ?
         Blade(C, volume=value(B), copy_basis=false) :
         Blade(C, volume=-value(B), copy_basis=false)
 
-# Operations involving Pseudoscalars
+# C::Pseudoscalar
 dual(B::AbstractScalar, C::Pseudoscalar) =
     mod(grade(C), 4) < 2 ?
         Pseudoscalar(C, value=value(B)) :
         Pseudoscalar(C, value=-value(B))
+
+# C::AbstractScalar
+dual(B::AbstractScalar, C::AbstractScalar) = B
 
 # Operations involving Reals
 dual(B::AbstractScalar, C::Real) = B

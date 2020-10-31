@@ -48,23 +48,23 @@ proj(B::Real, C::Zero) = C
 
 # ------ dual(B, C)
 
+# dual(B::Zero, C)
 dual_of_zero() = error("The dual of Zero is not well-defined")
 
+dual(B::Zero, C::Blade) = dual_of_zero()
+dual(B::Zero, C::Pseudoscalar) = dual_of_zero()
+dual(B::Zero, C::Scalar) = dual_of_zero()
+dual(B::Zero, C::One) = dual_of_zero()
+dual(B::Zero, C::Real) = dual_of_zero()
+
+# dual(B, C::Zero)
 dual_relative_to_zero() =
     error("The dual of anything relative to Zero is not well-defined")
-
-dual(B::Zero, C::Zero) = dual(B)
-
-# Special cases
-dual(B::Zero, C::Blade) = dual(B)
-dual(B::Zero, C::Pseudoscalar) = dual(B)
-dual(B::Zero, C::Scalar) = dual(B)
-dual(B::Zero, C::One) = dual(B)
-dual(B::Zero, C::Real) = dual(B)
 
 dual(M::Multivector, C::Zero) = dual_relative_to_zero()
 dual(B::Blade, C::Zero) = dual_relative_to_zero()
 dual(B::Pseudoscalar, C::Zero) = dual_relative_to_zero()
 dual(B::Scalar, C::Zero) = dual_relative_to_zero()
 dual(B::One, C::Zero) = dual_relative_to_zero()
+dual(B::Zero, C::Zero) = dual_relative_to_zero()
 dual(B::Real, C::Zero) = dual_relative_to_zero()

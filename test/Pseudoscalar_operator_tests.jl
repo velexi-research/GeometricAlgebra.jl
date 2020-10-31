@@ -101,7 +101,7 @@ end
 
 @testset "Pseudoscalar: -(B)" begin
     # Preparations
-    test_dim = 5
+    test_dim = 10
 
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value
@@ -190,7 +190,7 @@ end
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -215,7 +215,7 @@ end
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -298,7 +298,7 @@ end
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -323,7 +323,7 @@ end
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -376,7 +376,7 @@ end
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -388,21 +388,28 @@ end
     # --- Tests
 
     # B::Pseudoscalar, C::Pseudoscalar
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = Pseudoscalar(test_dim, test_value_2)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = test_value_1 * test_value_2
-    @test B_contractl_C isa Scalar
-    @test B_contractl_C == expected_result
-    @test (B < C) === B_contractl_C
+    for test_dim = 5:8
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = Pseudoscalar(test_dim, test_value_2)
+
+        B_contractl_C = contractl(B, C)
+
+        expected_result = mod(test_dim, 4) < 2 ?
+            test_value_1 * test_value_2 :
+           -test_value_1 * test_value_2
+
+        @test B_contractl_C isa Scalar
+        @test B_contractl_C == expected_result
+        @test (B < C) === B_contractl_C
+    end
 end
 
 @testset "Pseudoscalar: proj(B, C)" begin
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -450,7 +457,7 @@ end
     # --- Preparations
 
     # Test dimension
-    test_dim = 5
+    test_dim = 10
 
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -459,7 +466,24 @@ end
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # --- B::Pseudoscalar, C::Pseudoscalar
+    # --- C::Blade
+
+    # dim(B) == dim(C)
+    for test_grade in 2:5
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = Blade(rand(test_dim, test_grade))
+
+        dual_B = dual(B, C)
+        expected_result = zero(B)
+        @test dual_B === expected_result
+    end
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim + 1, test_value_1)
+    C = Blade(rand(test_dim, 3))
+    @test_throws DimensionMismatch dual(B, C)
+
+    # --- C::Pseudoscalar
 
     # dim(B) === dim(C)
     for dim_B in test_dim:test_dim + 3
@@ -483,12 +507,30 @@ end
     C = Pseudoscalar(test_dim + 1, test_value_2)
     @test_throws DimensionMismatch dual(B, C)
 
-    # --- B::Pseudoscalar, C::Scalar
+    # --- C::Scalar
 
-    # Preparations
     C = Scalar(test_value_2)
 
-    # Exercise functionality and check results
+    for dim_B in test_dim:test_dim + 3
+        B = Pseudoscalar(dim_B, test_value_1)
+        expected_result = zero(B)
+        @test dual(B, C) == expected_result
+    end
+
+    # --- C::One
+
+    C = One()
+
+    for dim_B in test_dim:test_dim + 3
+        B = Pseudoscalar(dim_B, test_value_1)
+        expected_result = zero(B)
+        @test dual(B, C) == expected_result
+    end
+
+    # --- C::Real
+
+    C = test_value_2
+
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(dim_B, test_value_1)
         expected_result = zero(B)

@@ -46,7 +46,17 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 
 # ------ *(B, C)
 
-*(B::Pseudoscalar, C::Pseudoscalar) = dot(B, C)
+*(B::Pseudoscalar, C::Pseudoscalar) = contractl(B, C)
+
+# Operations involving AbstractScalars
+*(B::Pseudoscalar, C::AbstractScalar) =
+    Pseudoscalar(B, value=value(B) * value(C))
+
+*(B::AbstractScalar, C::Pseudoscalar) = C * B
+
+# Operations involving Reals
+*(B::Pseudoscalar, x::Real) = Pseudoscalar(B, value=x * value(B))
+*(x::Real, C::Pseudoscalar) = C * x
 
 #= REVIEW
 # Operations involving Blades
@@ -57,9 +67,6 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 *(B::Pseudoscalar, v::Vector{<:Real}) = zero(B)
 *(v::Vector{<:Real}, B::Pseudoscalar) = Blade(v) * B
 
-# Operations involving Reals
-*(x::Real, B::Pseudoscalar) = Pseudoscalar(B, value=x * value(B))
-*(B::Pseudoscalar, x::Real) = x * B
 =#
 
 # ------ /(B, C)
@@ -131,6 +138,9 @@ function proj(B::Pseudoscalar, C::Pseudoscalar)
     B
 end
 
+# Operations involving AbstractScalars
+proj(B::Pseudoscalar, C::AbstractScalar; return_blade::Bool=true) = zero(B)
+
 #= REVIEW
 # Operations involving Blades
 function proj(B::Pseudoscalar, C::Blade)
@@ -144,22 +154,23 @@ function proj(B::Blade, C::Pseudoscalar)
 end
 =#
 
-# ------ dual(B, C)
+# ------ dual(B::Pseudoscalar, C)
 
-function dual(B::Pseudoscalar, C::Pseudoscalar)
-    assert_dim_equal(B, C)
-    Scalar{typeof(value(B))}(value(B))
-end
-
-#= REVIEW
-# Operations involving Blades
+# C::Blade
 function dual(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
     zero(B)
 end
 
-function dual(B::Blade, C::Pseudoscalar)
+# C::Pseudoscalar
+function dual(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    dual(B)
+    Scalar{typeof(value(B))}(value(B))
 end
-=#
+
+# C::AbstractScalar
+dual(B::Pseudoscalar, C::AbstractScalar) = zero(B)
+
+# Operations involving Reals
+dual(B::Pseudoscalar, C::Real) = zero(B)
+dual(B::Real, C::Pseudoscalar) = Scalar{typeof(value(C))}(B)
