@@ -196,14 +196,12 @@ proj(B::AbstractScalar, C::Pseudoscalar) = B
 proj(B::Pseudoscalar, C::AbstractScalar) = zero(B)
 =#
 
-#= REVIEW
 # Operations involving Vectors
 proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
 
 proj(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
     return_blade ? B : value(B)
-=#
 
 # ------ dual(B, C)
 

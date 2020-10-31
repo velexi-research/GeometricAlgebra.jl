@@ -606,9 +606,7 @@ end
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # --- Tests
-
-    # B::Scalar, C::Scalar
+    # --- B::Scalar, C::Scalar
     B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
@@ -618,8 +616,8 @@ end
     @test B_contractl_C == expected_result
     @test (B < C) === B_contractl_C
 
-    # B::Scalar, C::One
-    # B::One, C::Scalar
+    # --- B::Scalar, C::One
+    #     B::One, C::Scalar
     B = Scalar(test_value_1)
     C = One()
 
@@ -635,8 +633,8 @@ end
     @test C_contractl_B == expected_result
     @test (C < B) === C_contractl_B
 
-    # B::Scalar, C::Zero
-    # B::Zero, C::Scalar
+    # --- B::Scalar, C::Zero
+    #     B::Zero, C::Scalar
     B = Scalar(test_value_1)
     C = Zero()
 
@@ -650,8 +648,8 @@ end
     @test C_contractl_B === expected_result
     @test (C < B) === C_contractl_B
 
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
+    # --- B::Scalar, C::Real
+    #     B::Real, C::Scalar
     B = Scalar(test_value_1)
     C = test_value_2
 
@@ -671,6 +669,9 @@ end
 @testset "Scalar: proj(B, C)" begin
     # --- Preparations
 
+    # Test dimension
+    test_dim = 15
+
     # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -678,9 +679,10 @@ end
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # --- Tests
+    # Test vectors
+    test_vector = rand(test_dim)
 
-    # B::Scalar, C::Scalar
+    # --- B::Scalar, C::Scalar
     B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
@@ -689,8 +691,8 @@ end
     @test B_proj_C isa Scalar
     @test B_proj_C == expected_result
 
-    # B::Scalar, C::One
-    # B::One, C::Scalar
+    # --- B::Scalar, C::One
+    #     B::One, C::Scalar
     B = Scalar(test_value_1)
     C = One()
 
@@ -702,8 +704,8 @@ end
     expected_result = C
     @test C_proj_B === expected_result
 
-    # B::Scalar, C::Zero
-    # B::Zero, C::Scalar
+    # --- B::Scalar, C::Zero
+    #     B::Zero, C::Scalar
     B = Scalar(test_value_1)
     C = Zero()
 
@@ -715,8 +717,8 @@ end
     expected_result = Zero()
     @test C_proj_B === expected_result
 
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
+    # --- B::Scalar, C::Real
+    #     B::Real, C::Scalar
     B = Scalar(test_value_1)
     C = test_value_2
 
@@ -729,6 +731,19 @@ end
     expected_result = test_value_2
     @test C_proj_B isa Scalar
     @test C_proj_B == expected_result
+
+    # --- B::Scalar, C::Vector{<:Real}
+    #     B::Vector{<:Real}, C::Scalar
+
+    # return_blade == true
+    B = Scalar(test_value_1)
+    C = test_vector
+    @test proj(B, C) === B
+    @test proj(C, B) == zero(B)
+
+    # return_blade == false
+    @test proj(C, B, return_blade=false) == 0
+    @test proj(B, C, return_blade=false) == value(B)
 end
 
 @testset "Scalar: dual(B::Scalar, C)" begin
