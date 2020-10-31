@@ -44,7 +44,12 @@ contractl(B::Zero, C::Zero) = B
 # ------ proj(B, C)
 
 # Operations involving Reals
+proj(B::Zero, C::Real) = B
 proj(B::Real, C::Zero) = C
+
+# Operations involving Vectors
+proj(B::Zero, C::Vector{<:Real}) = B
+proj(B::Vector{<:Real}, C::Zero) = C
 
 # ------ dual(B, C)
 

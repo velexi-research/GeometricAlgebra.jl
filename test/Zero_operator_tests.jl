@@ -290,6 +290,19 @@ end
     C_proj_B = proj(C, B)
     expected_result = Zero()
     @test C_proj_B === expected_result
+
+    # B::Zero, C::Vector
+    # B::Vector, C::Zero
+    B = Zero()
+    C = Vector(rand(10))
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+
+    C_proj_B = proj(C, B)
+    expected_result = Zero()
+    @test C_proj_B === expected_result
 end
 
 @testset "Zero: dual(B::Zero, C)" begin
