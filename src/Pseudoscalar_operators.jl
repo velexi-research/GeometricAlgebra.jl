@@ -154,22 +154,22 @@ function proj(B::Blade, C::Pseudoscalar)
 end
 =#
 
-# ------ dual(B::Pseudoscalar, C)
+# ------ dual(B, C)
 
-# C::Blade
-function dual(B::Pseudoscalar, C::Blade)
-    assert_dim_equal(B, C)
-    zero(B)
-end
-
-# C::Pseudoscalar
+# B::Pseudoscalar, C::Pseudoscalar
 function dual(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
     Scalar{typeof(value(B))}(value(B))
 end
 
-# C::AbstractScalar
+# B::Pseudoscalar, C::AbstractScalar
+# B::AbstractScalar, C::Pseudoscalar
 dual(B::Pseudoscalar, C::AbstractScalar) = zero(B)
+
+dual(B::AbstractScalar, C::Pseudoscalar) =
+    mod(grade(C), 4) < 2 ?
+        Pseudoscalar(C, value=value(B)) :
+        Pseudoscalar(C, value=-value(B))
 
 # Operations involving Reals
 dual(B::Pseudoscalar, C::Real) = zero(B)

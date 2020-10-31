@@ -453,7 +453,7 @@ end
     @test C_proj_B === expected_result
 end
 
-@testset "Pseudoscalar: dual(B::Pseudoscalar, C)" begin
+@testset "Pseudoscalar: dual(B, C)" begin
     # --- Preparations
 
     # Test dimension
@@ -466,24 +466,7 @@ end
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    # --- C::Blade
-
-    # dim(B) == dim(C)
-    for test_grade in 2:5
-        B = Pseudoscalar(test_dim, test_value_1)
-        C = Blade(rand(test_dim, test_grade))
-
-        dual_B = dual(B, C)
-        expected_result = zero(B)
-        @test dual_B === expected_result
-    end
-
-    # dim(B) != dim(C)
-    B = Pseudoscalar(test_dim + 1, test_value_1)
-    C = Blade(rand(test_dim, 3))
-    @test_throws DimensionMismatch dual(B, C)
-
-    # --- C::Pseudoscalar
+    # --- B::Pseudoscalar, C::Pseudoscalar
 
     # dim(B) === dim(C)
     for dim_B in test_dim:test_dim + 3
@@ -507,7 +490,8 @@ end
     C = Pseudoscalar(test_dim + 1, test_value_2)
     @test_throws DimensionMismatch dual(B, C)
 
-    # --- C::Scalar
+    # --- B::Pseudoscalar, C::Scalar
+    #     B::Scalar, C::Pseudoscalar
 
     C = Scalar(test_value_2)
 
@@ -517,7 +501,8 @@ end
         @test dual(B, C) == expected_result
     end
 
-    # --- C::One
+    # --- B::Pseudoscalar, C::One
+    #     B::One, C::Pseudoscalar
 
     C = One()
 
@@ -527,7 +512,8 @@ end
         @test dual(B, C) == expected_result
     end
 
-    # --- C::Real
+    # --- B::Pseudoscalar, C::Real
+    #     B::Real, C::Pseudoscalar
 
     C = test_value_2
 

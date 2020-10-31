@@ -404,9 +404,22 @@ end
     expected_result = C
     @test C_proj_B isa Scalar
     @test C_proj_B == expected_result
+
+    # --- B::One, C::Vector{<:Real}
+    #     B::Vector{<:Real}, C::One
+
+    # return_blade == true
+    B = One()
+    C = Vector(rand(10))
+    @test proj(B, C) === B
+    @test proj(C, B) == zero(B)
+
+    # return_blade == false
+    @test proj(C, B, return_blade=false) == 0
+    @test proj(B, C, return_blade=false) == value(B)
 end
 
-@testset "One: dual(B::One, C)" begin
+@testset "One: dual(B, C)" begin
     # --- Preparations
 
     # Test values

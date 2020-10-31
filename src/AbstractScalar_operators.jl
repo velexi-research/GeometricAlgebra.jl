@@ -173,16 +173,23 @@ contractl(B::Zero, C::AbstractScalar) = B
 contractl(B::AbstractScalar, C::Real) = B * C
 contractl(B::Real, C::AbstractScalar) = B * C
 
-# ------ proj(B, C)
+# ------ proj(B::AbstractScalar, C)
 
 proj(B::AbstractScalar, C::AbstractScalar) = B
 
-# Operations involving Zero
+# C::Zero
 proj(B::AbstractScalar, C::Zero) = C
 
 # Operations involving Reals
 proj(B::AbstractScalar, C::Real) = B
 proj(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B)
+
+# Operations involving Vectors
+proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+
+proj(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
+    return_blade ? B : value(B)
 
 #= REVIEW
 # Operations involving Blades
@@ -196,28 +203,9 @@ proj(B::AbstractScalar, C::Pseudoscalar) = B
 proj(B::Pseudoscalar, C::AbstractScalar) = zero(B)
 =#
 
-# Operations involving Vectors
-proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+# ------ dual(B, C)
 
-proj(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
-    return_blade ? B : value(B)
-
-# ------ dual(B::AbstractScalar, C)
-
-# C::Blade
-dual(B::AbstractScalar, C::Blade) =
-    mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B), copy_basis=false) :
-        Blade(C, volume=-value(B), copy_basis=false)
-
-# C::Pseudoscalar
-dual(B::AbstractScalar, C::Pseudoscalar) =
-    mod(grade(C), 4) < 2 ?
-        Pseudoscalar(C, value=value(B)) :
-        Pseudoscalar(C, value=-value(B))
-
-# C::AbstractScalar
+# B::AbstractScalar, C::AbstractScalar
 dual(B::AbstractScalar, C::AbstractScalar) = B
 
 # Operations involving Reals

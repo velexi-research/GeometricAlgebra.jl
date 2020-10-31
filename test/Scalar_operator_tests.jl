@@ -746,7 +746,7 @@ end
     @test proj(B, C, return_blade=false) == value(B)
 end
 
-@testset "Scalar: dual(B::Scalar, C)" begin
+@testset "Scalar: dual(B, C)" begin
     # --- Preparations
 
     # Test values
