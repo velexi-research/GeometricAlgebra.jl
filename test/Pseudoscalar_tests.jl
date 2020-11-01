@@ -40,10 +40,10 @@ using GeometricAlgebra
         for value_type in subtypes(AbstractFloat)
             converted_test_value = precision_type(test_value)
 
-            S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
-            @test S.dim == test_dim
-            @test S.value isa precision_type
-            @test S.value == precision_type(converted_test_value)
+            B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B.dim == test_dim
+            @test B.value isa precision_type
+            @test B.value == precision_type(converted_test_value)
         end
     end
 
@@ -57,30 +57,30 @@ using GeometricAlgebra
         for value_type in subtypes(Signed)
             converted_test_value = precision_type(test_value)
 
-            S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
-            @test S.dim == test_dim
-            @test S.value isa precision_type
-            @test S.value == precision_type(converted_test_value)
+            B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B.dim == test_dim
+            @test B.value isa precision_type
+            @test B.value == precision_type(converted_test_value)
         end
 
         # subtypes(Unsigned)
         for value_type in subtypes(Unsigned)
             converted_test_value = precision_type(abs(test_value))
 
-            S = Pseudoscalar{precision_type}(test_dim, converted_test_value)
-            @test S.dim == test_dim
-            @test S.value isa precision_type
-            @test S.value == precision_type(converted_test_value)
+            B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B.dim == test_dim
+            @test B.value isa precision_type
+            @test B.value == precision_type(converted_test_value)
         end
 
         # Bool
-        S = Pseudoscalar{precision_type}(test_dim, true)
-        @test S.dim == test_dim
-        @test S.value isa precision_type
-        @test S.value == precision_type(1)
+        B = Pseudoscalar{precision_type}(test_dim, true)
+        @test B.dim == test_dim
+        @test B.value isa precision_type
+        @test B.value == precision_type(1)
 
-        S = Pseudoscalar{precision_type}(test_dim, false)
-        @test S == zero(Pseudoscalar{precision_type})
+        B = Pseudoscalar{precision_type}(test_dim, false)
+        @test B == zero(Pseudoscalar{precision_type})
     end
 
     # --- Invalid data fields
@@ -113,8 +113,8 @@ end
 
     for precision_type in subtypes(AbstractFloat)
         converted_test_value = precision_type(test_value)
-        S = Pseudoscalar(test_dim, converted_test_value)
-        @test S isa Pseudoscalar{precision_type}
+        B = Pseudoscalar(test_dim, converted_test_value)
+        @test B isa Pseudoscalar{precision_type}
     end
 
     # --- Pseudoscalar(dim::Integer, value::Integer)
@@ -123,22 +123,22 @@ end
 
     # subtypes(Signed)
     for value_type in subtypes(Signed)
-        S = Pseudoscalar(test_dim, value_type(test_value))
-        @test S isa Pseudoscalar{Float64}
+        B = Pseudoscalar(test_dim, value_type(test_value))
+        @test B isa Pseudoscalar{Float64}
     end
 
     # subtypes(Unsigned)
     for value_type in subtypes(Unsigned)
-        S = Pseudoscalar(test_dim, value_type(abs(test_value)))
-        @test S isa Pseudoscalar{Float64}
+        B = Pseudoscalar(test_dim, value_type(abs(test_value)))
+        @test B isa Pseudoscalar{Float64}
     end
 
     # Bool
-    S = Pseudoscalar(test_dim, true)
-    @test S isa Pseudoscalar{Float64}
+    B = Pseudoscalar(test_dim, true)
+    @test B isa Pseudoscalar{Float64}
 
-    S = Pseudoscalar(test_dim, false)
-    @test S == zero(Pseudoscalar{Float64})
+    B = Pseudoscalar(test_dim, false)
+    @test B == zero(Pseudoscalar{Float64})
 end
 
 @testset "Pseudoscalar: outer constructor - copy constructor" begin
@@ -163,23 +163,23 @@ end
     for precision_type in subtypes(AbstractFloat)
         # Preparations
         converted_test_value = precision_type(test_value)
-        S = Pseudoscalar(test_dim, converted_test_value)
+        B = Pseudoscalar(test_dim, converted_test_value)
 
-        # Construct a Pseudoscalar representing the same pseudoscalar as `S`
-        S_copy = Pseudoscalar(S)
-        @test S_copy isa Pseudoscalar{precision_type}
+        # Construct a Pseudoscalar representing the same pseudoscalar as `B`
+        B_copy = Pseudoscalar(B)
+        @test B_copy isa Pseudoscalar{precision_type}
 
-        # Construct a Pseudoscalar representing the same space as `S` with a
+        # Construct a Pseudoscalar representing the same space as `B` with a
         # different value.
-        S_copy = Pseudoscalar(S, value=converted_test_value + 1)
-        @test S_copy isa Pseudoscalar{precision_type}
-        @test value(S_copy) == converted_test_value + 1
+        B_copy = Pseudoscalar(B, value=converted_test_value + 1)
+        @test B_copy isa Pseudoscalar{precision_type}
+        @test value(B_copy) == converted_test_value + 1
     end
 end
 
 # --- Function tests
 
-@testset "AbstractBlade interface: S::Pseudoscalar" begin
+@testset "Pseudoscalar: AbstractMultivector attribute functions" begin
     # Preparations
     test_dim = 10
 
@@ -193,54 +193,37 @@ end
         # value > 0
         positive_test_value = converted_test_value > 0 ?
             converted_test_value : -converted_test_value
-        S = Pseudoscalar(test_dim, positive_test_value)
-        @test dim(S) == test_dim
-        @test grade(S) == test_dim
-        @test basis(S) == LinearAlgebra.I
-        @test volume(S) isa precision_type
-        @test volume(S) == positive_test_value
-        @test norm(S) isa precision_type
-        @test norm(S) == positive_test_value
-        @test sign(S) == 1
+        B = Pseudoscalar(test_dim, positive_test_value)
+        @test dim(B) == test_dim
+        @test grades(B) == [test_dim]
+        @test blades(B) == [B]
+        @test norm(B) isa precision_type
+        @test norm(B) == positive_test_value
+
+        @test B[0] == []
+        @test B[1] == []
+        @test B[test_dim] == [B]
 
         # value < 0
         negative_test_value = converted_test_value > 0 ?
             -converted_test_value : converted_test_value
-        S = Pseudoscalar(test_dim, negative_test_value)
-        @test dim(S) == test_dim
-        @test grade(S) == test_dim
-        @test basis(S) == LinearAlgebra.I
-        @test volume(S) isa precision_type
-        @test volume(S) == negative_test_value
-        @test norm(S) isa precision_type
-        @test norm(S) == abs(negative_test_value)
-        @test sign(S) == -1
+        B = Pseudoscalar(test_dim, negative_test_value)
+        @test norm(B) isa precision_type
+        @test norm(B) == abs(negative_test_value)
 
         # value = Inf
-        S = Pseudoscalar(test_dim, precision_type(Inf))
-        @test dim(S) == test_dim
-        @test grade(S) == test_dim
-        @test basis(S) == LinearAlgebra.I
-        @test volume(S) isa precision_type
-        @test volume(S) == precision_type(Inf)
-        @test norm(S) isa precision_type
-        @test norm(S) == Inf
-        @test sign(S) == 1
+        B = Pseudoscalar(test_dim, precision_type(Inf))
+        @test norm(B) isa precision_type
+        @test norm(B) == Inf
 
         # value = -Inf
-        S = Pseudoscalar(test_dim, precision_type(-Inf))
-        @test dim(S) == test_dim
-        @test grade(S) == test_dim
-        @test basis(S) == LinearAlgebra.I
-        @test volume(S) isa precision_type
-        @test volume(S) == precision_type(-Inf)
-        @test norm(S) isa precision_type
-        @test norm(S) == Inf
-        @test sign(S) == -1
+        B = Pseudoscalar(test_dim, precision_type(-Inf))
+        @test norm(B) isa precision_type
+        @test norm(B) == Inf
     end
 end
 
-@testset "Pseudoscalar: Pseudoscalar interface" begin
+@testset "Pseudoscalar: AbstractBlade attribute functions" begin
     # Preparations
     test_dim = 10
 
@@ -254,35 +237,78 @@ end
         # value > 0
         positive_test_value = converted_test_value > 0 ?
             converted_test_value : -converted_test_value
-        S = Pseudoscalar(test_dim, positive_test_value)
-        @test value(S) isa precision_type
-        @test value(S) == positive_test_value
+        B = Pseudoscalar(test_dim, positive_test_value)
+        @test grade(B) == test_dim
+        @test basis(B) == LinearAlgebra.I
+        @test volume(B) isa precision_type
+        @test volume(B) == positive_test_value
+        @test sign(B) == 1
 
         # value < 0
         negative_test_value = converted_test_value > 0 ?
             -converted_test_value : converted_test_value
-        S = Pseudoscalar(test_dim, negative_test_value)
-        @test value(S) isa precision_type
-        @test value(S) == negative_test_value
+        B = Pseudoscalar(test_dim, negative_test_value)
+        @test volume(B) isa precision_type
+        @test volume(B) == negative_test_value
+        @test sign(B) == -1
+
+        # value = Inf
+        B = Pseudoscalar(test_dim, precision_type(Inf))
+        @test volume(B) isa precision_type
+        @test volume(B) == precision_type(Inf)
+        @test sign(B) == 1
+
+        # value = -Inf
+        B = Pseudoscalar(test_dim, precision_type(-Inf))
+        @test volume(B) isa precision_type
+        @test volume(B) == precision_type(-Inf)
+        @test sign(B) == -1
+    end
+end
+
+@testset "Pseudoscalar: Pseudoscalar attribute functions" begin
+    # Preparations
+    test_dim = 10
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    for precision_type in subtypes(AbstractFloat)
+        # Preparations
+        converted_test_value = precision_type(test_value)
+
+        # value > 0
+        positive_test_value = converted_test_value > 0 ?
+            converted_test_value : -converted_test_value
+        B = Pseudoscalar(test_dim, positive_test_value)
+        @test value(B) isa precision_type
+        @test value(B) == positive_test_value
+
+        # value < 0
+        negative_test_value = converted_test_value > 0 ?
+            -converted_test_value : converted_test_value
+        B = Pseudoscalar(test_dim, negative_test_value)
+        @test value(B) isa precision_type
+        @test value(B) == negative_test_value
 
         # value = 0
-        S = Pseudoscalar(test_dim, precision_type(0))
-        @test value(S) isa precision_type
-        @test value(S) == 0
+        B = Pseudoscalar(test_dim, precision_type(0))
+        @test value(B) isa precision_type
+        @test value(B) == 0
 
         # value = Inf
-        S = Pseudoscalar(test_dim, precision_type(Inf))
-        @test value(S) isa precision_type
-        @test value(S) == precision_type(Inf)
+        B = Pseudoscalar(test_dim, precision_type(Inf))
+        @test value(B) isa precision_type
+        @test value(B) == precision_type(Inf)
 
         # value = -Inf
-        S = Pseudoscalar(test_dim, precision_type(-Inf))
-        @test value(S) isa precision_type
-        @test value(S) == precision_type(-Inf)
+        B = Pseudoscalar(test_dim, precision_type(-Inf))
+        @test value(B) isa precision_type
+        @test value(B) == precision_type(-Inf)
     end
 end
 
-@testset "convert(S): S::Pseudoscalar" begin
+@testset "Pseudoscalar: convert(B)" begin
     # Preparations
     test_dim = 10
 
@@ -294,18 +320,18 @@ end
         for precision_type_src in subtypes(AbstractFloat)
             # Preparations
             converted_test_value = precision_type_src(test_value)
-            S = Pseudoscalar{precision_type_src}(test_dim, converted_test_value)
+            B = Pseudoscalar{precision_type_src}(test_dim, converted_test_value)
 
             # Exercise functionality and check results
-            S_converted = convert(Pseudoscalar{precision_type_converted}, S)
+            B_converted = convert(Pseudoscalar{precision_type_converted}, B)
 
-            @test S_converted isa Pseudoscalar{precision_type_converted}
+            @test B_converted isa Pseudoscalar{precision_type_converted}
 
             if precision_type_src == precision_type_converted
-                @test S_converted === S
+                @test B_converted === B
             else
-                @test S_converted !== S
-                @test S_converted ≈ S
+                @test B_converted !== B
+                @test B_converted ≈ B
             end
         end
     end

@@ -246,7 +246,7 @@ end
 
 # --- Function tests
 
-@testset "Scalar: AbstractMultivector interface functions" begin
+@testset "Scalar: AbstractMultivector attribute functions" begin
     # --- Preparations
 
     test_value = rand() + 2  # add 2 to avoid 0 and 1
@@ -265,10 +265,11 @@ end
         @test dim(S) == 0
         @test grades(S) == [0]
         @test blades(S) == [S]
-        @test S[0] == [S]
-        @test S[1] == []
         @test norm(S) isa precision_type
         @test norm(S) == abs(converted_test_value)
+
+        @test S[0] == [S]
+        @test S[1] == []
 
         # value < 0
         negative_test_value = converted_test_value < 0 ?
@@ -289,7 +290,7 @@ end
     end
 end
 
-@testset "Scalar: AbstractBlade interface functions" begin
+@testset "Scalar: AbstractBlade attribute functions" begin
     # --- Preparations
 
     test_value = rand() + 2  # add 2 to avoid 0 and 1
@@ -333,7 +334,7 @@ end
     end
 end
 
-@testset "Scalar: AbstractScalar interface functions" begin
+@testset "Scalar: AbstractScalar attribute functions" begin
     # Preparations
     test_value = rand() + 2  # add 2 to avoid 0 and 1
     test_value = (rand() > 0.5) ? test_value : -test_value

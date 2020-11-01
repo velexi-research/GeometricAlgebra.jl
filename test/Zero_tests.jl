@@ -106,21 +106,22 @@ end
     end
 end
 
-@testset "Zero: AbstractMultivector interface functions" begin
+@testset "Zero: AbstractMultivector attribute functions" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
         @test dim(B) == 0
         @test grades(B) == [0]
         @test blades(B) == [B]
-        @test B[0] == [B]
-        @test B[1] == []
         @test norm(B) isa precision_type
         @test norm(B) == 0
+
+        @test B[0] == [B]
+        @test B[1] == []
     end
 end
 
-@testset "Zero: AbstractBlade interface functions" begin
+@testset "Zero: AbstractBlade attribute functions" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
@@ -132,7 +133,7 @@ end
     end
 end
 
-@testset "Zero: AbstractScalar interface functions" begin
+@testset "Zero: AbstractScalar attribute functions" begin
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
         @test value(B) isa precision_type
