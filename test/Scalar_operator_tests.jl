@@ -281,8 +281,8 @@ end
     B = Scalar(test_value_1)
     C = Zero()
 
-    @test B + C === B
-    @test C + B === B
+    @test B + C == B
+    @test C + B == B
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar
@@ -544,7 +544,7 @@ end
     expected_result = test_value_1 * test_value_2
     @test B_wedge_C isa Scalar
     @test B_wedge_C == expected_result
-    @test B ∧ C === B_wedge_C
+    @test B ∧ C == B_wedge_C
 
     # B::Scalar, C::One
     # B::One, C::Scalar
@@ -555,13 +555,13 @@ end
     expected_result = B
     @test B_wedge_C isa Scalar
     @test B_wedge_C == expected_result
-    @test B ∧ C === B_wedge_C
+    @test B ∧ C == B_wedge_C
 
     C_wedge_B = wedge(C, B)
     expected_result = B
     @test C_wedge_B isa Scalar
     @test C_wedge_B == expected_result
-    @test C ∧ B === C_wedge_B
+    @test C ∧ B == C_wedge_B
 
     # B::Scalar, C::Zero
     # B::Zero, C::Scalar
@@ -587,13 +587,13 @@ end
     expected_result = test_value_1 * test_value_2
     @test B_wedge_C isa Scalar
     @test B_wedge_C == expected_result
-    @test B ∧ C === B_wedge_C
+    @test B ∧ C == B_wedge_C
 
     C_wedge_B = wedge(C, B)
     expected_result = test_value_1 * test_value_2
     @test C_wedge_B isa Scalar
     @test C_wedge_B == expected_result
-    @test C ∧ B === C_wedge_B
+    @test C ∧ B == C_wedge_B
 end
 
 @testset "Scalar: contractl(B, C), B < C" begin
@@ -614,7 +614,7 @@ end
     expected_result = test_value_1 * test_value_2
     @test B_contractl_C isa Scalar
     @test B_contractl_C == expected_result
-    @test (B < C) === B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # --- B::Scalar, C::One
     #     B::One, C::Scalar
@@ -625,13 +625,13 @@ end
     expected_result = B
     @test B_contractl_C isa Scalar
     @test B_contractl_C == expected_result
-    @test (B < C) === B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = B
     @test C_contractl_B isa Scalar
     @test C_contractl_B == expected_result
-    @test (C < B) === C_contractl_B
+    @test (C < B) == C_contractl_B
 
     # --- B::Scalar, C::Zero
     #     B::Zero, C::Scalar
@@ -657,13 +657,13 @@ end
     expected_result = test_value_1 * test_value_2
     @test B_contractl_C isa Scalar
     @test B_contractl_C == expected_result
-    @test (B < C) === B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = test_value_1 * test_value_2
     @test C_contractl_B isa Scalar
     @test C_contractl_B == expected_result
-    @test (C < B) === C_contractl_B
+    @test (C < B) == C_contractl_B
 end
 
 @testset "Scalar: proj(B, C)" begin
@@ -698,7 +698,7 @@ end
 
     B_proj_C = proj(B, C)
     expected_result = B
-    @test B_proj_C === expected_result
+    @test B_proj_C == expected_result
 
     C_proj_B = proj(C, B)
     expected_result = C
@@ -738,8 +738,8 @@ end
     # return_blade == true
     B = Scalar(test_value_1)
     C = test_vector
-    @test proj(B, C) === B
-    @test proj(C, B) == zero(B)
+    @test proj(B, C) == B
+    @test proj(C, B) === zero(B)
 
     # return_blade == false
     @test proj(C, B, return_blade=false) == 0

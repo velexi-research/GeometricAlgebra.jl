@@ -129,7 +129,7 @@ end
             expected_result = mod(test_dim, 4) < 2 ?
                 Pseudoscalar(test_dim, test_value) :
                 Pseudoscalar(test_dim, -test_value)
-            @test reverse(B) === expected_result
+            @test reverse(B) == expected_result
 
             @test B * reverse(B) ≈ norm(B)^2
         end
@@ -380,7 +380,7 @@ end
     expected_result = sign(B) > 0 ?
         Pseudoscalar(B, value=Inf) :
         Pseudoscalar(B, value=-Inf)
-    @test B / C === expected_result
+    @test B / C == expected_result
 
     expected_result = C
     @test C / B === expected_result
@@ -486,7 +486,7 @@ end
 
         @test B_contractl_C isa Scalar
         @test B_contractl_C == expected_result
-        @test (B < C) === B_contractl_C
+        @test (B < C) == B_contractl_C
     end
 end
 
@@ -514,7 +514,7 @@ end
 
         B_proj_C = proj(B, C)
         expected_result = B
-        @test B_proj_C === expected_result
+        @test B_proj_C == expected_result
 
         # dim(B) != dim(C)
         B = Pseudoscalar(test_dim, test_value_1)
@@ -553,7 +553,7 @@ end
 
     # --- B::Pseudoscalar, C::Pseudoscalar
 
-    # dim(B) === dim(C)
+    # dim(B) == dim(C)
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
@@ -588,7 +588,7 @@ end
         expected_result = mod(dim_B, 4) < 2 ?
             Pseudoscalar(dim_B, test_value_2) :
             Pseudoscalar(dim_B, -test_value_2)
-        @test dual(C, B) === expected_result
+        @test dual(C, B) == expected_result
     end
 
     # --- B::Pseudoscalar, C::One

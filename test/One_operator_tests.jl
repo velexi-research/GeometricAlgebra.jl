@@ -301,13 +301,13 @@ end
     expected_result = C
     @test B_wedge_C isa Scalar
     @test B_wedge_C == expected_result
-    @test B ∧ C === B_wedge_C
+    @test B ∧ C == B_wedge_C
 
     C_wedge_B = wedge(C, B)
     expected_result = C
     @test C_wedge_B isa Scalar
     @test C_wedge_B == expected_result
-    @test C ∧ B === C_wedge_B
+    @test C ∧ B == C_wedge_B
 end
 
 @testset "One: contractl(B, C), B < C" begin
@@ -352,13 +352,13 @@ end
     expected_result = C
     @test B_contractl_C isa Scalar
     @test B_contractl_C == expected_result
-    @test (B < C) === B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = C
     @test C_contractl_B isa Scalar
     @test C_contractl_B == expected_result
-    @test (C < B) === C_contractl_B
+    @test (C < B) == C_contractl_B
 end
 
 @testset "One: proj(B, C)" begin
@@ -383,12 +383,12 @@ end
     B = One()
     C = Zero()
 
-    B_proj_C = proj(B, C)
     expected_result = Zero()
+
+    B_proj_C = proj(B, C)
     @test B_proj_C === expected_result
 
     C_proj_B = proj(C, B)
-    expected_result = Zero()
     @test C_proj_B === expected_result
 
     # B::One, C::Real
@@ -444,7 +444,7 @@ end
 
     C_dual_B = dual(C, B)
     expected_result = C
-    @test C_dual_B === expected_result
+    @test C_dual_B == expected_result
 
     # B::One, C::Real
     # C::Real, C::One
@@ -456,5 +456,5 @@ end
 
     C_dual_B = dual(C, B)
     expected_result = Scalar(C)
-    @test C_dual_B === expected_result
+    @test C_dual_B == expected_result
 end
