@@ -80,8 +80,8 @@ reciprocal(B::AbstractScalar) = 1 / B
 +(B::Zero, C::AbstractScalar) = C
 
 # Operations involving Reals
-+(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) + C)
-+(B::Real, C::AbstractScalar) = C + B
++(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) + x)
++(x::Real, B::AbstractScalar) = B + x
 
 # ------ -(B, C)
 
@@ -94,8 +94,8 @@ reciprocal(B::AbstractScalar) = 1 / B
 -(B::Zero, C::AbstractScalar) = -C
 
 # Operations involving Reals
--(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) - C)
--(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B - value(C))
+-(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) - x)
+-(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x - value(B))
 
 # ------ *(B, C)
 
@@ -108,8 +108,8 @@ reciprocal(B::AbstractScalar) = 1 / B
 *(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Reals
-*(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) * C)
-*(B::Real, C::AbstractScalar) = C * B
+*(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) * x)
+*(x::Real, B::AbstractScalar) = B * x
 
 #=
 # Operations involving Pseudoscalars
@@ -138,8 +138,8 @@ reciprocal(B::AbstractScalar) = 1 / B
 /(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Reals
-/(B::AbstractScalar, C::Real) = Scalar{typeof(value(B))}(value(B) / C)
-/(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B / value(C))
+/(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) / x)
+/(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x / value(B))
 
 # ------ wedge(B, C)
 
@@ -152,8 +152,8 @@ wedge(B::AbstractScalar, C::Zero) = C
 wedge(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Reals
-wedge(B::AbstractScalar, C::Real) = B * C
-wedge(B::Real, C::AbstractScalar) = B * C
+wedge(B::AbstractScalar, x::Real) = B * x
+wedge(x::Real, B::AbstractScalar) = x * B
 
 # Operations involving Vectors
 wedge(B::AbstractScalar, v::Vector{<:Real}) =  Blade(value(B) * v)
@@ -170,8 +170,8 @@ contractl(B::AbstractScalar, C::Zero) = C
 contractl(B::Zero, C::AbstractScalar) = B
 
 # Operations involving Reals
-contractl(B::AbstractScalar, C::Real) = B * C
-contractl(B::Real, C::AbstractScalar) = B * C
+contractl(B::AbstractScalar, x::Real) = B * x
+contractl(x::Real, B::AbstractScalar) = x * B
 
 # ------ proj(B::AbstractScalar, C)
 
@@ -181,8 +181,8 @@ proj(B::AbstractScalar, C::AbstractScalar) = B
 proj(B::AbstractScalar, C::Zero) = C
 
 # Operations involving Reals
-proj(B::AbstractScalar, C::Real) = B
-proj(B::Real, C::AbstractScalar) = Scalar{typeof(value(C))}(B)
+proj(B::AbstractScalar, x::Real) = B
+proj(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x)
 
 # Operations involving Vectors
 proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
@@ -209,8 +209,8 @@ proj(B::Pseudoscalar, C::AbstractScalar) = zero(B)
 dual(B::AbstractScalar, C::AbstractScalar) = B
 
 # Operations involving Reals
-dual(B::AbstractScalar, C::Real) = B
-dual(B::Real, C::AbstractScalar) = B
+dual(B::AbstractScalar, x::Real) = B
+dual(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x)
 
 # ------ dot(B, C)
 

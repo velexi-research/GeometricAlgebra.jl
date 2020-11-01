@@ -284,6 +284,24 @@ end
     @test B * C == expected_result
     @test C * B == expected_result
 
+    # B::Pseudoscalar, C::One
+    # B::One, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = One()
+
+    expected_result = B
+    @test B * C === expected_result
+    @test C * B === expected_result
+
+    # B::Pseudoscalar, C::Zero
+    # B::Zero, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Zero()
+
+    expected_result = C
+    @test B * C === expected_result
+    @test C * B === expected_result
+
     # B::Pseudoscalar, C::Real
     # C::Real, B::Pseudoscalar
     B = Pseudoscalar(test_dim, test_value_1)
@@ -317,6 +335,73 @@ end
     expected_result = Scalar(test_value_1 / test_value_2)
     @test B_slash_C isa Scalar
     @test B_slash_C == expected_result
+
+    # B::Pseudoscalar, C::Scalar
+    # B::Scalar, C::Pseudoscalar
+    C = Scalar(test_value_2)
+
+    B = Pseudoscalar(test_dim, test_value_1)
+    expected_result = Pseudoscalar(test_dim, test_value_1 / test_value_2)
+    @test B / C == expected_result
+
+    for test_dim in 5:8
+        B = Pseudoscalar(test_dim, test_value_1)
+
+        expected_result = mod(test_dim, 4) < 2 ?
+            Pseudoscalar(test_dim, test_value_2 / test_value_1) :
+            Pseudoscalar(test_dim, -test_value_2 / test_value_1)
+
+        @test C / B == expected_result
+    end
+
+    # B::Pseudoscalar, C::One
+    # B::One, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = One()
+
+    expected_result = B
+    @test B / C === expected_result
+
+    for test_dim in 5:8
+        B = Pseudoscalar(test_dim, test_value_1)
+
+        expected_result = mod(test_dim, 4) < 2 ?
+            Pseudoscalar(test_dim, 1/ test_value_1) :
+            Pseudoscalar(test_dim, -1/ test_value_1)
+
+        @test C / B == expected_result
+    end
+
+    # B::Pseudoscalar, C::Zero
+    # B::Zero, C::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = Zero()
+
+    expected_result = sign(B) > 0 ?
+        Pseudoscalar(B, value=Inf) :
+        Pseudoscalar(B, value=-Inf)
+    @test B / C === expected_result
+
+    expected_result = C
+    @test C / B === expected_result
+
+    # B::Pseudoscalar, C::Real
+    # C::Real, B::Pseudoscalar
+    B = Pseudoscalar(test_dim, test_value_1)
+    C = test_value_2
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 / test_value_2)
+    @test B / C == expected_result
+
+    for test_dim in 5:8
+        B = Pseudoscalar(test_dim, test_value_1)
+
+        expected_result = mod(test_dim, 4) < 2 ?
+            Pseudoscalar(test_dim, test_value_2 / test_value_1) :
+            Pseudoscalar(test_dim, -test_value_2 / test_value_1)
+
+        @test C / B == expected_result
+    end
 end
 
 @testset "Pseudoscalar: wedge(B, C)" begin
@@ -498,7 +583,12 @@ end
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(dim_B, test_value_1)
         expected_result = zero(B)
-        @test dual(B, C) == expected_result
+        @test dual(B, C) === expected_result
+
+        expected_result = mod(dim_B, 4) < 2 ?
+            Pseudoscalar(dim_B, test_value_2) :
+            Pseudoscalar(dim_B, -test_value_2)
+        @test dual(C, B) === expected_result
     end
 
     # --- B::Pseudoscalar, C::One
@@ -510,6 +600,11 @@ end
         B = Pseudoscalar(dim_B, test_value_1)
         expected_result = zero(B)
         @test dual(B, C) == expected_result
+
+        expected_result = mod(dim_B, 4) < 2 ?
+            Pseudoscalar(dim_B, 1) :
+            Pseudoscalar(dim_B, -1)
+        @test dual(C, B) == expected_result
     end
 
     # --- B::Pseudoscalar, C::Real

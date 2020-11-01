@@ -44,12 +44,12 @@ contractl(B::Zero, C::Zero) = B
 # ------ proj(B, C)
 
 # Operations involving Reals
-proj(B::Zero, C::Real) = B
-proj(B::Real, C::Zero) = C
+proj(B::Zero, x::Real) = B
+proj(x::Real, B::Zero) = B
 
 # Operations involving Vectors
-proj(B::Zero, C::Vector{<:Real}) = B
-proj(B::Vector{<:Real}, C::Zero) = C
+proj(B::Zero, v::Vector{<:Real}) = B
+proj(v::Vector{<:Real}, B::Zero) = B
 
 # ------ dual(B, C)
 
@@ -60,7 +60,7 @@ dual(B::Zero, C::Blade) = dual_of_zero()
 dual(B::Zero, C::Pseudoscalar) = dual_of_zero()
 dual(B::Zero, C::Scalar) = dual_of_zero()
 dual(B::Zero, C::One) = dual_of_zero()
-dual(B::Zero, C::Real) = dual_of_zero()
+dual(B::Zero, x::Real) = dual_of_zero()
 
 # dual(B, C::Zero)
 dual_relative_to_zero() =
@@ -72,4 +72,4 @@ dual(B::Pseudoscalar, C::Zero) = dual_relative_to_zero()
 dual(B::Scalar, C::Zero) = dual_relative_to_zero()
 dual(B::One, C::Zero) = dual_relative_to_zero()
 dual(B::Zero, C::Zero) = dual_relative_to_zero()
-dual(B::Real, C::Zero) = dual_relative_to_zero()
+dual(x::Real, C::Zero) = dual_relative_to_zero()

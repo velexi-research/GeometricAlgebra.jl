@@ -758,40 +758,17 @@ end
 
     B = Scalar(test_value_1)
 
-    # C::Scalar
+    # B::Scalar, C::Scalar
     C = Scalar(test_value_2)
     B_dual_C = dual(B, C)
     expected_result = test_value_1
     @test B_dual_C isa Scalar
     @test B_dual_C == expected_result
 
-    # C::Real
+    # B::Scalar, C::Real
     C = test_value_2
     B_dual_C = dual(B, C)
     expected_result = test_value_1
     @test B_dual_C isa Scalar
     @test B_dual_C == expected_result
-
-    # C::Blade
-    test_dim = 10
-    for test_grade in 5:8
-        C = Blade(randn(test_dim, test_grade))
-        B_dual_C = dual(B, C)
-        expected_result = mod(test_grade, 4) < 2 ?
-            Blade(C, volume=test_value_1) :
-            Blade(C, volume=-test_value_1)
-        @test B_dual_C isa Blade
-        @test B_dual_C == expected_result
-    end
-
-    # C::Pseudoscalar
-    for test_dim in 5:8
-        C = Pseudoscalar(test_dim, test_value_2)
-        B_dual_C = dual(B, C)
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, test_value_1) :
-            Pseudoscalar(test_dim, -test_value_1)
-        @test B_dual_C isa Pseudoscalar
-        @test B_dual_C == expected_result
-    end
 end
