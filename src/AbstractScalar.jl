@@ -30,7 +30,7 @@ Interface
 Note: the return value of all methods should preserve the precision of the
 AbstractScalar instance (when possible).
 
-### Methods
+### Attributes
 
     value(B::AbstractScalar{T})::T where {T<:AbstractFloat}
 """

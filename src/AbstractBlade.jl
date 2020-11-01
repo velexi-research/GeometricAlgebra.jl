@@ -14,7 +14,7 @@ except according to the terms contained in the LICENSE file.
 # Types
 export AbstractBlade
 
-# Methods
+# Functions
 export grade, basis, volume
 import Base.sign
 
@@ -37,7 +37,7 @@ Interface
 Note: the return value of all methods should preserve the precision of the
 AbstractBlade instance (when possible).
 
-### Methods
+### Attributes
 
     grade(B::AbstractBlade)::Int
     basis(B::AbstractBlade; normalized::Bool=true)::Matrix{AbstractFloat}
@@ -47,6 +47,10 @@ AbstractBlade instance (when possible).
 ### Unary Operators
 
     reciprocal(B::AbstractBlade)::AbstractBlade
+
+### Functions
+
+    rejection(vectors::Matrix, B::AbstractBlade, normalize::Bool=false)::Matrix
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
@@ -92,3 +96,11 @@ norm(B::AbstractBlade) = abs(volume(B))
 Return the sign of `B` relative to its unit basis.
 """
 sign(B::AbstractBlade)::Int8 = sign(volume(B))
+
+"""
+    rejection(vectors, B; normalize=false)
+
+Compute rejections of `vectors` from `B`. When `normalize` is true, the
+rejection vectors are normalized.
+"""
+rejection(vectors::Matrix, B::AbstractBlade; normalize=false) = nothing

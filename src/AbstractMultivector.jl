@@ -14,7 +14,7 @@ except according to the terms contained in the LICENSE file.
 # Types
 export AbstractMultivector
 
-# Methods
+# Function
 export dim, grades, blades
 import Base.getindex
 import LinearAlgebra.norm
@@ -37,7 +37,7 @@ import LinearAlgebra.dot
 export dot
 import Base.:(<)
 
-# Utility methods
+# Utility functions
 import Base.convert
 
 # --- Type definitions
@@ -53,20 +53,17 @@ Interface
 Note: the return value of all methods should preserve the precision of the
 AbstractMultivector instance (when possible).
 
-### Methods
+### Attributes
 
     dim(M::AbstractMultivector)::Int
     grades(M::AbstractMultivector)::Vector{Int}
     blades(M::AbstractMultivector)::Vector{<:AbstractBlade}
-    getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
-
     norm(M::AbstractMultivector{T})::T where {T<:AbstractFloat}
 
 ### Unary Operators
 
     -(M::AbstractMultivector)::AbstractMultivector
     reverse(M::AbstractMultivector)::AbstractMultivector
-    dual(M::AbstractMultivector)::AbstractMultivector
 
 ### Binary Operators
 
@@ -92,9 +89,13 @@ AbstractMultivector instance (when possible).
               N::AbstractMultivector)::AbstractMultivector
     >(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-    dual(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
+### Functions
 
+    dual(M::AbstractMultivector)::AbstractMultivector
+    dual(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
     proj(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
+
+    getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
 
