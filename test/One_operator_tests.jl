@@ -210,6 +210,21 @@ end
     expected_result = test_value
     @test C_times_B isa Scalar
     @test C_times_B == expected_result
+
+    # B::Vector, C::One
+    # B::One, B::Vector
+    B = rand(5)
+    C = One()
+
+    expected_result = Blade(B)
+
+    B_times_C = B * C
+    @test B_times_C isa Blade
+    @test B_times_C == expected_result
+
+    C_times_B = C * B
+    @test C_times_B isa Blade
+    @test C_times_B == expected_result
 end
 
 @testset "One: /(B, C)" begin
@@ -257,6 +272,16 @@ end
     expected_result = test_value
     @test C_slash_B isa Scalar
     @test C_slash_B == expected_result
+
+    # B::Vector, C::One
+    B = rand(5)
+    C = One()
+
+    expected_result = Blade(B)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Blade
+    @test B_slash_C == expected_result
 end
 
 @testset "One: wedge(B, C), B ∧ C" begin

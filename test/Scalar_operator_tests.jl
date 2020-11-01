@@ -447,6 +447,21 @@ end
     expected_result = test_value_1 * test_value_2
     @test C_times_B isa Scalar
     @test C_times_B == expected_result
+
+    # B::Vector, C::Scalar
+    # B::Scalar, B::Vector
+    B = rand(5)
+    C = Scalar(test_value_2)
+
+    expected_result = test_value_2 * Blade(B)
+
+    B_times_C = B * C
+    @test B_times_C isa Blade
+    @test B_times_C ≈ expected_result
+
+    C_times_B = C * B
+    @test C_times_B isa Blade
+    @test C_times_B ≈ expected_result
 end
 
 @testset "Scalar: /(B, C)" begin
@@ -522,6 +537,16 @@ end
     expected_result = test_value_2 / test_value_1
     @test C_slash_B isa Scalar
     @test C_slash_B == expected_result
+
+    # B::Vector, C::Scalar
+    B = rand(5)
+    C = Scalar(test_value_2)
+
+    expected_result = Blade(B) / C
+
+    B_slash_C = B / C
+    @test B_slash_C isa Blade
+    @test B_slash_C == expected_result
 end
 
 @testset "Scalar: wedge(B, C), B ∧ C" begin

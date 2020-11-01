@@ -150,6 +150,15 @@ end
     expected_result = Zero()
     @test B * C === expected_result
     @test C * B === expected_result
+
+    # B::Vector, C::Zero
+    # B::Zero, B::Vector
+    B = rand(5)
+    C = Zero()
+
+    expected_result = Zero()
+    @test B * C === expected_result
+    @test C * B === expected_result
 end
 
 @testset "Zero: /(B, C)" begin
@@ -191,6 +200,16 @@ end
     expected_result = -Inf
     @test C_slash_B isa Scalar
     @test C_slash_B == expected_result
+
+    # B::Vector, C::Zero
+    B = rand(5)
+    C = Zero()
+
+    expected_result = Blade(B) / 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Blade
+    @test B_slash_C == expected_result
 end
 
 @testset "Zero: wedge(B, C), B ∧ C" begin

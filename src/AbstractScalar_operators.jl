@@ -111,17 +111,9 @@ reciprocal(B::AbstractScalar) = 1 / B
 *(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) * x)
 *(x::Real, B::AbstractScalar) = B * x
 
-#=
-# Operations involving Pseudoscalars
-*(B::Scalar, C::Pseudoscalar) = Pseudoscalar(C, value=value(B) * value(C))
-*(B::Pseudoscalar, C::Scalar) = C * B
-=#
-
-#=
 # Operations involving Vectors
-*(B::Scalar, v::Vector{<:Real}) = B * Blade(v)
-*(v::Vector{<:Real}, B::Scalar) = Blade(v) * B
-=#
+*(v::Vector{<:Real}, B::AbstractScalar) = Blade(value(B) * v)
+*(B::AbstractScalar, v::Vector{<:Real}) = v * B
 
 # ------ /(B, C)
 
@@ -140,6 +132,9 @@ reciprocal(B::AbstractScalar) = 1 / B
 # Operations involving Reals
 /(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) / x)
 /(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x / value(B))
+
+# Operations involving Vectors
+/(v::Vector{<:Real}, B::AbstractScalar) = Blade(v) / value(B)
 
 # ------ wedge(B, C)
 
@@ -191,18 +186,6 @@ proj(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
 proj(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
     return_blade ? B : value(B)
 
-#= REVIEW
-# Operations involving Blades
-proj(B::AbstractScalar, C::Blade) = B
-proj(B::Blade, C::AbstractScalar) = zero(B)
-=#
-
-#= REVIEW
-# Operations involving Pseudoscalars
-proj(B::AbstractScalar, C::Pseudoscalar) = B
-proj(B::Pseudoscalar, C::AbstractScalar) = zero(B)
-=#
-
 # ------ dual(B, C)
 
 # B::AbstractScalar, C::AbstractScalar
@@ -211,11 +194,3 @@ dual(B::AbstractScalar, C::AbstractScalar) = B
 # Operations involving Reals
 dual(B::AbstractScalar, x::Real) = B
 dual(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x)
-
-# ------ dot(B, C)
-
-# Operations involving Vectors
-#=
-dot(B::AbstractScalar, v::Vector{<:Real}) = B * v
-dot(v::Vector{<:Real}, B::AbstractScalar) = zero(B)
-=#
