@@ -1,5 +1,5 @@
 """
-Unit tests for !=(M, N)
+Unit tests for !=(x, y)
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It

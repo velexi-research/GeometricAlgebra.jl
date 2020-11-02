@@ -1,5 +1,5 @@
 """
-Unit tests for !isapprox(M, N)
+Unit tests for !isapprox(x, y)
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
