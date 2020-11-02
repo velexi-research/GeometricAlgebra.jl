@@ -307,32 +307,3 @@ end
         @test value(B) == precision_type(-Inf)
     end
 end
-
-@testset "Pseudoscalar: convert(B)" begin
-    # Preparations
-    test_dim = 10
-
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    # Tests
-    for precision_type_converted in subtypes(AbstractFloat)
-        for precision_type_src in subtypes(AbstractFloat)
-            # Preparations
-            converted_test_value = precision_type_src(test_value)
-            B = Pseudoscalar{precision_type_src}(test_dim, converted_test_value)
-
-            # Exercise functionality and check results
-            B_converted = convert(Pseudoscalar{precision_type_converted}, B)
-
-            @test B_converted isa Pseudoscalar{precision_type_converted}
-
-            if precision_type_src == precision_type_converted
-                @test B_converted === B
-            else
-                @test B_converted !== B
-                @test B_converted ≈ B
-            end
-        end
-    end
-end

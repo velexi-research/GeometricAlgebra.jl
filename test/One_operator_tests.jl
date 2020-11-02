@@ -1,5 +1,5 @@
 """
-Operator unit tests for One type.
+Unit tests for methods defined for the One type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -19,6 +19,8 @@ using Test
 using GeometricAlgebra
 
 # --- Tests
+
+# ------ Unary operations
 
 @testset "One: -(B)" begin
     for precision_type in subtypes(AbstractFloat)
@@ -67,6 +69,8 @@ end
         @test reciprocal_B === B
     end
 end
+
+# ------ Binary operations
 
 @testset "One: +(B, C)" begin
     # --- Preparations
@@ -386,6 +390,46 @@ end
     @test (C < B) == C_contractl_B
 end
 
+@testset "One: dual(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    B = One()
+
+    # B::One, C::One
+    C = One()
+    B_dual_C = dual(B, C)
+    expected_result = B
+    @test B_dual_C === expected_result
+
+    # B::One, C::Scalar
+    # C::Scalar, B::One
+    C = Scalar(test_value)
+
+    B_dual_C = dual(B, C)
+    expected_result = B
+    @test B_dual_C === expected_result
+
+    C_dual_B = dual(C, B)
+    expected_result = C
+    @test C_dual_B == expected_result
+
+    # B::One, C::Real
+    # C::Real, C::One
+    C = test_value
+
+    B_dual_C = dual(B, C)
+    expected_result = B
+    @test B_dual_C === expected_result
+
+    C_dual_B = dual(C, B)
+    expected_result = Scalar(C)
+    @test C_dual_B == expected_result
+end
+
 @testset "One: proj(B, C)" begin
     # --- Preparations
 
@@ -444,42 +488,14 @@ end
     @test proj(B, C, return_blade=false) == value(B)
 end
 
-@testset "One: dual(B, C)" begin
-    # --- Preparations
+# ------ Utility methods
 
-    # Test values
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    B = One()
-
-    # B::One, C::One
-    C = One()
-    B_dual_C = dual(B, C)
-    expected_result = B
-    @test B_dual_C === expected_result
-
-    # B::One, C::Scalar
-    # C::Scalar, B::One
-    C = Scalar(test_value)
-
-    B_dual_C = dual(B, C)
-    expected_result = B
-    @test B_dual_C === expected_result
-
-    C_dual_B = dual(C, B)
-    expected_result = C
-    @test C_dual_B == expected_result
-
-    # B::One, C::Real
-    # C::Real, C::One
-    C = test_value
-
-    B_dual_C = dual(B, C)
-    expected_result = B
-    @test B_dual_C === expected_result
-
-    C_dual_B = dual(C, B)
-    expected_result = Scalar(C)
-    @test C_dual_B == expected_result
+@testset "One: convert(B)" begin
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            B = One{precision_type_src}()
+            B_converted = convert(AbstractScalar{precision_type_converted}, B)
+            @test B_converted isa One{precision_type_converted}
+        end
+    end
 end

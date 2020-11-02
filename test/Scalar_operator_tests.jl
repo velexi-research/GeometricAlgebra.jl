@@ -1,5 +1,5 @@
 """
-Operator unit tests for Scalar type.
+Unit tests for methods defined for the Scalar type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -20,126 +20,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "Scalar: ==(B, C)" begin
-    # Preparations
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    float64_or_bigfloat = (Float64, BigFloat)
-
-    # B::Scalar, C::Scalar
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # ==(B, C)
-            B = Scalar(precision_type1(test_value))
-            C = Scalar(precision_type2(test_value))
-            if precision_type1 == precision_type2
-                @test B == C
-            elseif precision_type1 in float64_or_bigfloat &&
-                   precision_type2 in float64_or_bigfloat
-                @test B == C
-            else
-                @test B != C
-            end
-
-            # value(B) != value(C)
-            B = Scalar(precision_type1(test_value))
-            C = Scalar(precision_type2(2 * test_value))
-            @test B != C
-        end
-    end
-
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
-    for precision_type in subtypes(AbstractFloat)
-        # B::Scalar, C::AbstractFloat
-        # B::AbstractFloat, C::Scalar
-        for value_type in subtypes(AbstractFloat)
-            B = Scalar(precision_type(test_value))
-
-            # ==(B, C)
-            if precision_type == value_type
-                @test B == value_type(test_value)
-                @test value_type(test_value) == B
-            elseif precision_type in float64_or_bigfloat &&
-                   value_type in float64_or_bigfloat
-                @test B == value_type(test_value)
-                @test value_type(test_value) == B
-            else
-                @test B != value_type(test_value)
-                @test value_type(test_value) != B
-            end
-
-            # !=(x,y)
-            @test B != value_type(2 * test_value)
-            @test value_type(2 * test_value) != B
-        end
-
-        # B::Scalar, C::Integer
-        # B::Integer, C::Scalar
-        int_value::Int = 3
-        for value_type in subtypes(Signed)
-            B = Scalar(precision_type(int_value))
-
-            # ==(B, C)
-            @test B == value_type(int_value)
-            @test value_type(int_value) == B
-
-            # !=(x,y)
-            @test B != value_type(2 * int_value)
-            @test value_type(2 * int_value) != B
-        end
-
-        for value_type in subtypes(Unsigned)
-            B = Scalar(precision_type(int_value))
-
-            # ==(B, C)
-            @test B == value_type(int_value)
-            @test value_type(int_value) == B
-
-            # !=(x,y)
-            @test B != value_type(2 * int_value)
-            @test value_type(2 * int_value) != B
-        end
-
-        # Bool
-        B = Scalar(precision_type(true))
-        @test B == 1
-        @test 1 == B
-        @test B != 0
-        @test 0 != B
-
-        B = Scalar(precision_type(false))
-        @test B == 0
-        @test 0 == B
-        @test B != 1
-        @test 1 != B
-    end
-end
-
-@testset "Scalar: ≈(B, C)" begin
-    # Preparations
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    # B::Scalar, C::Scalar
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Scalar(precision_type1(test_value))
-            C = Scalar(precision_type2(test_value))
-            @test B ≈ C
-        end
-    end
-
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
-    for precision_type in subtypes(AbstractFloat)
-        converted_value = precision_type(test_value)
-        B = Scalar(converted_value)
-        @test B ≈ converted_value
-        @test converted_value ≈ B
-    end
-end
+# ------ Unary operations
 
 @testset "Scalar: -(B)" begin
     # Preparations
@@ -239,6 +120,8 @@ end
         @test reciprocal(B) === Zero{precision_type}()
     end
 end
+
+# ------ Binary operations
 
 @testset "Scalar: +(B, C)" begin
     # --- Preparations
@@ -691,6 +574,33 @@ end
     @test (C < B) == C_contractl_B
 end
 
+@testset "Scalar: dual(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    B = Scalar(test_value_1)
+
+    # B::Scalar, C::Scalar
+    C = Scalar(test_value_2)
+    B_dual_C = dual(B, C)
+    expected_result = test_value_1
+    @test B_dual_C isa Scalar
+    @test B_dual_C == expected_result
+
+    # B::Scalar, C::Real
+    C = test_value_2
+    B_dual_C = dual(B, C)
+    expected_result = test_value_1
+    @test B_dual_C isa Scalar
+    @test B_dual_C == expected_result
+end
+
 @testset "Scalar: proj(B, C)" begin
     # --- Preparations
 
@@ -771,29 +681,149 @@ end
     @test proj(B, C, return_blade=false) == value(B)
 end
 
-@testset "Scalar: dual(B, C)" begin
-    # --- Preparations
+# ------ Comparison operators
 
-    # Test values
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+@testset "Scalar: ==(B, C)" begin
+    # Preparations
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    B = Scalar(test_value_1)
+    float64_or_bigfloat = (Float64, BigFloat)
 
     # B::Scalar, C::Scalar
-    C = Scalar(test_value_2)
-    B_dual_C = dual(B, C)
-    expected_result = test_value_1
-    @test B_dual_C isa Scalar
-    @test B_dual_C == expected_result
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            # ==(B, C)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
+            if precision_type1 == precision_type2
+                @test B == C
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B == C
+            else
+                @test B != C
+            end
+
+            # value(B) != value(C)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(2 * test_value))
+            @test B != C
+        end
+    end
 
     # B::Scalar, C::Real
-    C = test_value_2
-    B_dual_C = dual(B, C)
-    expected_result = test_value_1
-    @test B_dual_C isa Scalar
-    @test B_dual_C == expected_result
+    # B::Real, C::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        # B::Scalar, C::AbstractFloat
+        # B::AbstractFloat, C::Scalar
+        for value_type in subtypes(AbstractFloat)
+            B = Scalar(precision_type(test_value))
+
+            # ==(B, C)
+            if precision_type == value_type
+                @test B == value_type(test_value)
+                @test value_type(test_value) == B
+            elseif precision_type in float64_or_bigfloat &&
+                   value_type in float64_or_bigfloat
+                @test B == value_type(test_value)
+                @test value_type(test_value) == B
+            else
+                @test B != value_type(test_value)
+                @test value_type(test_value) != B
+            end
+
+            # !=(x,y)
+            @test B != value_type(2 * test_value)
+            @test value_type(2 * test_value) != B
+        end
+
+        # B::Scalar, C::Integer
+        # B::Integer, C::Scalar
+        int_value::Int = 3
+        for value_type in subtypes(Signed)
+            B = Scalar(precision_type(int_value))
+
+            # ==(B, C)
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
+
+            # !=(x,y)
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
+        end
+
+        for value_type in subtypes(Unsigned)
+            B = Scalar(precision_type(int_value))
+
+            # ==(B, C)
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
+
+            # !=(x,y)
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
+        end
+
+        # Bool
+        B = Scalar(precision_type(true))
+        @test B == 1
+        @test 1 == B
+        @test B != 0
+        @test 0 != B
+
+        B = Scalar(precision_type(false))
+        @test B == 0
+        @test 0 == B
+        @test B != 1
+        @test 1 != B
+    end
+end
+
+@testset "Scalar: ≈(B, C)" begin
+    # Preparations
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # B::Scalar, C::Scalar
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
+            @test B ≈ C
+        end
+    end
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(test_value)
+        B = Scalar(converted_value)
+        @test B ≈ converted_value
+        @test converted_value ≈ B
+    end
+end
+
+# ------ Utility methods
+
+@testset "Scalar: convert(S)" begin
+    # Preparations
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # Exercise functionality and check results
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            converted_test_value = precision_type_src(test_value)
+            S = Scalar{precision_type_src}(converted_test_value)
+            S_converted = convert(AbstractScalar{precision_type_converted}, S)
+            @test S_converted isa Scalar{precision_type_converted}
+            if precision_type_src == precision_type_converted
+                @test S_converted === S
+            else
+                @test S_converted !== S
+                @test S_converted ≈ S
+            end
+        end
+    end
 end

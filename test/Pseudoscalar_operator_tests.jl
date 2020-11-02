@@ -1,5 +1,5 @@
 """
-Operator unit tests for Pseudoscalar type.
+Unit tests for methods defined for the Pseudoscalar type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -20,84 +20,7 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "Pseudoscalar: ==(B, C)" begin
-    # Preparations
-    dim = 10
-
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    float64_or_bigfloat = (Float64, BigFloat)
-
-    # dim(B) == dim(C), value(B) == value(C)
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Pseudoscalar(dim, precision_type1(test_value))
-            C = Pseudoscalar(dim, precision_type2(test_value))
-            if precision_type1 == precision_type2
-                @test B == C
-            elseif precision_type1 in float64_or_bigfloat &&
-                   precision_type2 in float64_or_bigfloat
-                @test B == C
-            else
-                @test B != C
-            end
-        end
-    end
-
-    # dim(B) != dim(C), value(B) == value(C)
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Pseudoscalar(dim, precision_type1(test_value))
-            C = Pseudoscalar(dim + 1, precision_type2(test_value))
-            @test B != C
-        end
-    end
-
-    # dim(B) == dim(C), value(B) != value(C)
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Pseudoscalar(dim, precision_type1(test_value))
-            C = Pseudoscalar(dim, precision_type2(test_value) + 1)
-            @test B != C
-        end
-    end
-end
-
-@testset "Pseudoscalar: ≈(B, C)" begin
-    # Preparations
-    dim = 10
-
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    # dim(B) == dim(C), value(B) == value(C)
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Pseudoscalar(dim, precision_type1(test_value))
-            C = Pseudoscalar(dim, precision_type2(test_value))
-            @test B ≈ C
-        end
-    end
-
-    # dim(B) != dim(C), value(B) == value(C)
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Pseudoscalar(dim, precision_type1(test_value))
-            C = Pseudoscalar(dim + 1, precision_type2(test_value))
-            @test B ≉ C
-        end
-    end
-
-    # dim(B) == dim(C), value(B) != value(C)
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Pseudoscalar(dim, precision_type1(test_value))
-            C = Pseudoscalar(dim, precision_type2(test_value) + 1)
-            @test B ≉ C
-        end
-    end
-end
+# ------ Unary operations
 
 @testset "Pseudoscalar: -(B)" begin
     # Preparations
@@ -185,6 +108,8 @@ end
         end
     end
 end
+
+# ------ Binary operations
 
 @testset "Pseudoscalar: +(B, C)" begin
     # --- Preparations
@@ -616,5 +541,117 @@ end
         B = Pseudoscalar(dim_B, test_value_1)
         expected_result = zero(B)
         @test dual(B, C) == expected_result
+    end
+end
+
+# ------ Comparison operations
+
+@testset "Pseudoscalar: ==(B, C)" begin
+    # Preparations
+    dim = 10
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # dim(B) == dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value))
+            if precision_type1 == precision_type2
+                @test B == C
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B == C
+            else
+                @test B != C
+            end
+        end
+    end
+
+    # dim(B) != dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim + 1, precision_type2(test_value))
+            @test B != C
+        end
+    end
+
+    # dim(B) == dim(C), value(B) != value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value) + 1)
+            @test B != C
+        end
+    end
+end
+
+@testset "Pseudoscalar: ≈(B, C)" begin
+    # Preparations
+    dim = 10
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # dim(B) == dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value))
+            @test B ≈ C
+        end
+    end
+
+    # dim(B) != dim(C), value(B) == value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim + 1, precision_type2(test_value))
+            @test B ≉ C
+        end
+    end
+
+    # dim(B) == dim(C), value(B) != value(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Pseudoscalar(dim, precision_type1(test_value))
+            C = Pseudoscalar(dim, precision_type2(test_value) + 1)
+            @test B ≉ C
+        end
+    end
+end
+
+# ------ Utility methods
+
+@testset "Pseudoscalar: convert(B)" begin
+    # Preparations
+    test_dim = 10
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # Tests
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            # Preparations
+            converted_test_value = precision_type_src(test_value)
+            B = Pseudoscalar{precision_type_src}(test_dim, converted_test_value)
+
+            # Exercise functionality and check results
+            B_converted = convert(Pseudoscalar{precision_type_converted}, B)
+
+            @test B_converted isa Pseudoscalar{precision_type_converted}
+
+            if precision_type_src == precision_type_converted
+                @test B_converted === B
+            else
+                @test B_converted !== B
+                @test B_converted ≈ B
+            end
+        end
     end
 end

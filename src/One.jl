@@ -1,5 +1,5 @@
 """
-One.jl defines the One type and basic functions
+One.jl defines the One type and core methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -14,7 +14,7 @@ except according to the terms contained in the LICENSE file.
 # Types
 export One
 
-# Methods
+# Functions
 import Base.one
 
 # --- Type definitions
@@ -33,7 +33,20 @@ Alias for a One{Float64}().
 """
 One() = One{Float64}()
 
-# --- Basic functions
+# --- Method definitions for AbstractScalar interface functions
+
+"""
+    value(B::One)
+
+Return 1 (with the same precision of `B`).
+"""
+value(B::One{T}) where {T<:AbstractFloat} = T(1)
+
+# --- Method definitions for AbstractBlade interface functions
+
+reciprocal(B::One) = B
+
+# --- Utility methods
 
 """
     one(M::AbstractMultivector)
@@ -43,12 +56,3 @@ Return the multiplicative identity 1.
 """
 one(M::AbstractMultivector) = One{typeof(norm(M))}()
 one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = One{T}()
-
-# --- AbstractScalar interface functions for One
-
-"""
-    value(B::One)
-
-Return 1 (with the same precision of `B`).
-"""
-value(B::One{T}) where {T<:AbstractFloat} = T(1)

@@ -1,5 +1,5 @@
 """
-Blade.jl defines the Blade type and basic functions
+Blade.jl defines the Blade type and core methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -14,13 +14,10 @@ except according to the terms contained in the LICENSE file.
 # Types
 export Blade
 
-# Utility methods
-export blade_atol
-
-# --- Types
+# --- Type definitions
 
 import LinearAlgebra
-using LinearAlgebra: det, diag, qr
+using LinearAlgebra: det, diag, dot, qr
 
 """
     struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
@@ -349,7 +346,7 @@ Convenience constructors that return a Scalar with value `x`.
 Blade(x::Real) = Scalar(x)
 Blade(x::AbstractScalar) = Scalar(value(x))
 
-# --- AbstractBlade interface functions for Blade type
+# --- Method definitions for AbstractMultivector interface functions
 
 """
     dim(B::AbstractBlade)::Integer
@@ -357,6 +354,46 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 Return dimension of space that `B` is embedded in.
 """
 dim(B::Blade) = B.dim
+
+-(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
+
+Base.reverse(B::Blade) =
+    mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
+
+function dual(B::Blade)
+    # --- Extend basis(B) to an orthonormal basis for entire space.
+
+    F = qr(basis(B))
+
+    # --- Compute volume of dual
+
+    # Account for orientation of Q relative to orientation of I formed from
+    # standard basis
+    dual_volume = volume(B) * sign(det(F.Q))
+
+    # Account for orientation of first grade(B) columns of Q relative to
+    # orientation of basis(B)
+    if prod(diag(F.R)) < 0
+        dual_volume = -dual_volume
+    end
+
+    # Account for sign of I^{-1} relative to I
+    if mod(dim(B), 4) >= 2
+        dual_volume = -dual_volume
+    end
+
+    # Account for reversals required to eliminate B
+    if mod(grade(B), 4) >= 2
+        dual_volume = -dual_volume
+    end
+
+    Blade{typeof(volume(B))}(dim(B), dim(B) - grade(B),
+                             F.Q[:, grade(B) + 1:end], dual_volume,
+                             enforce_constraints=false,
+                             copy_basis=false)
+end
+
+# --- Method definitions for AbstractBlade interface functions
 
 """
     grade(B::AbstractBlade)::Integer
@@ -381,7 +418,39 @@ blade relative to its unit basis.
 """
 volume(B::Blade) = B.volume
 
-# --- Utility functions
+reciprocal(B::Blade) =
+    mod(grade(B), 4) < 2 ?
+        Blade(B, volume=1 / volume(B), copy_basis=false) :
+        Blade(B, volume=-1 / volume(B), copy_basis=false)
+
+# --- Comparison methods
+
+==(B::AbstractBlade, C::AbstractBlade) =
+    dim(B) == dim(C) && grade(B) == grade(C) &&
+    volume(B) == volume(C) && basis(B) == basis(C)
+
+function isapprox(B::Blade{T1}, C::Blade{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat}
+    # Check dim, grade, and norm are equal
+    if dim(B) != dim(C) || grade(B) != grade(C) ||
+        !isapprox(norm(B), norm(C), atol=atol, rtol=rtol)
+
+        return false
+    end
+
+    # Check that B and C represent the same space
+    projection = det(transpose(basis(B)) * basis(C))
+    if ≉(abs(projection), 1, atol=atol, rtol=rtol)
+        return false
+    end
+
+    # Check that B and C have the same orientation
+    return sign(B) * sign(C) == sign(projection)
+end
+
+# --- Utility methods
 
 """
     convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
@@ -391,6 +460,8 @@ Convert Blade to have the floating-point precision of type `T`.
 convert(::Type{S}, B::Blade) where {T<:AbstractFloat,
                                     S<:AbstractMultivector{T}} =
     T == typeof(volume(B)) ? B : Blade{T}(B)
+
+# --- Non-exported utility functions
 
 #=
  TODO: review numerical error in factorizations to see if a different

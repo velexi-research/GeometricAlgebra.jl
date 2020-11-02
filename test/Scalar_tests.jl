@@ -369,25 +369,3 @@ end
         @test value(S) == precision_type(-Inf)
     end
 end
-
-@testset "Scalar: convert(S)" begin
-    # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
-
-    # Exercise functionality and check results
-    for precision_type_converted in subtypes(AbstractFloat)
-        for precision_type_src in subtypes(AbstractFloat)
-            converted_test_value = precision_type_src(test_value)
-            S = Scalar{precision_type_src}(converted_test_value)
-            S_converted = convert(AbstractScalar{precision_type_converted}, S)
-            @test S_converted isa Scalar{precision_type_converted}
-            if precision_type_src == precision_type_converted
-                @test S_converted === S
-            else
-                @test S_converted !== S
-                @test S_converted ≈ S
-            end
-        end
-    end
-end

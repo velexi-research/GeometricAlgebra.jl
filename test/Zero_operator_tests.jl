@@ -1,5 +1,5 @@
 """
-Operator unit tests for Zero type.
+Unit tests for methods defined for the Zero type.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -19,6 +19,8 @@ using Test
 using GeometricAlgebra
 
 # --- Tests
+
+# ------ Unary operations
 
 @testset "Zero: -(B)" begin
     for precision_type in subtypes(AbstractFloat)
@@ -50,6 +52,8 @@ end
         @test reciprocal_B == Scalar{precision_type}(Inf)
     end
 end
+
+# ------ Binary operations
 
 @testset "Zero: +(B, C)" begin
     # --- Preparations
@@ -280,50 +284,6 @@ end
     @test (C < B) === C_contractl_B
 end
 
-@testset "Zero: proj(B, C)" begin
-    # --- Preparations
-
-    # Test values
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
-
-    # --- Tests
-
-    # B::Zero, C::Zero
-    B = Zero()
-    C = Zero()
-
-    B_proj_C = proj(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    # B::Zero, C::Real
-    # B::Real, C::Zero
-    B = Zero()
-    C = test_value
-
-    B_proj_C = proj(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = proj(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
-
-    # B::Zero, C::Vector
-    # B::Vector, C::Zero
-    B = Zero()
-    C = Vector(rand(10))
-
-    B_proj_C = proj(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = proj(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
-end
-
 @testset "Zero: dual(B::Zero, C)" begin
     # --- Preparations
 
@@ -390,4 +350,60 @@ end
     # B::Pseudoscalar
     B = Pseudoscalar(5, test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
+end
+
+@testset "Zero: proj(B, C)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # B::Zero, C::Zero
+    B = Zero()
+    C = Zero()
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+
+    # B::Zero, C::Real
+    # B::Real, C::Zero
+    B = Zero()
+    C = test_value
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+
+    C_proj_B = proj(C, B)
+    expected_result = Zero()
+    @test C_proj_B === expected_result
+
+    # B::Zero, C::Vector
+    # B::Vector, C::Zero
+    B = Zero()
+    C = Vector(rand(10))
+
+    B_proj_C = proj(B, C)
+    expected_result = Zero()
+    @test B_proj_C === expected_result
+
+    C_proj_B = proj(C, B)
+    expected_result = Zero()
+    @test C_proj_B === expected_result
+end
+
+# ------ Utility operations
+
+@testset "Zero: convert(B)" begin
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            B = Zero{precision_type_src}()
+            B_converted = convert(AbstractScalar{precision_type_converted}, B)
+            @test B_converted isa Zero{precision_type_converted}
+        end
+    end
 end

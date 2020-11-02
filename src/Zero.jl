@@ -1,5 +1,5 @@
 """
-Zero.jl defines the Zero type and basic functions
+Zero.jl defines the Zero type and core methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -14,7 +14,7 @@ except according to the terms contained in the LICENSE file.
 # Types
 export Zero
 
-# Methods
+# Functions
 import Base.zero
 
 # --- Type definitions
@@ -33,7 +33,22 @@ Alias for a Zero{Float64}().
 """
 Zero() = Zero{Float64}()
 
-# --- Basic functions
+# --- Method definitions for AbstractScalar interface functions
+
+"""
+    value(B::Zero)
+
+Return 0 (with the same precision of `B`).
+"""
+value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
+
+# --- Method definitions for AbstractMultivector interface functions
+
+-(B::Zero) = B
+
+dual(B::Zero; dim::Union{Integer, Nothing}=nothing) = dual_of_zero()
+
+# --- Utility methods
 
 """
     zero(M::AbstractMultivector)
@@ -43,12 +58,3 @@ Return the additive identity 0.
 """
 zero(M::AbstractMultivector) = Zero{typeof(norm(M))}()
 zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Zero{T}()
-
-# --- AbstractScalar interface functions for Zero
-
-"""
-    value(B::Zero)
-
-Return 0 (with the same precision of `B`).
-"""
-value(B::Zero{T}) where {T<:AbstractFloat} = T(0)

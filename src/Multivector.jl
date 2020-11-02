@@ -1,5 +1,5 @@
 """
-The multivector.jl submodule defines Multivector types.
+Multivector.jl defines the Multivector type and interface
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -11,7 +11,8 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-# Types
+# ------ Types
+
 export Multivector
 
 # --- Type definitions
@@ -122,9 +123,7 @@ Multivector(multivectors::Vector{<:AbstractMultivector}) =
         Multivector(reduce(vcat, map(blades, multivectors))) :
         Multivector{Float64}(Vector{AbstractBlade}())
 
-
-
-# --- AbstractMultivector interface functions for Multivector type
+# --- Method definitions for AbstractMultivector interface functions
 
 """
     grades(M::Multivector; collect=true)
@@ -145,6 +144,13 @@ Return the blades that the multivector `M` is composed of.
 blades(M::Multivector) = reduce(vcat, values(M.parts))
 
 """
+    norm(M::Multivector)
+
+Return the norm of the multivector `M`.
+"""
+norm(M::Multivector) = M.norm
+
+"""
     getindex(M::Multivector, k::Int)
 
 Return the `k`-vector component of multivector `M`.
@@ -152,12 +158,7 @@ Return the `k`-vector component of multivector `M`.
 Base.getindex(M::Multivector, k::Int) =
     k in grades(M) ?  M.parts[k] : Vector{AbstractBlade}()
 
-"""
-    norm(M::Multivector)
-
-Return the norm of the multivector `M`.
-"""
-norm(M::Multivector) = M.norm
+# --- Utility methods
 
 """
     convert(::Type{S}, M::Multivector) where {T<:AbstractFloat,

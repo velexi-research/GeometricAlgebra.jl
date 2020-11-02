@@ -11,7 +11,6 @@ except according to the terms contained in the LICENSE file.
 """
 module GeometricAlgebra
 
-
 # --- Submodules
 
 # Types
@@ -25,16 +24,7 @@ include("Blade.jl")
 include("Pseudoscalar.jl")
 include("Multivector.jl")
 
-# Operators
-include("AbstractMultivector_operators.jl")
-include("AbstractBlade_operators.jl")
-include("AbstractScalar_operators.jl")
-include("Zero_operators.jl")
-include("One_operators.jl")
-include("Scalar_operators.jl")
-include("Blade_operators.jl")
-include("Blade_operators_mgs.jl")
-include("Pseudoscalar_operators.jl")
-include("Multivector_operators.jl")
+# Methods
+include("operations.jl")
 
 end  # End of GeometricAlgebra.jl module

@@ -1,5 +1,5 @@
 """
-Pseudoscalar.jl defines the Pseudoscalar type and basic functions
+Pseudoscalar.jl defines the Pseudoscalar type and core methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -76,18 +76,23 @@ Copy constructor. Construct a Pseudoscalar representing the same space as
 Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
     Pseudoscalar{typeof(B.value)}(dim(B), value)
 
-# --- AbstractMultivector interface functions for Pseudoscalar type
+# --- Method definitions
 
 """
-    dim(B::Pseudoscalar)
+    value(B::Pseudoscalar)::Real
 
-Return dimension of space that `B` is embedded in.
+Return the value of `B`.
 """
-dim(B::Pseudoscalar) = B.dim
+value(B::Pseudoscalar) = B.value
 
-# --- AbstractBlade interface functions for Pseudoscalar type
+# --- Method definitions for AbstractBlade interface functions
 
 import LinearAlgebra.I
+
+reciprocal(B::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?
+        Pseudoscalar(B, value=1 / value(B)) :
+        Pseudoscalar(B, value=-1 / value(B))
 
 """
     grade(B::Pseudoscalar)
@@ -110,16 +115,34 @@ Return the value of `B`.
 """
 volume(B::Pseudoscalar) = value(B)
 
-# --- Pseudoscalar functions
+# --- Method definitions for AbstractMultivector interface functions
 
 """
-    value(B::Pseudoscalar)::Real
+    dim(B::Pseudoscalar)
 
-Return the value of `B`.
+Return dimension of space that `B` is embedded in.
 """
-value(B::Pseudoscalar) = B.value
+dim(B::Pseudoscalar) = B.dim
 
-# --- Utility functions
+-(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
+
+Base.reverse(B::Pseudoscalar) =
+    mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
+
+dual(B::Pseudoscalar) = Scalar(value(B))
+
+# --- Comparison methods
+
+==(B::Pseudoscalar, C::Pseudoscalar) =
+    (dim(B) == dim(C)) && (value(B) == value(C))
+
+isapprox(B::Pseudoscalar{T1}, C::Pseudoscalar{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    (dim(B) == dim(C)) && isapprox(value(B), value(C), atol=atol, rtol=rtol)
+
+# --- Utility methods
 
 """
     convert(::Type{S}, B::Pseudoscalar)

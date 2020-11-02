@@ -1,5 +1,5 @@
 """
-AbstractMultivector.jl defines the AbstractMultivector type and basic functions
+AbstractMultivector.jl defines the AbstractMultivector type and interface
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -11,31 +11,23 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-# Types
+# ------ Types
+
 export AbstractMultivector
 
-# Function
-export dim, grades, blades
+# ------ Functions
+
+# Attributes
 import Base.getindex
 import LinearAlgebra.norm
-export norm
+export dim, blades, grades, norm
 
-# Comparison operators
-import Base.:(==), Base.:(≈)
+# Unary operations
+import Base.:(-), Base.reverse
+export dual
 
-# Unary operators
-import Base.:(-)
-export reverse, dual
-
-# Binary operators
-import Base.:(+), Base.:(-), Base.:(*), Base.:(/)
-export wedge, contractl, proj, dual
-
-# Operator aliases
-export ∧
-import LinearAlgebra.dot
-export dot
-import Base.:(<)
+# Comparison operations
+import Base.:(==), import Base.isapprox
 
 # Utility functions
 import Base.convert
@@ -48,38 +40,46 @@ import Base.convert
 Supertype for all multivector types.
 
 Interface
----------
+=========
 
-Note: the return value of all methods should preserve the precision of the
-AbstractMultivector instance (when possible).
+Note: the return value of all methods should preserve the precision of its
+AbstractMultivector arguments (when possible).
+
+Functions
+---------
 
 ### Attributes
 
     dim(M::AbstractMultivector)::Int
+
     grades(M::AbstractMultivector)::Vector{Int}
+
     blades(M::AbstractMultivector)::Vector{<:AbstractBlade}
+
     norm(M::AbstractMultivector{T})::T where {T<:AbstractFloat}
 
-### Unary Operators
+    getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
+
+### Unary Operations
 
     -(M::AbstractMultivector)::AbstractMultivector
+
     reverse(M::AbstractMultivector)::AbstractMultivector
 
-### Binary Operators
+    dual(M::AbstractMultivector)::AbstractMultivector
+
+### Binary Operations
 
     +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
     -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
     *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
     /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
     wedge(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
     ∧(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-
-    dot(M::AbstractMultivector, N::AbstractMultivector;
-        left=true)::AbstractMultivector
-    ⋅(M::AbstractMultivector, N::AbstractMultivector;
-        left=true)::AbstractMultivector
 
     contractl(M::AbstractMultivector,
               N::AbstractMultivector)::AbstractMultivector
@@ -89,17 +89,127 @@ AbstractMultivector instance (when possible).
               N::AbstractMultivector)::AbstractMultivector
     >(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-### Functions
+    dot(M::AbstractMultivector, N::AbstractMultivector;
+        left=true)::AbstractMultivector
+    ⋅(M::AbstractMultivector, N::AbstractMultivector;
+        left=true)::AbstractMultivector
 
-    dual(M::AbstractMultivector)::AbstractMultivector
-    dual(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
     proj(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
 
-    getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
+### Comparison functions
+
+    ==(M::AbstractMultivector, N::AbstractMultivector)::Bool
+
+    isapprox(M::AbstractMultivector, N::AbstractMultivector)::Bool
+    ≈(M::AbstractMultivector, N::AbstractMultivector)::Bool
+
+### Utility functions
+
+    convert(::Type{T}, M::AbstractMultivector)
+        where {T<:AbstractMultivector{<:AbstractFloat}}
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
 
-# --- Utility functions
+# --- Method definitions
+#
+# Note: the following method definitions are no-op place holders to provide
+#       a central location for docstrings.
+#
+
+"""
+    dim(M)
+
+TODO
+"""
+dim(M::AbstractMultivector) = nothing
+
+"""
+    blades(M)
+
+TODO
+"""
+blades(M::AbstractMultivector) = nothing
+
+"""
+    grades(M)
+
+TODO
+"""
+grades(M::AbstractMultivector) = nothing
+
+"""
+    norm(M)
+
+TODO
+"""
+norm(M::AbstractMultivector) = nothing
+
+"""
+    getindex(M)
+
+TODO
+"""
+Base.getindex(M::AbstractMultivector) = nothing
+
+"""
+    -(M)
+
+Compute the additive inverse of a multivector `M`.
+"""
+-(M::AbstractMultivector) = nothing
+
+"""
+    reverse(M)
+
+Compute the reverse of a multivector `M`.
+"""
+reverse(M::AbstractMultivector) = nothing
+
+"""
+    dual(M)
+
+Compute the dual of a multivector `M` (relative to the space that the
+geometric algebra is extended from).
+
+TODO: find better choice of words than "extended from"
+"""
+dual(M::AbstractMultivector) = nothing
+
+# --- Comparison methods
+
+"""
+    ==(M::AbstractMultivector, N::AbstractMultivector)
+
+Return true if `M` and `N` are equal; otherwise, return false.
+"""
+==(M::AbstractMultivector, N::AbstractMultivector) = false
+
+"""
+    isapprox(M::AbstractMultivector, N::AbstractMultivector)
+    ≈(M::AbstractMultivector, N::AbstractMultivector)
+
+Return true if `M` and `N` are approximately equal; otherwise, return false.
+"""
+isapprox(M::AbstractMultivector, N::AbstractMultivector) = false
+
+# B::AbstractMultivector, x::Real
+# x::Real, B::AbstractMultivector
+isapprox(M::AbstractMultivector, x::Real) = false
+isapprox(x::Real, M::AbstractMultivector) = false
+
+# --- Utility methods
+
+"""
+    convert(::Type{T}, M::AbstractMultivector)
+        where {T<:AbstractMultivector{<:AbstractFloat}}
+
+Convert AbstractScalar to have the floating-point precision of type `T`.
+"""
+convert(::Type{T}, M::AbstractMultivector) where {S<:AbstractFloat,
+                                                  T<:AbstractMultivector{S}} =
+    nothing
+
+# --- Non-exported utility functions
 
 """
     assert_dim_equal(M, N)

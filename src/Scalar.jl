@@ -1,5 +1,5 @@
 """
-Scalar.jl defines the Scalar type and basic functions
+Scalar.jl defines the Scalar type and core methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -61,17 +61,7 @@ the precision of the Scalar.
 Scalar(value::AbstractFloat) = Scalar{typeof(value)}(value)
 Scalar(value::Integer) = Scalar(Float64(value))
 
-#= DEPRECATED
-"""
-    Scalar(B::AbstractScalar; value::Real=value(B))
-
-Copy constructor. Construct a Scalar with the same precision as `B` having the
-specified `value`.
-"""
-Scalar(B::AbstractScalar; value::Real=value(B)) = Scalar{typeof(value)}(value)
-=#
-
-# --- AbstractScalar interface functions for Scalar type
+# --- Method definitions for AbstractScalar interface functions
 
 """
     value(B::Scalar)
