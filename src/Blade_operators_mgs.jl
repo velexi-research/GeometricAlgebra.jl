@@ -23,7 +23,7 @@ except according to the terms contained in the LICENSE file.
 export wedge_mgs
 export dual_mgs
 
-# --- Binary operators from the AbstractMultivector and AbstractBlade interfaces
+# --- Binary operators
 
 using LinearAlgebra: norm
 
