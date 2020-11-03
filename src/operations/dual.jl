@@ -30,10 +30,6 @@ Notes
 """
 dual(B::AbstractBlade, C::AbstractBlade) = nothing  # TODO
 
-# --- Operations involving an AbstractBlade instance
-
-# TODO
-
 # --- Operations involving a Blade instance
 
 # B::Blade, C::Blade
