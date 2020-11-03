@@ -13,6 +13,7 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
+using LinearAlgebra: ⋅, det, diag, qr
 using Test
 
 # GeometricAlgebra.jl
@@ -55,7 +56,7 @@ using GeometricAlgebra
            -value(C) * dual(B)
 
         @test B_contractl_C ≈ expected_result
-        @test B < C == B_contractl_C
+        @test (B < C) == B_contractl_C
     end
 
     # dim(B) != dim(C)
@@ -77,13 +78,13 @@ using GeometricAlgebra
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
     C = Blade(test_basis)
     @test_throws DimensionMismatch contractl(B, C)
-    @test_throws DimensionMismatch B < C
+    @test_throws DimensionMismatch (B < C)
 
     # --- B::Blade, C::Scalar
     #     B::Scalar, B::Blade
@@ -95,12 +96,12 @@ using GeometricAlgebra
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=value(C) * volume(B))
     @test C_contractl_B ≈ expected_result
-    @test C < B == C_contractl_B
+    @test (C < B) == C_contractl_B
 
     # grade(C) > 1
     B = Blade(test_basis)
@@ -109,12 +110,12 @@ using GeometricAlgebra
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=value(C) * volume(B))
     @test C_contractl_B ≈ expected_result
-    @test C < B == C_contractl_B
+    @test (C < B) == C_contractl_B
 
     # --- B::Blade, C::Real
     #     C::Real, B::Blade
@@ -126,12 +127,12 @@ using GeometricAlgebra
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=C * volume(B))
     @test C_contractl_B ≈ expected_result
-    @test C < B == C_contractl_B
+    @test (C < B) == C_contractl_B
 
     # grade(B) > 1
     B = Blade(test_basis)
@@ -140,12 +141,12 @@ using GeometricAlgebra
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=C * volume(B))
     @test C_contractl_B ≈ expected_result
-    @test C < B == C_contractl_B
+    @test (C < B) == C_contractl_B
 
     # --- v::Vector, B::Blade
     #     B::Blade, v::Vector
@@ -156,15 +157,15 @@ using GeometricAlgebra
     test_vector_B = rand(test_dim)
     B = Blade(test_vector_B)
 
-    expected_result = LinearAlgebra.contractl(test_vector, test_vector_B)
+    expected_result = test_vector ⋅ test_vector_B
 
     B_contractl_v = contractl(B, v)
     @test B_contractl_v ≈ expected_result
-    @test B < v == B_contractl_v
+    @test (B < v) == B_contractl_v
 
     v_contractl_B = contractl(v, B)
     @test v_contractl_B ≈ expected_result
-    @test v < B == v_contractl_B
+    @test (v < B) == v_contractl_B
 
     # length(v) != dim(B)
     v = test_vector
@@ -182,12 +183,12 @@ using GeometricAlgebra
         v_contractl_B = contractl(v, B)
         expected_result = contractl(Blade(v), B)
         @test v_contractl_B ≈ expected_result
-        @test v < B == v_contractl_B
+        @test (v < B) == v_contractl_B
 
         B_contractl_v = contractl(B, v)
         expected_result = zero(B)
         @test B_contractl_v == expected_result
-        @test B < v == B_contractl_v
+        @test (B < v) == B_contractl_v
     end
 
     # length(v) != dim(B)
@@ -221,13 +222,11 @@ end
     B = Blade(test_vector_1)
     C = Blade(test_vector_2)
 
-    expected_result =
-        Scalar(LinearAlgebra.contractl(basis(B), basis(C)) *
-               volume(B) * volume(C))
+    expected_result = Scalar((basis(B) ⋅ basis(C)) * volume(B) * volume(C))
 
     B_contractl_C = contractl(B, C)
     @test B_contractl_C ≈ expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # grade(B) == 1, grade(C) > 1
     B = Blade(test_vector_1)
@@ -235,17 +234,17 @@ end
     for test_grade in 5:8
         C = Blade(test_basis_2)
 
-        F = LinearAlgebra.qr(test_basis_2)
+        F = qr(test_basis_2)
         Q = Matrix(F.Q)
         projection = Blade(Q * transpose(Q) * test_vector_1)
-        expected_volume_C = prod(LinearAlgebra.diag(F.R))
+        expected_volume_C = prod(diag(F.R))
         expected_result = mod(grade(C), 4) < 2 ?
             expected_volume_C * dual(projection, C) :
            -expected_volume_C * dual(projection, C)
 
         B_contractl_C = contractl(B, C)
         @test B_contractl_C ≈ expected_result
-        @test B < C == B_contractl_C
+        @test (B < C) == B_contractl_C
     end
 
     # grade(B) > 1, grade(C) == 1
@@ -255,19 +254,19 @@ end
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test contractl(B, C) == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # grade(B) == grade(C) > 1
     for test_grade in 5:8
         B = Blade(rand(test_dim, test_grade))
         C = Blade(rand(test_dim, test_grade))
 
-        expected_result = volume(B) * volume(C) *
-            LinearAlgebra.det(transpose(basis(B)) * basis(C))
+        expected_result =
+            volume(B) * volume(C) * det(transpose(basis(B)) * basis(C))
 
         B_contractl_C = contractl(B, C)
         @test B_contractl_C ≈ expected_result
-        @test B < C == B_contractl_C
+        @test (B < C) == B_contractl_C
     end
 
     # grade(B) < grade(C), grade(B) > 1, grade(C) > 1,
@@ -277,17 +276,17 @@ end
         test_basis_C = rand(test_dim, test_grade)
         C = Blade(test_basis_C)
 
-        F = LinearAlgebra.qr(test_basis_C)
+        F = qr(test_basis_C)
         Q = Matrix(F.Q)
         projection = Blade(Q * transpose(Q) * test_basis_1)
-        expected_volume_C = prod(LinearAlgebra.diag(F.R))
+        expected_volume_C = prod(diag(F.R))
         expected_result = mod(grade(C), 4) < 2 ?
             expected_volume_C * dual(projection, C) :
            -expected_volume_C * dual(projection, C)
 
         B_contractl_C = contractl(B, C)
         @test B_contractl_C ≈ expected_result
-        @test B < C == B_contractl_C
+        @test (B < C) == B_contractl_C
     end
 
     # grade(B) > grade(C), grade(B) > 1, grade(C) > 1,
@@ -297,7 +296,7 @@ end
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # dim(B) != dim(C)
     B = Blade(rand(test_dim, 3))
@@ -353,7 +352,7 @@ end
     B_contractl_C = contractl(B, C)
     expected_result = Pseudoscalar(test_dim, value(B) * value(C))
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # --- B::Pseudoscalar, C::Scalar
 
@@ -363,7 +362,7 @@ end
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     # --- B::Pseudoscalar, C::Real
     #     C::Pseudoscalar, B::Real
@@ -374,12 +373,12 @@ end
     B_contractl_C = contractl(B, C)
     expected_result = zero(B)
     @test B_contractl_C == expected_result
-    @test B < C == B_contractl_C
+    @test (B < C) == B_contractl_C
 
     C_contractl_B = contractl(C, B)
     expected_result = Pseudoscalar(test_dim, C * value(B))
     @test C_contractl_B == expected_result
-    @test C < B == C_contractl_B
+    @test (C < B) == C_contractl_B
 
     # --- B::Pseudoscalar, v::Vector
     #     v::Vector, B::Pseudoscalar
@@ -392,17 +391,17 @@ end
         v_contractl_B = contractl(v, B)
         expected_result = contractl(Blade(v), B)
         @test v_contractl_B ≈ expected_result
-        @test v < B == v_contractl_B
+        @test (v < B) == v_contractl_B
 
         B_contractl_v = contractl(B, v)
         expected_result = zero(B)
-        @test B_contractl_v == expected_result
-        @test B < v == B_contractl_v
+        @test B_contractl_v === expected_result
+        @test (B < v) == B_contractl_v
     end
 
     # dim(v) != dim(B)
     B = Pseudoscalar(test_dim + 1, test_value_1)
-    v = test_vector
+    v = rand(test_dim)
 
     @test_throws DimensionMismatch contractl(v, B)
     @test_throws DimensionMismatch v < B
@@ -484,7 +483,7 @@ end
     #     v::Vector, B::Scalar
 
     B = Scalar(test_value_1)
-    v = test_vector
+    v = rand(5)
 
     v_contractl_B = contractl(v, B)
     expected_result = zero(B)
@@ -492,8 +491,8 @@ end
     @test (v < B) == v_contractl_B
 
     B_contractl_v = contractl(B, v)
-    expected_result = Blade(v, volume=norm(v) * test_value)
-    @test B_contractl_v == expected_result
+    expected_result = Blade(v, volume=norm(v) * test_value_1)
+    @test B_contractl_v ≈ expected_result
     @test (B < v) == B_contractl_v
 end
 

@@ -21,6 +21,9 @@ import Base.:(<)
 <(M::AbstractMultivector, x::Real) = contractl(M, x)
 <(x::Real, M::AbstractMultivector) = contractl(x, M)
 
+<(M::AbstractMultivector, v::Vector{<:Real}) = contractl(M, v)
+<(v::Vector{<:Real}, M::AbstractMultivector) = contractl(v, M)
+
 # --- Method definitions
 
 """
@@ -66,12 +69,17 @@ contractl(x::Real, M::AbstractMultivector) = x * M
 
 # --- Operations involving an AbstractBlade instance
 
-# TODO
+# B::AbstractBlade, C::AbstractScalar
+contractl(B::AbstractBlade, C::AbstractScalar) = zero(B)
+
+# B::AbstractScalar, C::AbstractBlade
+contractl(B::AbstractScalar, C::AbstractBlade) =
+    Blade(C, volume=value(B) * volume(C))
 
 # --- Operations involving a Blade instance
 
 # B::Blade, C::Blade
-function contractl(B::Blade{<:Real}, C::Blade{<:Real})
+function contractl(B::Blade, C::Blade)
     # --- Check arguments
 
     assert_dim_equal(B, C)
@@ -162,6 +170,27 @@ function contractl(B::Pseudoscalar, C::Pseudoscalar)
         Scalar(-value(B) * value(C))
 end
 
+# B::Pseudoscalar, C::AbstractScalar
+# B::AbstractScalar, B::Pseudoscalar
+contractl(B::Pseudoscalar, C::AbstractScalar) = zero(B)
+contractl(B::AbstractScalar, C::Pseudoscalar) =
+    Pseudoscalar(C, value=value(B) * value(C))
+
+# B::Pseudoscalar, v::Vector
+# v::Vector, B::Pseudoscalar
+function contractl(B::Pseudoscalar, v::Vector{<:Real})
+    assert_dim_equal(B, v)
+    zero(B)
+end
+
+function contractl(v::Vector{<:Real}, B::Pseudoscalar)
+    assert_dim_equal(B, v)
+
+    mod(grade(B), 4) < 2 ?
+        volume(B) * dual(Blade(v)) :
+       -volume(B) * dual(Blade(v))
+end
+
 # --- Operations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
@@ -178,6 +207,11 @@ contractl(B::Zero, C::AbstractScalar) = B
 # x::Real, B::AbstractScalar
 contractl(B::AbstractScalar, x::Real) = B * x
 contractl(x::Real, B::AbstractScalar) = x * B
+
+# B::AbstractScalar, v::Vector
+# v::Vector, B::AbstractScalar
+contractl(B::AbstractScalar, v::Vector{<:Real}) = Blade(value(B) * v)
+contractl(v::Vector{<:Real}, B::AbstractScalar) = zero(B)
 
 # --- Operations involving a Scalar instance
 
