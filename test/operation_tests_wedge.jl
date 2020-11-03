@@ -13,6 +13,7 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
+import LinearAlgebra
 using Test
 
 # GeometricAlgebra.jl
@@ -60,7 +61,7 @@ using GeometricAlgebra
 
     C_wedge_B = wedge(C_vector, B)
     @test C_wedge_B ≈ (-1)^(grade(B)) * expected_result
-    @test C_wedge_B == C_vector ∧ B
+    @test C_wedge_B ≈ C_vector ∧ B
 
     # dim(B) != dim(C)
     C = Vector(rand(dim(B) + 1))
@@ -308,7 +309,7 @@ end
     # B::Scalar, v::Vector
     # v::Vector, B::Scalar
     B = Scalar(test_value_1)
-    v = Vector(rand(test_dim))
+    v = Vector(rand(5))
 
     # Exercise functionality and check results
     expected_result = Blade(v, volume=LinearAlgebra.norm(v) * value(B))
