@@ -206,7 +206,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         basis = Matrix(F.Q)
 
         # Compute volume
-        volume = (volume == nothing) ? signed_norm : volume * sign(signed_norm)
+        volume = isnothing(volume) ? signed_norm : volume * sign(signed_norm)
 
         # Return new Blade
         Blade{T}(dims[1], dims[2], basis, volume,
@@ -256,7 +256,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         basis = reshape(v, length(v), 1) / norm_v
 
         # Compute volume
-        volume = (volume == nothing) ? norm_v : volume
+        volume = isnothing(volume) ? norm_v : volume
 
         # Return new Blade
         Blade{T}(length(v), 1, basis, volume, atol=atol,

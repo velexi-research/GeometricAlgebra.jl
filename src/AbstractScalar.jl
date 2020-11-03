@@ -93,7 +93,7 @@ Compute the dual of `B`. Note that the dimension of the embedding space must
 be explicitly specified.
 """
 function dual(B::AbstractScalar; dim::Union{Integer, Nothing}=nothing)
-    if dim === nothing
+    if isnothing(dim)
         error("The dual of a scalar is not well-defined if `dim` is not " *
               "specified")
     end
