@@ -17,5 +17,5 @@ using Test, TestSetExtensions
 # --- Test sets
 
 @testset ExtendedTestSet "All the tests" begin
-    @includetests
+    @includetests ARGS
 end
