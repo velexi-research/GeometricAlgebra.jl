@@ -21,15 +21,15 @@ import LinearAlgebra.dot
 
 Compute the dot product of the multivector `M` with the multivector `N`.
 """
-dot(M::AbstractMultivector, N::AbstractMultivector; left=True) =
+dot(M::AbstractMultivector, N::AbstractMultivector; left=true) =
     left ? contractl(M, N) : nothing  # TODO
 
-dot(M::AbstractMultivector, x::Real; left=True) =
+dot(M::AbstractMultivector, x::Real; left=true) =
     left ? contractl(M, x) : nothing  # TODO
-dot(x::Real, M::AbstractMultivector; left=True) =
+dot(x::Real, M::AbstractMultivector; left=true) =
     left ? contractl(x, M) : nothing  # TODO
 
-dot(M::AbstractMultivector, v::Vector{<:Real}; left=True) =
+dot(M::AbstractMultivector, v::Vector{<:Real}; left=true) =
     left ? contractl(M, v) : nothing  # TODO
-dot(v::Vector{<:Real}, M::AbstractMultivector; left=True) =
+dot(v::Vector{<:Real}, M::AbstractMultivector; left=true) =
     left ? contractl(v, M) : nothing  # TODO
