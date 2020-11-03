@@ -36,7 +36,7 @@ Compute the difference of the multivectors `M` and `N`.
 
 # B::AbstractScalar, C::Zero
 # B::Zero, C::AbstractScalar
--(B::AbstractScalar, C::Zero) = C
+-(B::AbstractScalar, C::Zero) = B
 -(B::Zero, C::AbstractScalar) = -C
 
 # B::AbstractScalar, x::Real
