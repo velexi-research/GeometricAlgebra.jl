@@ -20,6 +20,176 @@ using GeometricAlgebra
 
 # --- Tests
 
+@testset "dual(B, C): B::Blade, C::Blade" begin
+    # --- Preparations
+
+    # Dimension of embedding space
+    test_dim = 20
+
+    C = Blade(rand(test_dim, 7))
+
+    # --- Exercise functionality and check results
+
+    # ------ dim(B) == dim(C), grade(B) < grade(C)
+
+    for grade_B in 2:5
+        B_vectors = basis(C)[:, 1:grade_B] * rand(grade_B, grade_B)
+        B = Blade(B_vectors)
+
+        dual_B = dual(B, C)
+
+        # --- Check dim, grade, and norm
+
+        @test dim(dual_B) == test_dim
+        @test grade(dual_B) == grade(C) - grade_B
+        @test norm(dual_B) == norm(B)
+
+        # --- Check that B and dual(B) are orthogonal complements
+
+        @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
+            10 * eps(Float64)
+
+        # --- Check sign(dual(B, C))
+
+        # Compute sign of I_C formed from basis(B) and basis(dual(B, C))
+        sign_Q = sign(LinearAlgebra.det(
+            transpose(hcat(basis(B), basis(dual_B))) * basis(C)))
+
+        # Compute expected_sign
+        expected_sign = sign(B) * sign_Q
+
+        # Account for sign of I_C^{-1} relative to I_C
+        if mod(grade(C), 4) >= 2
+            expected_sign = -expected_sign
+        end
+
+        # Account for reversals required to eliminate B
+        if mod(grade(B), 4) >= 2
+            expected_sign = -expected_sign
+        end
+
+        @test sign(dual_B) == expected_sign
+
+        # Check dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        if mod(grade(C), 4) < 2
+            @test dual(dual_B, C) ≈ B
+        else
+            @test dual(dual_B, C) ≈ -B
+        end
+    end
+
+    # ------ dim(B) == dim(C), grade(B) == grade(C)
+
+    coefficients = rand(grade(C), grade(C))
+    B_vectors = basis(C) * coefficients
+    B = Blade(B_vectors)
+
+    relative_orientation =
+        sign(LinearAlgebra.det(transpose(basis(B)) * basis(C)))
+    expected_result = mod(grade(B), 4) < 2 ?
+        Scalar(relative_orientation * volume(B)) :
+        Scalar(-relative_orientation * volume(B))
+    @test dual(B, C) ≈ expected_result
+
+    # ------ Error cases
+
+    for grade_B in 2:5
+        # dim(B) != dim(C)
+        B = Blade(rand(test_dim + 1, grade_B))
+        @test_throws DimensionMismatch dual(B, C)
+
+        # `B` not contained in `C`
+        B = Blade(rand(test_dim, grade_B))
+        while LinearAlgebra.norm(rejection(basis(B), C)) < sqrt(eps(Float64))
+            B = Blade(rand(test_dim, grade_B))
+        end
+        @test_throws ErrorException dual(B, C)
+    end
+end
+
+@testset "dual(B, C): B or C isa Blade" begin
+    # --- Preparations
+
+    # Dimension of embedding space
+    test_dim = 10
+
+    # Test values
+    test_value_1 = rand()
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+
+    test_value_2 = rand()
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # --- B::Blade, C::Pseudoscalar
+    #     B::Pseudoscalar, C::Blade
+
+    # dim(B) == dim(C)
+    for grade_B in 2:5
+        B = Blade(rand(test_dim, grade_B))
+        C = Pseudoscalar(test_dim, test_value_1)
+
+        dual_B = dual(B, C)
+        expected_result = dual(B)
+        @test dual_B == expected_result
+
+        # Check dual(dual_B, C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        if mod(grade(C), 4) < 2
+            @test dual(dual_B, C) ≈ B
+        else
+            @test dual(dual_B, C) ≈ -B
+        end
+
+        dual_B = dual(C, B)
+        expected_result = zero(C)
+        @test dual_B === expected_result
+    end
+
+    # dim(B) != dim(C)
+    B = Blade(rand(test_dim, 3))
+    C = Pseudoscalar(test_dim + 1, test_value_1)
+    @test_throws DimensionMismatch dual(B, C)
+    @test_throws DimensionMismatch dual(C, B)
+
+    # --- B::Blade, C::Scalar
+    #     B::Scalar, C::Blade
+
+    C = Scalar(test_value_1)
+
+    for test_grade in 5:8
+        C = Blade(randn(test_dim, test_grade))
+        B_dual_C = dual(B, C)
+        expected_result = mod(test_grade, 4) < 2 ?
+            Blade(C, volume=test_value_1) :
+            Blade(C, volume=-test_value_1)
+        @test B_dual_C isa Blade
+        @test B_dual_C == expected_result
+
+        C_dual_B = dual(C, B)
+        expected_result = zero(C)
+        @test C_dual_B === expected_result
+    end
+
+    # --- B::Blade, C::One
+    #     B::One, C::Blade
+
+    C = One()
+
+    for test_grade in 5:8
+        B = Blade(randn(test_dim, test_grade))
+
+        B_dual_C = dual(B, C)
+        expected_result = mod(test_grade, 4) < 2 ?
+            Blade(C, volume=1, copy_basis=false) :
+            Blade(C, volume=-1, copy_basis=false)
+        @test B_dual_C isa Blade
+        @test B_dual_C == expected_result
+
+        C_dual_B = dual(C, B)
+        expected_result = Zero(C)
+        @test C_dual_B === expected_result
+    end
+end
+
 @testset "dual(B, C): B or C isa Pseudoscalar" begin
     # --- Preparations
 
