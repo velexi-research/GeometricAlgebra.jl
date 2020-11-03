@@ -83,18 +83,20 @@ function contractl(B::Blade{<:Real}, C::Blade{<:Real})
         return zero(B)
     end
 
-    # --- Compute (B ⋅ C) = proj(B, C) * C
-    #     = volume(C) dual(proj(B, C), C) * I_C
-    #     = (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) proj(B, C) / I_C
-    #     = (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) dual(proj(B, C), C)
+    # --- Compute (B ⋅ C) = project(B, C) * C
+    #     = volume(C) dual(project(B, C), C) * I_C
+    #     = (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) project(B, C) / I_C
+    #     = (-1)^((grade(C) * grade(C) - 1) / 2) volume(C)
+    #       dual(project(B, C), C)
     #
     #     where I_C is the unit blade for the subspace represented by blade `C`
     #     that has the same orientation as basis(C).
 
-    # Compute proj(B, C) = (B ⋅ C) / C
-    projection = proj(B, C)
+    # Compute project(B, C) = (B ⋅ C) / C
+    projection = project(B, C)
 
-    # Compute (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) dual(proj(B, C), C)
+    # Compute
+    #   (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) dual(project(B, C), C)
     mod(grade(C), 4) < 2 ?
         volume(C) * dual(projection, C) :
        -volume(C) * dual(projection, C)
@@ -126,18 +128,20 @@ function contractl(v::Vector{<:Real}, B::Blade)
 
     assert_dim_equal(v, B)
 
-    # --- Compute (v ⋅ B) = proj(v, B) * B
-    #     = volume(B) dual(proj(v, B), B) * I_B
-    #     = (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) proj(v, B) / I_B
-    #     = (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) dual(proj(v, B), B)
+    # --- Compute (v ⋅ B) = project(v, B) * B
+    #     = volume(B) dual(project(v, B), B) * I_B
+    #     = (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) project(v, B) / I_B
+    #     = (-1)^((grade(B) * grade(B) - 1) / 2) volume(B)
+    #       dual(project(v, B), B)
     #
     #     where I_B is the unit blade for the subspace represented by blade `B`
     #     that has the same orientation as basis(B).
 
-    # Compute proj(v, B) = (v ⋅ B) / B
-    projection = proj(v, B)
+    # Compute project(v, B) = (v ⋅ B) / B
+    projection = project(v, B)
 
-    # Compute (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) dual(proj(v, B), B)
+    # Compute
+    #   (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) dual(project(v, B), B)
     mod(grade(B), 4) < 2 ?
         volume(B) * dual(projection, B) :
        -volume(B) * dual(projection, B)
