@@ -18,6 +18,7 @@ include("operations/multiply.jl")
 include("operations/divide.jl")
 include("operations/wedge.jl")
 include("operations/contractl.jl")
+include("operations/dot.jl")
 
 # Geometric operations
 include("operations/dual.jl")
