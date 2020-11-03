@@ -44,6 +44,24 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     function Multivector{T}(
             blades::Vector{<:AbstractBlade}) where {T<:AbstractFloat}
 
+        # --- Check arguments
+
+        # Check that all non-scalar blades have the same dimension
+        dim_ = nothing
+        for B in blades
+            if !(B isa AbstractScalar)
+                if isnothing(dim_)
+                    dim_ = dim(B)
+                else
+                    if dim_ != dim(B)
+                        message = "Non-scalar blades in `blades` have " *
+                                  "differing dimensions."
+                        throw(DimensionMismatch(message))
+                    end
+                end
+            end
+        end
+
         # --- Handle edge cases
 
         # Return Scalar(0) if number of blades is 0.
@@ -51,9 +69,19 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
             return zero(Blade{T})
         end
 
-        # --- Construct Multivector
+        # Return a Scalar if all of the blades are scalars
+        blades_all_scalar = true
+        for B in blades
+            if !(B isa AbstractScalar)
+                blades_all_scalar = false
+                break
+            end
+        end
+        if blades_all_scalar
+            return Scalar{T}(value(reduce(+, blades)))
+        end
 
-        dim_ = dim(blades[1])
+        # --- Construct Multivector
 
         # Construct `parts`. Sort blades by grade.
         parts = SortedDict{Int, Vector{AbstractBlade}}()
@@ -124,6 +152,13 @@ Multivector(multivectors::Vector{<:AbstractMultivector}) =
         Multivector{Float64}(Vector{AbstractBlade}())
 
 # --- Method definitions for AbstractMultivector interface functions
+
+"""
+    dim(M::Multivector)
+
+Return the dimensiont of the multivector `M`.
+"""
+dim(M::Multivector) = M.dim
 
 """
     grades(M::Multivector; collect=true)
