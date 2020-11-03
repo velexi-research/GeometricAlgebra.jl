@@ -21,7 +21,6 @@ import DataStructures.SDMKeyIteration, DataStructures.SortedDict
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-
 # --- Constructor tests
 
 @testset "Multivector: inner constructor" begin
@@ -94,9 +93,9 @@ end
     end
 end
 
-# --- Function tests
+# --- Test attribute methods
 
-@testset "AbstractMultivector interface: M::Multivector" begin
+@testset "Multivector: AbstractMultivector attribute functions" begin
     # --- Preparations
 
     vectors = [3 3; -4 -4; 0 1]
@@ -107,7 +106,7 @@ end
 
     test_dim = length(one_vector)
 
-    # --- Test basic functions
+    # --- Tests
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -122,6 +121,9 @@ end
                                     test_dim=>Vector([pseudoscalar]))
         expected_blades = reduce(vcat, values(expected_parts))
 
+        # dim()
+        @test dim(M) == test_dim
+
         # grades()
         @test grades(M) == [0, 1, 3]
         @test grades(M, collect=false) isa SDMKeyIteration
@@ -129,6 +131,9 @@ end
         # blades()
         @test blades(M) isa Vector{AbstractBlade}
         @test blades(M) == expected_blades
+
+        # norm()
+        @test_skip norm(M) == 0
 
         # getindex()
         for k in 1:test_dim
@@ -138,13 +143,10 @@ end
                 @test k_vectors == expected_parts[k]
             end
         end
-
-        # norm()
-        @test_skip norm(M) == 0
     end
 end
 
-@testset "convert(M): M::Multivector" begin
+@testset "Multivector: convert(M)" begin
     # Preparations
     vectors = [3 3; -4 -4; 0 1]
     one_vector = [3; 4; 0]

@@ -20,7 +20,6 @@ import Random.rand
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-
 # --- Constructor tests
 
 @testset "Pseudoscalar: inner constructor" begin

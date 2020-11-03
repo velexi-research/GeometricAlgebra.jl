@@ -18,7 +18,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-# --- Tests
+# --- Constructor tests
 
 @testset "Zero: constructor tests" begin
     # --- Inner constructor

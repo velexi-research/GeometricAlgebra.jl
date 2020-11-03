@@ -19,7 +19,6 @@ import Random.rand
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-
 # --- Constructor tests
 
 @testset "Scalar: inner constructor" begin

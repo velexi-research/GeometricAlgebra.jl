@@ -19,7 +19,6 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-
 # --- Constructor tests
 
 @testset "Blade: inner constructor" begin
@@ -921,13 +920,13 @@ end
     @test Blade(Scalar(test_value)) == Scalar(test_value)
 end
 
-# --- Function tests
+# --- Test attribute methods
 
-@testset "AbstractBlade interface: B::Blade" begin
+@testset "Blade: AbstractMultivector attribute functions" begin
     # --- Preparations
 
     vectors = [3 3; 4 4; 0 1]
-    expected_dim, expected_grade = size(vectors)
+    test_dim, test_grade = size(vectors)
 
     # --- Test basic functions
 
@@ -935,17 +934,42 @@ end
         # Blade with sign > 0
         B = Blade{precision_type}(vectors)
 
-        @test dim(B) == expected_dim
-        @test grade(B) == expected_grade
+        @test dim(B) == test_dim
+        @test grades(B) == [test_grade]
+        @test blades(B) == [B]
+
+        @test norm(B) isa precision_type
+        @test norm(B) ≈ 5
+
+        for k in 0:test_dim
+            if k == test_grade
+                @test B[k] == [B]
+            else
+                @test B[k] == []
+            end
+        end
+    end
+end
+
+@testset "Blade: AbstractBlade attribute functions" begin
+    # --- Preparations
+
+    vectors = [3 3; 4 4; 0 1]
+    test_grade = size(vectors, 2)
+
+    # --- Test basic functions
+
+    for precision_type in subtypes(AbstractFloat)
+        # Blade with sign > 0
+        B = Blade{precision_type}(vectors)
+
+        @test grade(B) == test_grade
 
         F = LinearAlgebra.qr(vectors)
         @test basis(B) ≈ Matrix(F.Q)
 
         @test volume(B) isa precision_type
         @test volume(B) ≈ 5
-
-        @test norm(B) isa precision_type
-        @test norm(B) ≈ 5
 
         @test sign(B) == 1
 
@@ -955,7 +979,103 @@ end
     end
 end
 
-@testset "convert(B): B::Blade" begin
+# --- Tests for AbstractMultivector interface functions
+
+@testset "Blade: -(B)" begin
+    # Preparations
+    vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+
+    # B::Blade
+    negative_B = Blade(B, volume=-volume(B))
+    @test -B == negative_B
+
+    @test -negative_B == B
+end
+
+@testset "Blade: reverse(B)" begin
+    # mod(grade, 4) == 1
+    vectors = Vector([3; 4; 0; 0; 0])
+    B = Blade(vectors)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(grade, 4) == 2
+    vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
+    B = Blade(vectors)
+    @test reverse(B) == -B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(grade, 4) == 3
+    vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+    B = Blade(vectors)
+    @test reverse(B) == -B
+    @test B * reverse(B) ≈ norm(B)^2
+
+    # mod(grade, 4) == 0
+    vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    @test reverse(B) === B
+    @test B * reverse(B) ≈ norm(B)^2
+end
+
+@testset "Blade: dual(B)" begin
+    # --- Preparations
+
+    # Test values
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- B::Blade
+
+    for dim_B in 10:13
+        for grade_B in 2:5
+            B = Blade(rand(dim_B, grade_B))
+
+            dual_B = dual(B)
+
+            # --- Check dim, grade, and norm
+
+            @test dim(dual_B) == dim_B
+            @test grade(dual_B) == dim_B - grade_B
+            @test norm(dual_B) == norm(B)
+
+            # --- Check that B and dual(B) are orthogonal complements
+
+            @test LinearAlgebra.norm(transpose(basis(dual_B)) * basis(B)) <
+                10 * eps(Float64)
+
+            # --- Check sign(dual(B))
+
+            # Compute sign of I formed from basis(B) and basis(dual(B))
+            sign_Q = sign(LinearAlgebra.det(hcat(basis(B), basis(dual_B))))
+
+            # Compute expected_sign
+            expected_sign = sign(B) * sign_Q
+
+            # Account for sign of I^{-1} relative to I
+            if mod(dim(B), 4) >= 2
+                expected_sign = -expected_sign
+            end
+
+            # Account for reversals required to eliminate B
+            if mod(grade(B), 4) >= 2
+                expected_sign = -expected_sign
+            end
+
+            @test sign(dual_B) == expected_sign
+
+            # Check dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
+            if mod(dim(B), 4) < 2
+                @test dual(dual_B) ≈ B
+            else
+                @test dual(dual_B) ≈ -B
+            end
+        end
+    end
+end
+
+@testset "Blade: convert(B)" begin
     # Preparations
     vectors = [3 3; 4 4; 0 1]
 
@@ -979,4 +1099,36 @@ end
             end
         end
     end
+end
+
+# --- Tests for AbstractBlade interface functions
+
+@testset "Blade: reciprocal(B)" begin
+    # mod(grade, 4) == 1
+    vectors = Vector([3; 4; 0; 0; 0])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
+
+    # mod(grade, 4) == 2
+    vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=-1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
+
+    # mod(grade, 4) == 3
+    vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=-1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
+
+    # mod(grade, 4) == 0
+    vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
+    B = Blade(vectors)
+    expected_reciprocal = Blade(B, volume=1 / volume(B))
+    @test reciprocal(B) ≈ expected_reciprocal
+    @test B * reciprocal(B) ≈ 1
 end
