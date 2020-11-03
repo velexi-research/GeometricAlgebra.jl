@@ -13,6 +13,18 @@ except according to the terms contained in the LICENSE file.
 
 export wedge, ∧
 
+# --- Operator aliases
+
+∧(M::AbstractMultivector, N::AbstractMultivector) = wedge(M, N)
+
+∧(M::AbstractMultivector, x::Real) = wedge(M, x)
+∧(x::Real, M::AbstractMultivector) = wedge(x, M)
+
+∧(M::AbstractMultivector, v::Vector{<:Real}) = wedge(M, Blade(v))
+∧(v::Vector{<:Real}, M::AbstractMultivector) = wedge(Blade(v), M)
+
+∧(v::Vector{<:Real}, w::Vector{<:Real}) = wedge(v, w)
+
 # --- Method definitions
 
 """
@@ -62,16 +74,6 @@ wedge(B::AbstractScalar, C::AbstractBlade) = B * C
 # x::Real, B::AbstractBlade
 wedge(B::AbstractBlade, x::Real) = B * x
 wedge(x::Real, B::AbstractBlade) = x * B
-
-# --- Operator aliases
-
-∧(M::AbstractMultivector, N::AbstractMultivector) = wedge(M, N)
-
-∧(M::AbstractMultivector, x::Real) = wedge(M, x)
-∧(x::Real, M::AbstractMultivector) = wedge(x, M)
-
-∧(M::AbstractMultivector, v::Vector{<:Real}) = wedge(M, Blade(v))
-∧(v::Vector{<:Real}, M::AbstractMultivector) = wedge(Blade(v), M)
 
 # --- Operations involving a Blade instance
 

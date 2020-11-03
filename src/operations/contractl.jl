@@ -14,6 +14,13 @@ except according to the terms contained in the LICENSE file.
 export contractl
 import Base.:(<)
 
+# --- Operator aliases
+
+<(M::AbstractMultivector, N::AbstractMultivector) = contractl(M, N)
+
+<(M::AbstractMultivector, x::Real) = contractl(M, x)
+<(x::Real, M::AbstractMultivector) = contractl(x, M)
+
 # --- Method definitions
 
 """
@@ -60,13 +67,6 @@ contractl(x::Real, M::AbstractMultivector) = x * M
 # --- Operations involving an AbstractBlade instance
 
 # TODO
-
-# --- Operator aliases
-
-<(M::AbstractMultivector, N::AbstractMultivector) = contractl(M, N)
-
-<(M::AbstractMultivector, x::Real) = contractl(M, x)
-<(x::Real, M::AbstractMultivector) = contractl(x, M)
 
 # --- Operations involving a Blade instance
 
