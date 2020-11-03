@@ -106,6 +106,25 @@ end
     end
 end
 
+# --- Test comparison operations
+
+@testset "Zero: iszero(B)" begin
+    # Basic functions
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        @test iszero(B)
+
+        B = Scalar{precision_type}(0)
+        @test iszero(B)
+
+        B = One{precision_type}()
+        @test !iszero(B)
+
+        B = Scalar{precision_type}(3)
+        @test !iszero(B)
+    end
+end
+
 # --- Test attribute methods
 
 @testset "Zero: AbstractMultivector attribute functions" begin

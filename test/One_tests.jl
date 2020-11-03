@@ -106,6 +106,25 @@ end
     end
 end
 
+# --- Test comparison operations
+
+@testset "One: isone(B)" begin
+    # Basic functions
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+        @test isone(B)
+
+        B = Scalar{precision_type}(1)
+        @test isone(B)
+
+        B = Zero{precision_type}()
+        @test !isone(B)
+
+        B = Scalar{precision_type}(3)
+        @test !isone(B)
+    end
+end
+
 # --- Test attribute methods
 
 @testset "One: AbstractMultivector attribute functions" begin
