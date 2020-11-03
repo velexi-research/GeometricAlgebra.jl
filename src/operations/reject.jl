@@ -15,6 +15,8 @@ export reject
 
 # --- Method definitions
 
+using LinearAlgebra: ⋅
+
 """
     reject(vectors, B; normalize=false)
 
