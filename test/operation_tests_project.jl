@@ -13,6 +13,7 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
+using LinearAlgebra: norm, ⋅
 using Test
 
 # GeometricAlgebra.jl
@@ -53,7 +54,7 @@ using GeometricAlgebra
 
     # Check that project(B, C) is contained in C
     projection_coefficients = transpose(basis(C)) * basis(projection)
-    @test LinearAlgebra.norm(projection_coefficients)^2 ≈ grade(B)
+    @test norm(projection_coefficients)^2 ≈ grade(B)
 
     # Check that norm(project(B, C)) TODO
 
@@ -112,7 +113,7 @@ using GeometricAlgebra
     # ------ project(v::Vector{<:Real}, B::Scalar)
 
     # return_blade == true
-    B = Scalar(test_value)
+    B = Scalar(test_value_1)
     @test project(v, B) == zero(B)
 
     # return_blade == false
@@ -121,18 +122,18 @@ using GeometricAlgebra
     # ------ project(B::Scalar, v::Vector{<:Real})
 
     # return_blade == true
-    B = Scalar(test_value)
+    B = Scalar(test_value_1)
     @test project(B, v) === B
 
     # return_blade == false
-    B = Scalar(test_value)
+    B = Scalar(test_value_1)
     @test project(B, v, return_blade=false) == value(B)
 
     # ------ project(v::Vector{<:Real}, B::Pseudoscalar)
     #        project(B::Pseudoscalar, v::Vector{<:Real})
 
     # length(v) == dim(B), return_blade == true
-    B = Pseudoscalar(test_dim, test_value)
+    B = Pseudoscalar(test_dim, test_value_1)
     @test project(v, B) == Blade(v)
     @test project(B, v) == zero(B)
 
@@ -141,7 +142,7 @@ using GeometricAlgebra
     @test project(B, v, return_blade=false) == 0
 
     # length(v) != dim(B)
-    B = Pseudoscalar(test_dim + 1, test_value)
+    B = Pseudoscalar(test_dim + 1, test_value_1)
     @test_throws DimensionMismatch project(v, B)
     @test_throws DimensionMismatch project(B, v)
 
@@ -160,17 +161,17 @@ using GeometricAlgebra
 
     # grade(B) == 1, return_blade == true
     B = Blade(rand(test_dim, 1))
-    projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
+    projection_vectors = v ⋅ basis(B) * basis(B)
     @test project(v, B) ≈ Blade(projection_vectors)
 
-    projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
+    projection_vectors = (v ⋅ basis(B)) * v
     @test project(B, v) ≈ Blade(projection_vectors)
 
     # grade(B) == 1, return_blade == false
-    projection_vectors = LinearAlgebra.dot(v, basis(B)) * basis(B)
+    projection_vectors = (v ⋅ basis(B)) * basis(B)
     @test project(v, B, return_blade=false) ≈ projection_vectors
 
-    projection_vectors = LinearAlgebra.dot(v, basis(B)) * v
+    projection_vectors = (v ⋅ basis(B)) * v
     @test project(B, v, return_blade=false) ≈ projection_vectors
 
     # length(v) != dim(B)
