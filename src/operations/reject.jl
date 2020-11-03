@@ -26,8 +26,8 @@ reject(vectors::Matrix, B::AbstractBlade; normalize=false) = nothing
 # --- Operations involving a Blade instance
 
 # vectors::Matrix, B::Blade
-function rejection(vectors::Matrix, B::Blade; normalize::Bool=false)
-    # --- Validate arguments
+function reject(vectors::Matrix, B::Blade; normalize::Bool=false)
+    # --- Check arguments
 
     if size(vectors, 1) != dim(B)
         throw(DimensionMismatch("`dim(vectors)` not equal to `dim(B)`"))
