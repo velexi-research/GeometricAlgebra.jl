@@ -21,21 +21,6 @@ export project
 Compute the projection of multivector `M` onto the subspace represented by
 blade `B`.
 """
-"""
-    project(B, C; return_blade=true)
-
-Compute the projection of blade `B` onto the subspace represented by blade `C`.
-
-When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
-the return value is a Real (if the result is a scalar) or a Vector (if the
-result is a vector).
-
-Valid arguments
----------------
-    project(B::AbstractBlade, C::AbstractBlade; return_blade::Bool)
-    project(v::Vector, B::AbstractBlade; return_blade::Bool)
-    project(B::AbstractBlade, v::Vector; return_blade::Bool)
-"""
 project(M::AbstractMultivector, B::AbstractBlade) = nothing
 
 # --- Operations involving an AbstractMultivector instance
@@ -44,6 +29,17 @@ project(M::AbstractMultivector, B::AbstractBlade) = nothing
 project(M::AbstractMultivector, B::Zero) = B
 
 # --- Operations involving an AbstractBlade instance
+
+"""
+    project(B, C; return_blade=true)
+
+Compute the projection of blade `B` onto the subspace represented by blade `C`.
+
+When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
+the return value is a Real (if the result is a scalar) or a Vector (if the
+result is a vector).
+"""
+project(B::AbstractBlade, C::AbstractBlade; return_blade::Bool=true) = nothing
 
 # B::AbstractScalar, C::AbstractBlade
 project(B::AbstractScalar, C::AbstractBlade; return_blade::Bool=true) =

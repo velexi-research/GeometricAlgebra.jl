@@ -35,7 +35,7 @@ using GeometricAlgebra
     @test B isa Zero{Float64}
 end
 
-@testset "zero()" begin
+@testset "Zero: zero()" begin
     # zero(M::AbstractMultivector)
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
@@ -106,6 +106,8 @@ end
     end
 end
 
+# --- Test attribute methods
+
 @testset "Zero: AbstractMultivector attribute functions" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
@@ -138,5 +140,50 @@ end
         B = Zero{precision_type}()
         @test value(B) isa precision_type
         @test value(B) == 0
+    end
+end
+
+# --- Tests for AbstractMultivector interface functions
+
+@testset "Zero: -(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+
+        @test -B === B
+    end
+end
+
+@testset "Zero: reverse(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        @test reverse(B) === B
+    end
+end
+
+@testset "Zero: dual(B)" begin
+    B = Zero()
+    expected_message = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_message) dual(B)
+end
+
+@testset "Zero: convert(B)" begin
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            B = Zero{precision_type_src}()
+            B_converted = convert(AbstractScalar{precision_type_converted}, B)
+            @test B_converted isa Zero{precision_type_converted}
+        end
+    end
+end
+
+# --- Tests for AbstractBlade interface functions
+
+@testset "Zero: reciprocal(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B isa Scalar{precision_type}
+        @test reciprocal_B == Scalar{precision_type}(Inf)
     end
 end

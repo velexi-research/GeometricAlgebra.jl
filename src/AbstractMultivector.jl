@@ -27,7 +27,7 @@ import Base.:(-), Base.reverse
 export dual
 
 # Comparison operations
-import Base.:(==), import Base.isapprox
+import Base.:(==), Base.isapprox
 
 # Utility functions
 import Base.convert

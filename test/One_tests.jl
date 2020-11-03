@@ -35,7 +35,7 @@ using GeometricAlgebra
     @test B isa One{Float64}
 end
 
-@testset "one()" begin
+@testset "One: one()" begin
     # one(M::AbstractMultivector)
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
@@ -106,6 +106,8 @@ end
     end
 end
 
+# --- Test attribute methods
+
 @testset "One: AbstractMultivector attribute functions" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
@@ -138,5 +140,67 @@ end
         B = One{precision_type}()
         @test value(B) isa precision_type
         @test value(B) == 1
+    end
+end
+
+# --- Tests for AbstractMultivector interface functions
+
+@testset "One: -(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+
+        minus_B = -B
+        @test minus_B isa Scalar{precision_type}
+        @test minus_B == Scalar{precision_type}(-1)
+    end
+end
+
+@testset "One: reverse(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+        reverse_B = reverse(B)
+        @test reverse_B === B
+        @test B * reverse_B == norm(B)^2
+    end
+end
+
+@testset "One: dual(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+
+        for test_dim in 5:8
+            dual_B = dual(B, dim=test_dim)
+
+            expected_dual = mod(test_dim, 4) < 2 ?
+                Pseudoscalar{precision_type}(test_dim, 1) :
+                Pseudoscalar{precision_type}(test_dim, -1)
+            @test dual_B isa Pseudoscalar{precision_type}
+            @test dual_B == expected_dual
+        end
+
+        expected_message = "The dual of a scalar is not well-defined if " *
+                           "`dim` is not specified"
+        @test_throws ErrorException(expected_message) dual(B)
+    end
+end
+
+@testset "One: convert(B)" begin
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            B = One{precision_type_src}()
+            B_converted = convert(AbstractScalar{precision_type_converted}, B)
+            @test B_converted isa One{precision_type_converted}
+        end
+    end
+end
+
+# --- Tests for AbstractBlade interface functions
+
+@testset "One: reciprocal(B)" begin
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B === B
     end
 end

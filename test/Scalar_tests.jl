@@ -244,7 +244,7 @@ end
 end
 =#
 
-# --- Function tests
+# --- Test attribute methods
 
 @testset "Scalar: AbstractMultivector attribute functions" begin
     # --- Preparations
@@ -367,5 +367,253 @@ end
         S = Scalar(precision_type(-Inf))
         @test value(S) isa precision_type
         @test value(S) == precision_type(-Inf)
+    end
+end
+
+# --- Test comparison operations
+
+@testset "Scalar: ==(B, C)" begin
+    # Preparations
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    float64_or_bigfloat = (Float64, BigFloat)
+
+    # B::Scalar, C::Scalar
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            # ==(B, C)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
+            if precision_type1 == precision_type2
+                @test B == C
+            elseif precision_type1 in float64_or_bigfloat &&
+                   precision_type2 in float64_or_bigfloat
+                @test B == C
+            else
+                @test B != C
+            end
+
+            # value(B) != value(C)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(2 * test_value))
+            @test B != C
+        end
+    end
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        # B::Scalar, C::AbstractFloat
+        # B::AbstractFloat, C::Scalar
+        for value_type in subtypes(AbstractFloat)
+            B = Scalar(precision_type(test_value))
+
+            # ==(B, C)
+            if precision_type == value_type
+                @test B == value_type(test_value)
+                @test value_type(test_value) == B
+            elseif precision_type in float64_or_bigfloat &&
+                   value_type in float64_or_bigfloat
+                @test B == value_type(test_value)
+                @test value_type(test_value) == B
+            else
+                @test B != value_type(test_value)
+                @test value_type(test_value) != B
+            end
+
+            # !=(x,y)
+            @test B != value_type(2 * test_value)
+            @test value_type(2 * test_value) != B
+        end
+
+        # B::Scalar, C::Integer
+        # B::Integer, C::Scalar
+        int_value::Int = 3
+        for value_type in subtypes(Signed)
+            B = Scalar(precision_type(int_value))
+
+            # ==(B, C)
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
+
+            # !=(x,y)
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
+        end
+
+        for value_type in subtypes(Unsigned)
+            B = Scalar(precision_type(int_value))
+
+            # ==(B, C)
+            @test B == value_type(int_value)
+            @test value_type(int_value) == B
+
+            # !=(x,y)
+            @test B != value_type(2 * int_value)
+            @test value_type(2 * int_value) != B
+        end
+
+        # Bool
+        B = Scalar(precision_type(true))
+        @test B == 1
+        @test 1 == B
+        @test B != 0
+        @test 0 != B
+
+        B = Scalar(precision_type(false))
+        @test B == 0
+        @test 0 == B
+        @test B != 1
+        @test 1 != B
+    end
+end
+
+@testset "Scalar: ≈(B, C)" begin
+    # Preparations
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # B::Scalar, C::Scalar
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value))
+            @test B ≈ C
+        end
+    end
+
+    # B::Scalar, C::Real
+    # B::Real, C::Scalar
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(test_value)
+        B = Scalar(converted_value)
+        @test B ≈ converted_value
+        @test converted_value ≈ B
+    end
+end
+
+# --- Tests for AbstractMultivector interface functions
+
+@testset "Scalar: -(B)" begin
+    # Preparations
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # Tests
+    for precision_type in subtypes(AbstractFloat)
+        B = Scalar{precision_type}(test_value)
+
+        minus_B = -B
+        @test minus_B isa Scalar{precision_type}
+        @test minus_B == Scalar{precision_type}(-test_value)
+    end
+end
+
+@testset "Scalar: reverse(B)" begin
+    # --- Preparations
+
+    test_value = rand() + 1  # add 1 to avoid 0
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Exercise functionality and check results
+
+    # value != 0
+    B = Scalar(test_value)
+    reverse_B = reverse(B)
+    @test reverse_B === B
+    @test B * reverse_B ≈ norm(B)^2
+
+    # value = Inf
+    B = Scalar(Inf)
+    @test reverse(B) === B
+
+    # value = -Inf
+    B = Scalar(-Inf)
+    @test reverse(B) === B
+end
+
+@testset "Scalar: dual(B)" begin
+    # Preparations
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # Tests
+    for precision_type in subtypes(AbstractFloat)
+        B = Scalar{precision_type}(test_value)
+
+        for test_dim in 5:8
+            dual_B = dual(B, dim=test_dim)
+
+            expected_result = mod(test_dim, 4) < 2 ?
+                Pseudoscalar{precision_type}(test_dim,
+                                             precision_type(test_value)) :
+                Pseudoscalar{precision_type}(test_dim,
+                                             precision_type(-test_value))
+            @test dual_B isa Pseudoscalar{precision_type}
+            @test dual_B == expected_result
+        end
+
+        expected_message = "The dual of a scalar is not well-defined if " *
+                           "`dim` is not specified"
+        @test_throws ErrorException(expected_message) dual(B)
+    end
+end
+
+@testset "Scalar: convert(S)" begin
+    # Preparations
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # Exercise functionality and check results
+    for precision_type_converted in subtypes(AbstractFloat)
+        for precision_type_src in subtypes(AbstractFloat)
+            converted_test_value = precision_type_src(test_value)
+            S = Scalar{precision_type_src}(converted_test_value)
+            S_converted = convert(AbstractScalar{precision_type_converted}, S)
+            @test S_converted isa Scalar{precision_type_converted}
+            if precision_type_src == precision_type_converted
+                @test S_converted === S
+            else
+                @test S_converted !== S
+                @test S_converted ≈ S
+            end
+        end
+    end
+end
+
+# --- Tests for AbstractBlade interface functions
+
+@testset "Scalar: reciprocal(B)" begin
+    # Preparations
+    test_value = rand() + 2  # add 2 to avoid 0 and 1
+    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # Tests
+    for precision_type in subtypes(AbstractFloat)
+        converted_value = precision_type(test_value)
+
+        # value > 0
+        B = Scalar(abs(converted_value))
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B isa Scalar{precision_type}
+        @test reciprocal_B == Scalar(1 / abs(converted_value))
+        @test B * reciprocal_B ≈ 1
+
+        # value < 0
+        negative_value = -(abs(converted_value))
+        B = Scalar(negative_value)
+        reciprocal_B = reciprocal(B)
+        @test reciprocal_B isa Scalar{precision_type}
+        @test reciprocal_B == Scalar(1 / negative_value)
+        @test B * reciprocal_B ≈ 1
+
+        # value = Inf
+        B = Scalar(precision_type(Inf))
+        @test reciprocal(B) === Zero{precision_type}()
+
+        # value = -Inf
+        B = Scalar(precision_type(-Inf))
+        @test reciprocal(B) === Zero{precision_type}()
     end
 end

@@ -11,8 +11,13 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-# Types
+# ------ Types
+
 export Blade
+
+# ------ Utility functions
+
+export blade_atol
 
 # --- Type definitions
 
@@ -460,8 +465,6 @@ Convert Blade to have the floating-point precision of type `T`.
 convert(::Type{S}, B::Blade) where {T<:AbstractFloat,
                                     S<:AbstractMultivector{T}} =
     T == typeof(volume(B)) ? B : Blade{T}(B)
-
-# --- Non-exported utility functions
 
 #=
  TODO: review numerical error in factorizations to see if a different
