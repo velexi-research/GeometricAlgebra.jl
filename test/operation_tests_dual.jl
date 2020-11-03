@@ -13,6 +13,7 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
+import LinearAlgebra
 using Test
 
 # GeometricAlgebra.jl
@@ -100,7 +101,7 @@ using GeometricAlgebra
 
         # `B` not contained in `C`
         B = Blade(rand(test_dim, grade_B))
-        while LinearAlgebra.norm(rejection(basis(B), C)) < sqrt(eps(Float64))
+        while LinearAlgebra.norm(reject(basis(B), C)) < sqrt(eps(Float64))
             B = Blade(rand(test_dim, grade_B))
         end
         @test_throws ErrorException dual(B, C)
@@ -153,7 +154,7 @@ end
     # --- B::Blade, C::Scalar
     #     B::Scalar, C::Blade
 
-    C = Scalar(test_value_1)
+    B = Scalar(test_value_1)
 
     for test_grade in 5:8
         C = Blade(randn(test_dim, test_grade))
@@ -172,10 +173,10 @@ end
     # --- B::Blade, C::One
     #     B::One, C::Blade
 
-    C = One()
+    B = One()
 
     for test_grade in 5:8
-        B = Blade(randn(test_dim, test_grade))
+        C = Blade(randn(test_dim, test_grade))
 
         B_dual_C = dual(B, C)
         expected_result = mod(test_grade, 4) < 2 ?
@@ -185,7 +186,7 @@ end
         @test B_dual_C == expected_result
 
         C_dual_B = dual(C, B)
-        expected_result = Zero(C)
+        expected_result = zero(C)
         @test C_dual_B === expected_result
     end
 end
