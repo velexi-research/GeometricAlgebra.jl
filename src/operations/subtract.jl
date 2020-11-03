@@ -31,18 +31,18 @@ Compute the difference of the multivectors `M` and `N`.
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
-+(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
-+(B::One, C::AbstractScalar) = C + B
+-(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) - 1)
+-(B::One, C::AbstractScalar) = Scalar{typeof(value(C))}(1 - value(C))
 
 # B::AbstractScalar, C::Zero
 # B::Zero, C::AbstractScalar
-+(B::AbstractScalar, C::Zero) = B
-+(B::Zero, C::AbstractScalar) = C
+-(B::AbstractScalar, C::Zero) = C
+-(B::Zero, C::AbstractScalar) = -C
 
 # B::AbstractScalar, x::Real
 # x::Real, B::AbstractScalar
-+(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) + x)
-+(x::Real, B::AbstractScalar) = B + x
+-(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) - x)
+-(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x - value(B))
 
 # --- Operations involving a Scalar instance
 
