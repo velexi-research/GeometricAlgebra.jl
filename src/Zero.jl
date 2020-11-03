@@ -15,7 +15,7 @@ except according to the terms contained in the LICENSE file.
 export Zero
 
 # Functions
-import Base.zero
+import Base.zero, Base.iszero
 
 # --- Type definitions
 
@@ -47,6 +47,10 @@ value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
 -(B::Zero) = B
 
 dual(B::Zero; dim::Union{Integer, Nothing}=nothing) = dual_of_zero()
+
+# --- Comparison methods
+
+iszero(M::AbstractMultivector) = (M === zero(M))
 
 # --- Utility methods
 

@@ -15,7 +15,7 @@ except according to the terms contained in the LICENSE file.
 export One
 
 # Functions
-import Base.one
+import Base.one, Base.isone
 
 # --- Type definitions
 
@@ -45,6 +45,10 @@ value(B::One{T}) where {T<:AbstractFloat} = T(1)
 # --- Method definitions for AbstractBlade interface functions
 
 reciprocal(B::One) = B
+
+# --- Comparison methods
+
+isone(M::AbstractMultivector) = (M === one(M))
 
 # --- Utility methods
 
