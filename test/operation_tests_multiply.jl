@@ -167,9 +167,8 @@ end
     B = Scalar(test_value_1)
     C = Zero()
 
-    expected_result = Zero()
-    @test B * C === expected_result
-    @test C * B === expected_result
+    @test iszero(B * C)
+    @test iszero(C * B)
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar
@@ -215,18 +214,16 @@ end
     B = One()
     C = One()
 
-    expected_result = One()
-    @test B * C === expected_result
-    @test C * B === expected_result
+    @test isone(B * C)
+    @test isone(C * B)
 
     # B::One, C::Zero
     # B::Zero, C::One
     B = One()
     C = Zero()
 
-    expected_result = Zero()
-    @test B * C === expected_result
-    @test C * B === expected_result
+    @test iszero(B * C)
+    @test iszero(C * B)
 
     # B::One, C::Real
     # B::Real, C::One
@@ -272,24 +269,21 @@ end
     B = Zero()
     C = Zero()
 
-    expected_result = Zero()
-    @test B * C === expected_result
+    @test iszero(B * C)
 
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
     C = test_value
 
-    expected_result = Zero()
-    @test B * C === expected_result
-    @test C * B === expected_result
+    @test iszero(B * C)
+    @test iszero(C * B)
 
     # B::Vector, C::Zero
     # B::Zero, B::Vector
     B = rand(5)
     C = Zero()
 
-    expected_result = Zero()
-    @test B * C === expected_result
-    @test C * B === expected_result
+    @test iszero(B * C)
+    @test iszero(C * B)
 end

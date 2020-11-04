@@ -63,7 +63,7 @@ using GeometricAlgebra
     B = Blade(rand(test_dim, 10))
     C = Blade(rand(test_dim, 3))
 
-    @test project(B, C) == zero(B)
+    @test iszero(project(B, C))
 
     # ------ dim(B) != dim(C)
 
@@ -84,8 +84,7 @@ using GeometricAlgebra
     B = Pseudoscalar(test_dim, test_value_1)
     C = Blade(test_vectors)
 
-    expected_result = zero(B)
-    @test project(B, C) == expected_result
+    @test iszero(project(B, C))
 
     expected_result = C
     @test project(C, B) == expected_result
@@ -107,14 +106,13 @@ using GeometricAlgebra
     expected_result = Scalar(value(B))
     @test project(B, C) == expected_result
 
-    expected_result = zero(C)
-    @test project(C, B) == expected_result
+    @test iszero(project(C, B))
 
     # ------ project(v::Vector{<:Real}, B::Scalar)
 
     # return_blade == true
     B = Scalar(test_value_1)
-    @test project(v, B) == zero(B)
+    @test iszero(project(v, B))
 
     # return_blade == false
     @test project(v, B, return_blade=false) == 0
@@ -135,7 +133,7 @@ using GeometricAlgebra
     # length(v) == dim(B), return_blade == true
     B = Pseudoscalar(test_dim, test_value_1)
     @test project(v, B) == Blade(v)
-    @test project(B, v) == zero(B)
+    @test iszero(project(B, v))
 
     # length(v) == dim(B), return_blade == false
     @test project(v, B, return_blade=false) == v
@@ -153,7 +151,7 @@ using GeometricAlgebra
     B = Blade(rand(test_dim, 5))
     projection_vectors = basis(B) * transpose(basis(B)) * v
     @test project(v, B) ≈ Blade(projection_vectors)
-    @test project(B, v) == zero(B)
+    @test iszero(project(B, v))
 
     # grade(B) > 1, return_blade == false
     @test project(v, B, return_blade=false) ≈ projection_vectors
@@ -223,9 +221,7 @@ end
     @test B_proj_C isa AbstractScalar
     @test B_proj_C == expected_result
 
-    expected_result = zero(C)
-    C_proj_B = project(C, B)
-    @test C_proj_B === expected_result
+    @test iszero(project(C, B))
 end
 
 @testset "project(B, C): B or C isa Scalar" begin
@@ -271,13 +267,8 @@ end
     B = Scalar(test_value_1)
     C = Zero()
 
-    B_proj_C = project(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = project(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
+    @test iszero(project(B, C))
+    @test iszero(project(C, B))
 
     # --- B::Scalar, C::Real
     #     B::Real, C::Scalar
@@ -301,7 +292,7 @@ end
     B = Scalar(test_value_1)
     C = test_vector
     @test project(B, C) == B
-    @test project(C, B) === zero(B)
+    @test iszero(project(C, B))
 
     # return_blade == false
     @test project(C, B, return_blade=false) == 0
@@ -321,22 +312,15 @@ end
     B = One()
     C = One()
 
-    B_proj_C = project(B, C)
-    expected_result = One()
-    @test B_proj_C === expected_result
+    @test isone(project(B, C))
 
     # B::One, C::Zero
     # B::Zero, C::One
     B = One()
     C = Zero()
 
-    expected_result = Zero()
-
-    B_proj_C = project(B, C)
-    @test B_proj_C === expected_result
-
-    C_proj_B = project(C, B)
-    @test C_proj_B === expected_result
+    @test iszero(project(B, C))
+    @test iszero(project(C, B))
 
     # B::One, C::Real
     # B::Real, C::One
@@ -359,7 +343,7 @@ end
     B = One()
     C = Vector(rand(10))
     @test project(B, C) === B
-    @test project(C, B) == zero(B)
+    @test iszero(project(C, B))
 
     # return_blade == false
     @test project(C, B, return_blade=false) == 0
@@ -379,33 +363,21 @@ end
     B = Zero()
     C = Zero()
 
-    B_proj_C = project(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
+    @test iszero(project(B, C))
 
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
     C = test_value
 
-    B_proj_C = project(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = project(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
+    @test iszero(project(B, C))
+    @test iszero(project(C, B))
 
     # B::Zero, C::Vector
     # B::Vector, C::Zero
     B = Zero()
     C = Vector(rand(10))
 
-    B_proj_C = project(B, C)
-    expected_result = Zero()
-    @test B_proj_C === expected_result
-
-    C_proj_B = project(C, B)
-    expected_result = Zero()
-    @test C_proj_B === expected_result
+    @test iszero(project(B, C))
+    @test iszero(project(C, B))
 end

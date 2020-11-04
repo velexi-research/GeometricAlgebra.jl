@@ -167,9 +167,7 @@ end
     @test B_slash_C isa Scalar
     @test B_slash_C == expected_result
 
-    C_slash_B = C / B
-    expected_result = Zero()
-    @test C_slash_B === expected_result
+    @test iszero(C / B)
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar
@@ -210,9 +208,7 @@ end
     B = One()
     C = One()
 
-    B_slash_C = B / C
-    expected_result = One()
-    @test B_slash_C === expected_result
+    @test isone(B / C)
 
     # B::One, C::Zero
     # B::Zero, C::One
@@ -224,9 +220,7 @@ end
     @test B_slash_C isa Scalar
     @test B_slash_C == expected_result
 
-    C_slash_B = C / B
-    expected_result = Zero()
-    @test C_slash_B === expected_result
+    @test iszero(C / B)
 
     # B::One, C::Real
     # B::Real, C::One
@@ -276,9 +270,7 @@ end
     B = Zero()
     C = test_value
 
-    B_slash_C = B / C
-    expected_result = Zero()
-    @test B_slash_C === expected_result
+    @test iszero(B / C)
 
     # C > 0
     C = Scalar(abs(test_value))

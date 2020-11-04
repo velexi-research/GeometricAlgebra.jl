@@ -79,7 +79,7 @@ using GeometricAlgebra
         @test B.value == precision_type(1)
 
         B = Pseudoscalar{precision_type}(test_dim, false)
-        @test B == zero(Pseudoscalar{precision_type})
+        @test iszero(B)
     end
 
     # --- Invalid data fields
@@ -137,7 +137,7 @@ end
     @test B isa Pseudoscalar{Float64}
 
     B = Pseudoscalar(test_dim, false)
-    @test B == zero(Pseudoscalar{Float64})
+    @test iszero(B)
 end
 
 @testset "Pseudoscalar: outer constructor - copy constructor" begin

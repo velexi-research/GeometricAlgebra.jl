@@ -50,9 +50,7 @@ using GeometricAlgebra
     B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim, test_value_1)
 
-    B_minus_C = B - C
-    expected_result = Zero()
-    @test B_minus_C === expected_result
+    @test iszero(B - C)
 end
 
 @testset "-(B, C): B or C isa Scalar" begin
@@ -82,9 +80,7 @@ end
     B = Scalar(test_value_1)
     C = Scalar(test_value_1)
 
-    B_minus_C = B - C
-    expected_result = Zero()
-    @test B_minus_C === expected_result
+    @test iszero(B - C)
 
     # ------ B::Scalar, C::One
     #        C::One, B::Scalar
@@ -135,13 +131,8 @@ end
     B = Scalar(test_value_1)
     C = test_value_1
 
-    B_minus_C = B - C
-    expected_result = Zero()
-    @test B_minus_C === expected_result
-
-    C_minus_B = C - B
-    expected_result = Zero()
-    @test C_minus_B === expected_result
+    @test iszero(B - C)
+    @test iszero(C - B)
 end
 
 @testset "-(B, C): B or C isa One" begin
@@ -158,8 +149,7 @@ end
     B = One()
     C = One()
 
-    expected_result = Zero()
-    @test B - C === expected_result
+    @test iszero(B - C)
 
     # ------ B::One, C::Zero
     #        B::Zero, C::One
@@ -167,7 +157,7 @@ end
     B = One()
     C = Zero()
 
-    @test B - C === One()
+    @test isone(B - C)
 
     C_minus_B = C - B
     @test C_minus_B isa Scalar
@@ -194,13 +184,8 @@ end
     B = One()
     C = 1
 
-    expected_result = Zero()
-
-    B_minus_C = B - C
-    @test B_minus_C === expected_result
-
-    C_minus_B = C - B
-    @test C_minus_B === expected_result
+    @test iszero(B - C)
+    @test iszero(C - B)
 end
 
 @testset "-(B, C): B or C isa Zero" begin
@@ -217,7 +202,7 @@ end
     B = Zero()
     C = Zero()
 
-    @test B - C === Zero()
+    @test iszero(B - C)
 
     # ------ B::Zero, C::Real
     #        B::Real, C::Zero
@@ -238,11 +223,6 @@ end
     B = Zero()
     C = 0
 
-    expected_result = Zero()
-
-    B_minus_C = B - C
-    @test B_minus_C === expected_result
-
-    C_minus_B = C - B
-    @test C_minus_B === expected_result
+    @test iszero(B - C)
+    @test iszero(C - B)
 end

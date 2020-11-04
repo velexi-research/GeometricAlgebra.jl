@@ -44,11 +44,11 @@ using GeometricAlgebra
 
             # value = 0
             S = Scalar{precision_type}(value_type(0))
-            @test S === Zero{precision_type}()
+            @test iszero(S)
 
             # value = 1
             S = Scalar{precision_type}(value_type(1))
-            @test S === One{precision_type}()
+            @test isone(S)
         end
     end
 
@@ -68,11 +68,11 @@ using GeometricAlgebra
 
             # value = 0
             S = Scalar{precision_type}(value_type(0))
-            @test S === Zero{precision_type}()
+            @test iszero(S)
 
             # value = 1
             S = Scalar{precision_type}(value_type(1))
-            @test S === One{precision_type}()
+            @test isone(S)
         end
 
         # subtypes(Unsigned)
@@ -86,19 +86,19 @@ using GeometricAlgebra
 
             # value = 0
             S = Scalar{precision_type}(value_type(0))
-            @test S === Zero{precision_type}()
+            @test iszero(S)
 
             # value = 1
             S = Scalar{precision_type}(value_type(1))
-            @test S === One{precision_type}()
+            @test isone(S)
         end
 
         # Bool
         S = Scalar{precision_type}(true)
-        @test S === One{precision_type}()
+        @test isone(S)
 
         S = Scalar{precision_type}(false)
-        @test S === Zero{precision_type}()
+        @test iszero(S)
     end
 end
 
@@ -124,12 +124,12 @@ end
         # value = 0
         converted_test_value = precision_type(0)
         S = Scalar(converted_test_value)
-        @test S === Zero{precision_type}()
+        @test iszero(S)
 
         # value = 1
         converted_test_value = precision_type(1)
         S = Scalar(converted_test_value)
-        @test S === One{precision_type}()
+        @test isone(S)
     end
 
     # --- Scalar(value::Integer)
@@ -145,12 +145,12 @@ end
         # value = 0
         converted_test_value = value_type(0)
         S = Scalar(converted_test_value)
-        @test S === Zero{Float64}()
+        @test iszero(S)
 
         # value = 1
         converted_test_value = value_type(1)
         S = Scalar(converted_test_value)
-        @test S === One{Float64}()
+        @test isone(S)
     end
 
     # subtypes(Unsigned)
@@ -162,20 +162,20 @@ end
         # value = 0
         converted_test_value = value_type(0)
         S = Scalar(converted_test_value)
-        @test S === Zero{Float64}()
+        @test iszero(S)
 
         # value = 1
         converted_test_value = value_type(1)
         S = Scalar(converted_test_value)
-        @test S === One{Float64}()
+        @test isone(S)
     end
 
     # Bool
     S = Scalar(true)
-    @test S === One{Float64}()
+    @test isone(S)
 
     S = Scalar(false)
-    @test S === Zero{Float64}()
+    @test iszero(S)
 end
 
 #= DEPRECATED
@@ -208,12 +208,12 @@ end
         # value = 0
         S = Scalar(precision_type(0))
         S_copy = Scalar(S)
-        @test S_copy === Zero{precision_type}()
+        @test iszero(S_copy)
 
         # value = 1
         S = Scalar(precision_type(1))
         S_copy = Scalar(S)
-        @test S_copy === One{precision_type}()
+        @test isone(S_copy)
     end
 
     # --- Scalar(S::Scalar; value::Real)
@@ -609,10 +609,10 @@ end
 
         # value = Inf
         B = Scalar(precision_type(Inf))
-        @test reciprocal(B) === Zero{precision_type}()
+        @test iszero(reciprocal(B))
 
         # value = -Inf
         B = Scalar(precision_type(-Inf))
-        @test reciprocal(B) === Zero{precision_type}()
+        @test iszero(reciprocal(B))
     end
 end

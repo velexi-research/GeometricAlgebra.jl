@@ -140,9 +140,7 @@ end
             @test dual(dual_B, C) ≈ -B
         end
 
-        dual_B = dual(C, B)
-        expected_result = zero(C)
-        @test dual_B === expected_result
+        @test iszero(dual(C, B))
     end
 
     # dim(B) != dim(C)
@@ -165,9 +163,7 @@ end
         @test B_dual_C isa Blade
         @test B_dual_C == expected_result
 
-        C_dual_B = dual(C, B)
-        expected_result = zero(C)
-        @test C_dual_B === expected_result
+        @test iszero(dual(C, B))
     end
 
     # --- B::Blade, C::One
@@ -185,9 +181,7 @@ end
         @test B_dual_C isa Blade
         @test B_dual_C == expected_result
 
-        C_dual_B = dual(C, B)
-        expected_result = zero(C)
-        @test C_dual_B === expected_result
+        @test iszero(dual(C, B))
     end
 end
 
@@ -235,8 +229,7 @@ end
 
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(dim_B, test_value_1)
-        expected_result = zero(B)
-        @test dual(B, C) === expected_result
+        @test iszero(dual(B, C))
 
         expected_result = mod(dim_B, 4) < 2 ?
             Pseudoscalar(dim_B, test_value_2) :
@@ -251,8 +244,7 @@ end
 
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(dim_B, test_value_1)
-        expected_result = zero(B)
-        @test dual(B, C) == expected_result
+        @test iszero(dual(B, C))
 
         expected_result = mod(dim_B, 4) < 2 ?
             Pseudoscalar(dim_B, 1) :
@@ -267,8 +259,7 @@ end
 
     for dim_B in test_dim:test_dim + 3
         B = Pseudoscalar(dim_B, test_value_1)
-        expected_result = zero(B)
-        @test dual(B, C) == expected_result
+        @test iszero(dual(B, C))
     end
 end
 

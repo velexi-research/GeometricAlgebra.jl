@@ -112,11 +112,10 @@ end
     B = Pseudoscalar(test_dim, test_value_1)
     C = Blade(test_vectors)
 
-    expected_result = zero(B)
-    @test wedge(B, C) == expected_result
-    @test wedge(C, B) == expected_result
-    @test B ∧ C == expected_result
-    @test C ∧ B == expected_result
+    @test iszero(wedge(B, C))
+    @test iszero(wedge(C, B))
+    @test iszero(B ∧ C)
+    @test iszero(C ∧ B)
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
@@ -174,9 +173,8 @@ end
     B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim, test_value_2)
 
-    expected_result = zero(B)
-    @test wedge(B, C) == expected_result
-    @test B ∧ C == expected_result
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim, test_value_1)
@@ -219,9 +217,8 @@ end
         @test v ∧ B == v_wedge_B
 
         B_wedge_v = wedge(B, v)
-        expected_result = zero(B)
-        @test B_wedge_v == expected_result
-        @test B ∧ v == B_wedge_v
+        @test iszero(B_wedge_v)
+        @test iszero(B ∧ v)
     end
 
     # dim(v) != dim(B)
@@ -279,15 +276,11 @@ end
     B = Scalar(test_value_1)
     C = Zero()
 
-    B_wedge_C = wedge(B, C)
-    expected_result = Zero()
-    @test B_wedge_C === expected_result
-    @test B ∧ C === B_wedge_C
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 
-    C_wedge_B = wedge(C, B)
-    expected_result = Zero()
-    @test C_wedge_B === expected_result
-    @test C ∧ B === C_wedge_B
+    @test iszero(wedge(C, B))
+    @test iszero(C ∧ B)
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar
@@ -332,25 +325,19 @@ end
     B = One()
     C = One()
 
-    B_wedge_C = wedge(B, C)
-    expected_result = One()
-    @test B_wedge_C === expected_result
-    @test B ∧ C === B_wedge_C
+    @test isone(wedge(B, C))
+    @test isone(B ∧ C)
 
     # B::One, C::Zero
     # B::Zero, C::One
     B = One()
     C = Zero()
 
-    B_wedge_C = wedge(B, C)
-    expected_result = Zero()
-    @test B_wedge_C === expected_result
-    @test B ∧ C === B_wedge_C
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 
-    C_wedge_B = wedge(C, B)
-    expected_result = Zero()
-    @test C_wedge_B === expected_result
-    @test C ∧ B === C_wedge_B
+    @test iszero(wedge(C, B))
+    @test iszero(C ∧ B)
 
     # B::One, C::Real
     # B::Real, C::One
@@ -383,7 +370,7 @@ end
     B = Zero()
     C = Zero()
 
-    @test B + C === Zero()
+    @test iszero(B + C)
 
     # B::Zero, C::Real
     # B::Real, C::Zero

@@ -128,9 +128,8 @@ end
     B = One()
     C = Zero()
 
-    expected_result = One()
-    @test B + C === expected_result
-    @test C + B === expected_result
+    @test isone(B + C)
+    @test isone(C + B)
 
     # B::One, C::Real
     # B::Real, C::One
@@ -161,7 +160,7 @@ end
     B = Zero()
     C = Zero()
 
-    @test B + C === Zero()
+    @test iszero(B + C)
 
     # B::Zero, C::Real
     # B::Real, C::Zero

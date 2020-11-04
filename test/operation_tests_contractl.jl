@@ -75,10 +75,8 @@ using GeometricAlgebra
     B = Pseudoscalar(test_dim, test_value_1)
     C = Blade(test_basis)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value_1)
@@ -93,10 +91,8 @@ using GeometricAlgebra
     B = Blade(test_vector)
     C = Scalar(test_value_2)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=value(C) * volume(B))
@@ -107,10 +103,8 @@ using GeometricAlgebra
     B = Blade(test_basis)
     C = Scalar(test_value_2)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=value(C) * volume(B))
@@ -124,10 +118,8 @@ using GeometricAlgebra
     B = Blade(test_vector)
     C = test_value_2
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=C * volume(B))
@@ -138,10 +130,8 @@ using GeometricAlgebra
     B = Blade(test_basis)
     C = test_value_2
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     C_contractl_B = contractl(C, B)
     expected_result = Blade(basis(B), volume=C * volume(B))
@@ -185,10 +175,8 @@ using GeometricAlgebra
         @test v_contractl_B ≈ expected_result
         @test (v < B) == v_contractl_B
 
-        B_contractl_v = contractl(B, v)
-        expected_result = zero(B)
-        @test B_contractl_v == expected_result
-        @test (B < v) == B_contractl_v
+        @test iszero(contractl(B, v))
+        @test iszero(B < v)
     end
 
     # length(v) != dim(B)
@@ -251,10 +239,8 @@ end
     B = Blade(test_basis_1)
     C = Blade(test_vector_2)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test contractl(B, C) == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     # grade(B) == grade(C) > 1
     for test_grade in 5:8
@@ -293,10 +279,8 @@ end
     B = Blade(test_basis_2)
     C = Blade(test_basis_1)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     # dim(B) != dim(C)
     B = Blade(rand(test_dim, 3))
@@ -359,10 +343,8 @@ end
     B = Pseudoscalar(test_dim, test_value_1)
     C = Scalar(test_value_2)
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     # --- B::Pseudoscalar, C::Real
     #     C::Pseudoscalar, B::Real
@@ -370,10 +352,8 @@ end
     B = Pseudoscalar(test_dim, test_value_1)
     C = test_value_2
 
-    B_contractl_C = contractl(B, C)
-    expected_result = zero(B)
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     C_contractl_B = contractl(C, B)
     expected_result = Pseudoscalar(test_dim, C * value(B))
@@ -393,10 +373,8 @@ end
         @test v_contractl_B ≈ expected_result
         @test (v < B) == v_contractl_B
 
-        B_contractl_v = contractl(B, v)
-        expected_result = zero(B)
-        @test B_contractl_v === expected_result
-        @test (B < v) == B_contractl_v
+        @test iszero(contractl(B, v))
+        @test iszero(B < v)
     end
 
     # dim(v) != dim(B)
@@ -452,15 +430,11 @@ end
     B = Scalar(test_value_1)
     C = Zero()
 
-    B_contractl_C = contractl(B, C)
-    expected_result = Zero()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
-    C_contractl_B = contractl(C, B)
-    expected_result = Zero()
-    @test C_contractl_B === expected_result
-    @test (C < B) === C_contractl_B
+    @test iszero(contractl(C, B))
+    @test iszero(C < B)
 
     # --- B::Scalar, C::Real
     #     B::Real, C::Scalar
@@ -485,10 +459,8 @@ end
     B = Scalar(test_value_1)
     v = rand(5)
 
-    v_contractl_B = contractl(v, B)
-    expected_result = zero(B)
-    @test v_contractl_B == expected_result
-    @test (v < B) == v_contractl_B
+    @test iszero(contractl(v, B))
+    @test iszero(v < B)
 
     B_contractl_v = contractl(B, v)
     expected_result = Blade(v, volume=norm(v) * test_value_1)
@@ -509,25 +481,19 @@ end
     B = One()
     C = One()
 
-    B_contractl_C = contractl(B, C)
-    expected_result = One()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
+    @test isone(contractl(B, C))
+    @test isone(B < C)
 
     # B::One, C::Zero
     # B::Zero, C::One
     B = One()
     C = Zero()
 
-    B_contractl_C = contractl(B, C)
-    expected_result = Zero()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
-    C_contractl_B = contractl(C, B)
-    expected_result = Zero()
-    @test C_contractl_B === expected_result
-    @test (C < B) === C_contractl_B
+    @test iszero(contractl(C, B))
+    @test iszero(C < B)
 
     # B::One, C::Real
     # B::Real, C::One
@@ -560,23 +526,17 @@ end
     B = Zero()
     C = Zero()
 
-    B_contractl_C = contractl(B, C)
-    expected_result = Zero()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
     # B::Zero, C::Real
     # B::Real, C::Zero
     B = Zero()
     C = test_value
 
-    B_contractl_C = contractl(B, C)
-    expected_result = Zero()
-    @test B_contractl_C === expected_result
-    @test (B < C) === B_contractl_C
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 
-    C_contractl_B = contractl(C, B)
-    expected_result = Zero()
-    @test C_contractl_B === expected_result
-    @test (C < B) === C_contractl_B
+    @test iszero(contractl(C, B))
+    @test iszero(C < B)
 end
