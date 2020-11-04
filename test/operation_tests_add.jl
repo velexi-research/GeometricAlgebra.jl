@@ -20,23 +20,17 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "+(B, C): B or C isa Pseudoscalar" begin
-    # --- Preparations
+# ------ B::Pseudoscalar
 
-    # Test dimension
+@testset "+(B::Pseudoscalar, C::Pseudoscalar)" begin
     test_dim = 10
 
-    # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Pseudoscalar(test_dim, test_value_1)
 
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    # --- Tests
-
-    # B::Pseudoscalar, C::Pseudoscalar
-    B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim, test_value_2)
 
     B_plus_C = B + C
@@ -45,76 +39,70 @@ using GeometricAlgebra
     @test B_plus_C == expected_result
 end
 
-@testset "+(B, C): B or C isa Scalar" begin
-    # --- Preparations
+# ------ B::Scalar
 
-    # Test values
+@testset "+(B::Scalar, C::Zero)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
+
+    C = Zero()
+
+    @test B + C == B
+end
+
+@testset "+(B::Scalar, C::One)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
+
+    C = One()
+
+    B_plus_C = B + C
+    expected_result = 1 + test_value
+    @test B_plus_C isa Scalar
+    @test B_plus_C == expected_result
+end
+
+@testset "+(B::Scalar, C::Scalar)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Scalar(test_value_1)
 
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    # --- Tests
-
-    # B::Scalar, C::Scalar
-    B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
     B_plus_C = B + C
     expected_result = test_value_1 + test_value_2
     @test B_plus_C isa Scalar
     @test B_plus_C == expected_result
+end
 
-    # B::Scalar, C::One
-    # B::One, C::Scalar
+@testset "+(B::Scalar, C::Real)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Scalar(test_value_1)
-    C = One()
 
-    B_plus_C = B + C
-    expected_result = 1 + test_value_1
-    @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
-
-    C_plus_B = C + B
-    expected_result = 1 + test_value_1
-    @test C_plus_B isa Scalar
-    @test C_plus_B == expected_result
-
-    # B::Scalar, C::Zero
-    # B::Zero, C::Scalar
-    B = Scalar(test_value_1)
-    C = Zero()
-
-    @test B + C == B
-    @test C + B == B
-
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
-    B = Scalar(test_value_1)
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
     B_plus_C = B + C
     expected_result = test_value_1 + test_value_2
     @test B_plus_C isa Scalar
     @test B_plus_C == expected_result
-
-    C_plus_B = C + B
-    expected_result = test_value_1 + test_value_2
-    @test C_plus_B isa Scalar
-    @test C_plus_B == expected_result
 end
 
-@testset "+(B, C): B or C isa One" begin
-    # --- Preparations
+# ------ B::One
 
-    # Test values
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+@testset "+(B::One, C::Zero)" begin
+    B = One()
+    C = Zero()
+    @test isone(B + C)
+end
 
-    # --- Tests
-
-    # B::One, C::One
+@testset "+(B::One, C::One)" begin
     B = One()
     C = One()
 
@@ -122,58 +110,110 @@ end
     C_plus_B = C + B
     @test B + C isa Scalar
     @test B + C == expected_result
-
-    # B::One, C::Zero
-    # B::Zero, C::One
-    B = One()
-    C = Zero()
-
-    @test isone(B + C)
-    @test isone(C + B)
-
-    # B::One, C::Real
-    # B::Real, C::One
-    B = One()
-    C = test_value
-
-    B_plus_C = B + C
-    expected_result = 1 + test_value
-    @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
-
-    C_plus_B = C + B
-    expected_result = 1 + test_value
-    @test C_plus_B isa Scalar
-    @test C_plus_B == expected_result
 end
 
-@testset "+(B, C): B or C isa Zero" begin
-    # --- Preparations
+@testset "+(B::One, C::Scalar)" begin
+    B = One()
 
-    # Test values
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
 
-    # --- Tests
+    B_plus_C = B + C
+    expected_result = 1 + test_value
+    @test B_plus_C isa Scalar
+    @test B_plus_C == expected_result
+end
 
-    # B::Zero, C::Zero
+@testset "+(B::One, C::Real)" begin
+    B = One()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = test_value
+
+    B_plus_C = B + C
+    expected_result = 1 + test_value
+    @test B_plus_C isa Scalar
+    @test B_plus_C == expected_result
+end
+
+# ------ B::Zero
+
+@testset "+(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-
     @test iszero(B + C)
+end
 
-    # B::Zero, C::Real
-    # B::Real, C::Zero
+@testset "+(B::Zero, C::One)" begin
     B = Zero()
+    C = One()
+    @test isone(B + C)
+end
+
+@testset "+(B::Zero, C::Scalar)" begin
+    B = Zero()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
+
+    @test B + C == C
+end
+
+@testset "+(B::Zero, C::Real)" begin
+    B = Zero()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
     B_plus_C = B + C
     expected_result = C
     @test B_plus_C isa Scalar
     @test B_plus_C == expected_result
+end
 
-    C_plus_B = C + B
-    expected_result = C
-    @test C_plus_B isa Scalar
-    @test C_plus_B == expected_result
+# ------ B::Real
+
+@testset "+(B::Real, C::Zero)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    C = Zero()
+
+    B_plus_C = B + C
+    expected_result = B
+    @test B_plus_C isa Scalar
+    @test B_plus_C == expected_result
+end
+
+@testset "+(B::Real, C::One)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    C = One()
+
+    B_plus_C = B + C
+    expected_result = 1 + test_value
+    @test B_plus_C isa Scalar
+    @test B_plus_C == expected_result
+end
+
+@testset "+(B::Real, C::Scalar)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Scalar(test_value_2)
+
+    B_plus_C = B + C
+    expected_result = test_value_1 + test_value_2
+    @test B_plus_C isa Scalar
+    @test B_plus_C == expected_result
 end
