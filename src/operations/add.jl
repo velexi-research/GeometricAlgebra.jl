@@ -26,13 +26,13 @@ Compute the sum of the multivectors `M` and `N`.
 
 # M::AbstractMultivector, B::One
 # B::One,M::AbstractMultivector
-+(M::AbstractMultivector, B::One) = Multivector(vcat([B], blades(M)))
-+(B::One, M::AbstractMultivector) = B + M
+@inline +(M::AbstractMultivector, B::One) = Multivector(vcat([B], blades(M)))
+@inline +(B::One, M::AbstractMultivector) = B + M
 
 # M::AbstractMultivector, B::Zero
 # B::Zero, M::AbstractMultivector
-+(M::AbstractMultivector, B::Zero) = M
-+(B::Zero, M::AbstractMultivector) = M
+@inline +(M::AbstractMultivector, B::Zero) = M
+@inline +(B::Zero, M::AbstractMultivector) = M
 
 # --- Operations involving a Blade instance
 
@@ -50,41 +50,41 @@ end
 # --- Operations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
-+(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B, value=value(B) + value(C))
+@inline +(B::Pseudoscalar, C::Pseudoscalar) =
+    Pseudoscalar(B, value=value(B) + value(C))
 
 # --- Operations involving an AbstractScalar instance
 
+# B::AbstractScalar, C::AbstractScalar
+@inline +(B::AbstractScalar, C::AbstractScalar) =
+    Scalar{typeof(value(B))}(value(B) + value(C))
+
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
-+(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
-+(B::One, C::AbstractScalar) = C + B
+@inline +(B::AbstractScalar, C::One) = Scalar{typeof(value(B))}(value(B) + 1)
+@inline +(B::One, C::AbstractScalar) = C + B
 
 # B::AbstractScalar, C::Zero
 # B::Zero, C::AbstractScalar
-+(B::AbstractScalar, C::Zero) = B
-+(B::Zero, C::AbstractScalar) = C
+@inline +(B::AbstractScalar, C::Zero) = B
+@inline +(B::Zero, C::AbstractScalar) = C
 
 # B::AbstractScalar, x::Real
 # x::Real, B::AbstractScalar
-+(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) + x)
-+(x::Real, B::AbstractScalar) = B + x
-
-# --- Operations involving a Scalar instance
-
-# B::Scalar, C::Scalar
-+(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) + value(C))
+@inline +(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) + x)
+@inline +(x::Real, B::AbstractScalar) = B + x
 
 # --- Operations involving a One instance
 
 # B::One, C::One
-+(B::One, C::One) = Scalar{typeof(value(B))}(2)
+@inline +(B::One, C::One) = Scalar{typeof(value(B))}(2)
 
 # B::One, C::Zero
 # B::Zero, C::One
-+(B::One, C::Zero) = B
-+(B::Zero, C::One) = C
+@inline +(B::One, C::Zero) = B
+@inline +(B::Zero, C::One) = C
 
 # --- Operations involving a Zero instance
 
 # B::Zero, C::Zero
-+(B::Zero, C::Zero) = B
+@inline +(B::Zero, C::Zero) = B
