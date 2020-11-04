@@ -125,8 +125,7 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
-    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
-    @test B * C == expected_result
+    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
 end
 
 # ------ B::Scalar
@@ -166,9 +165,8 @@ end
     C = Scalar(test_value_2)
 
     B_times_C = B * C
-    expected_result = test_value_1 * test_value_2
     @test B_times_C isa Scalar
-    @test B_times_C == expected_result
+    @test B_times_C == test_value_1 * test_value_2
 end
 
 @testset "*(B::Scalar, C::One)" begin
@@ -201,9 +199,8 @@ end
     C = test_value_2
 
     B_times_C = B * C
-    expected_result = test_value_1 * test_value_2
     @test B_times_C isa Scalar
-    @test B_times_C == expected_result
+    @test B_times_C == test_value_1 * test_value_2
 end
 
 @testset "*(B::Scalar, C::Vector)" begin
@@ -262,9 +259,8 @@ end
     C = test_value
 
     B_times_C = B * C
-    expected_result = test_value
     @test B_times_C isa Scalar
-    @test B_times_C == expected_result
+    @test B_times_C == test_value
 end
 
 @testset "*(B::One, C::Vector)" begin
@@ -351,8 +347,7 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Pseudoscalar(test_dim, test_value_2)
 
-    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
-    @test B * C == expected_result
+    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
 end
 
 @testset "*(B::Real, C::Scalar)" begin
@@ -365,9 +360,8 @@ end
     C = Scalar(test_value_2)
 
     B_times_C = B * C
-    expected_result = test_value_1 * test_value_2
     @test B_times_C isa Scalar
-    @test B_times_C == expected_result
+    @test B_times_C == test_value_1 * test_value_2
 end
 
 @testset "*(B::Real, C::One)" begin
@@ -378,9 +372,8 @@ end
     C = One()
 
     B_times_C = B * C
-    expected_result = test_value
     @test B_times_C isa Scalar
-    @test B_times_C == expected_result
+    @test B_times_C == test_value
 end
 
 @testset "*(B::Real, C::Zero)" begin

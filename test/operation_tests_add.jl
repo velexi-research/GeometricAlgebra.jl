@@ -34,9 +34,8 @@ using GeometricAlgebra
     C = Pseudoscalar(test_dim, test_value_2)
 
     B_plus_C = B + C
-    expected_result = Pseudoscalar(test_dim, test_value_1 + test_value_2)
     @test B_plus_C isa Pseudoscalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == Pseudoscalar(test_dim, test_value_1 + test_value_2)
 end
 
 # ------ B::Scalar
@@ -51,9 +50,8 @@ end
     C = Scalar(test_value_2)
 
     B_plus_C = B + C
-    expected_result = test_value_1 + test_value_2
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == test_value_1 + test_value_2
 end
 
 @testset "+(B::Scalar, C::One)" begin
@@ -64,9 +62,8 @@ end
     C = One()
 
     B_plus_C = B + C
-    expected_result = 1 + test_value
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == 1 + test_value
 end
 
 @testset "+(B::Scalar, C::Zero)" begin
@@ -89,9 +86,8 @@ end
     C = test_value_2
 
     B_plus_C = B + C
-    expected_result = test_value_1 + test_value_2
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == test_value_1 + test_value_2
 end
 
 # ------ B::One
@@ -104,19 +100,17 @@ end
     C = Scalar(test_value)
 
     B_plus_C = B + C
-    expected_result = 1 + test_value
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == 1 + test_value
 end
 
 @testset "+(B::One, C::One)" begin
     B = One()
     C = One()
 
-    expected_result = 2
     C_plus_B = C + B
     @test B + C isa Scalar
-    @test B + C == expected_result
+    @test B + C == 2
 end
 
 @testset "+(B::One, C::Zero)" begin
@@ -133,9 +127,8 @@ end
     C = test_value
 
     B_plus_C = B + C
-    expected_result = 1 + test_value
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == 1 + test_value
 end
 
 # ------ B::Zero
@@ -170,9 +163,8 @@ end
     C = test_value
 
     B_plus_C = B + C
-    expected_result = C
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == C
 end
 
 # ------ B::Real
@@ -187,9 +179,8 @@ end
     C = Scalar(test_value_2)
 
     B_plus_C = B + C
-    expected_result = test_value_1 + test_value_2
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == test_value_1 + test_value_2
 end
 
 @testset "+(B::Real, C::One)" begin
@@ -200,9 +191,8 @@ end
     C = One()
 
     B_plus_C = B + C
-    expected_result = 1 + test_value
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == 1 + test_value
 end
 
 @testset "+(B::Real, C::Zero)" begin
@@ -213,7 +203,6 @@ end
     C = Zero()
 
     B_plus_C = B + C
-    expected_result = B
     @test B_plus_C isa Scalar
-    @test B_plus_C == expected_result
+    @test B_plus_C == B
 end

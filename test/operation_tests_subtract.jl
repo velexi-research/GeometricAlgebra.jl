@@ -35,9 +35,8 @@ using GeometricAlgebra
     C = Pseudoscalar(test_dim, test_value_2)
 
     B_minus_C = B - C
-    expected_result = Pseudoscalar(test_dim, test_value_1 - test_value_2)
     @test B_minus_C isa Pseudoscalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == Pseudoscalar(test_dim, test_value_1 - test_value_2)
 
     # B == C
     B = Pseudoscalar(test_dim, test_value_1)
@@ -58,9 +57,8 @@ end
     C = Scalar(test_value_2)
 
     B_minus_C = B - C
-    expected_result = test_value_1 - test_value_2
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == test_value_1 - test_value_2
 
     # B == C
     B = Scalar(test_value_1)
@@ -76,9 +74,8 @@ end
     C = One()
 
     B_minus_C = B - C
-    expected_result = test_value - 1
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == test_value - 1
 end
 
 @testset "-(B::Scalar, C::Zero)" begin
@@ -102,9 +99,8 @@ end
     C = test_value_2
 
     B_minus_C = B - C
-    expected_result = test_value_1 - test_value_2
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == test_value_1 - test_value_2
 
     # B == C
     B = Scalar(test_value_1)
@@ -122,9 +118,8 @@ end
     C = Scalar(test_value)
 
     B_minus_C = B - C
-    expected_result = 1 - test_value
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == 1 - test_value
 end
 
 @testset "-(B::One, C::One)" begin
@@ -148,9 +143,8 @@ end
     C = test_value
 
     B_minus_C = B - C
-    expected_result = 1 - test_value
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == 1 - test_value
 
     # B == C
     B = One()
@@ -217,9 +211,8 @@ end
     C = Scalar(test_value_2)
 
     B_minus_C = B - C
-    expected_result = test_value_1 - test_value_2
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == test_value_1 - test_value_2
 
     # B == C
     B = test_value_1
@@ -236,9 +229,8 @@ end
     C = One()
 
     B_minus_C = B - C
-    expected_result = test_value - 1
     @test B_minus_C isa Scalar
-    @test B_minus_C == expected_result
+    @test B_minus_C == test_value - 1
 
     # B == C
     B = 1
