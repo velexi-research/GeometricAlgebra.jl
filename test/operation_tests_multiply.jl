@@ -20,48 +20,33 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "*(B, C): B or C isa Blade" begin
-    # --- Preparations
+# ------ B::Blade
 
-    # Dimension of embedding space
+@testset "*(B::Blade, C::Scalar)" begin
     test_dim = 10
+    B = Blade(rand(test_dim, 3))
 
-    # Test values
-    test_value_1 = rand()
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
 
-    test_value_2 = rand()
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    # Test vectors
-    test_vectors = rand(test_dim, 3)
-
-    # --- B::Scalar, C::Blade
-    #     B::Blade, C::Scalar
-
-    # Preparations
-    B = Scalar(test_value_1)
-    C = Blade(test_vectors)
-
-    # Exercise functionality and check results
-    expected_result = Blade(basis(C), volume=value(B) * volume(C))
-    @test B * C ≈ expected_result
-    @test C * B ≈ expected_result
-
-    # --- B::Real, C::Blade
-    #     B::Blade, C::Real
-
-    # Preparations
-    x = test_value_1
-    B = Blade(test_vectors)
-
-    # Exercise functionality and check results
-    expected_result = Blade(basis(B), volume=x * volume(B))
-    @test x * B ≈ expected_result
-    @test B * x ≈ expected_result
+    @test B * C ≈ Blade(basis(B), volume=value(C) * volume(B))
 end
 
-@testset "*(B, C): B or C isa Pseudoscalar" begin
+@testset "*(B::Blade, C::Real)" begin
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = test_value
+
+    @test B * C ≈ Blade(basis(B), volume=C * volume(B))
+end
+
+# ------ B::Pseudoscalar
+
+@testset "*(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
     # Test dimension
@@ -89,201 +74,349 @@ end
         @test B_times_C isa Scalar
         @test B_times_C == expected_result
     end
-
-    # B::Pseudoscalar, C::Scalar
-    # B::Scalar, C::Pseudoscalar
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = Scalar(test_value_2)
-
-    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
-    @test B * C == expected_result
-    @test C * B == expected_result
-
-    # B::Pseudoscalar, C::One
-    # B::One, C::Pseudoscalar
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = One()
-
-    expected_result = B
-    @test B * C === expected_result
-    @test C * B === expected_result
-
-    # B::Pseudoscalar, C::Zero
-    # B::Zero, C::Pseudoscalar
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = Zero()
-
-    expected_result = C
-    @test B * C === expected_result
-    @test C * B === expected_result
-
-    # B::Pseudoscalar, C::Real
-    # C::Real, B::Pseudoscalar
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = test_value_2
-
-    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
-    @test B * C == expected_result
-    @test C * B == expected_result
 end
 
-@testset "*(B, C): B or C isa Scalar" begin
-    # --- Preparations
+@testset "*(B::Pseudoscalar, C::Scalar)" begin
+    test_dim = 10
 
-    # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Pseudoscalar(test_dim, test_value_1)
 
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Scalar(test_value_2)
 
-    # --- Tests
+    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+end
 
-    # B::Scalar, C::Scalar
+@testset "*(B::Pseudoscalar, C::One)" begin
+    test_dim = 10
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = One()
+
+    @test B * C === B
+end
+
+@testset "*(B::Pseudoscalar, C::Zero)" begin
+    test_dim = 10
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = Zero()
+
+    @test iszero(B * C)
+end
+
+@testset "*(B::Pseudoscalar, C::Real)" begin
+    test_dim = 10
+
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Pseudoscalar(test_dim, test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = test_value_2
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test B * C == expected_result
+end
+
+# ------ B::Scalar
+
+@testset "*(B::Scalar, C::Blade)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
+
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test B * C ≈ Blade(basis(C), volume=value(B) * volume(C))
+end
+
+@testset "*(B::Scalar, C::PseudoscalarScalar)" begin
+    test_dim = 10
+
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Scalar(test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+end
+
+@testset "*(B::Scalar, C::Scalar)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Scalar(test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_times_C = B * C
     expected_result = test_value_1 * test_value_2
     @test B_times_C isa Scalar
     @test B_times_C == expected_result
+end
 
-    C_times_B = C * B
-    expected_result = test_value_1 * test_value_2
-    @test C_times_B isa Scalar
-    @test C_times_B == expected_result
+@testset "*(B::Scalar, C::One)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
 
-    # B::Scalar, C::One
-    # B::One, C::Scalar
-    B = Scalar(test_value_1)
     C = One()
 
-    expected_result = B
-    @test B * C === expected_result
-    @test C * B === expected_result
+    @test B * C === B
+end
 
-    # B::Scalar, C::Zero
-    # B::Zero, C::Scalar
-    B = Scalar(test_value_1)
+@testset "*(B::Scalar, C::Zero)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
+
     C = Zero()
 
     @test iszero(B * C)
-    @test iszero(C * B)
+end
 
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
+@testset "*(B::Scalar, C::Real)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Scalar(test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
     B_times_C = B * C
     expected_result = test_value_1 * test_value_2
     @test B_times_C isa Scalar
     @test B_times_C == expected_result
+end
 
-    C_times_B = C * B
-    expected_result = test_value_1 * test_value_2
-    @test C_times_B isa Scalar
-    @test C_times_B == expected_result
-
-    # B::Vector, C::Scalar
-    # B::Scalar, B::Vector
+@testset "*(B::Scalar, C::Vector)" begin
     B = rand(5)
-    C = Scalar(test_value_2)
 
-    expected_result = test_value_2 * Blade(B)
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
 
     B_times_C = B * C
     @test B_times_C isa Blade
-    @test B_times_C ≈ expected_result
-
-    C_times_B = C * B
-    @test C_times_B isa Blade
-    @test C_times_B ≈ expected_result
+    @test B_times_C ≈ test_value * Blade(B)
 end
 
-@testset "*(B, C): B or C isa One" begin
-    # --- Preparations
+# ------ B::One
 
-    # Test values
+@testset "*(B::One, C::Pseudoscalar)" begin
+    test_dim = 10
+
+    B = One()
+
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
 
-    # --- Tests
+    @test B * C === C
+end
 
-    # B::One, C::One
+@testset "*(B::One, C::Scalar)" begin
+    B = One()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
+
+    @test B * C === C
+end
+
+@testset "*(B::One, C::One)" begin
     B = One()
     C = One()
-
     @test isone(B * C)
-    @test isone(C * B)
+end
 
-    # B::One, C::Zero
-    # B::Zero, C::One
+@testset "*(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-
     @test iszero(B * C)
-    @test iszero(C * B)
+end
 
-    # B::One, C::Real
-    # B::Real, C::One
+@testset "*(B::One, C::Real)" begin
     B = One()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
     B_times_C = B * C
     expected_result = test_value
     @test B_times_C isa Scalar
     @test B_times_C == expected_result
-
-    C_times_B = C * B
-    expected_result = test_value
-    @test C_times_B isa Scalar
-    @test C_times_B == expected_result
-
-    # B::Vector, C::One
-    # B::One, B::Vector
-    B = rand(5)
-    C = One()
-
-    expected_result = Blade(B)
-
-    B_times_C = B * C
-    @test B_times_C isa Blade
-    @test B_times_C == expected_result
-
-    C_times_B = C * B
-    @test C_times_B isa Blade
-    @test C_times_B == expected_result
 end
 
-@testset "*(B, C): B or C isa Zero" begin
-    # --- Preparations
+@testset "*(B::One, C::Vector)" begin
+    B = rand(5)
+    C = One()
+    B_times_C = B * C
+    @test B_times_C isa Blade
+    @test B_times_C == Blade(B)
+end
 
-    # Test values
+# ------ B::Zero
+
+@testset "*(B::Zero, C::Pseudoscalar)" begin
+    test_dim = 10
+
+    B = Zero()
+
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
-
-    # --- Tests
-
-    # B::Zero, C::Zero
-    B = Zero()
-    C = Zero()
+    C = Pseudoscalar(test_dim, test_value)
 
     @test iszero(B * C)
+end
 
-    # B::Zero, C::Real
-    # B::Real, C::Zero
+@testset "*(B::Zero, C::Scalar)" begin
     B = Zero()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
+
+    @test iszero(B * C)
+end
+
+@testset "*(B::Zero, C::One)" begin
+    B = Zero()
+    C = One()
+    @test iszero(B * C)
+end
+
+@testset "*(B::Zero, C::Zero)" begin
+    B = Zero()
+    C = Zero()
+    @test iszero(B * C)
+end
+
+@testset "*(B::Zero, C::Real)" begin
+    B = Zero()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
     @test iszero(B * C)
-    @test iszero(C * B)
+end
 
-    # B::Vector, C::Zero
-    # B::Zero, B::Vector
-    B = rand(5)
+@testset "*(B::Zero, C::Vector)" begin
+    B = Zero()
+    C = rand(5)
+    @test iszero(B * C)
+end
+
+# ------ B::Real
+
+@testset "*(B::Real, C::Blade)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test B * C ≈ Blade(basis(C), volume=B * volume(C))
+end
+
+@testset "*(B::Real, C::Pseudoscalar)" begin
+    test_dim = 10
+
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    expected_result = Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test B * C == expected_result
+end
+
+@testset "*(B::Real, C::Scalar)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Scalar(test_value_2)
+
+    B_times_C = B * C
+    expected_result = test_value_1 * test_value_2
+    @test B_times_C isa Scalar
+    @test B_times_C == expected_result
+end
+
+@testset "*(B::Real, C::One)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    C = One()
+
+    B_times_C = B * C
+    expected_result = test_value
+    @test B_times_C isa Scalar
+    @test B_times_C == expected_result
+end
+
+@testset "*(B::Real, C::Zero)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
     C = Zero()
 
     @test iszero(B * C)
-    @test iszero(C * B)
+end
+
+# ------ B::Vector
+
+@testset "*(B::Vector, C::Scalar)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
+
+    C = rand(5)
+
+    B_times_C = B * C
+    @test B_times_C isa Blade
+    @test B_times_C ≈ test_value * Blade(C)
+end
+
+@testset "*(B::Vector, C::One)" begin
+    B = One()
+    C = rand(5)
+    B_times_C = B * C
+    @test B_times_C isa Blade
+    @test B_times_C == Blade(C)
+end
+
+@testset "*(B::Vector, C::Zero)" begin
+    B = rand(5)
+    C = Zero()
+    @test iszero(B * C)
 end
