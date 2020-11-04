@@ -49,10 +49,6 @@ end
 @testset "*(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
-    # Test dimension
-    test_dim = 10
-
-    # Test values
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
 
@@ -78,7 +74,6 @@ end
 
 @testset "*(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 10
-
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Pseudoscalar(test_dim, test_value_1)
@@ -92,7 +87,6 @@ end
 
 @testset "*(B::Pseudoscalar, C::One)" begin
     test_dim = 10
-
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
     B = Pseudoscalar(test_dim, test_value)
@@ -104,7 +98,6 @@ end
 
 @testset "*(B::Pseudoscalar, C::Zero)" begin
     test_dim = 10
-
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
     B = Pseudoscalar(test_dim, test_value)
@@ -116,7 +109,6 @@ end
 
 @testset "*(B::Pseudoscalar, C::Real)" begin
     test_dim = 10
-
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Pseudoscalar(test_dim, test_value_1)
@@ -142,12 +134,11 @@ end
 end
 
 @testset "*(B::Scalar, C::PseudoscalarScalar)" begin
-    test_dim = 10
-
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Scalar(test_value_1)
 
+    test_dim = 10
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Pseudoscalar(test_dim, test_value_2)
@@ -218,10 +209,9 @@ end
 # ------ B::One
 
 @testset "*(B::One, C::Pseudoscalar)" begin
-    test_dim = 10
-
     B = One()
 
+    test_dim = 10
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
     C = Pseudoscalar(test_dim, test_value)
@@ -274,10 +264,9 @@ end
 # ------ B::Zero
 
 @testset "*(B::Zero, C::Pseudoscalar)" begin
-    test_dim = 10
-
     B = Zero()
 
+    test_dim = 10
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
     C = Pseudoscalar(test_dim, test_value)
@@ -337,12 +326,11 @@ end
 end
 
 @testset "*(B::Real, C::Pseudoscalar)" begin
-    test_dim = 10
-
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = test_value_1
 
+    test_dim = 10
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Pseudoscalar(test_dim, test_value_2)
