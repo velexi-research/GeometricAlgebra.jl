@@ -57,7 +57,7 @@ end
     C = Scalar(test_value_2)
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == test_value_1 - test_value_2
 
     # B == C
@@ -74,7 +74,7 @@ end
     C = One()
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == test_value - 1
 end
 
@@ -99,7 +99,7 @@ end
     C = test_value_2
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == test_value_1 - test_value_2
 
     # B == C
@@ -118,7 +118,7 @@ end
     C = Scalar(test_value)
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == 1 - test_value
 end
 
@@ -143,7 +143,7 @@ end
     C = test_value
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == 1 - test_value
 
     # B == C
@@ -162,7 +162,7 @@ end
     C = Scalar(test_value)
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == -test_value
 end
 
@@ -170,7 +170,7 @@ end
     B = Zero()
     C = One()
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == -1
 end
 
@@ -189,7 +189,7 @@ end
     C = test_value
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == -test_value
 
     # B == C
@@ -211,7 +211,7 @@ end
     C = Scalar(test_value_2)
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == test_value_1 - test_value_2
 
     # B == C
@@ -229,7 +229,7 @@ end
     C = One()
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == test_value - 1
 
     # B == C
@@ -247,7 +247,7 @@ end
     C = Zero()
 
     B_minus_C = B - C
-    @test B_minus_C isa Scalar
+    @test B_minus_C isa AbstractScalar
     @test B_minus_C == test_value
 
     # B == C

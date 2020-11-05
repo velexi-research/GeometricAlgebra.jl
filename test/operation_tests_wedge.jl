@@ -269,9 +269,9 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == test_value_1 * test_value_2
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == test_value_1 * test_value_2
 end
 
@@ -282,9 +282,9 @@ end
 
     C = One()
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == test_value
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == test_value
 end
 
@@ -308,10 +308,10 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == test_value_1 * test_value_2
 
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == test_value_1 * test_value_2
 end
 
@@ -336,9 +336,9 @@ end
     test_value = rand() > 0.5 ? test_value : -test_value
     C = Scalar(test_value)
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == test_value
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == test_value
 end
 
@@ -363,9 +363,9 @@ end
     test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == C
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == C
 end
 
@@ -449,9 +449,9 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == test_value_1 * test_value_2
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == test_value_1 * test_value_2
 end
 
@@ -462,9 +462,9 @@ end
 
     C = One()
 
-    @test wedge(B, C) isa Scalar
+    @test wedge(B, C) isa AbstractScalar
     @test wedge(B, C) == B
-    @test B ∧ C isa Scalar
+    @test B ∧ C isa AbstractScalar
     @test B ∧ C == B
 end
 

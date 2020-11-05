@@ -50,7 +50,7 @@ end
     C = Scalar(test_value_2)
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == test_value_1 + test_value_2
 end
 
@@ -62,7 +62,7 @@ end
     C = One()
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == 1 + test_value
 end
 
@@ -86,7 +86,7 @@ end
     C = test_value_2
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == test_value_1 + test_value_2
 end
 
@@ -100,7 +100,7 @@ end
     C = Scalar(test_value)
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == 1 + test_value
 end
 
@@ -109,7 +109,7 @@ end
     C = One()
 
     C_plus_B = C + B
-    @test B + C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B + C == 2
 end
 
@@ -127,7 +127,7 @@ end
     C = test_value
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == 1 + test_value
 end
 
@@ -163,7 +163,7 @@ end
     C = test_value
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == C
 end
 
@@ -179,7 +179,7 @@ end
     C = Scalar(test_value_2)
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == test_value_1 + test_value_2
 end
 
@@ -191,7 +191,7 @@ end
     C = One()
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == 1 + test_value
 end
 
@@ -203,6 +203,6 @@ end
     C = Zero()
 
     B_plus_C = B + C
-    @test B_plus_C isa Scalar
+    @test B_plus_C isa AbstractScalar
     @test B_plus_C == B
 end

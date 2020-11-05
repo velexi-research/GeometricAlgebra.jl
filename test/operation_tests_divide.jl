@@ -34,7 +34,7 @@ using GeometricAlgebra
     C = Pseudoscalar(test_dim, test_value_2)
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == test_value_1 / test_value_2
 end
 
@@ -121,7 +121,7 @@ end
     C = Scalar(test_value_2)
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == test_value_1 / test_value_2
 end
 
@@ -133,7 +133,7 @@ end
     C = One()
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == test_value
 end
 
@@ -170,7 +170,7 @@ end
     C = test_value_2
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == test_value_1 / test_value_2
 end
 
@@ -204,7 +204,7 @@ end
     C = Scalar(test_value)
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == 1 / test_value
 end
 
@@ -318,7 +318,7 @@ end
     C = Scalar(test_value_2)
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == test_value_1 / test_value_2
 end
 
@@ -330,7 +330,7 @@ end
     C = One()
 
     B_slash_C = B / C
-    @test B_slash_C isa Scalar
+    @test B_slash_C isa AbstractScalar
     @test B_slash_C == test_value
 end
 

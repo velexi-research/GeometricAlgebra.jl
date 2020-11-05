@@ -67,7 +67,7 @@ end
             test_value_1 * test_value_2 :
            -test_value_1 * test_value_2
 
-        @test B_times_C isa Scalar
+        @test B_times_C isa AbstractScalar
         @test B_times_C == expected_result
     end
 end
@@ -156,7 +156,7 @@ end
     C = Scalar(test_value_2)
 
     B_times_C = B * C
-    @test B_times_C isa Scalar
+    @test B_times_C isa AbstractScalar
     @test B_times_C == test_value_1 * test_value_2
 end
 
@@ -190,7 +190,7 @@ end
     C = test_value_2
 
     B_times_C = B * C
-    @test B_times_C isa Scalar
+    @test B_times_C isa AbstractScalar
     @test B_times_C == test_value_1 * test_value_2
 end
 
@@ -249,7 +249,7 @@ end
     C = test_value
 
     B_times_C = B * C
-    @test B_times_C isa Scalar
+    @test B_times_C isa AbstractScalar
     @test B_times_C == test_value
 end
 
@@ -348,7 +348,7 @@ end
     C = Scalar(test_value_2)
 
     B_times_C = B * C
-    @test B_times_C isa Scalar
+    @test B_times_C isa AbstractScalar
     @test B_times_C == test_value_1 * test_value_2
 end
 
@@ -360,7 +360,7 @@ end
     C = One()
 
     B_times_C = B * C
-    @test B_times_C isa Scalar
+    @test B_times_C isa AbstractScalar
     @test B_times_C == test_value
 end
 

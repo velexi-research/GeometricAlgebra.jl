@@ -21,174 +21,9 @@ using GeometricAlgebra
 
 # --- Tests
 
-@testset "contractl(B, C): B or C isa Blade" begin
-    # --- Preparations
+# ------ B::Blade
 
-    # Dimension of embedding space
-    test_dim = 10
-
-    # Test values
-    test_value_1 = rand()
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-
-    test_value_2 = rand()
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    # Test vectors
-    test_vector = rand(test_dim)
-
-    # Test basis
-    test_grade = 3
-    test_basis = rand(test_dim, test_grade)
-
-    # --- B::Blade, C::Pseudoscalar
-
-    # dim(B) == dim(C)
-    test_grade = 3
-    for test_dim in 10:13
-        B = Blade(rand(test_dim, test_grade))
-        C = Pseudoscalar(test_dim, test_value_2)
-
-        B_contractl_C = contractl(B, C)
-
-        expected_result = mod(test_dim, 4) < 2 ?
-            value(C) * dual(B) :
-           -value(C) * dual(B)
-
-        @test B_contractl_C ≈ expected_result
-        @test (B < C) == B_contractl_C
-    end
-
-    # dim(B) != dim(C)
-    B = Blade(test_basis)
-    C = Pseudoscalar(test_dim + 1, test_value_2)
-    @test_throws DimensionMismatch contractl(B, C)
-    @test_throws DimensionMismatch B < C
-
-    # --- B::Pseudoscalar, C::Blade
-
-    # dim(B) == dim(C)
-    test_dim = 10
-    test_grade = 5
-    test_basis = rand(test_dim, test_grade)
-
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = Blade(test_basis)
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    # dim(B) != dim(C)
-    B = Pseudoscalar(test_dim + 1, test_value_1)
-    C = Blade(test_basis)
-    @test_throws DimensionMismatch contractl(B, C)
-    @test_throws DimensionMismatch (B < C)
-
-    # --- B::Blade, C::Scalar
-    #     B::Scalar, B::Blade
-
-    # grade(C) == 1
-    B = Blade(test_vector)
-    C = Scalar(test_value_2)
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Blade(basis(B), volume=value(C) * volume(B))
-    @test C_contractl_B ≈ expected_result
-    @test (C < B) == C_contractl_B
-
-    # grade(C) > 1
-    B = Blade(test_basis)
-    C = Scalar(test_value_2)
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Blade(basis(B), volume=value(C) * volume(B))
-    @test C_contractl_B ≈ expected_result
-    @test (C < B) == C_contractl_B
-
-    # --- B::Blade, C::Real
-    #     C::Real, B::Blade
-
-    # grade(B) == 1
-    B = Blade(test_vector)
-    C = test_value_2
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Blade(basis(B), volume=C * volume(B))
-    @test C_contractl_B ≈ expected_result
-    @test (C < B) == C_contractl_B
-
-    # grade(B) > 1
-    B = Blade(test_basis)
-    C = test_value_2
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Blade(basis(B), volume=C * volume(B))
-    @test C_contractl_B ≈ expected_result
-    @test (C < B) == C_contractl_B
-
-    # --- v::Vector, B::Blade
-    #     B::Blade, v::Vector
-
-    # grade(B) == 1
-    v = test_vector
-
-    test_vector_B = rand(test_dim)
-    B = Blade(test_vector_B)
-
-    expected_result = test_vector ⋅ test_vector_B
-
-    B_contractl_v = contractl(B, v)
-    @test B_contractl_v ≈ expected_result
-    @test (B < v) == B_contractl_v
-
-    v_contractl_B = contractl(v, B)
-    @test v_contractl_B ≈ expected_result
-    @test (v < B) == v_contractl_B
-
-    # length(v) != dim(B)
-    v = test_vector
-    B = Blade(rand(test_dim + 1))
-    @test_throws DimensionMismatch contractl(v, B)
-    @test_throws DimensionMismatch v < B
-    @test_throws DimensionMismatch contractl(B, v)
-    @test_throws DimensionMismatch B < v
-
-    # grade(B) > 1
-    v = test_vector
-    for test_grade in 5:8
-        B = Blade(rand(test_dim, test_grade))
-
-        v_contractl_B = contractl(v, B)
-        expected_result = contractl(Blade(v), B)
-        @test v_contractl_B ≈ expected_result
-        @test (v < B) == v_contractl_B
-
-        @test iszero(contractl(B, v))
-        @test iszero(B < v)
-    end
-
-    # length(v) != dim(B)
-    v = test_vector
-    B = Blade(rand(test_dim + 1, 3))
-    @test_throws DimensionMismatch contractl(v, B)
-    @test_throws DimensionMismatch v < B
-    @test_throws DimensionMismatch contractl(B, v)
-    @test_throws DimensionMismatch B < v
-end
-
-@testset "contractl(B, C): B::Blade, C::Blade" begin
+@testset "contractl(B::Blade, C::Blade)" begin
     # --- Preparations
 
     # Dimension of embedding space
@@ -210,10 +45,8 @@ end
     B = Blade(test_vector_1)
     C = Blade(test_vector_2)
 
-    expected_result = Scalar((basis(B) ⋅ basis(C)) * volume(B) * volume(C))
-
     B_contractl_C = contractl(B, C)
-    @test B_contractl_C ≈ expected_result
+    @test B_contractl_C ≈ Scalar((basis(B) ⋅ basis(C)) * volume(B) * volume(C))
     @test (B < C) == B_contractl_C
 
     # grade(B) == 1, grade(C) > 1
@@ -247,11 +80,10 @@ end
         B = Blade(rand(test_dim, test_grade))
         C = Blade(rand(test_dim, test_grade))
 
-        expected_result =
-            volume(B) * volume(C) * det(transpose(basis(B)) * basis(C))
-
         B_contractl_C = contractl(B, C)
-        @test B_contractl_C ≈ expected_result
+        @test B_contractl_C ≈ volume(B) * volume(C) *
+                              det(transpose(basis(B)) * basis(C))
+
         @test (B < C) == B_contractl_C
     end
 
@@ -289,13 +121,172 @@ end
     @test_throws DimensionMismatch B < C
 end
 
-@testset "contractl(B, C): B or C isa Pseudoscalar" begin
+@testset "contractl(B::Blade, C::Pseudoscalar)" begin
+    # ---Preparations
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # dim(B) == dim(C)
+    test_grade = 3
+    for test_dim in 10:13
+        B = Blade(rand(test_dim, test_grade))
+        C = Pseudoscalar(test_dim, test_value)
+
+        B_contractl_C = contractl(B, C)
+
+        expected_result = mod(test_dim, 4) < 2 ?
+            test_value * dual(B) :
+           -test_value * dual(B)
+
+        @test B_contractl_C ≈ expected_result
+        @test (B < C) == B_contractl_C
+    end
+
+    # dim(B) != dim(C)
+    test_dim = 8
+    B = Blade(rand(test_dim, test_grade))
+    C = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+end
+
+@testset "contractl(B::Blade, C::Scalar)" begin
     # --- Preparations
 
-    # Test dimension
     test_dim = 10
+    test_grade = 3
 
-    # Test values
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    test_vector = rand(test_dim)
+
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(B) == 1
+    B = Blade(test_vector)
+    C = Scalar(test_value)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+
+    # grade(B) > 1
+    B = Blade(test_basis)
+    C = Scalar(test_value)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Blade, C::Real)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    test_vector = rand(test_dim)
+
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+    #     C::Real, B::Blade
+
+    # grade(B) == 1
+    B = Blade(test_vector)
+    C = test_value
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+
+    # grade(B) > 1
+    B = Blade(test_basis)
+    C = test_value
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Blade, C::Vector)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+
+    test_vector_1 = rand(test_dim)
+    test_vector_2 = rand(test_dim)
+
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(B) == 1, dim(B) == length(C)
+    B = Blade(test_vector_1)
+    C = test_vector_2
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ test_vector_1 ⋅ test_vector_2
+    @test (B < C) == B_contractl_C
+
+    # grade(B) == 1, dim(B) != length(C)
+    B = Blade(rand(test_dim + 1))
+    C = test_vector_2
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+
+    # grade(B) > 1, dim(B) == length(C)
+    C = test_vector_2
+    for test_grade in 5:8
+        B = Blade(rand(test_dim, test_grade))
+
+        @test iszero(contractl(B, C))
+        @test iszero(B < C)
+    end
+
+    # grade(B) > 1, dim(B) != length(C)
+    B = Blade(rand(test_dim + 1, 3))
+    C = test_vector_2
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+end
+
+# ------ B::Pseudoscalar
+
+@testset "contractl(B::Pseudoscalar, C::Blade)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 5
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    C = Blade(rand(test_dim, test_grade))
+
+    # --- Tests
+
+    # dim(B) == dim(C)
+    B = Pseudoscalar(test_dim, test_value)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch (B < C)
+end
+
+@testset "contractl(B::Pseudoscalar, C::Pseudoscalar)" begin
+    # --- Preparations
+
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
 
@@ -303,8 +294,6 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
     # --- Tests
-
-    # B::Pseudoscalar, C::Pseudoscalar
 
     # dim(B) == dim(C)
     for test_dim = 5:8
@@ -317,226 +306,437 @@ end
             test_value_1 * test_value_2 :
            -test_value_1 * test_value_2
 
-        @test B_contractl_C isa Scalar
+        @test B_contractl_C isa AbstractScalar
         @test B_contractl_C == expected_result
         @test (B < C) == B_contractl_C
     end
 
     # dim(B) != dim(C)
+    test_dim = 5
     B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim + 1, test_value_2)
     @test_throws DimensionMismatch contractl(B, C)
     @test_throws DimensionMismatch B < C
-
-    # --- B::Scalar, C::Pseudoscalar
-
-    B = Scalar(test_value_1)
-    C = Pseudoscalar(test_dim, test_value_2)
-
-    B_contractl_C = contractl(B, C)
-    expected_result = Pseudoscalar(test_dim, value(B) * value(C))
-    @test B_contractl_C == expected_result
-    @test (B < C) == B_contractl_C
-
-    # --- B::Pseudoscalar, C::Scalar
-
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = Scalar(test_value_2)
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    # --- B::Pseudoscalar, C::Real
-    #     C::Pseudoscalar, B::Real
-
-    B = Pseudoscalar(test_dim, test_value_1)
-    C = test_value_2
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    C_contractl_B = contractl(C, B)
-    expected_result = Pseudoscalar(test_dim, C * value(B))
-    @test C_contractl_B == expected_result
-    @test (C < B) == C_contractl_B
-
-    # --- B::Pseudoscalar, v::Vector
-    #     v::Vector, B::Pseudoscalar
-
-    # dim(v) == dim(B)
-    for test_dim in 5:8
-        B = Pseudoscalar(test_dim, test_value_1)
-        v = Vector(rand(test_dim))
-
-        v_contractl_B = contractl(v, B)
-        expected_result = contractl(Blade(v), B)
-        @test v_contractl_B ≈ expected_result
-        @test (v < B) == v_contractl_B
-
-        @test iszero(contractl(B, v))
-        @test iszero(B < v)
-    end
-
-    # dim(v) != dim(B)
-    B = Pseudoscalar(test_dim + 1, test_value_1)
-    v = rand(test_dim)
-
-    @test_throws DimensionMismatch contractl(v, B)
-    @test_throws DimensionMismatch v < B
-
-    @test_throws DimensionMismatch contractl(B, v)
-    @test_throws DimensionMismatch B < v
 end
 
-@testset "contractl(B, C): B or C isa Scalar" begin
-    # --- Preparations
-
-    # Test values
+@testset "contractl(B::Pseudoscalar, C::Scalar)" begin
+    test_dim = 11
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Pseudoscalar(test_dim, test_value_1)
 
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Scalar(test_value_2)
 
-    # --- B::Scalar, C::Scalar
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Pseudoscalar, C::Real)" begin
+    test_dim = 12
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Pseudoscalar(test_dim, test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = test_value_2
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Pseudoscalar, C::Vector)" begin
+    # --- Preparations
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    # --- Tests
+
+    # dim(v) == dim(B)
+    for test_dim in 5:8
+        B = Pseudoscalar(test_dim, test_value)
+        C = Vector(rand(test_dim))
+
+        @test iszero(contractl(B, C))
+        @test iszero(B < C)
+    end
+
+    # dim(B) != dim(C)
+    test_dim = 10
+    B = Pseudoscalar(test_dim + 1, test_value)
+    C = rand(test_dim)
+
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+end
+
+# ------ B::Scalar
+
+@testset "contractl(B::Scalar, C::Blade)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    test_vector = rand(test_dim)
+
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(C) == 1
+    B = Scalar(test_value)
+    C = Blade(test_vector)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test (B < C) == B_contractl_C
+
+    # grade(C) > 1
+    B = Scalar(test_value)
+    C = Blade(test_basis)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::Scalar, C::Pseudoscalar)" begin
+    test_dim = 10
+
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Scalar(test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::Scalar, C::Scalar)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Scalar(test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_contractl_C = contractl(B, C)
-    expected_result = test_value_1 * test_value_2
-    @test B_contractl_C isa Scalar
-    @test B_contractl_C == expected_result
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == test_value_1 * test_value_2
     @test (B < C) == B_contractl_C
+end
 
-    # --- B::Scalar, C::One
-    #     B::One, C::Scalar
-    B = Scalar(test_value_1)
+@testset "contractl(B::Scalar, C::One)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
+
     C = One()
 
     B_contractl_C = contractl(B, C)
-    expected_result = B
-    @test B_contractl_C isa Scalar
-    @test B_contractl_C == expected_result
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == B
     @test (B < C) == B_contractl_C
+end
 
-    C_contractl_B = contractl(C, B)
-    expected_result = B
-    @test C_contractl_B isa Scalar
-    @test C_contractl_B == expected_result
-    @test (C < B) == C_contractl_B
+@testset "contractl(B::Scalar, C::Zero)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
 
-    # --- B::Scalar, C::Zero
-    #     B::Zero, C::Scalar
-    B = Scalar(test_value_1)
     C = Zero()
 
     @test iszero(contractl(B, C))
     @test iszero(B < C)
+end
 
-    @test iszero(contractl(C, B))
-    @test iszero(C < B)
-
-    # --- B::Scalar, C::Real
-    #     B::Real, C::Scalar
+@testset "contractl(B::Scalar, C::Real)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
     B = Scalar(test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
     B_contractl_C = contractl(B, C)
-    expected_result = test_value_1 * test_value_2
-    @test B_contractl_C isa Scalar
-    @test B_contractl_C == expected_result
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == test_value_1 * test_value_2
     @test (B < C) == B_contractl_C
-
-    C_contractl_B = contractl(C, B)
-    expected_result = test_value_1 * test_value_2
-    @test C_contractl_B isa Scalar
-    @test C_contractl_B == expected_result
-    @test (C < B) == C_contractl_B
-
-    # --- B::Scalar, v::Vector
-    #     v::Vector, B::Scalar
-
-    B = Scalar(test_value_1)
-    v = rand(5)
-
-    @test iszero(contractl(v, B))
-    @test iszero(v < B)
-
-    B_contractl_v = contractl(B, v)
-    expected_result = Blade(v, volume=norm(v) * test_value_1)
-    @test B_contractl_v ≈ expected_result
-    @test (B < v) == B_contractl_v
 end
 
-@testset "contractl(B, C): B or C isa One" begin
-    # --- Preparations
-
-    # Test values
+@testset "contractl(B::Scalar, C::Vector)" begin
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
+    B = Scalar(test_value)
 
-    # --- Tests
+    C = rand(5)
 
-    # B::One, C::One
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ Blade(C, volume=norm(C) * test_value)
+    @test (B < C) == B_contractl_C
+end
+
+# ------ B::One
+
+@testset "contractl(B::One, C::Scalar)" begin
+    B = One()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == test_value
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::One, C::One)" begin
     B = One()
     C = One()
-
     @test isone(contractl(B, C))
     @test isone(B < C)
+end
 
-    # B::One, C::Zero
-    # B::Zero, C::One
+@testset "contractl(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-
     @test iszero(contractl(B, C))
     @test iszero(B < C)
+end
 
-    @test iszero(contractl(C, B))
-    @test iszero(C < B)
-
-    # B::One, C::Real
-    # B::Real, C::One
+@testset "contractl(B::One, C::Real)" begin
     B = One()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
     B_contractl_C = contractl(B, C)
-    expected_result = C
-    @test B_contractl_C isa Scalar
-    @test B_contractl_C == expected_result
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == test_value
     @test (B < C) == B_contractl_C
-
-    C_contractl_B = contractl(C, B)
-    expected_result = C
-    @test C_contractl_B isa Scalar
-    @test C_contractl_B == expected_result
-    @test (C < B) == C_contractl_B
 end
 
-@testset "contractl(B, C): B or C isa Zero" begin
+# ------ B::Zero
+
+@testset "contractl(B::Zero, C::Scalar)" begin
+    B = Zero()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Zero, C::One)" begin
+    B = Zero()
+    C = One()
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Zero, C::Zero)" begin
+    B = Zero()
+    C = Zero()
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+@testset "contractl(B::Zero, C::Real)" begin
+    B = Zero()
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = test_value
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+# ------ B::Real
+
+@testset "contractl(B::Real, C::Blade)" begin
     # --- Preparations
 
+    test_dim = 10
+    test_grade = 3
+
     # Test values
+    test_value = rand()
+    test_value = rand() > 0.5 ? test_value : -test_value
+
+    test_vector = rand(test_dim)
+
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(C) == 1
+    B = test_value
+    C = Blade(test_vector)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test (B < C) == B_contractl_C
+
+    # grade(C) > 1
+    B = test_value
+    C = Blade(test_basis)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::Real, C::Pseudoscalar)" begin
+    test_dim = 12
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::Real, C::Scalar)" begin
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = test_value_1
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Scalar(test_value_2)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == test_value_1 * test_value_2
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::Real, C::One)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    C = One()
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C == test_value
+    @test (B < C) == B_contractl_C
+end
+
+@testset "contractl(B::Real, C::Zero)" begin
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    C = Zero()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+end
+
+# ------ B::Vector
+
+@testset "contractl(B::Vector, C::Blade)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+
+    test_vector_1 = rand(test_dim)
+    test_vector_2 = rand(test_dim)
+
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(C) == 1, dim(B) == length(C)
+    B = test_vector_1
+    C = Blade(test_vector_2)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ test_vector_1 ⋅ test_vector_2
+    @test (B < C) == B_contractl_C
+
+    # grade(C) == 1, dim(B) != length(C)
+    C = Blade(rand(test_dim + 1))
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+
+    # grade(C) > 1, dim(B) == length(C)
+    B = test_vector_1
+    for test_grade in 5:8
+        C = Blade(rand(test_dim, test_grade))
+
+        B_contractl_C = contractl(B, C)
+        @test B_contractl_C ≈ contractl(Blade(B), C)
+        @test (B < C) == B_contractl_C
+    end
+
+    # grade(C) > 1, dim(B) != length(C)
+    B = test_vector_1
+    C = Blade(rand(test_dim + 1, 3))
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+end
+
+@testset "contractl(B::Vector, C::Pseudoscalar)" begin
+    # --- Preparations
+
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
 
     # --- Tests
 
-    # B::Zero, C::Zero
-    B = Zero()
-    C = Zero()
+    # dim(B) == dim(C)
+    for test_dim in 5:8
+        B = Vector(rand(test_dim))
+        C = Pseudoscalar(test_dim, test_value)
+
+        B_contract_C = contractl(B, C)
+        @test B_contract_C ≈ contractl(Blade(B), C)
+        @test (B< C) == B_contract_C
+    end
+
+    # dim(B) != dim(C)
+    test_dim = 10
+    B = Pseudoscalar(test_dim + 1, test_value)
+    C = rand(test_dim)
+
+    @test_throws DimensionMismatch contractl(B, C)
+    @test_throws DimensionMismatch B < C
+end
+
+@testset "contractl(B::Vector, C::Scalar)" begin
+    B = rand(5)
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Scalar(test_value)
 
     @test iszero(contractl(B, C))
     @test iszero(B < C)
-
-    # B::Zero, C::Real
-    # B::Real, C::Zero
-    B = Zero()
-    C = test_value
-
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
-
-    @test iszero(contractl(C, B))
-    @test iszero(C < B)
 end
