@@ -39,7 +39,7 @@ When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
 the return value is a Real (if the result is a scalar) or a Vector (if the
 result is a vector).
 """
-project(B::AbstractBlade, C::AbstractBlade; return_blade::Bool=true) = nothing
+project(B::AbstractBlade, C::AbstractBlade) = nothing
 
 # B::AbstractScalar, C::AbstractBlade
 project(B::AbstractScalar, C::AbstractBlade; return_blade::Bool=true) =
@@ -111,7 +111,8 @@ function project(B::Pseudoscalar, C::Blade)
 end
 
 # B::Blade, C::AbstractScalar
-project(B::Blade, C::AbstractScalar; return_blade::Bool=true) = zero(B)
+project(B::Blade, C::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
 
 # B::Blade, v::Vector
 # v::Vector, B::Blade
@@ -147,7 +148,8 @@ function project(B::Pseudoscalar, C::Pseudoscalar)
 end
 
 # B::Pseudoscalar, v::AbstractScalar
-project(B::Pseudoscalar, C::AbstractScalar; return_blade::Bool=true) = zero(B)
+project(B::Pseudoscalar, C::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
 
 # B::Pseudoscalar, v::Vector
 # v::Vector, B::Pseudoscalar
@@ -167,12 +169,16 @@ end
 project(B::AbstractScalar, C::AbstractScalar) = B
 
 # B::AbstractScalar, C::Zero
-project(B::AbstractScalar, C::Zero) = C
+project(B::AbstractScalar, C::Zero; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
 
 # B::AbstractScalar, x::Real
 # x::Real, B::AbstractScalar
-project(B::AbstractScalar, x::Real) = B
-project(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x)
+project(B::AbstractScalar, x::Real; return_blade::Bool=true) =
+    return_blade ? B : value(B)
+
+project(x::Real, B::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? Scalar{typeof(value(B))}(x) : x
 
 # B::AbstractScalar, v::Vector
 # v::Vector, B::AbstractScalar
@@ -186,8 +192,11 @@ project(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
 
 # B::Zero, x::Real
 # x::Real, B::Zero
-project(B::Zero, x::Real) = B
-project(x::Real, B::Zero) = B
+project(B::Zero, x::Real; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+
+project(x::Real, B::Zero; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
 
 # B::Zero, v::Vector
 # v::Vector, B::Zero

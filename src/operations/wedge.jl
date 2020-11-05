@@ -115,9 +115,12 @@ function wedge(B::Blade, v::Vector{<:Real})
     Blade(hcat(basis(B), volume(B) * v))
 end
 
-wedge(v::Vector{<:Real}, B::Blade) =
-    mod(grade(B), 2) == 0 ?
-        wedge(B, v) : wedge(B, -v)
+function wedge(v::Vector{<:Real}, B::Blade)
+    assert_dim_equal(v, B)
+
+    # Note: volume(B) is incorporated into the norm of `v`
+    Blade(hcat(volume(B) * v, basis(B)))
+end
 
 # v::Vector, w::Vector
 wedge(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
@@ -158,7 +161,7 @@ wedge(x::Real, B::AbstractScalar) = x * B
 
 # B::AbstractScalar, v::Vector
 # v::Vector, B::AbstractScalar
-wedge(B::AbstractScalar, v::Vector{<:Real}) =  Blade(value(B) * v)
+wedge(B::AbstractScalar, v::Vector{<:Real}) = value(B) * Blade(v)
 wedge(v::Vector{<:Real}, B::AbstractScalar) = wedge(B, v)
 
 # --- Operations involving a Scalar instance
