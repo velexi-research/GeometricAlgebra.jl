@@ -95,14 +95,6 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
             push!(k_vectors, convert(AbstractBlade{T}, B))
         end
 
-        # Return AbstractBlade if there is only one term
-        if length(parts) == 1
-            k_vectors = first(values(parts))
-            if length(k_vectors) == 1
-                return first(k_vectors)
-            end
-        end
-
         # --- Reduce multivector
 
         # Reduce scalar, vector, and pseudoscalar parts
@@ -114,11 +106,26 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
 
         # TODO: reduce remaining k-vectors
 
-        # Compute norm
-        norm = 0  # TODO: implement
+        # --- Compute norm
+
+        norm_ = 0
+        for k_vectors in parts
+            norm_ += reduce(+, map(B -> norm(B)^2, k_vectors))
+        end
+        norm_ = sqrt(norm_)
+
+        # --- Construct result
+
+        # Return AbstractBlade if there is only one term
+        if length(parts) == 1
+            k_vectors = first(values(parts))
+            if length(k_vectors) == 1
+                return first(k_vectors)
+            end
+        end
 
         # Return new Multivector
-        new(dim_, parts, norm)
+        new(dim_, parts, norm_)
     end
 
     """
