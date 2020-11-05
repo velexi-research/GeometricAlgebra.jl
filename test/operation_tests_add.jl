@@ -108,9 +108,9 @@ end
     B = One()
     C = One()
 
-    C_plus_B = C + B
+    B_plus_C = B + C
     @test B_plus_C isa AbstractScalar
-    @test B + C == 2
+    @test B_plus_C == 2
 end
 
 @testset "+(B::One, C::Zero)" begin
