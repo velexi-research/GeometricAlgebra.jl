@@ -11,8 +11,6 @@ except according to the terms contained in the LICENSE file.
 """
 module GeometricAlgebra
 
-# --- Submodules
-
 # Types
 include("AbstractMultivector.jl")
 include("AbstractBlade.jl")
