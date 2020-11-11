@@ -42,7 +42,7 @@ function dual(B::Blade, C::Blade)
     # Check that B is contained in C
     projection_coefficients = transpose(basis(C)) * basis(B)
     if LinearAlgebra.norm(projection_coefficients)^2 ≉ grade(B)
-        error("`B` not contained in `C`")
+        throw(ArgumentError("`B` not contained in `C`"))
     end
 
     # --- Handle edge cases

@@ -85,11 +85,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
         if enforce_constraints
             if dim < 0
-                error("`dim` must be nonnegative")
+                throw(ArgumentError("`dim` must be nonnegative"))
             end
 
             if grade < 0
-                error("`grade` must be nonnegative")
+                throw(ArgumentError("`grade` must be nonnegative"))
             end
 
             basis_size = size(basis)
@@ -109,7 +109,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             if dim > 0 && grade > 0
                 for i in 1:grade
                     if LinearAlgebra.norm(basis[:, i]) ≉ 1
-                        error("columns of `basis` not normalized")
+                        message = "columns of `basis` not normalized"
+                        throw(ArgumentError(message))
                     end
                 end
             end
