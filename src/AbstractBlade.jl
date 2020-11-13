@@ -43,10 +43,8 @@ Interface
 Note: the return value of all methods should preserve the precision of its
 AbstractBlade arguments (when possible).
 
-Functions
----------
-
-### Attributes
+Attributes
+----------
 
     grade(B::AbstractBlade)::Int
 
@@ -56,7 +54,8 @@ Functions
 
     sign(B::AbstractBlade)::Int8
 
-### Operations
+Operations
+----------
 
     dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
 

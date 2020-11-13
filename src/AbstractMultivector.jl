@@ -45,10 +45,8 @@ Interface
 Note: the return value of all methods should preserve the precision of its
 AbstractMultivector arguments (when possible).
 
-Functions
----------
-
-### Attributes
+Attributes
+----------
 
     dim(M::AbstractMultivector)::Int
 
@@ -60,7 +58,8 @@ Functions
 
     getindex(M::AbstractMultivector, k::Int)::Vector{<:AbstractBlade}
 
-### Unary Operations
+Unary Operations
+----------------
 
     -(M::AbstractMultivector)::AbstractMultivector
 
@@ -68,7 +67,8 @@ Functions
 
     dual(M::AbstractMultivector)::AbstractMultivector
 
-### Binary Operations
+Binary Operations
+-----------------
 
     +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
@@ -96,14 +96,16 @@ Functions
 
     proj(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
 
-### Comparison functions
+Comparison Functions
+--------------------
 
     ==(M::AbstractMultivector, N::AbstractMultivector)::Bool
 
     isapprox(M::AbstractMultivector, N::AbstractMultivector)::Bool
     ≈(M::AbstractMultivector, N::AbstractMultivector)::Bool
 
-### Utility functions
+Utility Functions
+-----------------
 
     convert(::Type{T}, M::AbstractMultivector)
         where {T<:AbstractMultivector{<:AbstractFloat}}
