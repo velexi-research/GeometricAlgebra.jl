@@ -114,44 +114,43 @@ abstract type AbstractMultivector{T<:AbstractFloat} end
 
 # --- Method definitions
 #
-# Note: the following method definitions are no-op place holders to provide
-#       a central location for docstrings.
-#
+# Note: the following method definitions are no-op place holders and intended
+#       to be extended.
 
 """
     dim(M)
 
-TODO
+Return dimension of the real space that `M` is embedded within.
 """
 dim(M::AbstractMultivector) = nothing
 
 """
     blades(M)
 
-TODO
+Return the blades that `M` is composed of.
 """
 blades(M::AbstractMultivector) = nothing
 
 """
     grades(M)
 
-TODO
+Return the grades of the nonzero `k`-vector components of `M`.
 """
 grades(M::AbstractMultivector) = nothing
 
 """
     norm(M)
 
-TODO
+Compute the norm of `M`.
 """
 norm(M::AbstractMultivector) = nothing
 
 """
-    getindex(M)
+    getindex(M::AbstractMultivector, k::Int)
 
-TODO
+Return the `k`-vector component of multivector `M`.
 """
-Base.getindex(M::AbstractMultivector) = nothing
+Base.getindex(M::AbstractMultivector, k::Int) = nothing
 
 """
     -(M)

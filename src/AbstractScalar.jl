@@ -40,6 +40,13 @@ Attributes
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
+# --- Method definitions
+#
+# Note: the following method definitions are no-op place holders and intended
+#       to be extended.
+
+value(B::AbstractScalar{T})::T where {T<:AbstractFloat} = nothing
+
 # --- Method definitions for AbstractBlade interface functions
 
 """

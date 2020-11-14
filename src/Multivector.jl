@@ -163,7 +163,7 @@ Multivector(multivectors::Vector{<:AbstractMultivector}) =
 """
     dim(M::Multivector)
 
-Return the dimension of the multivector `M`.
+Return dimension of space that the multivector `M` is embedded in.
 """
 dim(M::Multivector) = M.dim
 

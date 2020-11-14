@@ -67,9 +67,8 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 # --- Method definitions
 #
-# Note: the following method definitions are no-op place holders to provide
-#       a central location for docstrings.
-#
+# Note: the following method definitions are no-op place holders and intended
+#       to be extended.
 
 """
     grade(B)
