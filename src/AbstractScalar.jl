@@ -45,7 +45,7 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 # Note: the following method definitions are no-op place holders and intended
 #       to be extended.
 
-value(B::AbstractScalar{T})::T where {T<:AbstractFloat} = nothing
+value(B::AbstractScalar) = nothing
 
 # --- Method definitions for AbstractBlade interface functions
 
@@ -61,8 +61,7 @@ grade(B::AbstractScalar) = 0
 
 Return 1.
 """
-basis(B::AbstractScalar; normalized::Bool=true) =
-    normalized ? 1 : value(B)
+basis(B::AbstractScalar; normalized::Bool=true) = normalized ? 1 : value(B)
 
 """
     volume(B::AbstractScalar)
