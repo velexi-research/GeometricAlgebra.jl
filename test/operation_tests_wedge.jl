@@ -21,7 +21,45 @@ using GeometricAlgebra
 
 # --- Tests
 
+# ------ M::Multivector
+
+@testset "wedge(M::Multivector, N::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::Blade)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::One)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::Zero)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::Real)" begin
+    @test_skip 1
+end
+
+@testset "wedge(M::Multivector, N::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Blade
+
+@testset "wedge(B::Blade, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "wedge(B::Blade, C::Blade)" begin
     B_vectors = hcat([1; 1; 0; 0; 0],
@@ -80,6 +118,16 @@ end
     @test B ∧ C == B_wedge_C
 end
 
+@testset "wedge(B::Blade, C::One)" begin
+    # TODO
+    @test_skip 1
+end
+
+@testset "wedge(B::Blade, C::Zero)" begin
+    # TODO
+    @test_skip 1
+end
+
 @testset "wedge(B::Blade, C::Real)" begin
     test_dim = 10
     B = Blade(rand(test_dim, 3))
@@ -115,6 +163,10 @@ end
 end
 
 # ------ B::Pseudoscalar
+
+@testset "wedge(B::Pseudoscalar, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "wedge(B::Pseudoscalar, C::Blade)" begin
     # --- Preparations
@@ -184,6 +236,16 @@ end
     @test B ∧ C == B_wedge_C
 end
 
+@testset "wedge(B::Pseudoscalar, C::One)" begin
+    # TODO
+    @test_skip 1
+end
+
+@testset "wedge(B::Pseudoscalar, C::Zero)" begin
+    # TODO
+    @test_skip 1
+end
+
 @testset "wedge(B::Pseudoscalar, C::Real)" begin
     # --- Preparations
 
@@ -229,6 +291,10 @@ end
 end
 
 # ------ B::Scalar
+
+@testset "wedge(B::Scalar, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "wedge(B::Scalar, C::Blade)" begin
     test_value = rand()
@@ -329,6 +395,18 @@ end
 
 # ------ B::One
 
+@testset "wedge(B::One, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "wedge(B::One::, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "wedge(B::One::, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
 @testset "wedge(B::One::, C::Scalar)" begin
     B = One()
 
@@ -369,7 +447,26 @@ end
     @test B ∧ C == C
 end
 
+@testset "wedge(B::One, C::Vector)" begin
+    # TODO
+    @test_skip 1
+end
+
 # ------ B::Zero
+
+@testset "wedge(B::Zero, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "wedge(B::Zero, C::Blade)" begin
+    # TODO
+    @test_skip 1
+end
+
+@testset "wedge(B::Zero, C::Pseudoscalar)" begin
+    # TODO
+    @test_skip 1
+end
 
 @testset "wedge(B::Zero, C::Scalar)" begin
     B = Zero()
@@ -407,7 +504,16 @@ end
     @test iszero(B ∧ C)
 end
 
+@testset "wedge(B::Zero, C::Vector)" begin
+    # TODO
+    @test_skip 1
+end
+
 # ------ B::Real
+
+@testset "wedge(B::Real, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "wedge(B::Real, C::Blade)" begin
     test_value = rand()
@@ -481,6 +587,10 @@ end
 
 # ------ B::Vector
 
+@testset "wedge(B::Vector, M::Multivector)" begin
+    @test_skip 1
+end
+
 @testset "wedge(B::Vector, C::Blade)" begin
     # --- Preparations
 
@@ -539,6 +649,16 @@ end
     B_wedge_C = wedge(B, C)
     @test B_wedge_C ≈ Blade(B, volume=norm(B) * value(C))
     @test B ∧ C == B_wedge_C
+end
+
+@testset "wedge(B::Vector, C::One)" begin
+    # TODO
+    @test_skip 1
+end
+
+@testset "wedge(B::Vector, C::Zero)" begin
+    # TODO
+    @test_skip 1
 end
 
 @testset "wedge(B::Vector, C::Vector)" begin

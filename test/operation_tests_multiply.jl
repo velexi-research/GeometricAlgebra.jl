@@ -20,7 +20,53 @@ using GeometricAlgebra
 
 # --- Tests
 
+# ------ M::Multivector
+
+@testset "*(M::Multivector, N::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::Blade)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::One)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::Zero)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::Real)" begin
+    @test_skip 1
+end
+
+@testset "*(M::Multivector, N::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Blade
+
+@testset "*(B::Blade, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Blade, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Blade, C::Pseudoscalar)" begin
+    @test_skip 1
+end
 
 @testset "*(B::Blade, C::Scalar)" begin
     test_dim = 10
@@ -31,6 +77,14 @@ using GeometricAlgebra
     C = Scalar(test_value)
 
     @test B * C ≈ Blade(basis(B), volume=value(C) * volume(B))
+end
+
+@testset "*(B::Blade, C::One)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Blade, C::Zero)" begin
+    @test_skip 1
 end
 
 @testset "*(B::Blade, C::Real)" begin
@@ -44,7 +98,19 @@ end
     @test B * C ≈ Blade(basis(B), volume=C * volume(B))
 end
 
+@testset "*(B::Blade, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Pseudoscalar
+
+@testset "*(B::Pseudoscalar, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Pseudoscalar, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "*(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
@@ -120,7 +186,15 @@ end
     @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
 end
 
+@testset "*(B::Pseudoscalar, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Scalar
+
+@testset "*(B::Scalar, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "*(B::Scalar, C::Blade)" begin
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -208,6 +282,14 @@ end
 
 # ------ B::One
 
+@testset "*(B::One, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "*(B::One, C::Blade)" begin
+    @test_skip 1
+end
+
 @testset "*(B::One, C::Pseudoscalar)" begin
     B = One()
 
@@ -263,6 +345,14 @@ end
 
 # ------ B::Zero
 
+@testset "*(B::Zero, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Zero, C::Blade)" begin
+    @test_skip 1
+end
+
 @testset "*(B::Zero, C::Pseudoscalar)" begin
     B = Zero()
 
@@ -313,6 +403,10 @@ end
 end
 
 # ------ B::Real
+
+@testset "*(B::Real, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "*(B::Real, C::Blade)" begin
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -375,6 +469,18 @@ end
 end
 
 # ------ B::Vector
+
+@testset "*(B::Vector, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Vector, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "*(B::Vector, C::Pseudoscalar)" begin
+    @test_skip 1
+end
 
 @testset "*(B::Vector, C::Scalar)" begin
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1

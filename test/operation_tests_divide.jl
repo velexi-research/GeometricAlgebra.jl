@@ -20,7 +20,83 @@ using GeometricAlgebra
 
 # --- Tests
 
+# ------ M::Multivector
+
+@testset "/(M::Multivector, N::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::Blade)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::One)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::Zero)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::Real)" begin
+    @test_skip 1
+end
+
+@testset "/(M::Multivector, N::Vector)" begin
+    @test_skip 1
+end
+
+# ------ B::Blade
+
+@testset "/(B::Blade, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::One)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::Zero)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::Real)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Blade, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Pseudoscalar
+
+@testset "/(B::Pseudoscalar, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Pseudoscalar, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "/(B::Pseudoscalar, C::Pseudoscalar)" begin
     test_dim = 10
@@ -90,7 +166,19 @@ end
     @test B / C == Pseudoscalar(test_dim, test_value_1 / test_value_2)
 end
 
+@testset "/(B::Pseudoscalar, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Scalar
+
+@testset "/(B::Scalar, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Scalar, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "/(B::Scalar, C::Pseudoscalar)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -174,7 +262,19 @@ end
     @test B_slash_C == test_value_1 / test_value_2
 end
 
+@testset "/(B::Scalar, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::One
+
+@testset "/(B::One, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::One, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "/(B::One, C::Pseudoscalar)" begin
     # --- Preparations
@@ -235,7 +335,19 @@ end
     @test B_slash_C == 1 / test_value
 end
 
+@testset "/(B::One, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Zero
+
+@testset "/(B::Zero, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Zero, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "/(B::Zero, C::Pseudoscalar)" begin
     B = Zero()
@@ -283,7 +395,19 @@ end
     @test iszero(B / C)
 end
 
+@testset "/(B::Zero, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Real
+
+@testset "/(B::Real, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Real, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "/(B::Real, C::Pseudoscalar)" begin
     # --- Preparations
@@ -358,6 +482,18 @@ end
 end
 
 # ------ B::Vector
+
+@testset "/(B::Vector, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Vector, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "/(B::Vector, C::Pseudoscalar)" begin
+    @test_skip 1
+end
 
 @testset "/(B::Vector, C::Scalar)" begin
     B = rand(5)

@@ -21,7 +21,45 @@ using GeometricAlgebra
 
 # --- Tests
 
+# ------ M::Multivector
+
+@testset "contractl(M::Multivector, N::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::Blade)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::One)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::Zero)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::Real)" begin
+    @test_skip 1
+end
+
+@testset "contractl(M::Multivector, N::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Blade
+
+@testset "contractl(B::Blade, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "contractl(B::Blade, C::Blade)" begin
     # --- Preparations
@@ -183,6 +221,14 @@ end
     @test iszero(B < C)
 end
 
+@testset "contractl(B::Blade, C::One)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::Blade, C::Zero)" begin
+    @test_skip 1
+end
+
 @testset "contractl(B::Blade, C::Real)" begin
     # --- Preparations
 
@@ -259,6 +305,10 @@ end
 
 # ------ B::Pseudoscalar
 
+@testset "contractl(B::Pseudoscalar, M::Multivector)" begin
+    @test_skip 1
+end
+
 @testset "contractl(B::Pseudoscalar, C::Blade)" begin
     # --- Preparations
 
@@ -333,6 +383,14 @@ end
     @test iszero(B < C)
 end
 
+@testset "contractl(B::Pseudoscalar, C::One)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::Pseudoscalar, C::Zero)" begin
+    @test_skip 1
+end
+
 @testset "contractl(B::Pseudoscalar, C::Real)" begin
     test_dim = 12
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -374,6 +432,10 @@ end
 end
 
 # ------ B::Scalar
+
+@testset "contractl(B::Scalar, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "contractl(B::Scalar, C::Blade)" begin
     # --- Preparations
@@ -491,6 +553,18 @@ end
 
 # ------ B::One
 
+@testset "contractl(B::One, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::One, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::One, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
 @testset "contractl(B::One, C::Scalar)" begin
     B = One()
 
@@ -531,7 +605,23 @@ end
     @test (B < C) == B_contractl_C
 end
 
+@testset "contractl(B::One, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Zero
+
+@testset "contractl(B::Zero, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::Zero, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::Zero, C::Pseudoscalar)" begin
+    @test_skip 1
+end
 
 @testset "contractl(B::Zero, C::Scalar)" begin
     B = Zero()
@@ -569,7 +659,15 @@ end
     @test iszero(B < C)
 end
 
+@testset "contractl(B::Zero, C::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Real
+
+@testset "contractl(B::Real, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "contractl(B::Real, C::Blade)" begin
     # --- Preparations
@@ -660,6 +758,10 @@ end
 
 # ------ B::Vector
 
+@testset "contractl(B::Vector, M::Multivector)" begin
+    @test_skip 1
+end
+
 @testset "contractl(B::Vector, C::Blade)" begin
     # --- Preparations
 
@@ -739,4 +841,12 @@ end
 
     @test iszero(contractl(B, C))
     @test iszero(B < C)
+end
+
+@testset "contractl(B::Vector, C::One)" begin
+    @test_skip 1
+end
+
+@testset "contractl(B::Vector, C::Zero)" begin
+    @test_skip 1
 end

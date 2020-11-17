@@ -21,7 +21,45 @@ using GeometricAlgebra
 
 # --- Tests
 
+# ------ M::Multivector
+
+@testset "project(M::Multivector, N::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::Blade)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::One)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::Zero)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::Real)" begin
+    @test_skip 1
+end
+
+@testset "project(M::Multivector, N::Vector)" begin
+    @test_skip 1
+end
+
 # ------ B::Blade
+
+@testset "project(B::Blade, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "project(B::Blade, C::Blade)" begin
     # --- Preparations
@@ -109,6 +147,18 @@ end
     @test B_proj_C == 0
 end
 
+@testset "project(B::Blade, C::One)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Blade, C::Zero)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Blade, C::Real)" begin
+    @test_skip 1
+end
+
 @testset "project(B::Blade, C::Vector)" begin
     # --- Preparations
 
@@ -139,6 +189,10 @@ end
 end
 
 # ------ B::Pseudoscalar
+
+@testset "project(B::Pseudoscalar, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "project(B::Pseudoscalar, C::Blade)" begin
     # --- Preparations
@@ -207,6 +261,18 @@ end
     @test B_proj_C == 0
 end
 
+@testset "project(B::Pseudoscalar, C::One)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Pseudoscalar, C::Zero)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Pseudoscalar, C::Real)" begin
+    @test_skip 1
+end
+
 @testset "project(B::Pseudoscalar, C::Vector)" begin
     # --- Preparations
 
@@ -232,6 +298,10 @@ end
 end
 
 # ------ B::Scalar
+
+@testset "project(B::Scalar, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "project(B::Scalar, C::Blade)" begin
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -369,6 +439,18 @@ end
 
 # ------ B::One
 
+@testset "project(B::One, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "project(B::One, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "project(B::One, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
 @testset "project(B::One, C::Scalar)" begin
     B = One()
 
@@ -443,6 +525,18 @@ end
 
 # ------ B::Zero
 
+@testset "project(B::Zero, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Zero, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Zero, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
 @testset "project(B::Zero, C::Scalar)" begin
     B = Zero()
 
@@ -516,6 +610,18 @@ end
 
 # ------ B::Real
 
+@testset "project(B::Real, M::Multivector)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Real, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "project(B::Real, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
 @testset "project(B::Real, C::Scalar)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -559,6 +665,10 @@ end
 end
 
 # ------ B::Vector
+
+@testset "project(B::Vector, M::Multivector)" begin
+    @test_skip 1
+end
 
 @testset "project(B::Vector, C::Blade)" begin
     # --- Preparations

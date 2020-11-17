@@ -21,6 +21,32 @@ using GeometricAlgebra
 
 # --- Tests
 
+# ------ M::Multivector
+
+@testset "dual(M::Multivector, N::Blade)" begin
+    @test_skip 1
+end
+
+@testset "dual(M::Multivector, N::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "dual(M::Multivector, N::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "dual(M::Multivector, N::One)" begin
+    @test_skip 1
+end
+
+@testset "dual(M::Multivector, N::Real)" begin
+    @test_skip 1
+end
+
+@testset "dual(M::Multivector, N::Vector)" begin
+    @test_skip 1
+end
+
 # --- B::Blade
 
 @testset "dual(B::Blade, C::Blade)" begin
@@ -106,7 +132,7 @@ using GeometricAlgebra
         while LinearAlgebra.norm(reject(basis(B), C)) < sqrt(eps(Float64))
             B = Blade(rand(test_dim, grade_B))
         end
-        @test_throws ErrorException dual(B, C)
+        @test_throws ArgumentError dual(B, C)
     end
 end
 
@@ -161,6 +187,14 @@ end
         C = One()
         @test iszero(dual(B, C))
     end
+end
+
+@testset "dual(B::Blade, C::Real)" begin
+    @test_skip 1
+end
+
+@testset "dual(B::Blade, C::Vector)" begin
+    @test_skip 1
 end
 
 # --- B::Pseudoscalar
@@ -268,6 +302,10 @@ end
     end
 end
 
+@testset "dual(B::Pseudoscalar, C::Vector)" begin
+    @test_skip 1
+end
+
 # --- B::Scalar
 
 @testset "dual(B::Scalar, C::Blade)" begin
@@ -355,6 +393,10 @@ end
     @test B_dual_C === B
 end
 
+@testset "dual(B::Scalar, C::Vector)" begin
+    @test_skip 1
+end
+
 # --- B::One
 
 @testset "dual(B::One, C::Blade)" begin
@@ -413,6 +455,14 @@ end
     @test B_dual_C === B
 end
 
+@testset "dual(B::Scalar, C::Real)" begin
+    @test_skip 1
+end
+
+@testset "dual(B::Scalar, C::Vector)" begin
+    @test_skip 1
+end
+
 # --- B::Zero or C::Zero
 
 @testset "dual(B::Zero, C)" begin
@@ -447,6 +497,14 @@ end
     # C::Pseudoscalar
     C = Pseudoscalar(5, test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::Multivector
+    # C = Multivector(5, test_value)
+    @test_skip 1
+
+    # C::Vector
+    # C = Vector(5, test_value)
+    @test_skip 1
 end
 
 @testset "dual(B, C::Zero)" begin
@@ -484,9 +542,21 @@ end
     # B::Pseudoscalar
     B = Pseudoscalar(5, test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::Multivector
+    # C = Multivector(5, test_value)
+    @test_skip 1
+
+    # C::Vector
+    # C = Vector(5, test_value)
+    @test_skip 1
 end
 
 # ------ B::Real
+
+@testset "dual(B::Real, C::Blade)" begin
+    @test_skip 1
+end
 
 @testset "dual(B::Real, C::Pseudoscalar)" begin
     # --- Preparations
@@ -521,4 +591,26 @@ end
     B_dual_C = dual(B, C)
     @test B_dual_C isa AbstractScalar
     @test B_dual_C == test_value_1
+end
+
+@testset "dual(B::Real, C::One)" begin
+    @test_skip 1
+end
+
+# ------ B::Vector
+
+@testset "dual(B::Vector, C::Blade)" begin
+    @test_skip 1
+end
+
+@testset "dual(B::Vector, C::Pseudoscalar)" begin
+    @test_skip 1
+end
+
+@testset "dual(B::Vector, C::Scalar)" begin
+    @test_skip 1
+end
+
+@testset "dual(B::Vector, C::One)" begin
+    @test_skip 1
 end
