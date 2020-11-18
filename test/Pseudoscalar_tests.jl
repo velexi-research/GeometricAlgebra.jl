@@ -86,10 +86,10 @@ using GeometricAlgebra
 
     for precision_type in subtypes(AbstractFloat)
         # dim == 0
-        @test_throws ErrorException Pseudoscalar(0, 10)
+        @test_throws ArgumentError Pseudoscalar(0, 10)
 
         # dim < 0
-        @test_throws ErrorException Pseudoscalar(-1, 10)
+        @test_throws ArgumentError Pseudoscalar(-1, 10)
     end
 end
 

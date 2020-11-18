@@ -42,7 +42,8 @@ struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     the specified `value`.
     """
     Pseudoscalar{T}(dim::Integer, value::Real) where {T<:AbstractFloat} =
-        dim <= 0 ? error("`dim` must be positive") :
+        dim <= 0 ?
+            throw(ArgumentError("`dim` must be positive")) :
             value == 0 ? zero(Pseudoscalar{T}) : new(dim, T(value))
 end
 
