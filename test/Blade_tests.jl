@@ -135,13 +135,13 @@ using GeometricAlgebra
         # ------ enforce_constraints = true
 
         # dim < 0
-        @test_throws ErrorException Blade{precision_type}(-5,
+        @test_throws ArgumentError Blade{precision_type}(-5,
                                                           test_grade,
                                                           test_basis,
                                                           test_volume)
 
         # grade < 0
-        @test_throws ErrorException Blade{precision_type}(test_dim,
+        @test_throws ArgumentError Blade{precision_type}(test_dim,
                                                           -1,
                                                           test_basis,
                                                           test_volume)
@@ -159,7 +159,7 @@ using GeometricAlgebra
                                                              test_volume)
 
         # basis not normalized
-        @test_throws ErrorException Blade{precision_type}(test_dim,
+        @test_throws ArgumentError Blade{precision_type}(test_dim,
                                                           test_grade,
                                                           test_basis,
                                                           test_volume)
