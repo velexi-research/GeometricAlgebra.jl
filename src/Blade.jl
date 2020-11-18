@@ -35,7 +35,7 @@ is equal to `sign(volume)`.
 Notes
 -----
 * The grade of a Blade type is greater than 0 and less than the dimension of
-  the space  that the blade is embedded in
+  the space that the blade is embedded in
 """
 struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #=
