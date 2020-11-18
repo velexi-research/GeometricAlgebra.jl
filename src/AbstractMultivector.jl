@@ -198,6 +198,11 @@ isapprox(M::AbstractMultivector, N::AbstractMultivector) = false
 isapprox(M::AbstractMultivector, x::Real) = false
 isapprox(x::Real, M::AbstractMultivector) = false
 
+# B::AbstractMultivector, v::Vector
+# v::Vector, B::AbstractMultivector
+isapprox(M::AbstractMultivector, v::Vector) = false
+isapprox(v::Vector, M::AbstractMultivector) = false
+
 # --- Utility methods
 
 """
