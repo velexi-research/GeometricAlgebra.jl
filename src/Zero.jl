@@ -52,6 +52,15 @@ dual(B::Zero; dim::Union{Integer, Nothing}=nothing) = dual_of_zero()
 
 iszero(M::AbstractMultivector) = (M === zero(M))
 
+# ------ ==(B, C)
+
+import LinearAlgebra: norm
+
+# B::Zero, v::Vector
+# v::Vector, B::Zero
+==(B::Zero, v::Vector{<:Real}) = (norm(v) == 0)
+==(v::Vector{<:Real}, B::Zero) = (norm(v) == 0)
+
 # --- Utility methods
 
 """
