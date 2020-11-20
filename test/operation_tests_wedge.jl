@@ -78,6 +78,7 @@ end
     # dim(B) != dim(C)
     C = Blade(rand(dim(B) + 1, 2))
     @test_throws DimensionMismatch wedge(B, C)
+    @test_throws DimensionMismatch B ∧ C
 end
 
 @testset "wedge(B::Blade, C::Pseudoscalar)" begin
@@ -102,6 +103,7 @@ end
     # dim(B) != dim(C)
     B = Blade(test_vectors)
     C = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch wedge(B, C)
     @test_throws DimensionMismatch B ∧ C
 end
 
@@ -119,13 +121,24 @@ end
 end
 
 @testset "wedge(B::Blade, C::One)" begin
-    # TODO
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+
+    C = One()
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Blade, C::Zero)" begin
-    # TODO
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+
+    C = Zero()
+
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 end
 
 @testset "wedge(B::Blade, C::Real)" begin
@@ -160,6 +173,7 @@ end
     # dim(B) != dim(C)
     C = Vector(rand(dim(B) + 1))
     @test_throws DimensionMismatch wedge(B, C)
+    @test_throws DimensionMismatch B ∧ C
 end
 
 # ------ B::Pseudoscalar
@@ -190,6 +204,7 @@ end
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim + 1, test_value)
     C = Blade(test_vectors)
+    @test_throws DimensionMismatch wedge(B, C)
     @test_throws DimensionMismatch B ∧ C
 end
 
@@ -216,6 +231,7 @@ end
     # dim(B) != dim(C)
     B = Pseudoscalar(test_dim, test_value_1)
     C = Pseudoscalar(test_dim + 1, test_value_2)
+    @test_throws DimensionMismatch wedge(B, C)
     @test_throws DimensionMismatch B ∧ C
 end
 
@@ -237,13 +253,28 @@ end
 end
 
 @testset "wedge(B::Pseudoscalar, C::One)" begin
-    # TODO
-    @test_skip 1
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = One()
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Pseudoscalar, C::Zero)" begin
-    # TODO
-    @test_skip 1
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = Zero()
+
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 end
 
 @testset "wedge(B::Pseudoscalar, C::Real)" begin
@@ -335,10 +366,10 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == test_value_1 * test_value_2
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == test_value_1 * test_value_2
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C == test_value_1 * test_value_2
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::One)" begin
@@ -348,10 +379,10 @@ end
 
     C = One()
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == test_value
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == test_value
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C == test_value
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::Zero)" begin
@@ -374,11 +405,10 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == test_value_1 * test_value_2
-
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == test_value_1 * test_value_2
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C == test_value_1 * test_value_2
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::Vector)" begin
@@ -400,11 +430,27 @@ end
 end
 
 @testset "wedge(B::One::, C::Blade)" begin
-    @test_skip 1
+    B = One()
+
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === C
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::One::, C::Pseudoscalar)" begin
-    @test_skip 1
+    B = One()
+
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === C
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::One::, C::Scalar)" begin
@@ -441,15 +487,19 @@ end
     test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
-    @test wedge(B, C) isa AbstractScalar
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C isa AbstractScalar
     @test wedge(B, C) == C
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == C
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::One, C::Vector)" begin
-    # TODO
-    @test_skip 1
+    B = One()
+    C = Vector(rand(5))
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C == Blade(C)
+    @test B ∧ C == B_wedge_C
 end
 
 # ------ B::Zero
@@ -459,13 +509,25 @@ end
 end
 
 @testset "wedge(B::Zero, C::Blade)" begin
-    # TODO
-    @test_skip 1
+    B = Zero()
+
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 end
 
 @testset "wedge(B::Zero, C::Pseudoscalar)" begin
-    # TODO
-    @test_skip 1
+    B = Zero()
+
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 end
 
 @testset "wedge(B::Zero, C::Scalar)" begin
@@ -505,8 +567,11 @@ end
 end
 
 @testset "wedge(B::Zero, C::Vector)" begin
-    # TODO
-    @test_skip 1
+    B = Zero()
+    C = Vector(rand(5))
+
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 end
 
 # ------ B::Real
@@ -555,10 +620,10 @@ end
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == test_value_1 * test_value_2
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == test_value_1 * test_value_2
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C == test_value_1 * test_value_2
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Real, C::One)" begin
@@ -568,10 +633,10 @@ end
 
     C = One()
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == B
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == B
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C == test_value
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Real, C::Zero)" begin
@@ -610,6 +675,7 @@ end
     # dim(B) != dim(C)
     B = Vector(rand(dim(C) + 1))
     @test_throws DimensionMismatch wedge(B, C)
+    @test_throws DimensionMismatch B ∧ C
 end
 
 @testset "wedge(B::Vector, C::Pseudoscalar)" begin
@@ -652,13 +718,20 @@ end
 end
 
 @testset "wedge(B::Vector, C::One)" begin
-    # TODO
-    @test_skip 1
+    B = Vector(rand(5))
+    C = One()
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C == Blade(B)
+    @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Vector, C::Zero)" begin
-    # TODO
-    @test_skip 1
+    B = Vector(rand(5))
+    C = Zero()
+
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
 end
 
 @testset "wedge(B::Vector, C::Vector)" begin
@@ -680,4 +753,5 @@ end
     # dim(B) != dim(C)
     C_vector = Vector(rand(dim(B) + 1))
     @test_throws DimensionMismatch wedge(B_vector, C_vector)
+    @test_throws DimensionMismatch B_vector ∧ C_vector
 end

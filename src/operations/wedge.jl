@@ -35,6 +35,8 @@ Compute the outer product of the multivector `M` with the multivector `N`.
 """
 wedge(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
 
+# --- Specializations involving an AbstractMultivector instance
+
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
 wedge(M::AbstractMultivector, B::AbstractBlade) =
@@ -63,19 +65,29 @@ wedge(M::AbstractMultivector, B::Zero) = B
 wedge(M::AbstractMultivector, x::Real) = x * M
 wedge(x::Real, M::AbstractMultivector) = x * M
 
-# --- Operations involving an AbstractBlade instance
+# --- Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
 wedge(B::AbstractBlade, C::AbstractScalar) = B * C
 wedge(B::AbstractScalar, C::AbstractBlade) = B * C
 
+# B::AbstractBlade, C::One
+# B::One, C::AbstractBlade
+wedge(B::AbstractBlade, C::One) = B
+wedge(B::One, C::AbstractBlade) = C
+
+# B::AbstractBlade, C::Zero
+# B::Zero, C::AbstractBlade
+wedge(B::AbstractBlade, C::Zero) = zero(B)
+wedge(B::Zero, C::AbstractBlade) = zero(C)
+
 # B::AbstractBlade, x::Real
 # x::Real, B::AbstractBlade
 wedge(B::AbstractBlade, x::Real) = B * x
 wedge(x::Real, B::AbstractBlade) = x * B
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function wedge(B::Blade, C::Blade)
@@ -125,7 +137,7 @@ end
 # v::Vector, w::Vector
 wedge(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function wedge(B::Pseudoscalar, C::Pseudoscalar)
@@ -142,7 +154,7 @@ end
 
 wedge(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
@@ -164,12 +176,12 @@ wedge(x::Real, B::AbstractScalar) = x * B
 wedge(B::AbstractScalar, v::Vector{<:Real}) = value(B) * Blade(v)
 wedge(v::Vector{<:Real}, B::AbstractScalar) = wedge(B, v)
 
-# --- Operations involving a Scalar instance
+# --- Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
 wedge(B::Scalar, C::Scalar) = B * C
 
-# --- Operations involving a One instance
+# --- Specializations involving a One instance
 
 # B::One, C::One
 wedge(B::One, C::One) = B
@@ -179,7 +191,7 @@ wedge(B::One, C::One) = B
 wedge(B::One, C::Zero) = C
 wedge(B::Zero, C::One) = B
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 wedge(B::Zero, C::Zero) = B
