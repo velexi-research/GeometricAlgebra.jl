@@ -27,15 +27,17 @@ export wedge, ∧
 
 # --- Method definitions
 
+# ------ Docstring methods (no-op)
+
 """
     wedge(M, N)
     M ∧ N
 
 Compute the outer product of the multivector `M` with the multivector `N`.
 """
-wedge(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
+wedge(M::AbstractMultivector, N::AbstractMultivector) = nothing
 
-# --- Specializations involving an AbstractMultivector instance
+# ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
@@ -65,7 +67,7 @@ wedge(M::AbstractMultivector, B::Zero) = B
 wedge(M::AbstractMultivector, x::Real) = x * M
 wedge(x::Real, M::AbstractMultivector) = x * M
 
-# --- Specializations involving an AbstractBlade instance
+# ------ Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
@@ -87,7 +89,7 @@ wedge(B::Zero, C::AbstractBlade) = zero(C)
 wedge(B::AbstractBlade, x::Real) = B * x
 wedge(x::Real, B::AbstractBlade) = x * B
 
-# --- Specializations involving a Blade instance
+# ------ Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function wedge(B::Blade, C::Blade)
@@ -137,7 +139,7 @@ end
 # v::Vector, w::Vector
 wedge(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
 
-# --- Specializations involving a Pseudoscalar instance
+# ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function wedge(B::Pseudoscalar, C::Pseudoscalar)
@@ -154,7 +156,7 @@ end
 
 wedge(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v
 
-# --- Specializations involving an AbstractScalar instance
+# ------ Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
@@ -176,12 +178,12 @@ wedge(x::Real, B::AbstractScalar) = x * B
 wedge(B::AbstractScalar, v::Vector{<:Real}) = value(B) * Blade(v)
 wedge(v::Vector{<:Real}, B::AbstractScalar) = wedge(B, v)
 
-# --- Specializations involving a Scalar instance
+# ------ Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
 wedge(B::Scalar, C::Scalar) = B * C
 
-# --- Specializations involving a One instance
+# ------ Specializations involving a One instance
 
 # B::One, C::One
 wedge(B::One, C::One) = B
@@ -191,7 +193,7 @@ wedge(B::One, C::One) = B
 wedge(B::One, C::Zero) = C
 wedge(B::Zero, C::One) = B
 
-# --- Specializations involving a Zero instance
+# ------ Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 wedge(B::Zero, C::Zero) = B

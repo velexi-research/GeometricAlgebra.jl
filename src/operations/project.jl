@@ -17,6 +17,8 @@ export project
 
 using LinearAlgebra: I
 
+# ------ Docstring methods (no-op)
+
 """
     project(M, B)
 
@@ -24,13 +26,6 @@ Compute the projection of multivector `M` onto the subspace represented by
 blade `B`.
 """
 project(M::AbstractMultivector, B::AbstractBlade) = nothing
-
-# --- Specializations involving an AbstractMultivector instance
-
-# M::AbstractMultivector, B::Zero
-project(M::AbstractMultivector, B::Zero) = B
-
-# --- Specializations involving an AbstractBlade instance
 
 """
     project(B, C; return_blade=true)
@@ -43,6 +38,13 @@ is a vector, a Matrix if the result is a blade with 1 < grade < `dim`, and a
 multiple of LinearAlgebra.I if the result is a pseudoscalar.
 """
 project(B::AbstractBlade, C::AbstractBlade) = nothing
+
+# ------ Specializations involving an AbstractMultivector instance
+
+# M::AbstractMultivector, B::Zero
+project(M::AbstractMultivector, B::Zero) = B
+
+# ------ Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
@@ -62,32 +64,7 @@ project(B::AbstractBlade, C::Real; return_blade::Bool=true) =
 project(B::Real, C::AbstractBlade; return_blade::Bool=true) =
     return_blade ? Scalar(B) : B
 
-# B::AbstractBlade, v::Vector
-# v::Vector, B::AbstractBlade
-function project(B::AbstractBlade, v::Vector{<:Real}; return_blade::Bool=true)
-    # Check arguments
-    assert_dim_equal(v, B)
-
-    # Compute projection
-    projection = (grade(B) == 1) ?
-        v * LinearAlgebra.dot(v, basis(B)) : 0
-
-    return_blade ? Blade(projection) : projection
-end
-
-function project(v::Vector{<:Real}, B::AbstractBlade; return_blade::Bool=true)
-    # Check arguments
-    assert_dim_equal(v, B)
-
-    # Compute projection
-    projection = (grade(B) == 1) ?
-        basis(B) * LinearAlgebra.dot(v, basis(B)) :
-        basis(B) * transpose(transpose(v) * basis(B))
-
-    return_blade ? Blade(projection) : projection
-end
-
-# --- Specializations involving a Blade instance
+# ------ Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function project(B::Blade, C::Blade; return_blade::Bool=true)
@@ -158,7 +135,7 @@ function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
     return_blade ? Blade(projection) : projection
 end
 
-# --- Specializations involving a Pseudoscalar instance
+# ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function project(B::Pseudoscalar, C::Pseudoscalar; return_blade=true)
@@ -186,7 +163,7 @@ function project(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true)
     return_blade ? Blade(v) : v
 end
 
-# --- Specializations involving an AbstractScalar instance
+# ------ Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
 project(B::AbstractScalar, C::AbstractScalar; return_blade::Bool=true) =
@@ -212,7 +189,7 @@ project(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
 project(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
 
-# --- Specializations involving a Zero instance
+# ------ Specializations involving a Zero instance
 
 # B::Zero, x::Real
 # x::Real, B::Zero

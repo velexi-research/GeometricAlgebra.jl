@@ -23,7 +23,7 @@ except according to the terms contained in the LICENSE file.
 export wedge_mgs
 export dual_mgs
 
-# --- Binary operators
+# --- Method definitions
 
 using LinearAlgebra: norm
 

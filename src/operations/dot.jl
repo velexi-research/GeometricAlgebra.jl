@@ -15,6 +15,8 @@ import LinearAlgebra.dot
 
 # --- Method definitions
 
+# ------ Docstring methods (no-op)
+
 """
     dot(M, N)
     M ⋅ N
@@ -23,6 +25,8 @@ Compute the dot product of the multivector `M` with the multivector `N`.
 """
 dot(M::AbstractMultivector, N::AbstractMultivector; left=true) =
     left ? contractl(M, N) : nothing  # TODO
+
+# ------ Specializations involving an AbstractMultivector instance
 
 dot(M::AbstractMultivector, x::Real; left=true) =
     left ? contractl(M, x) : nothing  # TODO
