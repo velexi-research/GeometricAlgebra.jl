@@ -103,11 +103,6 @@ function wedge(B::Blade, C::Blade)
 
     # --- Construct new blade
 
-#    # Incorporate volume(B) and volume(C) into the norm of the first vector of
-#    # basis(B)
-#    basis_B = copy(basis(B))
-#    basis_B[:, 1] *= volume(B) * volume(C)
-
     volume(B) * volume(C) * Blade(hcat(basis(B), basis(C)))
 end
 
