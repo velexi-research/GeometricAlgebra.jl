@@ -15,6 +15,8 @@ export project
 
 # --- Method definitions
 
+using LinearAlgebra: I
+
 """
     project(M, B)
 
@@ -36,14 +38,29 @@ project(M::AbstractMultivector, B::Zero) = B
 Compute the projection of blade `B` onto the subspace represented by blade `C`.
 
 When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
-the return value is a Real (if the result is a scalar) or a Vector (if the
-result is a vector).
+the return value is a Real if the result is a scalar, a Vector if the result
+is a vector, a Matrix if the result is a blade with 1 < grade < `dim`, and a
+multiple of LinearAlgebra.I if the result is a pseudoscalar.
 """
 project(B::AbstractBlade, C::AbstractBlade) = nothing
 
+# B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
 project(B::AbstractScalar, C::AbstractBlade; return_blade::Bool=true) =
     return_blade ? B : value(B)
+project(B::AbstractBlade, C::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+
+# B::AbstractBlade, C::Zero
+project(B::AbstractBlade, C::Zero; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+
+# B::AbstractBlade, C::Real
+# B::Real, C::AbstractBlade
+project(B::AbstractBlade, C::Real; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+project(B::Real, C::AbstractBlade; return_blade::Bool=true) =
+    return_blade ? Scalar(B) : B
 
 # B::AbstractBlade, v::Vector
 # v::Vector, B::AbstractBlade
@@ -73,7 +90,7 @@ end
 # --- Operations involving a Blade instance
 
 # B::Blade, C::Blade
-function project(B::Blade, C::Blade)
+function project(B::Blade, C::Blade; return_blade::Bool=true)
     # --- Check arguments
 
     assert_dim_equal(B, C)
@@ -82,7 +99,7 @@ function project(B::Blade, C::Blade)
 
     # When grade(B) > grade(C), the projection is zero.
     if grade(B) > grade(C)
-        return zero(B)
+        return return_blade ? zero(B) : 0
     end
 
     # Compute the projections of basis(B) onto basis(C)
@@ -95,24 +112,26 @@ function project(B::Blade, C::Blade)
     projections[:, 1] *= volume(B)
 
     # Compute projection (using fact that projection is an outermorphism)
-    Blade(projections)
+    return_blade ? Blade(projections) : projections
 end
 
 # B::Blade, C::Pseudoscalar
 # B::Pseudoscalar, C::Blade
-function project(B::Blade, C::Pseudoscalar)
+function project(B::Blade, C::Pseudoscalar; return_blade::Bool=true)
     assert_dim_equal(B, C)
-    B
+    if return_blade
+        return B
+    else
+        projections = copy(basis(B))
+        projections[:, 1] *= volume(B)
+        return projections
+    end
 end
 
-function project(B::Pseudoscalar, C::Blade)
+function project(B::Pseudoscalar, C::Blade; return_blade::Bool=true)
     assert_dim_equal(B, C)
-    zero(B)
-end
-
-# B::Blade, C::AbstractScalar
-project(B::Blade, C::AbstractScalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
+end
 
 # B::Blade, v::Vector
 # v::Vector, B::Blade
@@ -142,13 +161,17 @@ end
 # --- Operations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
-function project(B::Pseudoscalar, C::Pseudoscalar)
+function project(B::Pseudoscalar, C::Pseudoscalar; return_blade=true)
     assert_dim_equal(B, C)
-    B
+    return_blade ? B : value(B) * I
 end
 
 # B::Pseudoscalar, v::AbstractScalar
 project(B::Pseudoscalar, C::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? zero(B) : 0
+
+# B::Pseudoscalar, C::Zero
+project(B::Pseudoscalar, C::Zero; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
 
 # B::Pseudoscalar, v::Vector
@@ -166,7 +189,8 @@ end
 # --- Operations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
-project(B::AbstractScalar, C::AbstractScalar) = B
+project(B::AbstractScalar, C::AbstractScalar; return_blade::Bool=true) =
+    return_blade ? B : value(B)
 
 # B::AbstractScalar, C::Zero
 project(B::AbstractScalar, C::Zero; return_blade::Bool=true) =

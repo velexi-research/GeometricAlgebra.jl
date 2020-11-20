@@ -13,7 +13,7 @@ except according to the terms contained in the LICENSE file.
 
 # Standard library
 import InteractiveUtils.subtypes
-using LinearAlgebra: norm, ⋅
+using LinearAlgebra: norm, ⋅, UniformScaling, I
 using Test
 
 # GeometricAlgebra.jl
@@ -64,47 +64,56 @@ end
 @testset "project(B::Blade, C::Blade)" begin
     # --- Preparations
 
-    test_dim = 15
+    test_dim = 10
 
-    # --- Tests
-
-    # ------ grade(B) < grade(C)
+    # --- grade(B) < grade(C)
 
     B = Blade(rand(test_dim, 5))
     C = Blade(rand(test_dim, 7))
 
-    projection = project(B, C)
-    @test projection isa Blade
-    @test dim(projection) == dim(B)
+    # ------ return_blade == true
+
+    B_proj_C = project(B, C)
+    @test B_proj_C isa Blade
+    @test dim(B_proj_C) == dim(B)
 
     # Check norm
-    norm_projection = norm(B) *
+    expected_norm_B_proj_C = norm(B) *
         norm(Blade(basis(C) * transpose(basis(C)) * basis(B)))
-    @test norm(projection) ≈ norm_projection
+    @test norm(B_proj_C) ≈ expected_norm_B_proj_C
 
     # Check that project(B, C) is contained in C
-    projection_coefficients = transpose(basis(C)) * basis(projection)
+    projection_coefficients = transpose(basis(C)) * basis(B_proj_C)
     @test norm(projection_coefficients)^2 ≈ grade(B)
 
-    # Check that norm(project(B, C)) TODO
+    # ------ return_blade == false
 
-    # ------ grade(B) > grade(C)
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Matrix
+    @test Blade(B_proj_C_matrix) == B_proj_C
 
-    B = Blade(rand(test_dim, 10))
+    # --- grade(B) > grade(C)
+
     C = Blade(rand(test_dim, 3))
 
-    @test iszero(project(B, C))
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
-    # ------ dim(B) != dim(C)
+    # return_blade == false
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Real
+    @test B_proj_C_matrix == 0
 
-    B = Blade(rand(test_dim, 3))
+    # --- dim(B) != dim(C)
+
     C = Blade(rand(test_dim + 1, 4))
-    @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=true)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 
-    # ------ Check consistency with project(v::Vector, B::Blade)
+    # --- Check consistency with project(v::Vector, B::Blade)
 
     v = Vector(rand(test_dim))
-    B = Blade(rand(test_dim, 3))
     @test project(v, B) ≈ project(Blade(v), B)
 end
 
@@ -117,20 +126,29 @@ end
     test_dim = 5
     test_vectors = rand(test_dim, 3)
 
-    # --- Tests
+    # --- dim(B) == dim(C)
 
-    # dim(B) == dim(C)
     B = Blade(test_vectors)
     C = Pseudoscalar(test_dim, test_value)
+
+    # return_blade == true
     @test project(B, C) === B
 
-    # dim(B) != dim(C)
+    # return_blade == false
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Matrix
+    @test Blade(B_proj_C_matrix) ≈ B
+
+    # --- dim(B) != dim(C)
+
     B = Pseudoscalar(test_dim + 1, test_value)
     C = Blade(test_vectors)
     @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
 
 @testset "project(B::Blade, C::Scalar)" begin
+    # Preparations
     test_dim = 5
     B = Blade(rand(test_dim, 3))
 
@@ -139,24 +157,64 @@ end
     C = Scalar(test_value)
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
-    @test B_proj_C isa Real
-    @test B_proj_C == 0
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Real
+    @test B_proj_C_matrix == 0
 end
 
 @testset "project(B::Blade, C::One)" begin
-    @test_skip 1
+    # Preparations
+    test_dim = 5
+    B = Blade(rand(test_dim, 3))
+    C = One()
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Real
+    @test B_proj_C_matrix == 0
 end
 
 @testset "project(B::Blade, C::Zero)" begin
-    @test_skip 1
+    # Preparations
+    test_dim = 5
+    B = Blade(rand(test_dim, 3))
+    C = Zero()
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Real
+    @test B_proj_C_matrix == 0
 end
 
 @testset "project(B::Blade, C::Real)" begin
-    @test_skip 1
+    # Preparations
+    test_dim = 5
+    B = Blade(rand(test_dim, 3))
+
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = test_value
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C_matrix = project(B, C, return_blade=false)
+    @test B_proj_C_matrix isa Real
+    @test B_proj_C_matrix == 0
 end
 
 @testset "project(B::Blade, C::Vector)" begin
@@ -169,11 +227,14 @@ end
 
     # grade(B) > 1, return_blade == true
     B = Blade(rand(test_dim, 5))
-    projection_vectors = basis(B) * transpose(basis(B)) * C
-    @test iszero(project(B, C))
+
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # grade(B) > 1, return_blade == false
-    @test project(B, C, return_blade=false) == 0
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 
     # grade(B) == 1, return_blade == true
     B = Blade(rand(test_dim, 1))
@@ -186,6 +247,7 @@ end
     # dim(B) != length(C)
     B = Blade(rand(test_dim + 1, 3))
     @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
 
 # ------ B::Pseudoscalar
@@ -205,15 +267,26 @@ end
 
     # --- Tests
 
-    # dim(B) == dim(C)
+    # ------ dim(B) == dim(C)
+
     B = Pseudoscalar(test_dim, test_value)
     C = Blade(test_vectors)
-    @test iszero(project(B, C))
 
-    # dim(B) != dim(C)
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
+
+    # ------ dim(B) != dim(C)
+
     B = Blade(test_vectors)
     C = Pseudoscalar(test_dim + 1, test_value)
     @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
 
 @testset "project(B::Pseudoscalar, C::Pseudoscalar)" begin
@@ -228,17 +301,26 @@ end
     # --- Tests
 
     for test_dim in 5:8
-        # dim(B) == dim(C)
+        # --- dim(B) == dim(C)
+
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
+        # return_blade == true
         B_proj_C = project(B, C)
         @test B_proj_C == B
 
-        # dim(B) != dim(C)
+        # return_blade == false
+        B_proj_C = project(B, C, return_blade=false)
+        @test B_proj_C isa UniformScaling
+        @test B_proj_C == value(B) * I
+
+        # --- dim(B) != dim(C)
+
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim + 1, test_value_2)
         @test_throws DimensionMismatch project(B, C)
+        @test_throws DimensionMismatch project(B, C, return_blade=false)
     end
 end
 
@@ -253,7 +335,8 @@ end
     C = Scalar(test_value_2)
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -262,15 +345,59 @@ end
 end
 
 @testset "project(B::Pseudoscalar, C::One)" begin
-    @test_skip 1
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = One()
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 @testset "project(B::Pseudoscalar, C::Zero)" begin
-    @test_skip 1
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = Zero()
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 @testset "project(B::Pseudoscalar, C::Real)" begin
-    @test_skip 1
+    test_dim = 10
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = Pseudoscalar(test_dim, test_value_1)
+
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = test_value_2
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 @testset "project(B::Pseudoscalar, C::Vector)" begin
@@ -286,15 +413,22 @@ end
 
     # --- Tests
 
-    # dim(B) == length(C), return_blade == true
-    @test iszero(project(B, C))
+    # ------ dim(B) == length(C)
 
-    # dim(B) == length(C), return_blade == false
-    @test project(B, C, return_blade=false) == 0
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
-    # dim(B) != length(C)
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
+
+    # ------ dim(B) != length(C)
+
     B = Pseudoscalar(test_dim + 1, test_value)
     @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
 
 # ------ B::Scalar
@@ -387,7 +521,8 @@ end
     C = Zero()
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -417,8 +552,7 @@ end
 
 
 @testset "project(B::Scalar, C::Vector)" begin
-    # --- Preparations
-
+    # Preparations
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
     B = Scalar(test_value)
@@ -444,11 +578,37 @@ end
 end
 
 @testset "project(B::One, C::Blade)" begin
-    @test_skip 1
+    B = One()
+
+    test_dim = 5
+    C = Blade(rand(test_dim, 3))
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test isone(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 1
 end
 
 @testset "project(B::One, C::Pseudoscalar)" begin
-    @test_skip 1
+    B = One()
+
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test isone(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 1
 end
 
 @testset "project(B::One, C::Scalar)" begin
@@ -459,7 +619,8 @@ end
     C = Scalar(test_value)
 
     # return_blade == true
-    @test project(B, C) === B
+    B_proj_C = project(B, C)
+    @test isone(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -472,7 +633,8 @@ end
     C = One()
 
     # return_blade == true
-    @test isone(project(B, C))
+    B_proj_C = project(B, C)
+    @test isone(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -485,7 +647,8 @@ end
     C = Zero()
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -501,7 +664,8 @@ end
     C = test_value
 
     # return_blade == treu
-    @test project(B, C) === B
+    B_proj_C = project(B, C)
+    @test isone(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -515,7 +679,8 @@ end
     C = Vector(rand(10))
 
     # return_blade == true
-    @test project(B, C) === B
+    B_proj_C = project(B, C)
+    @test isone(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -530,11 +695,37 @@ end
 end
 
 @testset "project(B::Zero, C::Blade)" begin
-    @test_skip 1
+    B = Zero()
+
+    test_dim = 5
+    C = Blade(rand(test_dim, 3))
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 @testset "project(B::Zero, C::Pseudoscalar)" begin
-    @test_skip 1
+    B = Zero()
+
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 @testset "project(B::Zero, C::Scalar)" begin
@@ -545,7 +736,8 @@ end
     C = Scalar(test_value)
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -558,7 +750,8 @@ end
     C = One()
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -571,7 +764,8 @@ end
     C = Zero()
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -587,7 +781,8 @@ end
     C = test_value
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -600,7 +795,8 @@ end
     C = Vector(rand(10))
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -615,11 +811,43 @@ end
 end
 
 @testset "project(B::Real, C::Blade)" begin
-    @test_skip 1
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = test_value
+
+    test_dim = 5
+    C = Blade(rand(test_dim, 3))
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test B_proj_C isa AbstractScalar
+    @test B_proj_C == test_value
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == test_value
 end
 
 @testset "project(B::Real, C::Pseudoscalar)" begin
-    @test_skip 1
+    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    B = test_value_1
+
+    test_dim = 10
+    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test B_proj_C isa AbstractScalar
+    @test B_proj_C == test_value_1
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == test_value_1
 end
 
 @testset "project(B::Real, C::Scalar)" begin
@@ -649,8 +877,14 @@ end
 
     C = One()
 
+    # return_blade == true
     B_proj_C = project(B, C)
     @test B_proj_C isa AbstractScalar
+    @test B_proj_C == test_value
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
     @test B_proj_C == test_value
 end
 
@@ -661,7 +895,14 @@ end
 
     C = Zero()
 
-    @test iszero(project(B, C))
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 # ------ B::Vector
@@ -678,26 +919,32 @@ end
 
     # --- Tests
 
-    # grade(C) > 1, return_blade == true
+    # ------ grade(C) > 1
+
+    # return_blade == true
     C = Blade(rand(test_dim, 5))
     projection_vectors = basis(C) * transpose(basis(C)) * B
     @test project(B, C) ≈ Blade(projection_vectors)
 
-    # grade(C) > 1, return_blade == false
+    # return_blade == false
     @test project(B, C, return_blade=false) ≈ projection_vectors
 
-    # grade(C) == 1, return_blade == true
+    # ------ grade(C) == 1
+
+    # return_blade == true
     C = Blade(rand(test_dim, 1))
     projection_vectors = B ⋅ basis(C) * basis(C)
     @test project(B, C) ≈ Blade(projection_vectors)
 
-    # grade(C) == 1, return_blade == false
+    # return_blade == false
     projection_vectors = (B ⋅ basis(C)) * basis(C)
     @test project(B, C, return_blade=false) ≈ projection_vectors
 
-    # length(B) != dim(C)
+    # ------ length(B) != dim(C)
+
     C = Blade(rand(test_dim + 1, 3))
     @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
 
 @testset "project(B::Vector, C::Pseudoscalar)" begin
@@ -712,15 +959,19 @@ end
 
     # --- Tests
 
-    # length(B) == dim(C), return_blade == true
+    # ------ length(B) == dim(C)
+
+    # return_blade == true
     @test project(B, C) == Blade(B)
 
-    # length(B) == dim(C), return_blade == false
+    # return_blade == false
     @test project(B, C, return_blade=false) == B
 
-    # length(B) != dim(C)
+    # ------ length(B) != dim(C)
+
     B = Vector(rand(test_dim + 1))
     @test_throws DimensionMismatch project(B, C)
+    @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
 
 @testset "project(B::Vector, C::Scalar)" begin
@@ -734,7 +985,8 @@ end
     C = Scalar(test_value)
 
     # return_blade == true
-    @test iszero(project(B, C))
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -743,17 +995,30 @@ end
 end
 
 @testset "project(B::Vector, C::One)" begin
-    # return_blade == true
+    # Preparations
     B = Vector(rand(10))
     C = One()
-    @test iszero(project(B, C))
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
 
     # return_blade == false
-    @test project(B, C, return_blade=false) == 0
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
 
 @testset "project(B::Vector, C::Zero)" begin
     B = Vector(rand(10))
     C = Zero()
-    @test iszero(project(B, C))
+
+    # return_blade == true
+    B_proj_C = project(B, C)
+    @test iszero(B_proj_C)
+
+    # return_blade == false
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Real
+    @test B_proj_C == 0
 end
