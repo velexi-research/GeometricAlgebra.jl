@@ -25,12 +25,12 @@ blade `B`.
 """
 project(M::AbstractMultivector, B::AbstractBlade) = nothing
 
-# --- Operations involving an AbstractMultivector instance
+# --- Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::Zero
 project(M::AbstractMultivector, B::Zero) = B
 
-# --- Operations involving an AbstractBlade instance
+# --- Specializations involving an AbstractBlade instance
 
 """
     project(B, C; return_blade=true)
@@ -87,7 +87,7 @@ function project(v::Vector{<:Real}, B::AbstractBlade; return_blade::Bool=true)
     return_blade ? Blade(projection) : projection
 end
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function project(B::Blade, C::Blade; return_blade::Bool=true)
@@ -158,7 +158,7 @@ function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
     return_blade ? Blade(projection) : projection
 end
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function project(B::Pseudoscalar, C::Pseudoscalar; return_blade=true)
@@ -186,7 +186,7 @@ function project(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true)
     return_blade ? Blade(v) : v
 end
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
 project(B::AbstractScalar, C::AbstractScalar; return_blade::Bool=true) =
@@ -212,7 +212,7 @@ project(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
 project(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
     return_blade ? zero(B) : 0
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, x::Real
 # x::Real, B::Zero

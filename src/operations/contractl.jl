@@ -34,7 +34,7 @@ Compute the left contraction of the multivector `M` with the multivector `N`.
 """
 contractl(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
 
-# --- Operations involving an AbstractMultivector instance
+# --- Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
@@ -67,7 +67,7 @@ contractl(M::AbstractMultivector, x::Real) =
 
 contractl(x::Real, M::AbstractMultivector) = x * M
 
-# --- Operations involving an AbstractBlade instance
+# --- Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 contractl(B::AbstractBlade, C::AbstractScalar) = zero(B)
@@ -76,7 +76,7 @@ contractl(B::AbstractBlade, C::AbstractScalar) = zero(B)
 contractl(B::AbstractScalar, C::AbstractBlade) =
     Blade(C, volume=value(B) * volume(C))
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function contractl(B::Blade, C::Blade)
@@ -160,7 +160,7 @@ end
 contractl(B::Blade, x::Real) = zero(B)
 contractl(x::Real, B::Blade) = x * B
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function contractl(B::Pseudoscalar, C::Pseudoscalar)
@@ -191,7 +191,7 @@ function contractl(v::Vector{<:Real}, B::Pseudoscalar)
        -volume(B) * dual(Blade(v))
 end
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
@@ -213,12 +213,12 @@ contractl(x::Real, B::AbstractScalar) = x * B
 contractl(B::AbstractScalar, v::Vector{<:Real}) = Blade(value(B) * v)
 contractl(v::Vector{<:Real}, B::AbstractScalar) = zero(B)
 
-# --- Operations involving a Scalar instance
+# --- Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
 contractl(B::Scalar, C::Scalar) = B * C
 
-# --- Operations involving a One instance
+# --- Specializations involving a One instance
 
 # B::One, C::One
 contractl(B::One, C::One) = B
@@ -228,7 +228,7 @@ contractl(B::One, C::One) = B
 contractl(B::One, C::Zero) = C
 contractl(B::Zero, C::One) = B
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 contractl(B::Zero, C::Zero) = B

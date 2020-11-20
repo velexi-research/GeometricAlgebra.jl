@@ -22,7 +22,7 @@ Compute the sum of the multivectors `M` and `N`.
 """
 +(M::AbstractMultivector, N::AbstractMultivector) = nothing
 
-# --- Operations involving an AbstractMultivector instance
+# --- Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::One
 # B::One,M::AbstractMultivector
@@ -34,7 +34,7 @@ Compute the sum of the multivectors `M` and `N`.
 @inline +(M::AbstractMultivector, B::Zero) = M
 @inline +(B::Zero, M::AbstractMultivector) = M
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function +(B::Blade, C::Blade)
@@ -47,13 +47,13 @@ function +(B::Blade, C::Blade)
     # TODO: general blade sum
 end
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 @inline +(B::Pseudoscalar, C::Pseudoscalar) =
     Pseudoscalar(B, value=value(B) + value(C))
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
 @inline +(B::AbstractScalar, C::AbstractScalar) =
@@ -74,7 +74,7 @@ end
 @inline +(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) + x)
 @inline +(x::Real, B::AbstractScalar) = B + x
 
-# --- Operations involving a One instance
+# --- Specializations involving a One instance
 
 # B::One, C::One
 @inline +(B::One, C::One) = Scalar{typeof(value(B))}(2)
@@ -84,7 +84,7 @@ end
 @inline +(B::One, C::Zero) = B
 @inline +(B::Zero, C::One) = C
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 @inline +(B::Zero, C::Zero) = B

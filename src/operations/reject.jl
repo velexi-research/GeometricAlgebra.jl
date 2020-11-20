@@ -25,7 +25,7 @@ rejection vectors are normalized.
 """
 reject(vectors::Matrix, B::AbstractBlade; normalize=false) = nothing
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # vectors::Matrix, B::Blade
 function reject(vectors::Matrix, B::Blade; normalize::Bool=false)

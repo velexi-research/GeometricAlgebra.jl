@@ -22,7 +22,7 @@ Compute the geometric quotient of multivectors `M` and `N`.
 """
 /(M::AbstractMultivector, N::AbstractMultivector) = nothing
 
-# --- Operations involving an AbstractMultivector instance
+# --- Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::One
 # B::One, M::AbstractMultivector
@@ -34,7 +34,7 @@ Compute the geometric quotient of multivectors `M` and `N`.
 /(B::Zero, M::AbstractMultivector) = B
 /(M::AbstractMultivector, B::Zero) = Scalar{typeof(norm(M))}(Inf)
 
-# --- Operations involving an AbstractBlade instance
+# --- Specializations involving an AbstractBlade instance
 
 /(B::AbstractBlade, C::AbstractBlade) = B * reciprocal(C)
 
@@ -51,7 +51,7 @@ Compute the geometric quotient of multivectors `M` and `N`.
 /(B::AbstractBlade, x::Real) = Blade(B, volume=volume(B) / x)
 /(x::Real, B::AbstractBlade) = x * reciprocal(B)
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::AbstractScalar
 # B::AbstractScalar, C::Blade
@@ -71,7 +71,7 @@ Compute the geometric quotient of multivectors `M` and `N`.
 /(B::Blade, C::Zero) = Blade(B, volume=sign(B) * Inf)
 /(B::Zero, C::Blade) = B
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function /(B::Pseudoscalar, C::Pseudoscalar)
@@ -102,7 +102,7 @@ end
         Pseudoscalar(B, value=x / value(B)) :
         Pseudoscalar(B, value=-x / value(B))
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
@@ -127,12 +127,12 @@ end
 # v::Vector, B::AbstractScalar
 /(v::Vector{<:Real}, B::AbstractScalar) = Blade(v) / value(B)
 
-# --- Operations involving a Scalar instance
+# --- Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
 /(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) / value(C))
 
-# --- Operations involving a One instance
+# --- Specializations involving a One instance
 
 # B::One, C::One
 /(B::One, C::One) = B
@@ -142,7 +142,7 @@ end
 /(B::One, C::Zero) = reciprocal(C)
 /(B::Zero, C::One) = B
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 /(B::Zero, C::Zero) = Scalar{typeof(value(B))}(NaN)

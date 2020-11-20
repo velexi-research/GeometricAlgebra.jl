@@ -30,7 +30,7 @@ Notes
 """
 dual(B::AbstractBlade, C::AbstractBlade) = nothing  # TODO
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function dual(B::Blade, C::Blade)
@@ -112,7 +112,7 @@ dual(B::AbstractScalar, C::Blade) =
         Blade(C, volume=value(B), copy_basis=false) :
         Blade(C, volume=-value(B), copy_basis=false)
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 function dual(B::Pseudoscalar, C::Pseudoscalar)
@@ -134,7 +134,7 @@ dual(B::AbstractScalar, C::Pseudoscalar) =
 dual(B::Pseudoscalar, x::Real) = zero(B)
 dual(x::Real, B::Pseudoscalar) = Scalar{typeof(value(B))}(x)
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
 dual(B::AbstractScalar, C::AbstractScalar) = B
@@ -144,7 +144,7 @@ dual(B::AbstractScalar, C::AbstractScalar) = B
 dual(B::AbstractScalar, x::Real) = B
 dual(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x)
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # dual(B::Zero, C)
 dual_of_zero() = error("The dual of Zero is not well-defined")

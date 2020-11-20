@@ -22,7 +22,7 @@ Compute the geometric product of multivectors `M` and `N`.
 """
 *(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
 
-# --- Operations involving an AbstractMultivector instance
+# --- Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
@@ -57,7 +57,7 @@ Compute the geometric product of multivectors `M` and `N`.
 *(M::AbstractMultivector, v::Vector) = Multivector(map(B -> B * v, blades(M)))
 *(v::Vector, M::AbstractMultivector) = Multivector(map(B -> v * B, blades(M)))
 
-# --- Operations involving an AbstractBlade instance
+# --- Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, B::AbstractBlade
@@ -70,7 +70,7 @@ Compute the geometric product of multivectors `M` and `N`.
 *(B::AbstractBlade, x::Real) = Blade(B, volume=volume(B) * x)
 *(x::Real, B::AbstractBlade) = B * x
 
-# --- Operations involving a Blade instance
+# --- Specializations involving a Blade instance
 
 # B::Blade, C::Blade
 function *(B::Blade, C::Blade)
@@ -133,7 +133,7 @@ function *(v::Vector{<:Real}, B::Blade)
     Multivector([v_dot_B, v_wedge_B])
 end
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 *(B::Pseudoscalar, C::Pseudoscalar) = contractl(B, C)
@@ -160,7 +160,7 @@ end
 *(B::Pseudoscalar, x::Real) = Pseudoscalar(B, value=x * value(B))
 *(x::Real, C::Pseudoscalar) = C * x
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
@@ -182,12 +182,12 @@ end
 *(v::Vector{<:Real}, B::AbstractScalar) = Blade(value(B) * v)
 *(B::AbstractScalar, v::Vector{<:Real}) = v * B
 
-# --- Operations involving a Scalar instance
+# --- Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
 *(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) * value(C))
 
-# --- Operations involving a One instance
+# --- Specializations involving a One instance
 
 # B::One, C::One
 *(B::One, C::One) = B
@@ -197,7 +197,7 @@ end
 *(B::One, C::Zero) = C
 *(B::Zero, C::One) = B
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 *(B::Zero, C::Zero) = B

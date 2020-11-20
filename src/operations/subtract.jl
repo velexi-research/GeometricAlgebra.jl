@@ -22,12 +22,12 @@ Compute the difference of the multivectors `M` and `N`.
 """
 -(M::AbstractMultivector, N::AbstractMultivector) = M + -N
 
-# --- Operations involving a Pseudoscalar instance
+# --- Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
 -(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B, value=value(B) - value(C))
 
-# --- Operations involving an AbstractScalar instance
+# --- Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
@@ -44,12 +44,12 @@ Compute the difference of the multivectors `M` and `N`.
 -(B::AbstractScalar, x::Real) = Scalar{typeof(value(B))}(value(B) - x)
 -(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x - value(B))
 
-# --- Operations involving a Scalar instance
+# --- Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
 -(B::Scalar, C::Scalar) = Scalar{typeof(value(B))}(value(B) - value(C))
 
-# --- Operations involving a One instance
+# --- Specializations involving a One instance
 
 # B::One, C::One
 -(B::One, C::One) = Zero{typeof(value(B))}()
@@ -59,7 +59,7 @@ Compute the difference of the multivectors `M` and `N`.
 -(B::One, C::Zero) = B
 -(B::Zero, C::One) = -C
 
-# --- Operations involving a Zero instance
+# --- Specializations involving a Zero instance
 
 # B::Zero, C::Zero
 -(B::Zero, C::Zero) = B
