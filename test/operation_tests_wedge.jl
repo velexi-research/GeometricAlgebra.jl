@@ -62,6 +62,8 @@ end
 end
 
 @testset "wedge(B::Blade, C::Blade)" begin
+    # --- Preparations
+
     B_vectors = hcat([1; 1; 0; 0; 0],
                      [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
@@ -70,12 +72,26 @@ end
                      [0; 0; 0; 4; 0])
     C = Blade(C_vectors)
 
-    # dim(B) == dim(C)
+    # --- Tests
+
+    # ------ dim(B) == dim(C)
+
+    # grade(B) + grade(C) <= dim(B)
     B_wedge_C = wedge(B, C)
     @test B_wedge_C ≈ Blade(hcat(B_vectors, C_vectors))
     @test B ∧ C == B_wedge_C
 
-    # dim(B) != dim(C)
+    # grade(B) + grade(C) > dim(B)
+    C_vectors = hcat([1; 0; 0; 0; 0],
+                     [0; 1; 0; 0; 0],
+                     [0; 0; 1; 0; 0],
+                     [0; 0; 0; 1; 0])
+    C = Blade(C_vectors)
+    @test iszero(wedge(B, C))
+    @test iszero(B ∧ C)
+
+    # ------ dim(B) != dim(C)
+
     C = Blade(rand(dim(B) + 1, 2))
     @test_throws DimensionMismatch wedge(B, C)
     @test_throws DimensionMismatch B ∧ C
