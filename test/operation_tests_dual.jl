@@ -39,14 +39,6 @@ end
     @test_skip 1
 end
 
-@testset "dual(M::Multivector, N::Real)" begin
-    @test_skip 1
-end
-
-@testset "dual(M::Multivector, N::Vector)" begin
-    @test_skip 1
-end
-
 # --- B::Blade
 
 @testset "dual(B::Blade, C::Blade)" begin
@@ -120,19 +112,24 @@ end
 
     @test dual(B, C) ≈ expected_result
 
-    # ------ Error cases
+    # ------ dim(B) != dim(C)
+
+    B = Blade(rand(test_dim + 1, grade(C) - 1))
+    @test_throws DimensionMismatch dual(B, C)
+
+    # ------ B not contained in C
 
     for grade_B in 2:5
-        # dim(B) != dim(C)
-        B = Blade(rand(test_dim + 1, grade_B))
-        @test_throws DimensionMismatch dual(B, C)
+        # grade(B) > grade(C)
+        B = Blade(rand(test_dim, grade(C) + 1))
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
 
-        # `B` not contained in `C`
+        # grade(B) <= grade(C), B not contained in C
         B = Blade(rand(test_dim, grade_B))
         while LinearAlgebra.norm(reject(basis(B), C)) < sqrt(eps(Float64))
             B = Blade(rand(test_dim, grade_B))
         end
-        @test_throws ArgumentError dual(B, C)
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
     end
 end
 
@@ -169,7 +166,7 @@ end
 end
 
 @testset "dual(B::Blade, C::Scalar)" begin
-    test_dim = 14
+    test_dim = 9
     test_value = rand()
     test_value = rand() > 0.5 ? test_value : -test_value
 
@@ -181,20 +178,12 @@ end
 end
 
 @testset "dual(B::Blade, C::One)" begin
-    test_dim = 12
+    test_dim = 10
     for test_grade in 5:8
         B = Blade(randn(test_dim, test_grade))
         C = One()
         @test iszero(dual(B, C))
     end
-end
-
-@testset "dual(B::Blade, C::Real)" begin
-    @test_skip 1
-end
-
-@testset "dual(B::Blade, C::Vector)" begin
-    @test_skip 1
 end
 
 # --- B::Pseudoscalar
@@ -285,27 +274,6 @@ end
     end
 end
 
-@testset "dual(B::Pseudoscalar, C::Real)" begin
-    # --- Preparations
-
-    # Test values
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    for test_dim in 9:12
-        B = Pseudoscalar(test_dim, test_value_1)
-        C = test_value_2
-        @test iszero(dual(B, C))
-    end
-end
-
-@testset "dual(B::Pseudoscalar, C::Vector)" begin
-    @test_skip 1
-end
-
 # --- B::Scalar
 
 @testset "dual(B::Scalar, C::Blade)" begin
@@ -356,20 +324,39 @@ end
 end
 
 @testset "dual(B::Scalar, C::Scalar)" begin
+    # --- Preparations
+
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-    B = Scalar(test_value_1)
 
     test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+
+    # --- Tests
+
+    # B != 0, C != 0
+    B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
     B_dual_C = dual(B, C)
     @test B_dual_C isa AbstractScalar
     @test B_dual_C == test_value_1
+
+    # B == 0
+    B = Scalar(0)
+    C = Scalar(test_value_2)
+    expected_error = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C == 0
+    B = Scalar(test_value_1)
+    C = Scalar(0)
+    expected_error = "The dual of anything relative to Zero is not well-defined"
+    @test_throws ErrorException(expected_error) dual(B, C)
 end
 
 @testset "dual(B::Scalar, C::One)" begin
+    # B != 0
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value = rand() > 0.5 ? test_value : -test_value
     B = Scalar(test_value)
@@ -378,23 +365,12 @@ end
 
     B_dual_C = dual(B, C)
     @test B_dual_C === B
-end
 
-@testset "dual(B::Scalar, C::Real)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-    B = Scalar(test_value_1)
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-    C = test_value_2
-
-    B_dual_C = dual(B, C)
-    @test B_dual_C === B
-end
-
-@testset "dual(B::Scalar, C::Vector)" begin
-    @test_skip 1
+    # B == 0
+    B = Scalar(0)
+    C = One()
+    expected_error = "The dual of Zero is not well-defined"
+    @test_throws ErrorException(expected_error) dual(B, C)
 end
 
 # --- B::One
@@ -438,6 +414,7 @@ end
 end
 
 @testset "dual(B::One, C::Scalar)" begin
+    # B != 0
     B = One()
 
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -446,6 +423,12 @@ end
 
     B_dual_C = dual(B, C)
     @test B_dual_C === B
+
+    # B == 0
+    B = One()
+    C = Scalar(0)
+    expected_error = "The dual of anything relative to Zero is not well-defined"
+    @test_throws ErrorException(expected_error) dual(B, C)
 end
 
 @testset "dual(B::One, C::One)" begin
@@ -453,14 +436,6 @@ end
     C = One()
     B_dual_C = dual(B, C)
     @test B_dual_C === B
-end
-
-@testset "dual(B::Scalar, C::Real)" begin
-    @test_skip 1
-end
-
-@testset "dual(B::Scalar, C::Vector)" begin
-    @test_skip 1
 end
 
 # --- B::Zero or C::Zero
@@ -486,10 +461,6 @@ end
     C = Scalar(test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
 
-    # C::Real
-    C = test_value
-    @test_throws ErrorException(expected_error) dual(B, C)
-
     # C::Blade
     C = Blade(randn(4, 3))
     @test_throws ErrorException(expected_error) dual(B, C)
@@ -500,10 +471,6 @@ end
 
     # C::Multivector
     # C = Multivector(5, test_value)
-    @test_skip 1
-
-    # C::Vector
-    # C = Vector(5, test_value)
     @test_skip 1
 end
 
@@ -531,10 +498,6 @@ end
     B = Scalar(test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
 
-    # B::Real
-    B = test_value
-    @test_throws ErrorException(expected_error) dual(B, C)
-
     # B::Blade
     B = Blade(randn(4, 3))
     @test_throws ErrorException(expected_error) dual(B, C)
@@ -545,72 +508,5 @@ end
 
     # C::Multivector
     # C = Multivector(5, test_value)
-    @test_skip 1
-
-    # C::Vector
-    # C = Vector(5, test_value)
-    @test_skip 1
-end
-
-# ------ B::Real
-
-@testset "dual(B::Real, C::Blade)" begin
-    @test_skip 1
-end
-
-@testset "dual(B::Real, C::Pseudoscalar)" begin
-    # --- Preparations
-
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
-    # --- Tests
-
-    for test_dim in 20:23
-        B = test_value_1
-        C = Pseudoscalar(test_dim, test_value_2)
-
-        B_dual_C = dual(B, C)
-        @test B_dual_C isa AbstractScalar
-        @test B_dual_C == test_value_1
-    end
-end
-
-@testset "dual(B::Real, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-    B = test_value_1
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-    C = Scalar(test_value_2)
-
-    B_dual_C = dual(B, C)
-    @test B_dual_C isa AbstractScalar
-    @test B_dual_C == test_value_1
-end
-
-@testset "dual(B::Real, C::One)" begin
-    @test_skip 1
-end
-
-# ------ B::Vector
-
-@testset "dual(B::Vector, C::Blade)" begin
-    @test_skip 1
-end
-
-@testset "dual(B::Vector, C::Pseudoscalar)" begin
-    @test_skip 1
-end
-
-@testset "dual(B::Vector, C::Scalar)" begin
-    @test_skip 1
-end
-
-@testset "dual(B::Vector, C::One)" begin
     @test_skip 1
 end

@@ -32,6 +32,17 @@ Notes
 """
 dual(B::AbstractBlade, C::AbstractBlade) = nothing  # TODO
 
+# ------ Specializations involving a AbstractBlade instance
+
+# B::AbstractBlade, C::AbstractScalar
+# B::AbstractScalar, C::AbstractBlade
+dual(B::AbstractBlade, C::AbstractScalar) = grade(B) > 0 ? zero(B) : B
+
+dual(B::AbstractScalar, C::AbstractBlade) =
+    mod(grade(C), 4) < 2 ?
+        Blade(C, volume=value(B), copy_basis=false) :
+        Blade(C, volume=-value(B), copy_basis=false)
+
 # ------ Specializations involving a Blade instance
 
 # B::Blade, C::Blade
@@ -42,6 +53,10 @@ function dual(B::Blade, C::Blade)
     assert_dim_equal(B, C)
 
     # Check that B is contained in C
+    if grade(B) > grade(C)
+        throw(ArgumentError("`B` not contained in `C`"))
+    end
+
     projection_coefficients = transpose(basis(C)) * basis(B)
     if LinearAlgebra.norm(projection_coefficients)^2 ≉ grade(B)
         throw(ArgumentError("`B` not contained in `C`"))
@@ -105,15 +120,6 @@ function dual(B::Pseudoscalar, C::Blade)
     zero(B)
 end
 
-# B::Blade, C::AbstractScalar
-# b::AbstractScalar, C::Blade
-dual(B::Blade, C::AbstractScalar) = zero(B)
-
-dual(B::AbstractScalar, C::Blade) =
-    mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B), copy_basis=false) :
-        Blade(C, volume=-value(B), copy_basis=false)
-
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
@@ -131,34 +137,33 @@ dual(B::AbstractScalar, C::Pseudoscalar) =
         Pseudoscalar(C, value=value(B)) :
         Pseudoscalar(C, value=-value(B))
 
-# B::Pseudoscalar, x::Real
-# x::Real, B::Pseudoscalar
-dual(B::Pseudoscalar, x::Real) = zero(B)
-dual(x::Real, B::Pseudoscalar) = Scalar{typeof(value(B))}(x)
-
 # ------ Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
-dual(B::AbstractScalar, C::AbstractScalar) = B
+function dual(B::AbstractScalar, C::AbstractScalar)
+    if iszero(C)
+        dual_relative_to_zero()
+    end
 
-# B::AbstractScalar, x::Real
-# x::Real, B::AbstractScalar
-dual(B::AbstractScalar, x::Real) = B
-dual(x::Real, B::AbstractScalar) = Scalar{typeof(value(B))}(x)
+    if iszero(B)
+        dual_of_zero()
+    end
+
+    B
+end
 
 # ------ Specializations involving a Zero instance
 
 # dual(B::Zero, C)
-dual_of_zero() = error("The dual of Zero is not well-defined")
+@inline dual_of_zero() = error("The dual of Zero is not well-defined")
 
 dual(B::Zero, C::Blade) = dual_of_zero()
 dual(B::Zero, C::Pseudoscalar) = dual_of_zero()
 dual(B::Zero, C::Scalar) = dual_of_zero()
 dual(B::Zero, C::One) = dual_of_zero()
-dual(B::Zero, x::Real) = dual_of_zero()
 
 # dual(B, C::Zero)
-dual_relative_to_zero() =
+@inline dual_relative_to_zero() =
     error("The dual of anything relative to Zero is not well-defined")
 
 dual(M::Multivector, C::Zero) = dual_relative_to_zero()
@@ -167,4 +172,3 @@ dual(B::Pseudoscalar, C::Zero) = dual_relative_to_zero()
 dual(B::Scalar, C::Zero) = dual_relative_to_zero()
 dual(B::One, C::Zero) = dual_relative_to_zero()
 dual(B::Zero, C::Zero) = dual_relative_to_zero()
-dual(x::Real, C::Zero) = dual_relative_to_zero()
