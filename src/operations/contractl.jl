@@ -57,8 +57,8 @@ contractl(B::AbstractScalar, M::AbstractMultivector) = B * M
 
 # M::AbstractMultivector, B::Zero
 # B::Zero, M::AbstractMultivector
-contractl(B::Zero, M::AbstractMultivector) = B
-contractl(M::AbstractMultivector, B::Zero) = B
+contractl(B::Zero, M::AbstractMultivector) = zero(M)
+contractl(M::AbstractMultivector, B::Zero) = zero(M)
 
 # M::AbstractMultivector, x::Real
 # x::Real, M::AbstractMultivector
@@ -72,11 +72,17 @@ contractl(x::Real, M::AbstractMultivector) = x * M
 # ------ Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
+# B::AbstractScalar, C::AbstractBlade
 contractl(B::AbstractBlade, C::AbstractScalar) = zero(B)
 
-# B::AbstractScalar, C::AbstractBlade
 contractl(B::AbstractScalar, C::AbstractBlade) =
     Blade(C, volume=value(B) * volume(C))
+
+# B::AbstractBlade, C::Zero
+# B::Zero, C::AbstractBlade
+contractl(B::AbstractBlade, C::Zero) = zero(B)
+contractl(B::Zero, C::Blade) = zero(B)
+
 
 # ------ Specializations involving a Blade instance
 
@@ -177,6 +183,11 @@ end
 contractl(B::Pseudoscalar, C::AbstractScalar) = zero(B)
 contractl(B::AbstractScalar, C::Pseudoscalar) =
     Pseudoscalar(C, value=value(B) * value(C))
+
+# B::Pseudoscalar, C::Zero
+# B::Zero, C::Pseudoscalar
+contractl(B::Pseudoscalar, C::Zero) = zero(B)
+contractl(B::Zero, C::Pseudoscalar) = zero(B)
 
 # B::Pseudoscalar, v::Vector
 # v::Vector, B::Pseudoscalar

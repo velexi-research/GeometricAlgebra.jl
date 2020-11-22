@@ -222,11 +222,53 @@ end
 end
 
 @testset "contractl(B::Blade, C::One)" begin
-    @test_skip 1
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+    test_vector = rand(test_dim)
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(B) == 1
+    B = Blade(test_vector)
+    C = One()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+
+    # grade(B) > 1
+    B = Blade(test_basis)
+    C = One()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Blade, C::Zero)" begin
-    @test_skip 1
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+    test_vector = rand(test_dim)
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(B) == 1
+    B = Blade(test_vector)
+    C = Zero()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+
+    # grade(B) > 1
+    B = Blade(test_basis)
+    C = Zero()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Blade, C::Real)" begin
@@ -384,11 +426,27 @@ end
 end
 
 @testset "contractl(B::Pseudoscalar, C::One)" begin
-    @test_skip 1
+    test_dim = 12
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = One()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Pseudoscalar, C::Zero)" begin
-    @test_skip 1
+    test_dim = 12
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    B = Pseudoscalar(test_dim, test_value)
+
+    C = Zero()
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Pseudoscalar, C::Real)" begin
@@ -558,11 +616,43 @@ end
 end
 
 @testset "contractl(B::One, C::Blade)" begin
-    @test_skip 1
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+    test_vector = rand(test_dim)
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(B) == 1
+    B = One()
+    C = Blade(test_vector)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C == C
+    @test (B < C) == B_contractl_C
+
+    # grade(B) > 1
+    B = One()
+    C = Blade(test_basis)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C == C
+    @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::One, C::Pseudoscalar)" begin
-    @test_skip 1
+    B = One()
+
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C == Pseudoscalar(test_dim, test_value)
+    @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::One, C::Scalar)" begin
@@ -606,7 +696,12 @@ end
 end
 
 @testset "contractl(B::One, C::Vector)" begin
-    @test_skip 1
+    B = One()
+    C = rand(5)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C ≈ Blade(C, volume=norm(C))
+    @test (B < C) == B_contractl_C
 end
 
 # ------ B::Zero
@@ -616,11 +711,40 @@ end
 end
 
 @testset "contractl(B::Zero, C::Blade)" begin
-    @test_skip 1
+    # --- Preparations
+
+    test_dim = 10
+    test_grade = 3
+    test_vector = rand(test_dim)
+    test_basis = rand(test_dim, test_grade)
+
+    # --- Tests
+
+    # grade(B) == 1
+    B = Zero()
+    C = Blade(test_vector)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
+
+    # grade(B) > 1
+    B = Zero()
+    C = Blade(test_basis)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Zero, C::Pseudoscalar)" begin
-    @test_skip 1
+    B = Zero()
+
+    test_dim = 10
+    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
+    test_value = rand() > 0.5 ? test_value : -test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Zero, C::Scalar)" begin
@@ -660,7 +784,11 @@ end
 end
 
 @testset "contractl(B::Zero, C::Vector)" begin
-    @test_skip 1
+    B = Zero()
+    C = rand(5)
+
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 # ------ B::Real
@@ -844,9 +972,15 @@ end
 end
 
 @testset "contractl(B::Vector, C::One)" begin
-    @test_skip 1
+    B = rand(5)
+    C = One()
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
 
 @testset "contractl(B::Vector, C::Zero)" begin
-    @test_skip 1
+    B = rand(5)
+    C = Zero()
+    @test iszero(contractl(B, C))
+    @test iszero(B < C)
 end
