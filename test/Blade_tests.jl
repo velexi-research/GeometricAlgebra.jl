@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Blade: inner constructor" begin
+@testset "Blade: inner constructors" begin
     #=
       Notes
       -----
@@ -551,69 +551,9 @@ using GeometricAlgebra
         B = Blade{precision_type}(zero_vector)
         @test iszero(B)
     end
-
-    # --- Copy constructor
-    #
-    # Blade{T}(B::Blade{<:AbstractFloat};
-    #          volume::Real=volume(B),
-    #          atol::Real=blade_atol(T),
-    #          copy_basis::Bool=false) where {T<:AbstractFloat}
-
-    for precision_type_src in subtypes(AbstractFloat)
-        # Preparations
-        vectors = Matrix{precision_type_src}([3 -3; 4 -4; 0 1])
-        B = Blade{precision_type_src}(vectors)
-
-        for precision_type_converted in subtypes(AbstractFloat)
-
-            # Construct a Blade representing the same blade as `B`
-            B_copy = Blade{precision_type_converted}(B)
-            @test B_copy.dim == B.dim
-            @test B_copy.grade == B.grade
-
-            if precision_type_src == precision_type_converted
-                @test B_copy.basis === B.basis
-            else
-                @test B_copy.basis ≈ B.basis
-                @test B_copy.basis !== B.basis
-            end
-
-            @test B_copy.volume ≈ B.volume
-
-            # Construct a Blade representing the same space as `B` with
-            # specified volume
-            B_copy = Blade{precision_type_converted}(B, volume=test_volume)
-            @test B_copy.dim == B.dim
-            @test B_copy.grade == B.grade
-
-            if precision_type_src == precision_type_converted
-                @test B_copy.basis === B.basis
-            else
-                @test B_copy.basis ≈ B.basis
-                @test B_copy.basis !== B.basis
-            end
-
-            @test B_copy.volume == precision_type_converted(test_volume)
-
-            # Construct a Blade representing the same blade as `B` containing
-            # a copy of the basis (instead of a reference).
-            B_copy = Blade{precision_type_converted}(B, copy_basis=true)
-            @test B_copy.dim == B.dim
-            @test B_copy.grade == B.grade
-
-            if precision_type_src == precision_type_converted
-                @test B_copy.basis == B.basis
-            else
-                @test B_copy.basis ≈ B.basis
-            end
-            @test B_copy.basis !== B.basis
-
-            @test B_copy.volume == B.volume
-        end
-    end
 end
 
-@testset "Blade: outer constructor - basic constructors" begin
+@testset "Blade: outer constructors - basic constructors" begin
     #=
       Notes
       -----
@@ -861,7 +801,7 @@ end
     @test B isa Pseudoscalar{Float64}
 end
 
-@testset "Blade: outer constructor - copy constructor" begin
+@testset "Blade: outer constructors - copy constructors" begin
     #=
       Notes
       -----
@@ -879,6 +819,64 @@ end
     # Select random volume for tests where `volume` != 0
     test_volume = rand() + 1  # add 1 to avoid 0
     test_volume = rand() > 0.5 ? test_volume : -test_volume
+
+    # --- Blade{T}(B::Blade{<:AbstractFloat};
+    #              volume::Real=volume(B),
+    #              atol::Real=blade_atol(T),
+    #              copy_basis::Bool=false) where {T<:AbstractFloat}
+
+    for precision_type_src in subtypes(AbstractFloat)
+        # Preparations
+        vectors = Matrix{precision_type_src}([3 -3; 4 -4; 0 1])
+        B = Blade{precision_type_src}(vectors)
+
+        for precision_type_converted in subtypes(AbstractFloat)
+
+            # Construct a Blade representing the same blade as `B`
+            B_copy = Blade{precision_type_converted}(B)
+            @test B_copy.dim == B.dim
+            @test B_copy.grade == B.grade
+
+            if precision_type_src == precision_type_converted
+                @test B_copy.basis === B.basis
+            else
+                @test B_copy.basis ≈ B.basis
+                @test B_copy.basis !== B.basis
+            end
+
+            @test B_copy.volume ≈ B.volume
+
+            # Construct a Blade representing the same space as `B` with
+            # specified volume
+            B_copy = Blade{precision_type_converted}(B, volume=test_volume)
+            @test B_copy.dim == B.dim
+            @test B_copy.grade == B.grade
+
+            if precision_type_src == precision_type_converted
+                @test B_copy.basis === B.basis
+            else
+                @test B_copy.basis ≈ B.basis
+                @test B_copy.basis !== B.basis
+            end
+
+            @test B_copy.volume == precision_type_converted(test_volume)
+
+            # Construct a Blade representing the same blade as `B` containing
+            # a copy of the basis (instead of a reference).
+            B_copy = Blade{precision_type_converted}(B, copy_basis=true)
+            @test B_copy.dim == B.dim
+            @test B_copy.grade == B.grade
+
+            if precision_type_src == precision_type_converted
+                @test B_copy.basis == B.basis
+            else
+                @test B_copy.basis ≈ B.basis
+            end
+            @test B_copy.basis !== B.basis
+
+            @test B_copy.volume == B.volume
+        end
+    end
 
     # --- Blade(B::AbstractBlade{T}; volume=volume(B), copy_basis=false)
     #         where {T<:AbstractFloat}
@@ -908,7 +906,7 @@ end
     end
 end
 
-@testset "Blade: outer constructor - Scalar constructors" begin
+@testset "Blade: outer constructors - Scalar constructors" begin
     # --- Preparations
 
     test_value = rand() + 1  # add 1 to avoid 0

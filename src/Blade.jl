@@ -263,23 +263,6 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         Blade{T}(length(v), 1, basis, volume, atol=atol,
                  enforce_constraints=false, copy_basis=false)
     end
-
-    """
-    Construct a Blade representing the same space as `B` having a specified
-    oriented `volume` relative to `B`. A Scalar representing zero is returned
-    if the absolute value of `volume` is less than `atol`,
-
-    When `copy_basis` is true, the `basis` of the new Blade is a copy
-    of the `basis` of the original Blade; otherwise, the `basis` of the new
-    Blade is reference to the `basis` of the original Blade.
-    """
-    Blade{T}(B::Blade;
-             volume::Real=volume(B),
-             atol::Real=blade_atol(T),
-             copy_basis::Bool=false) where {T<:AbstractFloat} =
-
-        Blade{T}(dim(B), grade(B), convert(Matrix{T}, basis(B)), volume,
-                 atol=atol, enforce_constraints=false, copy_basis=copy_basis)
 end
 
 """
@@ -329,6 +312,11 @@ Blade(vectors::Array{<:Integer};
           atol::Real=blade_atol(typeof(volume(B))),
           copy_basis=false)
 
+    Blade{T}(B::Blade;
+          volume::Real=volume(B),
+          atol::Real=blade_atol(T),
+          copy_basis=false) where {T<: AbstractFloat}
+
 Copy constructor. Construct a Blade representing the same space as `B` having
 a specified oriented volume relative to `B`. A Scalar representing zero is
 returned if the absolute value of `volume` is less than `atol`.
@@ -337,6 +325,14 @@ When `copy_basis` is true, the `basis` of the new Blade is a copy of the
 `basis` of the original Blade; otherwise, the `basis` of the new Blade is
 reference to the `basis` of the original Blade.
 """
+Blade{T}(B::Blade;
+         volume::Real=volume(B),
+         atol::Real=blade_atol(T),
+         copy_basis::Bool=false) where {T<:AbstractFloat} =
+
+    Blade{T}(dim(B), grade(B), convert(Matrix{T}, basis(B)), volume,
+             atol=atol, enforce_constraints=false, copy_basis=copy_basis)
+
 Blade(B::Blade;
       volume::Real=B.volume,
       atol::Real=blade_atol(typeof(B.volume)),
