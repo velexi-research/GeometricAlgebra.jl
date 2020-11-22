@@ -145,124 +145,6 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             new(dim, grade, copy(basis), volume) :
             new(dim, grade, basis, volume)
     end
-
-    """
-    Construct a Blade from a collection of vectors stored as the columns of a
-    matrix. If the norm the blade is less than `atol`, a Scalar representing
-    zero is returned. If the grade of the blade is equal to the dimension of
-    the space that the blade is embedded in, a Pseudoscalar is returned.
-
-    By default, `vectors` determines the volume of the blade. However, if
-    `volume` is specified, `vectors` is only used to define the subspace
-    (including orientation) represented by the blade.
-
-    When `volume` is positive, the orientation of the blade is the same as the
-    orientation of the outer product of the columns of `vectors` (taken in
-    order). When `volume` is negative, the orientation of the blade is the
-    opposite of the orientation implied by the `vectors`.
-    """
-    function Blade{T}(vectors::Matrix{<:Real};
-                      volume::Union{Real, Nothing}=nothing,
-                      atol::Real=blade_atol(T)) where {T<:AbstractFloat}
-
-        # --- Handle edge cases
-
-        # `volume` is effectively zero
-        if volume != nothing && abs(volume) < atol
-            return zero(Blade{T})
-        end
-
-        # number of vectors == 0
-        dims = size(vectors)
-        if dims[1] == 0 || dims[2] == 0
-            return zero(Blade{T})
-        end
-
-        # number of vectors > dimension of column space
-        if dims[2] > dims[1]
-            if dims[1] == 1
-                # `vectors` is a single row vector, so convert it to a column
-                # vector and call constructor for single column vector.
-                return Blade{T}(reshape(vectors, dims[2]))
-            else
-                return zero(Blade{T})
-            end
-        end
-
-        # --- Construct Blade
-
-        # Convert `vectors` to have type `T`
-        vectors = convert(Matrix{T}, vectors)
-
-        # Compute QR factorization and signed norm
-        F = qr(vectors)
-        signed_norm = prod(diag(F.R))
-
-        # Return zero if norm is below tolerance
-        if abs(signed_norm) < atol
-            return zero(Blade{T})
-        end
-
-        # Compute orthonormal basis for subspace
-        basis = Matrix(F.Q)
-
-        # Compute volume
-        volume = isnothing(volume) ? signed_norm : volume * sign(signed_norm)
-
-        # Return new Blade
-        Blade{T}(dims[1], dims[2], basis, volume,
-                 atol=atol, enforce_constraints=false, copy_basis=false)
-    end
-
-    """
-    Construct a Blade from a single vector. A Scalar representing zero is
-    returned when the norm of the blade is less than `atol`.
-
-    By default, `v` determines the volume of the blade. However, if `volume`
-    is specified, `v` is only used to define the subspace represented by the
-    blade.
-
-    When `volume` is positive, the orientation of the blade is the same as the
-    direction of `v`. When `volume` is negative, the orientation of the blade
-    is the opposite of the direction of `v`.
-    """
-    function Blade{T}(v::Vector{<:Real};
-                      volume::Union{Real, Nothing}=nothing,
-                      atol::Real=blade_atol(T)) where {T<:AbstractFloat}
-
-        # --- Handle edge cases
-
-        # `volume` is effectively zero
-        if volume != nothing && abs(volume) < atol
-            return zero(Blade{T})
-        end
-
-        # length(v) == 0
-        if length(v) == 0
-            return zero(Blade{T})
-        end
-
-        # --- Construct Blade
-
-        # Convert `v` to have type `T` and compute norm
-        v = convert(Vector{T}, v)
-        norm_v = LinearAlgebra.norm(v)
-
-        # Return zero if norm is below tolerance
-        if abs(norm_v) < atol
-            return zero(Blade{T})
-        end
-
-        # Compute basis as a column vector
-        basis = reshape(v, length(v), 1) / norm_v
-
-        # Compute volume
-        volume = isnothing(volume) ? norm_v : volume
-
-        # Return new Blade
-        Blade{T}(length(v), 1, basis, volume, atol=atol,
-                 enforce_constraints=false, copy_basis=false)
-    end
 end
 
 """
@@ -274,28 +156,134 @@ end
           volume::Union{Real, Nothing}=nothing,
           atol::Real=blade_atol(Float64))
 
-Construct a Blade from a collection of vectors represented as (1) the columns
-of a matrix or (2) a single vector. A Scalar representing zero is returned when
-the norm of the blade is less than `atol`.
+Construct a Blade from a collection of vectors stored as (1) the columns of a
+matrix or (2) a single vector. If the norm of the blade is less than `atol`, a
+Scalar representing zero is returned. If the grade of the blade is equal to
+the dimension of the space that the blade is embedded in, a Pseudoscalar is
+returned.
 
-By default, `vectors` determines the volume (i.e., norm and orientation) of the
-blade. However, if `volume` is specified, `vectors` is only used to define the
-subspace represented by the blade.
+By default, `vectors` determines the volume of the blade. However, if `volume`
+is specified, `vectors` is only used to define the subspace (including
+orientation) represented by the blade.
 
-When `volume` is positive, the orientation of the blade is the same as the
-orientation of the outer product of the columns of `vectors` (taken in order).
-When `volume` is negative, the orientation of the blade is the opposite of the
-orientation implied by the `vectors`.
+Notes
+-----
+
+### Orientation
+
+* _`vectors` contains more than one vector_. When `volume` is positive, the
+  orientation of the blade is the same as the orientation of the outer product
+  of the columns of `vectors` (taken in order). When `volume` is negative, the
+  orientation of the blade is the opposite of the orientation implied by the
+  `vectors`.
+
+* _`vectors` contains a single vector `v`_. When `volume` is positive, the
+  orientation of the blade is the same as the direction of `v`. When `volume`
+  is negative, the orientation of the blade is the opposite of the direction
+  of `v`.
+
+### Precision
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Blade.
 
-* If `vectors` is an Array of floating-point values, the precision of the Blade
-  is inferred from the precision of the elements of `vector`.
+* If `vectors` is an Array of floating-point values, the precision of the
+  Blade is inferred from the precision of the elements of `vector`.
 
-* If `vectors` is an Array of integers, the precision of the Blade defaults to
- `Float64`.
+* If `vectors` is an Array of integers, the precision of the Blade
+  defaults to `Float64`.
 """
+function Blade{T}(vectors::Matrix{<:Real};
+                  volume::Union{Real, Nothing}=nothing,
+                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+
+    # --- Handle edge cases
+
+    # `volume` is effectively zero
+    if volume != nothing && abs(volume) < atol
+        return zero(Blade{T})
+    end
+
+    # number of vectors == 0
+    dims = size(vectors)
+    if dims[1] == 0 || dims[2] == 0
+        return zero(Blade{T})
+    end
+
+    # number of vectors > dimension of column space
+    if dims[2] > dims[1]
+        if dims[1] == 1
+            # `vectors` is a single row vector, so convert it to a column
+            # vector and call constructor for single column vector.
+            return Blade{T}(reshape(vectors, dims[2]))
+        else
+            return zero(Blade{T})
+        end
+    end
+
+    # --- Construct Blade
+
+    # Convert `vectors` to have type `T`
+    vectors = convert(Matrix{T}, vectors)
+
+    # Compute QR factorization and signed norm
+    F = qr(vectors)
+    signed_norm = prod(diag(F.R))
+
+    # Return zero if norm is below tolerance
+    if abs(signed_norm) < atol
+        return zero(Blade{T})
+    end
+
+    # Compute orthonormal basis for subspace
+    basis = Matrix(F.Q)
+
+    # Compute volume
+    volume = isnothing(volume) ? signed_norm : volume * sign(signed_norm)
+
+    # Return new Blade
+    Blade{T}(dims[1], dims[2], basis, volume,
+             atol=atol, enforce_constraints=false, copy_basis=false)
+end
+
+function Blade{T}(v::Vector{<:Real};
+                  volume::Union{Real, Nothing}=nothing,
+                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+
+    # --- Handle edge cases
+
+    # `volume` is effectively zero
+    if volume != nothing && abs(volume) < atol
+        return zero(Blade{T})
+    end
+
+    # length(v) == 0
+    if length(v) == 0
+        return zero(Blade{T})
+    end
+
+    # --- Construct Blade
+
+    # Convert `v` to have type `T` and compute norm
+    v = convert(Vector{T}, v)
+    norm_v = LinearAlgebra.norm(v)
+
+    # Return zero if norm is below tolerance
+    if abs(norm_v) < atol
+        return zero(Blade{T})
+    end
+
+    # Compute basis as a column vector
+    basis = reshape(v, length(v), 1) / norm_v
+
+    # Compute volume
+    volume = isnothing(volume) ? norm_v : volume
+
+    # Return new Blade
+    Blade{T}(length(v), 1, basis, volume, atol=atol,
+             enforce_constraints=false, copy_basis=false)
+end
+
 Blade(vectors::Array{T};
       volume::Union{Real, Nothing}=nothing,
       atol::Real=blade_atol(T)) where {T<:AbstractFloat} =

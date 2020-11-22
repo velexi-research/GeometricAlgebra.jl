@@ -21,7 +21,7 @@ using GeometricAlgebra
 
 # --- Constructor tests
 
-@testset "Blade: inner constructors" begin
+@testset "Blade: inner constructor" begin
     #=
       Notes
       -----
@@ -181,15 +181,24 @@ using GeometricAlgebra
         @test B.basis == test_basis
         @test B.basis !== test_basis
     end
+end
 
-    # --- Basic constructor with multiple vectors
-    #
-    # Blade{T}(vectors::Matrix{<:Real};
-    #          volume::Union{Real, Nothing}=nothing,
-    #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+@testset "Blade: outer constructors - Blade{T}(vectors::Matrix)" begin
+    #=
+      Notes
+      -----
+      * Test value of constructed instance.
 
-    # Preparations
+      * Test behavior of keyword arguments: `volume`, `atol`
+    =#
+
+    # --- Preparations
+
     vectors = Matrix([3 3; -4 -4; 0 1])
+    test_dim = 3
+    test_volume = 5
+
+    # --- Tests
 
     for precision_type in subtypes(AbstractFloat)
 
@@ -375,16 +384,25 @@ using GeometricAlgebra
         B = Blade{precision_type}(special_case_vectors)
         @test B isa Pseudoscalar{precision_type}
     end
+end
 
-    # --- Basic constructor with a single vector
-    #
-    # Blade{T}(vector::Vector{<:Real};
-    #          volume::Union{Real, Nothing}=nothing,
-    #          atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+@testset "Blade: outer constructors - Blade{T}(v::Vector)" begin
+    #=
+      Notes
+      -----
+      * Test value of constructed instance.
+
+      * Test behavior of keyword arguments: `volume`, `atol`
+    =#
+    # --- Preparations
+
+    vector = [3, 4, 12]
+    test_volume = 5
+
+    # --- Tests
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
-        vector = [3, 4, 12]
 
         # --- vector::Vector{<:AbstractFloat}
 
@@ -553,7 +571,7 @@ using GeometricAlgebra
     end
 end
 
-@testset "Blade: outer constructors - basic constructors" begin
+@testset "Blade: outer constructors - Blade(vectors::Array)" begin
     #=
       Notes
       -----
@@ -754,7 +772,7 @@ end
 
     # --- Bool
 
-    # --- vectors isa Matrix
+    # ------ vectors isa Matrix
 
     # Preparations
     converted_vectors = Matrix{Bool}(vectors .!= 0)
@@ -775,7 +793,7 @@ end
     B = Blade(converted_vectors, atol=6)
     @test iszero(B)
 
-    # --- vectors isa Vector
+    # ------ vectors isa Vector
 
     # Preparations
     converted_one_vector = Vector{Bool}(one_vector .!= 0)
@@ -793,7 +811,7 @@ end
     B = Blade(converted_one_vector, atol=6)
     @test iszero(B)
 
-    # --- number of vectors == dimension of column space
+    # ------ number of vectors == dimension of column space
 
     # vectors are linearly independent
     converted_vectors = Matrix{Bool}([1 1 0; 0 0 1; 0 1 0])
