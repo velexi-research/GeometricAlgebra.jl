@@ -34,7 +34,7 @@ See the LICENSE file for copyright and license information.
 
 #### Base Requirements
 
-* Julia (>=1.4)
+* Julia (>=1.6)
 
 #### Julia Packages ####
 
