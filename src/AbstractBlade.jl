@@ -99,13 +99,6 @@ Return the sign of `B` relative to its unit basis.
 sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 """
-    dual(B)
-
-TODO
-"""
-dual(B::AbstractBlade) = nothing
-
-"""
     reciprocal(B)
 
 Compute the multiplicative inverse of blade `B`.
