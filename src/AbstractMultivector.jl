@@ -94,7 +94,7 @@ Binary Operations
     ⋅(M::AbstractMultivector, N::AbstractMultivector;
         left=true)::AbstractMultivector
 
-    proj(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
+    project(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
 
 Comparison Functions
 --------------------
