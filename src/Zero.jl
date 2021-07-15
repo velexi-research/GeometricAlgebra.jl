@@ -14,9 +14,6 @@ except according to the terms contained in the LICENSE file.
 # Types
 export Zero
 
-# Functions
-import Base.zero, Base.iszero
-
 # --- Type definitions
 
 """
@@ -50,8 +47,6 @@ dual(B::Zero; dim::Union{Integer, Nothing}=nothing) = dual_of_zero()
 
 # --- Comparison methods
 
-iszero(M::AbstractMultivector) = (M === zero(M))
-
 # ------ ==(B, C)
 
 import LinearAlgebra: norm
@@ -60,14 +55,3 @@ import LinearAlgebra: norm
 # v::Vector, B::Zero
 ==(B::Zero, v::Vector{<:Real}) = (norm(v) == 0)
 ==(v::Vector{<:Real}, B::Zero) = (norm(v) == 0)
-
-# --- Utility methods
-
-"""
-    zero(M::AbstractMultivector)
-    zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
-
-Return the additive identity 0.
-"""
-zero(M::AbstractMultivector) = Zero{typeof(norm(M))}()
-zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Zero{T}()

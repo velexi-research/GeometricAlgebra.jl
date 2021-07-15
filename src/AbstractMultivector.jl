@@ -28,8 +28,10 @@ export dual
 
 # Comparison operations
 import Base.:(==), Base.isapprox
+import Base.iszero, Base.isone
 
 # Utility functions
+import Base.zero, Base.one
 import Base.convert
 
 # --- Type definitions
@@ -122,49 +124,50 @@ abstract type AbstractMultivector{T<:AbstractFloat} end
 
 Return dimension of the real space that `M` is embedded within.
 """
-dim(M::AbstractMultivector) = nothing
+function dim end
 
 """
     blades(M)
 
 Return the blades that `M` is composed of.
 """
-blades(M::AbstractMultivector) = nothing
+function blades end
 
 """
     grades(M)
 
 Return the grades of the nonzero `k`-vector components of `M`.
 """
-grades(M::AbstractMultivector) = nothing
+function grades end
 
 """
     norm(M)
 
 Compute the norm of `M`.
 """
-norm(M::AbstractMultivector) = nothing
+function norm end
 
 """
     getindex(M::AbstractMultivector, k::Int)
 
 Return the `k`-vector component of multivector `M`.
 """
-Base.getindex(M::AbstractMultivector, k::Int) = nothing
+function getindex end
 
 """
-    -(M)
+    inverse(M), -(M)
 
 Compute the additive inverse of a multivector `M`.
 """
--(M::AbstractMultivector) = nothing
+function inverse end
+-(M::AbstractMultivector) = inverse(M)
 
 """
     reverse(M)
 
 Compute the reverse of a multivector `M`.
 """
-reverse(M::AbstractMultivector) = nothing
+function reverse end
 
 """
     dual(M)
@@ -174,7 +177,7 @@ geometric algebra is extended from).
 
 TODO: find better choice of words than "extended from"
 """
-dual(M::AbstractMultivector) = nothing
+function dual end
 
 # --- Comparison methods
 
@@ -183,7 +186,7 @@ dual(M::AbstractMultivector) = nothing
 
 Return true if `M` and `N` are equal; otherwise, return false.
 """
-==(M::AbstractMultivector, N::AbstractMultivector) = false
+function == end
 
 """
     isapprox(M::AbstractMultivector, N::AbstractMultivector)
@@ -191,7 +194,7 @@ Return true if `M` and `N` are equal; otherwise, return false.
 
 Return true if `M` and `N` are approximately equal; otherwise, return false.
 """
-isapprox(M::AbstractMultivector, N::AbstractMultivector) = false
+function isapprox end
 
 # B::AbstractMultivector, x::Real
 # x::Real, B::AbstractMultivector
@@ -203,7 +206,35 @@ isapprox(x::Real, M::AbstractMultivector) = false
 isapprox(M::AbstractMultivector, v::Vector) = false
 isapprox(v::Vector, M::AbstractMultivector) = false
 
+# Comparison to zero()
+iszero(M::AbstractMultivector) = (M === zero(M))
+
+# Comparison to one()
+isone(M::AbstractMultivector) = (M === one(M))
+
 # --- Utility methods
+
+"""
+    zero(M::AbstractMultivector)
+    zero(::Type{<:AbstractMultivector})
+    zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
+
+Return the additive identity 0.
+"""
+zero(M::AbstractMultivector) = Zero{typeof(norm(M))}()
+zero(::Type{<:AbstractMultivector}) = Zero{Float64}()
+zero(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = Zero{T}()
+
+"""
+    one(M::AbstractMultivector)
+    one(::Type{<:AbstractMultivector})
+    one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat}
+
+Return the multiplicative identity 1.
+"""
+one(M::AbstractMultivector) = One{typeof(norm(M))}()
+one(::Type{<:AbstractMultivector}) = One{Float64}()
+one(::Type{<:AbstractMultivector{T}}) where {T<:AbstractFloat} = One{T}()
 
 """
     convert(::Type{T}, M::AbstractMultivector)
@@ -211,9 +242,7 @@ isapprox(v::Vector, M::AbstractMultivector) = false
 
 Convert AbstractScalar to have the floating-point precision of type `T`.
 """
-convert(::Type{T}, M::AbstractMultivector) where {S<:AbstractFloat,
-                                                  T<:AbstractMultivector{S}} =
-    nothing
+function convert end
 
 # --- Non-exported utility functions
 
