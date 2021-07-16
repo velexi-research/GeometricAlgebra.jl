@@ -1,19 +1,21 @@
 name: Run tests
+
 on:
   push:
     branches:
-      - dev-kchu-ci
       - dev
+      - main
   pull_request:
     branches:
       - dev
       - main
+
 jobs:
   run-tests:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        julia-version: ["1.4", "1.5", "1.6"]
+        julia-version: ["1.6"]
         julia-arch: [x64]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
