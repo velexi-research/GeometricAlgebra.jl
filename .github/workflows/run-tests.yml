@@ -1,9 +1,11 @@
 name: Run tests
 on:
-  [push, pull_request]:
+  push:
+    - ["dev-kchu-ci"]
+  pull_request:
     branches:
-        - ["dev-kchu-ci"]
-        # - ["main", "dev"]
+      - ["dev-kchu-ci"]
+      # - ["main", "dev"]
 jobs:
   run-tests:
     runs-on: ${{ matrix.os }}
