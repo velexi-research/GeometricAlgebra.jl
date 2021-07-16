@@ -19,6 +19,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+#=
 # --- Tests
 
 # ------ M::Multivector
@@ -510,3 +511,4 @@ end
     # C = Multivector(5, test_value)
     @test_skip 1
 end
+=#

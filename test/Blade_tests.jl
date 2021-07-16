@@ -19,6 +19,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+#=
 # --- Constructor tests
 
 @testset "Blade: inner constructor" begin
@@ -1284,3 +1285,4 @@ end
     @test reciprocal(B) ≈ expected_reciprocal
     @test B * reciprocal(B) ≈ 1
 end
+=#

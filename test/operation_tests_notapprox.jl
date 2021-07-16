@@ -20,6 +20,7 @@ using GeometricAlgebra
 
 # --- Tests
 
+#=
 # ------ M::Multivector
 
 @testset "!isapprox(M::Multivector, N::Blade)" begin
@@ -484,3 +485,4 @@ end
         @test B ≉ C
     end
 end
+=#
