@@ -1,8 +1,8 @@
 GeometricAlgebra.jl
 ===================
 
-![build](https://github.com/velexi-corporation/GeometricAlgebra.jl.git/actions/workflows/build.yml/badge.svg)
-![build-dev](https://github.com/velexi-corporation/GeometricAlgebra.jl.git/actions/workflows/build-dev.yml/badge.svg)
+![build](https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/build.yml/badge.svg)
+![build-dev](https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/build-dev.yml/badge.svg)
 
 ------------------------------------------------------------------------------
 
