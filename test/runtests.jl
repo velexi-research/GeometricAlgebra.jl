@@ -11,9 +11,11 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Imports
 
+# Standard library
+using Test
+
 # External packages
 using Documenter
-using Test
 using TestSetExtensions
 
 # GeometricAlgebra.jl
