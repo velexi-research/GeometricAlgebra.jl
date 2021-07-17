@@ -11,7 +11,7 @@ all: test
 
 test check:
 	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Remove old coverage files
-	julia --color=yes -e 'import Pkg; Pkg.test(coverage=true)'
+	julia --color=yes -e 'import Pkg; Pkg.test(;coverage=true)'
 	@echo
 	coverage.jl
 

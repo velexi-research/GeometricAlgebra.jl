@@ -19,6 +19,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+#=
 # --- Tests
 
 # ------ M::Multivector
@@ -771,3 +772,4 @@ end
     @test_throws DimensionMismatch wedge(B_vector, C_vector)
     @test_throws DimensionMismatch B_vector ∧ C_vector
 end
+=#
