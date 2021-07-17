@@ -21,6 +21,7 @@ import DataStructures.SDMKeyIteration, DataStructures.SortedDict
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+#=
 # --- Constructor tests
 
 @testset "Multivector: inner constructor" begin
@@ -181,3 +182,4 @@ end
         end
     end
 end
+=#

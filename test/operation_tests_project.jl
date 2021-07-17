@@ -19,6 +19,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+#=
 # --- Tests
 
 # ------ M::Multivector
@@ -1022,3 +1023,4 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
+=#

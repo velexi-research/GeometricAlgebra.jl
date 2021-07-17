@@ -19,6 +19,7 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+#=
 # --- Tests
 
 # ------ M::Multivector
@@ -984,3 +985,4 @@ end
     @test iszero(contractl(B, C))
     @test iszero(B < C)
 end
+=#
