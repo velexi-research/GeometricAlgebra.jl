@@ -10,7 +10,7 @@
 all: test
 
 test check:
-	julia -e 'using Coverage; clean_folder(".");'
+	cd test; julia -e 'using Coverage; clean_folder("..");'
 	julia --color=yes -e 'import Pkg; Pkg.test(;coverage=true)'
 	@echo
 	coverage.jl
@@ -18,7 +18,7 @@ test check:
 # Maintenance
 clean:
 	find . -name "tmp.init-pkg.*" -exec rm -rf {} \;  # init-pkg.jl files
-	julia -e 'using Coverage; clean_folder(".");'
+	cd test; julia -e 'using Coverage; clean_folder("..");'
 	find . -name "*.jl.*.mem" -exec rm -f {} \;  # memory allocation tracking files
 
 # Setup Julia
