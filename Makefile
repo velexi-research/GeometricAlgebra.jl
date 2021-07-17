@@ -9,11 +9,18 @@
 # Default target
 all: test
 
-test check:
-	cd test; julia -e 'using Coverage; clean_folder("..");'
+test-cmd check-cmd:
+	@cd test; julia -e 'using Coverage; clean_folder("..");'
 	julia --color=yes -e 'import Pkg; Pkg.test(;coverage=true)'
-	@echo
 	coverage.jl
+
+test check: export JULIA_TEST_FAIL_FAST = true
+
+test check: test-cmd
+
+test-full check-full: export JULIA_TEST_FAIL_FAST = false
+
+test-full check-full: test-cmd
 
 # Maintenance
 clean:
@@ -30,4 +37,6 @@ setup:
 
 # Phony Targets
 .PHONY: all clean setup \
-        test check
+        test-cmd check-cmd \
+		test check \
+        test-full check-full
