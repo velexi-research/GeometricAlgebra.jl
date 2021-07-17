@@ -22,9 +22,11 @@ using GeometricAlgebra
 # --- Test sets
 
 @testset "All the tests" begin
+    #=
     @testset "Doctests" begin
         doctest(GeometricAlgebra)
     end
+    =#
 
     @testset ExtendedTestSet "Unit tests" begin
         @includetests ARGS
