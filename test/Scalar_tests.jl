@@ -19,6 +19,11 @@ import Random.rand
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 # --- Constructor tests
 
 @testset "Scalar: inner constructor" begin
@@ -30,8 +35,7 @@ using GeometricAlgebra
 
     # --- Scalar{T}(value::Real)
 
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
@@ -112,8 +116,7 @@ end
 
     # --- Scalar(value::AbstractFloat)
 
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     for precision_type in subtypes(AbstractFloat)
         # value != 0, value != 1
@@ -248,8 +251,7 @@ end
 @testset "Scalar: AbstractMultivector attribute functions" begin
     # --- Preparations
 
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # --- Tests
 
@@ -292,8 +294,7 @@ end
 @testset "Scalar: AbstractBlade attribute functions" begin
     # --- Preparations
 
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # --- Tests
 
@@ -335,8 +336,8 @@ end
 
 @testset "Scalar: AbstractScalar attribute functions" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # Exercise functionality and check results
     for precision_type in subtypes(AbstractFloat)
@@ -373,9 +374,8 @@ end
 
 @testset "Scalar: ==(B, C)" begin
     # Preparations
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
 
+    test_value = @get_random_value()
     float64_or_bigfloat = (Float64, BigFloat)
 
     # B::Scalar, C::Scalar
@@ -470,8 +470,8 @@ end
 
 @testset "Scalar: ≈(B, C)" begin
     # Preparations
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+
+    test_value = @get_random_value()
 
     # B::Scalar, C::Scalar
     for precision_type1 in subtypes(AbstractFloat)
@@ -496,8 +496,8 @@ end
 
 @testset "Scalar: -(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -512,8 +512,7 @@ end
 @testset "Scalar: reverse(B)" begin
     # --- Preparations
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = @get_random_value(1) # add 1 to avoid 0
 
     # --- Exercise functionality and check results
 
@@ -534,8 +533,8 @@ end
 
 @testset "Scalar: dual(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -561,8 +560,8 @@ end
 
 @testset "Scalar: convert(S)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # Exercise functionality and check results
     for precision_type_converted in subtypes(AbstractFloat)
@@ -585,8 +584,8 @@ end
 
 @testset "Scalar: reciprocal(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    test_value = @get_random_value(2) # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
