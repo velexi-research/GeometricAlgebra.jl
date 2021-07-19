@@ -1,5 +1,5 @@
 """
-Utility functions and macros for unit tests.
+Utility functions for unit tests.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -17,9 +17,7 @@ Return a random value with absolute value in the range [`value_to_add`, `value_t
 If `value_to_add` is not provided, 0 will be used.
 Value is either negative or positive with equal probability.
 """
-macro get_random_value(value_to_add=0)
-    return quote
-        local random_number = rand() + $value_to_add
-        (rand() > 0.5) ? random_number : -random_number
-    end
+function get_random_value(value_to_add=0)
+    random_number = rand() + value_to_add
+    return (rand() > 0.5) ? random_number : -random_number
 end
