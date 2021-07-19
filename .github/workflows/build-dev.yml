@@ -6,7 +6,7 @@ on:
       - dev
 
 jobs:
-  run-tests:
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -15,10 +15,17 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
+      - name: Check out code
       - uses: actions/checkout@v2
+
+      - name: Set up Julia
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.julia-version }}
           arch: ${{ matrix.julia-arch }}
+
+      - name: Build package
       - uses: julia-actions/julia-buildpkg@v1
+
+      - name: Run tests
       - uses: julia-actions/julia-runtest@v1
