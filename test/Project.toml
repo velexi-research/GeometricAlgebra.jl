@@ -1,8 +1,14 @@
 [deps]
+Coverage = "a2441757-f6aa-5fb2-8edb-039e3f45d037"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+DeepDiffs = "ab62b9b5-e342-54a8-a765-a90f495de1a6"
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestSetExtensions = "98d24dd4-01ad-11ea-1b02-c9a08f80db04"
+
+# TODO: Remove "DeepDiffs" and "Distributed" when TestSetExtensions.jl is updated to
+#       support FallbackTestSet

@@ -9,17 +9,24 @@
 # Default target
 all: test
 
-test check:
-	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Remove old coverage files
+test-cmd check-cmd:
+	@cd test; julia -e 'using Coverage; clean_folder("..");'
 	julia --color=yes -e 'import Pkg; Pkg.test(;coverage=true)'
-	@echo
 	coverage.jl
+
+test check: export JULIA_TEST_FAIL_FAST = true
+
+test check: test-cmd
+
+test-full check-full: export JULIA_TEST_FAIL_FAST = false
+
+test-full check-full: test-cmd
 
 # Maintenance
 clean:
 	find . -name "tmp.init-pkg.*" -exec rm -rf {} \;  # init-pkg.jl files
-	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Coverage.jl files
-	find . -name "*.jl.*.mem" -exec rm -f {} \;  # Coverage.jl files
+	cd test; julia -e 'using Coverage; clean_folder("..");'
+	find . -name "*.jl.*.mem" -exec rm -f {} \;  # memory allocation tracking files
 
 # Setup Julia
 setup:
@@ -30,4 +37,6 @@ setup:
 
 # Phony Targets
 .PHONY: all clean setup \
-        test check
+        test-cmd check-cmd \
+		test check \
+        test-full check-full
