@@ -22,7 +22,7 @@ import Base.:(+)
 
 Compute the sum of the multivectors `M` and `N`.
 """
-+(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
+function + end  # TODO
 
 # ------ Specializations involving an AbstractMultivector instance
 

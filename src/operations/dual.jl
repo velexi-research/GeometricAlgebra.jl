@@ -30,7 +30,7 @@ Notes
 
 * The volume of `C` is ignored.
 """
-dual(B::AbstractBlade, C::AbstractBlade) = nothing  # TODO
+function dual end  # TODO
 
 # ------ Specializations involving a AbstractBlade instance
 
