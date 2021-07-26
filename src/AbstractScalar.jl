@@ -45,7 +45,12 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 # Note: the following method definitions are no-op place holders and intended
 #       to be extended.
 
-value(B::AbstractScalar) = nothing
+"""
+    value(B)
+
+TODO
+"""
+function value end
 
 # --- Method definitions for AbstractBlade interface functions
 
