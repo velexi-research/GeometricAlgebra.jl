@@ -25,7 +25,7 @@ using LinearAlgebra: ⋅
 Compute rejections of `vectors` from `B`. When `normalize` is true, the
 rejection vectors are normalized.
 """
-function reject end
+reject(vectors::Matrix, B::AbstractBlade; normalize=false) = nothing  # TODO
 
 # ------ Specializations involving a Blade instance
 

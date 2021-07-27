@@ -35,7 +35,7 @@ export wedge, ∧
 
 Compute the outer product of the multivector `M` with the multivector `N`.
 """
-function wedge end
+wedge(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
 
 # ------ Specializations involving an AbstractMultivector instance
 

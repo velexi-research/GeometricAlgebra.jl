@@ -34,7 +34,7 @@ import Base.:(<)
 
 Compute the left contraction of the multivector `M` with the multivector `N`.
 """
-function contractl end  # TODO
+contractl(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
 
 # ------ Specializations involving an AbstractMultivector instance
 
