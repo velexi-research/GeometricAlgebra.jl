@@ -37,7 +37,6 @@ the return value is a Real if the result is a scalar, a Vector if the result
 is a vector, a Matrix if the result is a blade with 1 < grade < `dim`, and a
 multiple of LinearAlgebra.I if the result is a pseudoscalar.
 """
-# project(B::AbstractBlade, C::AbstractBlade) = nothing
 
 # ------ Specializations involving an AbstractMultivector instance
 

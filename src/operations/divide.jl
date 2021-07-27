@@ -22,14 +22,12 @@ import Base.:(/)
 
 Compute the geometric quotient of multivectors `M` and `N`.
 """
-function / end  # TODO
 
 # ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::One
 # B::One, M::AbstractMultivector
 /(M::AbstractMultivector, B::One) = M
-# /(B::One, M::AbstractMultivector) = nothing  # TODO
 
 # M::AbstractMultivector, B::Zero
 # B::Zero, M::AbstractMultivector

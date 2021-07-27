@@ -22,7 +22,6 @@ import Base.:(*)
 
 Compute the geometric product of multivectors `M` and `N`.
 """
-function * end  # TODO
 
 # ------ Specializations involving an AbstractMultivector instance
 
