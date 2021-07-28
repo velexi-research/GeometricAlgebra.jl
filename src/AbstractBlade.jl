@@ -75,21 +75,21 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
 TODO
 """
-grade(B::AbstractBlade) = nothing
+function grade end
 
 """
     basis(B)
 
 TODO
 """
-basis(B::AbstractBlade) = nothing
+function basis end
 
 """
     volume(B)
 
 TODO
 """
-volume(B::AbstractBlade) = nothing
+function volume end
 
 """
     sign(B::AbstractBlade)::Int8
@@ -103,7 +103,7 @@ sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 Compute the multiplicative inverse of blade `B`.
 """
-reciprocal(B::AbstractBlade) = nothing
+function reciprocal end
 
 # --- Method definitions for AbstractMultivector interface functions
 
