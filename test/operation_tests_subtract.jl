@@ -18,6 +18,11 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 # --- Tests
 
 # ------ M::Multivector
@@ -102,8 +107,7 @@ end
     test_dim = 10
 
     # B != C
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Pseudoscalar(test_dim, test_value_1)
 
     test_value_2 = abs(test_value_1) + rand() + 1
@@ -156,8 +160,7 @@ end
 
 @testset "-(B::Scalar, C::Scalar)" begin
     # B != C
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
     test_value_2 = abs(test_value_1) + rand() + 1
@@ -175,8 +178,7 @@ end
 end
 
 @testset "-(B::Scalar, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = One()
@@ -187,8 +189,7 @@ end
 end
 
 @testset "-(B::Scalar, C::Zero)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = Zero()
@@ -198,8 +199,7 @@ end
 
 @testset "-(B::Scalar, C::Real)" begin
     # B != C
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
     test_value_2 = abs(test_value_1) + rand() + 1
@@ -237,8 +237,7 @@ end
 @testset "-(B::One, C::Scalar)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     B_minus_C = B - C
@@ -297,8 +296,7 @@ end
 @testset "-(B::Zero, C::Scalar)" begin
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     B_minus_C = B - C
@@ -324,8 +322,7 @@ end
     # B != C
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
     B_minus_C = B - C
@@ -358,8 +355,7 @@ end
 
 @testset "-(B::Real, C::Scalar)" begin
     # B != C
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value_1
 
     test_value_2 = abs(test_value_1) + rand() + 1
@@ -378,8 +374,7 @@ end
 
 @testset "-(B::Real, C::One)" begin
     # B != C
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value
 
     C = One()
@@ -396,8 +391,7 @@ end
 
 @testset "-(B::Real, C::Zero)" begin
     # B != C
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value
 
     C = Zero()

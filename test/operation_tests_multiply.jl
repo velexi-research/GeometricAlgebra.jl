@@ -18,6 +18,11 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 # --- Tests
 
 # ------ M::Multivector
@@ -72,8 +77,7 @@ end
     test_dim = 10
     B = Blade(rand(test_dim, 3))
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     @test B * C ≈ Blade(basis(B), volume=value(C) * volume(B))
@@ -91,8 +95,7 @@ end
     test_dim = 10
     B = Blade(rand(test_dim, 3))
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
     @test B * C ≈ Blade(basis(B), volume=C * volume(B))
@@ -115,11 +118,9 @@ end
 @testset "*(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
 
     # --- Tests
 
@@ -140,12 +141,10 @@ end
 
 @testset "*(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 10
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Pseudoscalar(test_dim, test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
@@ -153,8 +152,7 @@ end
 
 @testset "*(B::Pseudoscalar, C::One)" begin
     test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Pseudoscalar(test_dim, test_value)
 
     C = One()
@@ -164,8 +162,7 @@ end
 
 @testset "*(B::Pseudoscalar, C::Zero)" begin
     test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Pseudoscalar(test_dim, test_value)
 
     C = Zero()
@@ -175,12 +172,10 @@ end
 
 @testset "*(B::Pseudoscalar, C::Real)" begin
     test_dim = 10
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Pseudoscalar(test_dim, test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value_2
 
     @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
@@ -197,8 +192,7 @@ end
 end
 
 @testset "*(B::Scalar, C::Blade)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     test_dim = 10
@@ -208,25 +202,21 @@ end
 end
 
 @testset "*(B::Scalar, C::PseudoscalarScalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
     test_dim = 10
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Pseudoscalar(test_dim, test_value_2)
 
     @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
 end
 
 @testset "*(B::Scalar, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     B_times_C = B * C
@@ -235,8 +225,7 @@ end
 end
 
 @testset "*(B::Scalar, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = One()
@@ -245,8 +234,7 @@ end
 end
 
 @testset "*(B::Scalar, C::Zero)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = Zero()
@@ -255,12 +243,10 @@ end
 end
 
 @testset "*(B::Scalar, C::Real)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value_2
 
     B_times_C = B * C
@@ -271,8 +257,7 @@ end
 @testset "*(B::Scalar, C::Vector)" begin
     B = rand(5)
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     B_times_C = B * C
@@ -294,8 +279,7 @@ end
     B = One()
 
     test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Pseudoscalar(test_dim, test_value)
 
     @test B * C === C
@@ -304,8 +288,7 @@ end
 @testset "*(B::One, C::Scalar)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     @test B * C === C
@@ -326,8 +309,7 @@ end
 @testset "*(B::One, C::Real)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
     B_times_C = B * C
@@ -357,8 +339,7 @@ end
     B = Zero()
 
     test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Pseudoscalar(test_dim, test_value)
 
     @test iszero(B * C)
@@ -367,8 +348,7 @@ end
 @testset "*(B::Zero, C::Scalar)" begin
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     @test iszero(B * C)
@@ -389,8 +369,7 @@ end
 @testset "*(B::Zero, C::Real)" begin
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
     @test iszero(B * C)
@@ -409,8 +388,7 @@ end
 end
 
 @testset "*(B::Real, C::Blade)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value
 
     test_dim = 10
@@ -420,25 +398,21 @@ end
 end
 
 @testset "*(B::Real, C::Pseudoscalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value_1
 
     test_dim = 10
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Pseudoscalar(test_dim, test_value_2)
 
     @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
 end
 
 @testset "*(B::Real, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value_1
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     B_times_C = B * C
@@ -447,8 +421,7 @@ end
 end
 
 @testset "*(B::Real, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value
 
     C = One()
@@ -459,8 +432,7 @@ end
 end
 
 @testset "*(B::Real, C::Zero)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value
 
     C = Zero()
@@ -483,8 +455,7 @@ end
 end
 
 @testset "*(B::Vector, C::Scalar)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = rand(5)

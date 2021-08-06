@@ -20,6 +20,11 @@ import Random.rand
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 # --- Constructor tests
 
 @testset "Pseudoscalar: inner constructor" begin
@@ -32,8 +37,7 @@ using GeometricAlgebra
     # --- Pseudoscalar{T}(dim::Integer, value::Real)
 
     test_dim = 10
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
@@ -107,8 +111,7 @@ end
 
     # --- Pseudoscalar(dim::Integer, value::AbstractFloat)
 
-    test_value = rand()
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value()
 
     for precision_type in subtypes(AbstractFloat)
         converted_test_value = precision_type(test_value)
@@ -154,8 +157,7 @@ end
 
     test_dim = 10
 
-    test_value = rand()
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value()
 
     # --- Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
 
@@ -182,8 +184,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -226,8 +227,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -269,8 +269,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -313,8 +312,7 @@ end
     # Preparations
     dim = 10
 
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value()
 
     float64_or_bigfloat = (Float64, BigFloat)
 
@@ -357,8 +355,7 @@ end
     # Preparations
     dim = 10
 
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value()
 
     # dim(B) == dim(C), value(B) == value(C)
     for precision_type1 in subtypes(AbstractFloat)
@@ -394,8 +391,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -410,8 +406,7 @@ end
 @testset "Pseudoscalar: reverse(B)" begin
     # --- Preparations
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         for test_dim in 5:8
@@ -429,8 +424,7 @@ end
 
 @testset "Pseudoscalar: dual(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -456,8 +450,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value()
 
     # Tests
     for precision_type_converted in subtypes(AbstractFloat)
@@ -485,8 +478,7 @@ end
 
 @testset "Pseudoscalar: reciprocal(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
