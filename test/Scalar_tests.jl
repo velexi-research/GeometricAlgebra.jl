@@ -33,7 +33,7 @@ include("test_utils.jl")
       * Test value of constructed instance
     =#
 
-    # --- Scalar{T}(value::Real)
+    # --- Scalar{T}(value::AbstractFloat)
 
     test_value = get_random_value(2) # add 2 to avoid 0 and 1
 
@@ -43,16 +43,17 @@ include("test_utils.jl")
 
             # value != 0, value != 1
             S = Scalar{precision_type}(converted_test_value)
+            @test S isa Scalar{precision_type}
             @test S.value isa precision_type
             @test S.value == precision_type(converted_test_value)
 
             # value = 0
             S = Scalar{precision_type}(value_type(0))
-            @test iszero(S)
+            @test S isa Zero{precision_type}
 
             # value = 1
             S = Scalar{precision_type}(value_type(1))
-            @test isone(S)
+            @test S isa One{precision_type}
         end
     end
 
@@ -67,16 +68,17 @@ include("test_utils.jl")
 
             # value != 0, value != 1
             S = Scalar{precision_type}(converted_test_value)
+            S isa Scalar{precision_type}
             @test S.value isa precision_type
             @test S.value == precision_type(converted_test_value)
 
             # value = 0
             S = Scalar{precision_type}(value_type(0))
-            @test iszero(S)
+            S isa Zero{precision_type}
 
             # value = 1
             S = Scalar{precision_type}(value_type(1))
-            @test isone(S)
+            S isa One{precision_type}
         end
 
         # subtypes(Unsigned)
@@ -85,24 +87,25 @@ include("test_utils.jl")
 
             # value != 0, value != 1
             S = Scalar{precision_type}(converted_test_value)
+            S isa Scalar{precision_type}
             @test S.value isa precision_type
             @test S.value == precision_type(converted_test_value)
 
             # value = 0
             S = Scalar{precision_type}(value_type(0))
-            @test iszero(S)
+            @test S isa Zero{precision_type}
 
             # value = 1
             S = Scalar{precision_type}(value_type(1))
-            @test isone(S)
+            S isa One{precision_type}
         end
 
         # Bool
         S = Scalar{precision_type}(true)
-        @test isone(S)
+        @test S isa One{precision_type}
 
         S = Scalar{precision_type}(false)
-        @test iszero(S)
+        @test S isa Zero{precision_type}
     end
 end
 
@@ -123,16 +126,17 @@ end
         converted_test_value = precision_type(test_value)
         S = Scalar(converted_test_value)
         @test S isa Scalar{precision_type}
+        @test S.value == precision_type(converted_test_value)
 
         # value = 0
         converted_test_value = precision_type(0)
         S = Scalar(converted_test_value)
-        @test iszero(S)
+        @test S isa Zero{precision_type}
 
         # value = 1
         converted_test_value = precision_type(1)
         S = Scalar(converted_test_value)
-        @test isone(S)
+        @test S isa One{precision_type}
     end
 
     # --- Scalar(value::Integer)
@@ -144,16 +148,17 @@ end
         # value != 0, value != 1
         S = Scalar(value_type(test_value))
         @test S isa Scalar{Float64}
+        @test S.value == test_value
 
         # value = 0
         converted_test_value = value_type(0)
         S = Scalar(converted_test_value)
-        @test iszero(S)
+        @test S isa Zero{Float64}
 
         # value = 1
         converted_test_value = value_type(1)
         S = Scalar(converted_test_value)
-        @test isone(S)
+        @test S isa One{Float64}
     end
 
     # subtypes(Unsigned)
@@ -161,24 +166,25 @@ end
         # value != 0, value != 1
         S = Scalar(value_type(abs(test_value)))
         @test S isa Scalar{Float64}
+        @test S.value == abs(test_value)
 
         # value = 0
         converted_test_value = value_type(0)
         S = Scalar(converted_test_value)
-        @test iszero(S)
+        @test S isa Zero{Float64}
 
         # value = 1
         converted_test_value = value_type(1)
         S = Scalar(converted_test_value)
-        @test isone(S)
+        @test S isa One{Float64}
     end
 
     # Bool
     S = Scalar(true)
-    @test isone(S)
+    @test S isa One{Float64}
 
     S = Scalar(false)
-    @test iszero(S)
+    @test S isa Zero{Float64}
 end
 
 #= DEPRECATED
