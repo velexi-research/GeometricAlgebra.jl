@@ -107,7 +107,7 @@ end
     test_dim = 10
 
     # B != C
-    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value_1)
 
     test_value_2 = abs(test_value_1) + rand() + 1
@@ -116,7 +116,8 @@ end
 
     B_minus_C = B - C
     @test B_minus_C isa Pseudoscalar
-    @test B_minus_C == Pseudoscalar(test_dim, test_value_1 - test_value_2)
+    @test B_minus_C.dim == test_dim
+    @test B_minus_C.value == test_value_1 - test_value_2
 
     # B == C
     B = Pseudoscalar(test_dim, test_value_1)
@@ -159,33 +160,53 @@ end
 end
 
 @testset "-(B::Scalar, C::Scalar)" begin
-    # B != C
+    # --- Preparations
+
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = abs(test_value_1) + rand() + 1
+    # --- Tests
+
+    # B != C, C != B - 1
+    test_value_2 = abs(test_value_1) + rand() + 2
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == test_value_1 - test_value_2
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == test_value_1 - test_value_2
 
     # B == C
-    B = Scalar(test_value_1)
     C = Scalar(test_value_1)
     @test iszero(B - C)
+
+    # C == B + 1
+    C = Scalar(test_value_1 - 1)
+    
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Scalar, C::One)" begin
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    B = Scalar(test_value)
+    # --- Preparations
 
     C = One()
 
+    # --- Tests
+
+    # B != 2
+    test_value = get_random_value(3)  # add 3 to keep value away from 0, 1, and 2
+    B = Scalar(test_value)
+
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == test_value - 1
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == test_value - 1
+
+    # B == 2
+    B = Scalar(2)
+
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Scalar, C::Zero)" begin
@@ -198,22 +219,31 @@ end
 end
 
 @testset "-(B::Scalar, C::Real)" begin
-    # B != C
+    # --- Preparations
+
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = abs(test_value_1) + rand() + 1
+    # --- Tests
+
+    # B != C, C != B - 1
+    test_value_2 = abs(test_value_1) + rand() + 2
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == test_value_1 - test_value_2
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == test_value_1 - test_value_2
 
     # B == C
-    B = Scalar(test_value_1)
     C = test_value_1
     @test iszero(B - C)
+
+    # C == B - 1
+    C= test_value_1 - 1
+
+    B_minus_C = B - C
+    @test B_minus_C isa One    
 end
 
 @testset "-(B::Scalar, C::Vector)" begin
@@ -241,8 +271,8 @@ end
     C = Scalar(test_value)
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == 1 - test_value
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == 1 - test_value
 end
 
 @testset "-(B::One, C::One)" begin
@@ -254,11 +284,13 @@ end
 @testset "-(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-    @test isone(B - C)
+
+    B_minus_C = B - C
+    @test B_minus_C === B
 end
 
 @testset "-(B::One, C::Real)" begin
-    # B != C
+    # B != C, C != B - 1
     B = One()
 
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -266,13 +298,19 @@ end
     C = test_value
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == 1 - test_value
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == 1 - test_value
 
     # B == C
     B = One()
     C = 1
     @test iszero(B - C)
+
+    # C == B - 1
+    C = 0
+
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::One, C::Vector)" begin
@@ -294,45 +332,68 @@ end
 end
 
 @testset "-(B::Zero, C::Scalar)" begin
+    # --- Preparations
+
     B = Zero()
 
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    # --- Tests
+
+    # C != -1
+    test_value = get_random_value(2)  # add 2 to keep value away from 0, 1, and -1
     C = Scalar(test_value)
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == -test_value
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == -test_value
+
+    # C == -1
+    C = Scalar(-1)
+
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Zero, C::One)" begin
     B = Zero()
     C = One()
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == -1
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == -1
 end
 
 @testset "-(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-    @test iszero(B - C)
+    
+    B_minus_C = B - C
+    @test B_minus_C === B
 end
 
 @testset "-(B::Zero, C::Real)" begin
-    # B != C
+    # --- Preparations
+
     B = Zero()
 
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    # --- Tests
+
+    # B != C, C != -1
+    test_value = get_random_value(2)  # add 2 to keep value away from 0, 1, and -1
     C = test_value
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == -test_value
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == -test_value
 
     # B == C
     B = Zero()
     C = 0
     @test iszero(B - C)
+
+    # C == -1
+    C = -1
+
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Zero, C::Vector)" begin
@@ -354,56 +415,84 @@ end
 end
 
 @testset "-(B::Real, C::Scalar)" begin
-    # B != C
+    # --- Preparation
+
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value_1
 
-    test_value_2 = abs(test_value_1) + rand() + 1
+    # --- Tests
+
+    # B != C, C != B - 1
+    test_value_2 = abs(test_value_1) + rand() + 2
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == test_value_1 - test_value_2
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == test_value_1 - test_value_2
 
     # B == C
-    B = test_value_1
     C = Scalar(test_value_1)
     @test iszero(B - C)
+
+    # C == B - 1
+    C = Scalar(test_value_1 - 1)
+
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Real, C::One)" begin
-    # B != C
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    B = test_value
+    # --- Preparations
 
     C = One()
 
+    # --- Tests
+
+    # B != C, B != C + 1
+    test_value = get_random_value(3)  # add 2 to keep value away from 0, 1, and 2
+    B = test_value
+
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == test_value - 1
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == test_value - 1
 
     # B == C
     B = 1
-    C = One()
     @test iszero(B - C)
+
+    # B = C + 1
+    B = 2
+
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Real, C::Zero)" begin
-    # B != C
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    B = test_value
+    # --- Preparations
 
     C = Zero()
 
+    # --- Tests
+
+    # B != C, B != C + 1
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    B = test_value
+
     B_minus_C = B - C
-    @test B_minus_C isa AbstractScalar
-    @test B_minus_C == test_value
+    @test B_minus_C isa Scalar
+    @test B_minus_C.value == test_value
 
     # B == C
     B = 0
     C = Zero()
     @test iszero(B - C)
+
+    # B == C + 1
+    B = 1
+    
+    B_minus_C = B - C
+    @test B_minus_C isa One
 end
 
 # ------ B::Vector
