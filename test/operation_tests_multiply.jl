@@ -116,15 +116,11 @@ end
 end
 
 @testset "*(B::Pseudoscalar, C::Pseudoscalar)" begin
-    # --- Preparations
+    # B != 1 / C
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
+    test_value_2 = abs(1 / test_value_1) + rand() + 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
 
-    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
-
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
-
-    # --- Tests
-
-    # B::Pseudoscalar, C::Pseudoscalar
     for test_dim in 5:8
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
@@ -134,25 +130,46 @@ end
             test_value_1 * test_value_2 :
            -test_value_1 * test_value_2
 
-        @test B_times_C isa AbstractScalar
-        @test B_times_C == expected_result
+        @test B_times_C isa Scalar
+        @test B_times_C.value == expected_result
+    end
+
+    # B == 1 / C
+    # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
+    # when computing the reciprocal of the value, which could result in the product
+    # being different from one
+    test_value_1 = 2
+
+    for test_dim in 5:8
+        test_value_2 = mod(test_dim, 4) < 2 ?
+            1 / test_value_1 :
+            -1 / test_value_1
+        
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = Pseudoscalar(test_dim, test_value_2)
+
+        B_times_C = B * C
+        @test B_times_C isa One
     end
 end
 
 @testset "*(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 10
-    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value_1)
 
     test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
-    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    B_times_C = B * C
+    @test B_times_C isa Pseudoscalar
+    @test B_times_C.dim == test_dim
+    @test B_times_C.value == test_value_1 * test_value_2
 end
 
 @testset "*(B::Pseudoscalar, C::One)" begin
     test_dim = 10
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value)
 
     C = One()
@@ -162,7 +179,7 @@ end
 
 @testset "*(B::Pseudoscalar, C::Zero)" begin
     test_dim = 10
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value)
 
     C = Zero()
@@ -171,14 +188,28 @@ end
 end
 
 @testset "*(B::Pseudoscalar, C::Real)" begin
+    # --- Preparation
+
     test_dim = 10
-    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value_1)
 
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    # --- Tests
+
+    # C != 0
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
     C = test_value_2
 
-    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    B_times_C = B * C
+    @test B_times_C isa Pseudoscalar
+    @test B_times_C.dim == test_dim
+    @test B_times_C.value == test_value_1 * test_value_2
+
+    # C == 0
+    C = 0
+
+    B_times_C = B * C
+    @test B_times_C isa Zero
 end
 
 @testset "*(B::Pseudoscalar, C::Vector)" begin
@@ -201,27 +232,45 @@ end
     @test B * C ≈ Blade(basis(C), volume=value(B) * volume(C))
 end
 
-@testset "*(B::Scalar, C::PseudoscalarScalar)" begin
+@testset "*(B::Scalar, C::Pseudoscalar)" begin
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
     test_dim = 10
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
     C = Pseudoscalar(test_dim, test_value_2)
 
-    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    B_times_C = B * C
+    @test B_times_C isa Pseudoscalar
+    @test B_times_C.dim == test_dim
+    @test B_times_C.value == test_value_1 * test_value_2
 end
 
 @testset "*(B::Scalar, C::Scalar)" begin
+    # C != 1 / B
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = abs(1 / test_value_1) + rand() + 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_times_C = B * C
-    @test B_times_C isa AbstractScalar
-    @test B_times_C == test_value_1 * test_value_2
+    @test B_times_C isa Scalar
+    @test B_times_C.value == test_value_1 * test_value_2
+
+    # C == 1 / B
+    # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
+    # when computing the reciprocal of the value, which could result in the product
+    # being different from one
+    test_value_1 = 2
+    B = Scalar(test_value_1)
+
+    test_value_2 = 1 / test_value_1
+    C = Scalar(test_value_2)
+
+    B_times_C = B * C
+    @test B_times_C isa One
 end
 
 @testset "*(B::Scalar, C::One)" begin
@@ -243,15 +292,36 @@ end
 end
 
 @testset "*(B::Scalar, C::Real)" begin
+    # C != 0, C != 1 / B
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = abs(1 / test_value_1) + rand() + 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
     B_times_C = B * C
-    @test B_times_C isa AbstractScalar
-    @test B_times_C == test_value_1 * test_value_2
+    @test B_times_C isa Scalar
+    @test B_times_C.value == test_value_1 * test_value_2
+
+    # C == 0
+    C = 0
+
+    B_times_C = B * C
+    @test B_times_C isa Zero
+
+    # C == 1 / B
+    # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
+    # when computing the reciprocal of the value, which could result in the product
+    # being different from one
+    test_value_1 = 2
+    B = Scalar(test_value_1)
+
+    test_value_2 = 1 / test_value_1
+    C = test_value_2
+
+    B_times_C = B * C
+    @test B_times_C isa One
 end
 
 @testset "*(B::Scalar, C::Vector)" begin
@@ -279,7 +349,7 @@ end
     B = One()
 
     test_dim = 10
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value = get_random_value(1)  # add 1 to keep value away from 0
     C = Pseudoscalar(test_dim, test_value)
 
     @test B * C === C
@@ -297,24 +367,45 @@ end
 @testset "*(B::One, C::One)" begin
     B = One()
     C = One()
-    @test isone(B * C)
+    
+    B_times_C = B * C
+    @test B_times_C === B
 end
 
 @testset "*(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-    @test iszero(B * C)
+
+    B_times_C = B * C
+    @test B_times_C === C
 end
 
 @testset "*(B::One, C::Real)" begin
+    # --- Preparations
+    
     B = One()
 
+    # --- Tests
+
+    # C != 0, C != 1
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
     B_times_C = B * C
-    @test B_times_C isa AbstractScalar
-    @test B_times_C == test_value
+    @test B_times_C isa Scalar
+    @test B_times_C.value == test_value
+
+    # C == 0
+    C = 0
+
+    B_times_C = B * C
+    @test B_times_C isa Zero
+
+    # C == 1
+    C = 1
+
+    B_times_C = B * C
+    @test B_times_C isa One
 end
 
 @testset "*(B::One, C::Vector)" begin
@@ -339,7 +430,7 @@ end
     B = Zero()
 
     test_dim = 10
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value = get_random_value(1)  # add 1 to keep value away from 0
     C = Pseudoscalar(test_dim, test_value)
 
     @test iszero(B * C)
@@ -357,13 +448,17 @@ end
 @testset "*(B::Zero, C::One)" begin
     B = Zero()
     C = One()
-    @test iszero(B * C)
+
+    B_times_C = B * C
+    @test B_times_C === B
 end
 
 @testset "*(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-    @test iszero(B * C)
+
+    B_times_C = B * C
+    @test B_times_C === B
 end
 
 @testset "*(B::Zero, C::Real)" begin
@@ -398,37 +493,92 @@ end
 end
 
 @testset "*(B::Real, C::Pseudoscalar)" begin
-    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    B = test_value_1
+    # --- Preparations
 
     test_dim = 10
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
     C = Pseudoscalar(test_dim, test_value_2)
 
-    @test B * C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
+    # --- Tests
+
+    # B != 0
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
+    B = test_value_1
+
+    B_times_C = B * C
+    @test B_times_C isa Pseudoscalar
+    @test B_times_C.dim == test_dim
+    @test B_times_C.value == test_value_1 * test_value_2
+
+    # B == 0
+    B = 0
+
+    B_times_C = B * C
+    @test B_times_C isa Zero
 end
 
 @testset "*(B::Real, C::Scalar)" begin
-    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    # B != 0, B != 1 / C
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = test_value_1
 
-    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = abs(1 / test_value_1) + rand() + 1
+    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_times_C = B * C
-    @test B_times_C isa AbstractScalar
-    @test B_times_C == test_value_1 * test_value_2
+    @test B_times_C isa Scalar
+    @test B_times_C.value == test_value_1 * test_value_2
+
+    # B == 0
+    B = 0
+
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    C = Scalar(test_value)
+
+    B_times_C = B * C
+    @test B_times_C isa Zero
+
+    # B == 1 / C
+    # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
+    # when computing the reciprocal of the value, which could result in the product
+    # being different from one
+    test_value_1 = 2
+    B = test_value_1
+
+    test_value_2 = 1 / test_value_1
+    C = Scalar(test_value_2)
+
+    B_times_C = B * C
+    @test B_times_C isa One
 end
 
 @testset "*(B::Real, C::One)" begin
-    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    B = test_value
+    # --- Preparations
 
     C = One()
 
+    # --- Tests
+
+    # B != 0, B != 1
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    B = test_value
+
     B_times_C = B * C
-    @test B_times_C isa AbstractScalar
-    @test B_times_C == test_value
+    @test B_times_C isa Scalar
+    @test B_times_C.value == test_value
+
+    # B == 0
+    B = 0
+
+    B_times_C = B * C
+    @test B_times_C isa Zero
+
+    # B == 1
+    B = 1
+
+    B_times_C = B * C
+    @test B_times_C isa One
 end
 
 @testset "*(B::Real, C::Zero)" begin
