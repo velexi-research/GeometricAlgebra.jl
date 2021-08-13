@@ -43,7 +43,7 @@ include("test_utils.jl")
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
-            converted_test_value = precision_type(test_value)
+            converted_test_value = value_type(test_value)
 
             B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
             @test B isa Pseudoscalar{precision_type}
@@ -58,7 +58,7 @@ include("test_utils.jl")
     
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
-            converted_test_value = precision_type(test_value)
+            converted_test_value = value_type(test_value)
 
             B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
             @test B isa Zero{precision_type}
@@ -158,7 +158,7 @@ end
         B = Pseudoscalar(test_dim, converted_test_value)
         @test B isa Pseudoscalar{precision_type}
         @test B.dim == test_dim
-        @test B.value == precision_type(converted_test_value)
+        @test B.value == converted_test_value
     end
 
     # value == 0

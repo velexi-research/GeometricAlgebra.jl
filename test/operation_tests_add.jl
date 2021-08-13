@@ -232,7 +232,7 @@ end
 
     # --- Tests
 
-    # C != -B, C != -B + 1, C != 0
+    # C != -B, C != -B + 1
     test_value_2 = abs(test_value_1) + rand() + 2
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
@@ -252,12 +252,6 @@ end
 
     B_plus_C = B + C
     @test B_plus_C isa One
-
-    # C == 0
-    C = 0
-
-    B_plus_C = B + C
-    @test B_plus_C === B
 end
 
 @testset "+(B::Scalar, C::Vector)" begin
@@ -436,7 +430,7 @@ end
 
     # --- Tests
 
-    # B != -C, B != 0
+    # B != -C
     test_value_2 = abs(test_value_1) + rand() + 2
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     B = test_value_2
@@ -450,12 +444,6 @@ end
 
     B_plus_C = B + C
     @test B_plus_C isa Zero
-
-    # B == 0
-    B = 0
-    
-    B_plus_C = B + C
-    @test B_plus_C === C
 end
 
 @testset "+(B::Real, C::One)" begin
