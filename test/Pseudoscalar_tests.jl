@@ -20,7 +20,11 @@ import Random.rand
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-#=
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 # --- Constructor tests
 
 @testset "Pseudoscalar: inner constructor" begin
@@ -30,32 +34,48 @@ using GeometricAlgebra
       * Test value of constructed instance
     =#
 
-    # --- Pseudoscalar{T}(dim::Integer, value::Real)
+    # --- Pseudoscalar{T}(dim::Integer, value::AbstractFloat)
 
     test_dim = 10
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = (rand() > 0.5) ? test_value : -test_value
+
+    # value != 0
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
-            converted_test_value = precision_type(test_value)
+            converted_test_value = value_type(test_value)
 
             B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B isa Pseudoscalar{precision_type}
             @test B.dim == test_dim
             @test B.value isa precision_type
             @test B.value == precision_type(converted_test_value)
+        end
+    end
+    
+    # value == 0
+    test_value = 0
+    
+    for precision_type in subtypes(AbstractFloat)
+        for value_type in subtypes(AbstractFloat)
+            converted_test_value = value_type(test_value)
+
+            B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B isa Zero{precision_type}
         end
     end
 
     # --- Pseudoscalar{T}(dim::Integer, value::Integer)
 
     test_dim = 10
+
+    # value != 0
     test_value = (rand() > 0.5) ? 10 : -10
 
     for precision_type in subtypes(AbstractFloat)
         # subtypes(Signed)
         for value_type in subtypes(Signed)
-            converted_test_value = precision_type(test_value)
+            converted_test_value = value_type(test_value)
 
             B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
             @test B.dim == test_dim
@@ -65,7 +85,7 @@ using GeometricAlgebra
 
         # subtypes(Unsigned)
         for value_type in subtypes(Unsigned)
-            converted_test_value = precision_type(abs(test_value))
+            converted_test_value = value_type(abs(test_value))
 
             B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
             @test B.dim == test_dim
@@ -75,22 +95,44 @@ using GeometricAlgebra
 
         # Bool
         B = Pseudoscalar{precision_type}(test_dim, true)
+        @test B isa Pseudoscalar{precision_type}
         @test B.dim == test_dim
         @test B.value isa precision_type
         @test B.value == precision_type(1)
 
         B = Pseudoscalar{precision_type}(test_dim, false)
-        @test iszero(B)
+        @test B isa Zero{precision_type}
+    end
+
+    # value == 0
+    test_value = 0
+
+    for precision_type in subtypes(AbstractFloat)
+        # subtypes(Signed)
+        for value_type in subtypes(Signed)
+            converted_test_value = value_type(test_value)
+
+            B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B isa Zero{precision_type}
+        end
+
+        # subtypes(Unsigned)
+        for value_type in subtypes(Unsigned)
+            converted_test_value = value_type(abs(test_value))
+
+            B = Pseudoscalar{precision_type}(test_dim, converted_test_value)
+            @test B isa Zero{precision_type}
+        end
     end
 
     # --- Invalid data fields
 
     for precision_type in subtypes(AbstractFloat)
         # dim == 0
-        @test_throws ArgumentError Pseudoscalar(0, 10)
+        @test_throws ArgumentError Pseudoscalar{precision_type}(0, 10)
 
         # dim < 0
-        @test_throws ArgumentError Pseudoscalar(-1, 10)
+        @test_throws ArgumentError Pseudoscalar{precision_type}(-1, 10)
     end
 end
 
@@ -108,37 +150,78 @@ end
 
     # --- Pseudoscalar(dim::Integer, value::AbstractFloat)
 
-    test_value = rand()
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    # value != 0
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         converted_test_value = precision_type(test_value)
         B = Pseudoscalar(test_dim, converted_test_value)
         @test B isa Pseudoscalar{precision_type}
+        @test B.dim == test_dim
+        @test B.value == converted_test_value
+    end
+
+    # value == 0
+    test_value = 0
+
+    for precision_type in subtypes(AbstractFloat)
+        converted_test_value = precision_type(test_value)
+        B = Pseudoscalar(test_dim, converted_test_value)
+        @test B isa Zero{precision_type}
     end
 
     # --- Pseudoscalar(dim::Integer, value::Integer)
 
+    # value != 0
     test_value = (rand() > 0.5) ? 10 : -10
 
     # subtypes(Signed)
     for value_type in subtypes(Signed)
         B = Pseudoscalar(test_dim, value_type(test_value))
         @test B isa Pseudoscalar{Float64}
+        @test B.dim == test_dim
+        @test B.value == value_type(test_value)
     end
 
     # subtypes(Unsigned)
     for value_type in subtypes(Unsigned)
         B = Pseudoscalar(test_dim, value_type(abs(test_value)))
         @test B isa Pseudoscalar{Float64}
+        @test B.dim == test_dim
+        @test B.value == value_type(abs(test_value))
     end
 
     # Bool
     B = Pseudoscalar(test_dim, true)
     @test B isa Pseudoscalar{Float64}
+    @test B.dim == test_dim
+    @test B.value == 1.0
 
     B = Pseudoscalar(test_dim, false)
-    @test iszero(B)
+    @test B isa Zero{Float64}
+    
+    # value == 0
+    test_value = 0
+
+    # subtypes(Signed)
+    for value_type in subtypes(Signed)
+        B = Pseudoscalar(test_dim, value_type(test_value))
+        @test B isa Zero{Float64}
+    end
+
+    # subtypes(Unsigned)
+    for value_type in subtypes(Unsigned)
+        B = Pseudoscalar(test_dim, value_type(abs(test_value)))
+        @test B isa Zero{Float64}
+    end
+
+    # --- Invalid data fields
+
+    # dim == 0
+    @test_throws ArgumentError Pseudoscalar(0, 10)
+
+    # dim < 0
+    @test_throws ArgumentError Pseudoscalar(-1, 10)
 end
 
 @testset "Pseudoscalar: outer constructor - copy constructor" begin
@@ -155,8 +238,7 @@ end
 
     test_dim = 10
 
-    test_value = rand()
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value()
 
     # --- Pseudoscalar(dim::Integer, value::T) where {T<:AbstractFloat}
 
@@ -168,11 +250,14 @@ end
         # Construct a Pseudoscalar representing the same pseudoscalar as `B`
         B_copy = Pseudoscalar(B)
         @test B_copy isa Pseudoscalar{precision_type}
+        @test B.dim == test_dim
+        @test B.value == precision_type(converted_test_value)
 
         # Construct a Pseudoscalar representing the same space as `B` with a
         # different value.
         B_copy = Pseudoscalar(B, value=converted_test_value + 1)
         @test B_copy isa Pseudoscalar{precision_type}
+        @test B.dim == test_dim
         @test value(B_copy) == converted_test_value + 1
     end
 end
@@ -183,8 +268,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -227,8 +311,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -270,8 +353,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         # Preparations
@@ -291,11 +373,6 @@ end
         @test value(B) isa precision_type
         @test value(B) == negative_test_value
 
-        # value = 0
-        B = Pseudoscalar(test_dim, precision_type(0))
-        @test value(B) isa precision_type
-        @test value(B) == 0
-
         # value = Inf
         B = Pseudoscalar(test_dim, precision_type(Inf))
         @test value(B) isa precision_type
@@ -314,8 +391,7 @@ end
     # Preparations
     dim = 10
 
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value()
 
     float64_or_bigfloat = (Float64, BigFloat)
 
@@ -358,8 +434,7 @@ end
     # Preparations
     dim = 10
 
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value()
 
     # dim(B) == dim(C), value(B) == value(C)
     for precision_type1 in subtypes(AbstractFloat)
@@ -395,8 +470,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -411,8 +485,7 @@ end
 @testset "Pseudoscalar: reverse(B)" begin
     # --- Preparations
 
-    test_value = rand() + 1  # add 1 to avoid 0
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     for precision_type in subtypes(AbstractFloat)
         for test_dim in 5:8
@@ -430,8 +503,7 @@ end
 
 @testset "Pseudoscalar: dual(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -457,8 +529,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = rand()
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value()
 
     # Tests
     for precision_type_converted in subtypes(AbstractFloat)
@@ -486,8 +557,7 @@ end
 
 @testset "Pseudoscalar: reciprocal(B)" begin
     # Preparations
-    test_value = rand() + 2  # add 2 to avoid 0 and 1
-    test_value = (rand() > 0.5) ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -508,4 +578,3 @@ end
         end
     end
 end
-=#

@@ -18,6 +18,11 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 # --- Tests
 
 # ------ M::Multivector
@@ -99,38 +104,86 @@ end
 end
 
 @testset "/(B::Pseudoscalar, C::Pseudoscalar)" begin
+    # --- Preparations
+
     test_dim = 10
 
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    # --- Tests
+    
+    # B != C, C.value != Inf
+    test_value_2 = abs(test_value_1) + rand() + 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Pseudoscalar(test_dim, test_value_2)
 
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == test_value_1 / test_value_2
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == test_value_1 / test_value_2
+
+    # B == C, C.value != Inf
+    C = Pseudoscalar(test_dim, test_value_1)
+
+    B_slash_C = B / C
+    @test B_slash_C isa One
+
+    # B != C, C.value == Inf
+    test_value_2 = Inf
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == C, C.value == Inf
+    test_value = Inf
+    B = Pseudoscalar(test_dim, test_value)
+    C = Pseudoscalar(test_dim, test_value)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Pseudoscalar, C::Scalar)" begin
+    # --- Preparations
+
     test_dim = 10
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    # --- Tests
+
+    # B != Inf, C != Inf
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
-    @test B / C == Pseudoscalar(test_dim, test_value_1 / test_value_2)
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test B_slash_C.value == test_value_1 / test_value_2
+
+    # B != Inf, C == Inf
+    test_value_2 = Inf
+    C = Scalar(test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+    
+    # B == Inf, C == Inf
+    test_value = Inf
+    B = Pseudoscalar(test_dim, test_value)
+    C = Scalar(test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Pseudoscalar, C::One)" begin
     test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value)
 
     C = One()
@@ -140,30 +193,51 @@ end
 
 @testset "/(B::Pseudoscalar, C::Zero)" begin
     test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value)
 
     C = Zero()
 
-    expected_result = sign(B) > 0 ?
-        Pseudoscalar(B, value=Inf) :
-        Pseudoscalar(B, value=-Inf)
+    expected_result = sign(B) > 0 ? Inf : -Inf
 
-    @test B / C == expected_result
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test B_slash_C.value == expected_result
 end
 
 @testset "/(B::Pseudoscalar, C::Real)" begin
+    # --- Preparations
+
     test_dim = 10
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     B = Pseudoscalar(test_dim, test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    # --- Tests
+
+    # B.value != Inf, C != Inf
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
     C = test_value_2
 
-    @test B / C == Pseudoscalar(test_dim, test_value_1 / test_value_2)
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test B_slash_C.value == test_value_1 / test_value_2
+
+    # B.value != Inf, C == Inf
+    C = Inf
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B.value == Inf, C == Inf
+    B = Pseudoscalar(test_dim, Inf)
+    C = Inf
+
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Pseudoscalar, C::Vector)" begin
@@ -181,12 +255,15 @@ end
 end
 
 @testset "/(B::Scalar, C::Pseudoscalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    # --- Preparations
+
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    # --- Tests
+
+    # B != Inf, C.value != Inf
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
 
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_2)
@@ -195,41 +272,85 @@ end
             Pseudoscalar(test_dim, test_value_1 / test_value_2) :
             Pseudoscalar(test_dim, -test_value_1 / test_value_2)
 
-        @test B / C == expected_result
+        B_slash_C = B / C
+        @test B_slash_C isa Pseudoscalar
+        @test B_slash_C.dim == expected_result.dim
+        @test B_slash_C.value == expected_result.value
     end
+
+    # B != Inf, C.value == Inf
+    test_dim = 10
+    test_value_2 = Inf
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == Inf, C.value == Inf
+    test_dim = 10
+    test_value = Inf
+    B = Scalar(test_value)
+    C = Pseudoscalar(test_dim, test_value)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Scalar, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    # --- Preparations
+
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    # --- Tests
+
+    # B != C, B != Inf, C != Inf
+    test_value_2 = abs(test_value_1) + rand() + 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = Scalar(test_value_2)
 
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == test_value_1 / test_value_2
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == test_value_1 / test_value_2
+
+    # B == C, B != Inf
+    C = Scalar(test_value_1)
+
+    B_slash_C = B / C
+    @test B_slash_C isa One
+
+    # B != Inf, C == Inf
+    C = Scalar(Inf)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == Inf, C == Inf
+    test_value = Inf
+    B = Scalar(test_value)
+    C = Scalar(test_value)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Scalar, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = One()
 
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == test_value
+    @test B_slash_C === B
 end
 
 @testset "/(B::Scalar, C::Zero)" begin
     # --- Preparations
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
 
     C = Zero()
 
@@ -239,27 +360,68 @@ end
     B = Scalar(abs(test_value))
     B_slash_C = B / C
     @test B_slash_C isa Scalar
-    @test B_slash_C == Inf
+    @test B_slash_C.value == Inf
 
     # B < 0
     B = Scalar(-abs(test_value))
     B_slash_C = B / C
     @test B_slash_C isa Scalar
-    @test B_slash_C == -Inf
+    @test B_slash_C.value == -Inf
 end
 
 @testset "/(B::Scalar, C::Real)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    # --- Preparations
+
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
+    # --- Tests
+
+    # B != C, B != Inf, C != Inf, C != 0
+    test_value_2 = abs(test_value_1) + rand() + 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
     C = test_value_2
 
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == test_value_1 / test_value_2
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == test_value_1 / test_value_2
+
+    # B == C, B != Inf, C != 0
+    C = test_value_1
+
+    B_slash_C = B / C
+    @test B_slash_C isa One
+
+    # B != Inf, C == Inf
+    C = Inf
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B > 0, B != Inf, C == 0
+    B = Scalar(abs(test_value_1))
+    C = 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == Inf
+
+    # B < 0, B != -Inf, C == 0
+    B = Scalar(-abs(test_value_1))
+    C = 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == -Inf
+
+    # B == Inf, C == Inf
+    test_value = Inf
+    B = Scalar(test_value)
+    C = test_value
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Scalar, C::Vector)" begin
@@ -279,33 +441,51 @@ end
 @testset "/(B::One, C::Pseudoscalar)" begin
     # --- Preparations
 
-    test_dim = 10
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
 
     B = One()
 
+    # --- Tests
+
+    # C.value != Inf
     for test_dim in 5:8
-        C = Pseudoscalar(test_dim, test_value)
+        C = Pseudoscalar(test_dim, test_value_1)
 
         expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, 1/ test_value) :
-            Pseudoscalar(test_dim, -1/ test_value)
+            Pseudoscalar(test_dim, 1/ test_value_1) :
+            Pseudoscalar(test_dim, -1/ test_value_1)
 
-        @test B / C == expected_result
+        B_slash_C = B / C
+        @test B_slash_C isa Pseudoscalar
+        @test B_slash_C.dim == expected_result.dim
+        @test B_slash_C.value == expected_result.value
     end
+
+    # C.value == Inf
+    test_dim = 10
+    test_value_2 = Inf
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
 end
 
 @testset "/(B::One, C::Scalar)" begin
+    # C != Inf
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 1 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == 1 / test_value
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == 1 / test_value
+
+    # C == Inf
+    C = Scalar(Inf)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
 end
 
 @testset "/(B::One, C::One)" begin
@@ -326,13 +506,32 @@ end
 @testset "/(B::One, C::Real)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    # B != C, C != Inf, C != 0
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
     B_slash_C = B / C
     @test B_slash_C isa Scalar
-    @test B_slash_C == 1 / test_value
+    @test B_slash_C.value == 1 / test_value
+
+    # B == C
+    C = 1
+
+    B_slash_C = B / C
+    @test B_slash_C isa One
+
+    # C == Inf
+    C = Inf
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # C == 0
+    C = 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == Inf
 end
 
 @testset "/(B::One, C::Vector)" begin
@@ -353,16 +552,14 @@ end
     B = Zero()
 
     test_dim = 10
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     C = Pseudoscalar(test_dim, test_value_1)
 
     @test iszero(B / C)
 end
 
 @testset "/(B::Zero, C::Scalar)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = Zero()
@@ -382,17 +579,29 @@ end
 
     B_slash_C = B / C
     @test B_slash_C isa Scalar
-    @test isnan(value(B_slash_C))
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Zero, C::Real)" begin
+    # --- Preparations
+
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    # --- Tests
+
+    # C != 0
     C = test_value
 
     @test iszero(B / C)
+
+    # C == 0
+    C = 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Zero, C::Vector)" begin
@@ -412,14 +621,13 @@ end
 @testset "/(B::Real, C::Pseudoscalar)" begin
     # --- Preparations
 
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value_1
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
-
     # --- Tests
+
+    # B != Inf, B != 0, C.value != Inf
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
 
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_2)
@@ -428,54 +636,137 @@ end
             Pseudoscalar(test_dim, test_value_1 / test_value_2) :
             Pseudoscalar(test_dim, -test_value_1 / test_value_2)
 
-        @test B / C == expected_result
+        B_slash_C = B / C
+        @test B_slash_C isa Pseudoscalar
+        @test B_slash_C.dim == expected_result.dim
+        @test B_slash_C.value == expected_result.value
     end
+
+    # B != Inf, B != 0, C.value == Inf
+    test_dim = 10
+    test_value_2 = Inf
+    C = Pseudoscalar(test_dim, test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == 0
+    B = 0
+
+    test_dim = 10
+    C = Pseudoscalar(test_dim, test_value_1)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == Inf, C.value == Inf
+    test_value = Inf
+    test_dim = 10
+    B = test_value
+    C = Pseudoscalar(test_dim, test_value)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Pseudoscalar
+    @test B_slash_C.dim == test_dim
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Real, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    # --- Preparations
+
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value_1
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    # --- Tests
+
+    # B != C, B != Inf, C != Inf
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == test_value_1 / test_value_2
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == test_value_1 / test_value_2
+
+    # B == C, B != Inf
+    C = Scalar(test_value_1)
+
+    B_slash_C = B / C
+    @test B_slash_C isa One
+
+    # B != Inf, C == Inf
+    test_value_2 = Inf
+    C = Scalar(test_value_2)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == 0
+    B = 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
+
+    # B == Inf, C == Inf
+    test_value = Inf
+    B = test_value
+    C = Scalar(test_value)
+
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
 end
 
 @testset "/(B::Real, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
-    B = test_value
+    # --- Preparations
 
     C = One()
 
+    # --- Tests
+    
+    # B != C, B != 0
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    B = test_value
+
     B_slash_C = B / C
-    @test B_slash_C isa AbstractScalar
-    @test B_slash_C == test_value
+    @test B_slash_C isa Scalar
+    @test B_slash_C.value == test_value
+
+    # B == C
+    B = 1
+
+    B_slash_C = B / C
+    @test B_slash_C isa One
+
+    # B == 0
+    B = 0
+
+    B_slash_C = B / C
+    @test B_slash_C isa Zero
 end
 
 @testset "/(B::Real, C::Zero)" begin
     # --- Preparations
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
 
     C = Zero()
 
     # --- Tests
 
     # B > 0
-    B = Scalar(abs(test_value))
+    B = abs(test_value)
     B_slash_C = B / C
     @test B_slash_C isa Scalar
     @test B_slash_C == Inf
 
+    # B = 0
+    B = 0
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
+
     # B < 0
-    B = Scalar(-abs(test_value))
+    B = -abs(test_value)
     B_slash_C = B / C
     @test B_slash_C isa Scalar
     @test B_slash_C == -Inf
@@ -498,8 +789,7 @@ end
 @testset "/(B::Vector, C::Scalar)" begin
     B = rand(5)
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     B_slash_C = B / C
