@@ -80,7 +80,7 @@ Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
 # --- Method definitions
 
 """
-    value(B::Pseudoscalar)::Real
+    value(B::Pseudoscalar)::AbstractFloat
 
 Return the value of `B`.
 """
@@ -95,34 +95,14 @@ reciprocal(B::Pseudoscalar) =
         Pseudoscalar(B, value=1 / value(B)) :
         Pseudoscalar(B, value=-1 / value(B))
 
-"""
-    grade(B::Pseudoscalar)
-
-Return the grade of the dimension of the space spanned by `B`.
-"""
 grade(B::Pseudoscalar) = B.dim
 
-"""
-    basis(B::Pseudoscalar)
-
-Return LinearAlgebra.I.
-"""
 basis(B::Pseudoscalar) = LinearAlgebra.I
 
-"""
-    volume(B::Pseudoscalar)
-
-Return the value of `B`.
-"""
 volume(B::Pseudoscalar) = value(B)
 
 # --- Method definitions for AbstractMultivector interface functions
 
-"""
-    dim(B::Pseudoscalar)
-
-Return dimension of space that `B` is embedded in.
-"""
 dim(B::Pseudoscalar) = B.dim
 
 -(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
@@ -145,12 +125,5 @@ isapprox(B::Pseudoscalar{T1}, C::Pseudoscalar{T2};
 
 # --- Utility methods
 
-"""
-    convert(::Type{S}, B::Pseudoscalar)
-        where {T<:AbstractFloat, S<:Pseudoscalar{T}}
-
-Convert Pseudoscalar to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, B::Pseudoscalar) where {T<:AbstractFloat,
-                                           S<:AbstractMultivector{T}} =
+convert(::Type{T}, B::Pseudoscalar) where {T<:AbstractFloat} =
     T == typeof(value(B)) ? B : Pseudoscalar{T}(dim(B), value(B))

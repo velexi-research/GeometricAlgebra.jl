@@ -17,15 +17,13 @@ export reject
 
 using LinearAlgebra: ⋅
 
-# ------ Docstring methods (no-op)
-
 """
-    reject(vectors, B; normalize=false)
+    reject(vectors::Matrix, B::AbstractBlade; normalize=false)::Matrix
 
 Compute rejections of `vectors` from `B`. When `normalize` is true, the
 rejection vectors are normalized.
 """
-reject(vectors::Matrix, B::AbstractBlade; normalize=false) = nothing  # TODO
+function reject end
 
 # ------ Specializations involving a Blade instance
 

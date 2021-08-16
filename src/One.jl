@@ -32,11 +32,6 @@ One() = One{Float64}()
 
 # --- Method definitions for AbstractScalar interface functions
 
-"""
-    value(B::One)
-
-Return 1 (with the same precision of `B`).
-"""
 value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 # --- Method definitions for AbstractBlade interface functions

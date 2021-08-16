@@ -26,15 +26,14 @@ import Base.:(<)
 
 # --- Method definitions
 
-# ------ Docstring methods (no-op)
-
 """
-    contractl(M, N)
-    M < N
+    contract_left(M::AbstractMultivector,
+                  N::AbstractMultivector)::AbstractMultivector
+    <(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-Compute the left contraction of the multivector `M` with the multivector `N`.
+Compute the left contraction of `M` with `N`.
 """
-contractl(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
+function contractl end
 
 # ------ Specializations involving an AbstractMultivector instance
 

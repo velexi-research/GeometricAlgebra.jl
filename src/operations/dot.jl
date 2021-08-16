@@ -12,16 +12,15 @@ except according to the terms contained in the LICENSE file.
 # --- Exports
 
 import LinearAlgebra.dot
+export dot
 
 # --- Method definitions
 
-# ------ Docstring methods (no-op)
-
 """
-    dot(M, N)
-    M ⋅ N
+    dot(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    ⋅(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-Compute the dot product of the multivector `M` with the multivector `N`.
+Compute the dot product of `M` and `N`.
 """
 dot(M::AbstractMultivector, N::AbstractMultivector; left=true) =
     left ? contractl(M, N) : nothing  # TODO

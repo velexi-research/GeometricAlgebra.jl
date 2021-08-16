@@ -160,53 +160,21 @@ Multivector(multivectors::Vector{<:AbstractMultivector}) =
 
 # --- Method definitions for AbstractMultivector interface functions
 
-"""
-    dim(M::Multivector)
-
-Return dimension of space that the multivector `M` is embedded in.
-"""
 dim(M::Multivector) = M.dim
 
-"""
-    grades(M::Multivector; collect=true)
-
-Return the grades of the blades that multivector `M` is composed of. When
-`collect` is `false`, an iterator over the grades is returned.
-"""
 grades(M::Multivector; collect=true) =
     collect ?
         Base.collect(keys(M.parts)) :
         keys(M.parts)
 
-"""
-    blades(M::Multivector)
-
-Return the blades that the multivector `M` is composed of.
-"""
 blades(M::Multivector) = reduce(vcat, values(M.parts))
 
-"""
-    norm(M::Multivector)
-
-Return the norm of the multivector `M`.
-"""
 norm(M::Multivector) = M.norm
 
-"""
-    getindex(M::Multivector, k::Int)
-
-Return the `k`-vector component of multivector `M`.
-"""
 Base.getindex(M::Multivector, k::Int) =
     k in grades(M) ?  M.parts[k] : Vector{AbstractBlade}()
 
 # --- Utility methods
 
-"""
-    convert(::Type{S}, M::Multivector) where {T<:AbstractFloat,
-                                              S<:Multivector{T}}
-
-Convert Blade to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, M::Multivector) where {T<:AbstractFloat, S<:Multivector{T}} =
-    Multivector{T}(M)
+convert(::Type{T}, M::Multivector) where {T<:AbstractFloat} =
+    T == typeof(norm(M)) ? M : Multivector{T}(M)

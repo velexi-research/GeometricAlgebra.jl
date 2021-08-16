@@ -63,9 +63,4 @@ Scalar(value::Integer) = Scalar(Float64(value))
 
 # --- Method definitions for AbstractScalar interface functions
 
-"""
-    value(B::Scalar)
-
-Return the value of `B` (with the same precision of `B`).
-"""
 value(B::Scalar) = B.value

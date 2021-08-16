@@ -46,33 +46,18 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 #       to be extended.
 
 """
-    value(B)
+    value(B::AbstractScalar)::AbstractFloat
 
-TODO
+Return value of `B` (with the same precision as `B`).
 """
 function value end
 
 # --- Method definitions for AbstractBlade interface functions
 
-"""
-    grade(B::AbstractScalar)
-
-Return 0.
-"""
 grade(B::AbstractScalar) = 0
 
-"""
-    basis(B::AbstractScalar; normalized::Bool=true)
+basis(B::AbstractScalar) = 1
 
-Return 1.
-"""
-basis(B::AbstractScalar; normalized::Bool=true) = normalized ? 1 : value(B)
-
-"""
-    volume(B::AbstractScalar)
-
-Return the value of `B`.
-"""
 volume(B::AbstractScalar) = value(B)
 
 -(B::AbstractScalar) = Scalar(-value(B))
@@ -82,35 +67,35 @@ reciprocal(B::AbstractScalar) = 1 / B
 # --- Method definitions for AbstractMultivector interface functions
 
 """
-    dim(B::AbstractScalar)
+    dim(B::AbstractScalar)::Int
 
 Return 0.
+
+Implementation
+==============
+
+* The convention that scalars have zero dimension is adopted because
+  (1) scalars exist independently of all geometric algebras and (2) scalars
+  are 0-dimensional entities.
 """
 dim(B::AbstractScalar) = 0
 
-"""
-    reverse(B::AbstractScalar)
-
-Return `B` (the reverse of a scalar is itself).
-"""
 Base.reverse(B::AbstractScalar) = B
 
 """
-    dual(B::AbstractScalar; dim::Integer)
+    dual(B::AbstractScalar, dim::Integer)::Pseudoscalar
 
-Compute the dual of `B`. Note that the dimension of the embedding space must
-be explicitly specified.
+Compute the dual of `B`. Note: an error is raised if the dimension of the
+embedding space is not explicitly specified.
 """
-function dual(B::AbstractScalar; dim::Union{Integer, Nothing}=nothing)
-    if isnothing(dim)
-        error("The dual of a scalar is not well-defined if `dim` is not " *
-              "specified")
-    end
-
+dual(B::AbstractScalar, dim::Integer) =
     mod(dim, 4) < 2 ?
         Pseudoscalar(dim, value(B)) :
         Pseudoscalar(dim, -value(B))
-end
+
+dual(B::AbstractScalar) =
+    error("The dual of a scalar is not well-defined if `dim` is not " *
+          "specified")
 
 # --- Comparison methods
 
@@ -145,12 +130,5 @@ isapprox(x::Real, B::AbstractScalar{T};
 
 # --- Utility methods
 
-"""
-    convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat,
-                                                 S<:AbstractMultivector{T}}
-
-Convert AbstractScalar to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, B::AbstractScalar) where {T<:AbstractFloat,
-                                             S<:AbstractMultivector{T}} =
+convert(::Type{T}, B::AbstractScalar) where {T<:AbstractFloat} =
     T == typeof(value(B)) ? B : Scalar{T}(value(B))

@@ -48,9 +48,9 @@ Attributes
 
     grade(B::AbstractBlade)::Int
 
-    basis(B::AbstractBlade; normalized::Bool=true)::Matrix{AbstractFloat}
+    basis(B::AbstractBlade)::Matrix
 
-    volume(B::AbstractBlade{T)::T where {T<:AbstractFloat}
+    volume(B::AbstractBlade)::AbstractFloat
 
     sign(B::AbstractBlade)::Int8
 
@@ -71,23 +71,30 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 #       to be extended.
 
 """
-    grade(B)
+    grade(B::AbstractBlade)::Int
 
-TODO
+Return grade of `B`.
 """
 function grade end
 
 """
-    basis(B)
+    basis(B::AbstractBlade)::Matrix
 
-TODO
+Return an orthonormal basis for the subspace represented by `B`.
+
+* When `B` is an AbstractScalar, 1 is returned.
+
+* When `B` is a Pseudoscalar, LinearAlgebra.I is returned.
 """
 function basis end
 
 """
-    volume(B)
+    volume(B::AbstractBlade)::AbstractFloat
 
-TODO
+Return the signed volume of `B`.
+
+* When `B` is a Blade, `volume(B)` is the signed norm of the blade _relative_
+  to its unit basis.
 """
 function volume end
 
@@ -99,7 +106,23 @@ Return the sign of `B` relative to its unit basis.
 sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 """
-    reciprocal(B)
+    dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+
+Compute the dual `B` relative to the subspace represented by `C`.
+
+Notes
+-----
+* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+  vector spaces of the same dimension and (2) the subspace represented by `B`
+  is contained in subspace represented by `C`.
+
+* The volume of `C` is ignored.
+"""
+dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade =
+    nothing  # no-op method to attach docstring to
+
+"""
+    reciprocal(B::AbstractBlade)::AbstractBlade
 
 Compute the multiplicative inverse of blade `B`.
 """
@@ -107,32 +130,11 @@ function reciprocal end
 
 # --- Method definitions for AbstractMultivector interface functions
 
-"""
-    grades(B::AbstractBlade)
-
-Return a Vector containing the grade of the blade `B`.
-"""
 grades(B::AbstractBlade) = [grade(B)]
 
-"""
-    blades(B::AbstractBlade)
-
-Return a Vector containing the blade `B`.
-"""
 blades(B::AbstractBlade) = Vector{AbstractBlade}([B])
 
-"""
-    norm(B::AbstractBlade)
-
-Return the norm of `B`.
-"""
 norm(B::AbstractBlade) = abs(volume(B))
 
-"""
-    getindex(B::AbstractBlade, k::Int)
-
-Return the `k`-vector component of blade `B`. When grade(`B`) is equal to `k`,
-return a Vector containing `B`. Otherwise, return an empty vector.
-"""
 Base.getindex(B::AbstractBlade, k::Int) =
     k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()

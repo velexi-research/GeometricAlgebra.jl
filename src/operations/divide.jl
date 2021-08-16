@@ -15,15 +15,6 @@ import Base.:(/)
 
 # --- Method definitions
 
-# ------ Docstring methods (no-op)
-
-"""
-    M / N
-
-Compute the geometric quotient of multivectors `M` and `N`.
-"""
-/(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
-
 # ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::One

@@ -15,11 +15,6 @@ import Base.:(-)
 
 # --- Method definitions
 
-"""
-    M - N
-
-Compute the difference of the multivectors `M` and `N`.
-"""
 -(M::AbstractMultivector, N::AbstractMultivector) = M + -N
 
 # ------ Specializations involving a Pseudoscalar instance

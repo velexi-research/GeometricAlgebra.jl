@@ -17,27 +17,23 @@ export project
 
 using LinearAlgebra: I
 
-# ------ Docstring methods (no-op)
-
 """
-    project(M, B)
+    project(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
 
-Compute the projection of multivector `M` onto the subspace represented by
-blade `B`.
-"""
-project(M::AbstractMultivector, B::AbstractBlade) = nothing  # TODO
+Compute the projection of `M` onto the subspace represented by `B`.
 
-"""
-    project(B, C; return_blade=true)
+    project(B::AbstractBlade, C::AbstractBlade;
+            return_blade=true)::Union{AbstractBlade, AbstractFloat,
+                                      Vector, Matrix, LinearAlgebra.I}
 
-Compute the projection of blade `B` onto the subspace represented by blade `C`.
+Compute the projection of `B` onto the subspace represented by `C`.
 
 When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
-the return value is a Real if the result is a scalar, a Vector if the result
-is a vector, a Matrix if the result is a blade with 1 < grade < `dim`, and a
-multiple of LinearAlgebra.I if the result is a pseudoscalar.
+the return value is an AbstractFloat if the result is a scalar, a Vector if the
+result is a vector, a Matrix if the result is a blade with 1 < grade < `dim`,
+and a multiple of LinearAlgebra.I if the result is a pseudoscalar.
 """
-project(B::AbstractBlade, C::AbstractBlade) = nothing  # TODO
+function project end
 
 # ------ Specializations involving an AbstractMultivector instance
 

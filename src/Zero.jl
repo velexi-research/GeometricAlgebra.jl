@@ -32,11 +32,6 @@ Zero() = Zero{Float64}()
 
 # --- Method definitions for AbstractScalar interface functions
 
-"""
-    value(B::Zero)
-
-Return 0 (with the same precision of `B`).
-"""
 value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
 
 # --- Method definitions for AbstractMultivector interface functions

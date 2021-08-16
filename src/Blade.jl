@@ -338,11 +338,6 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 
 # --- Method definitions for AbstractMultivector interface functions
 
-"""
-    dim(B::AbstractBlade)::Integer
-
-Return dimension of space that `B` is embedded in.
-"""
 dim(B::Blade) = B.dim
 
 -(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
@@ -385,27 +380,10 @@ end
 
 # --- Method definitions for AbstractBlade interface functions
 
-"""
-    grade(B::AbstractBlade)::Integer
-
-Return the grade of the dimension of the space spanned by `B`.
-"""
 grade(B::Blade) = B.grade
 
-"""
-    basis(B::AbstractBlade)
-
-When `B` is a Blade, return an orthonormal basis for the space spanned by the
-blade.
-"""
 basis(B::Blade) = B.basis
 
-"""
-    volume(B::AbstractBlade)::Real
-
-Return the volume of `B`. For Blades, `volume(B)` is the signed norm of the
-blade relative to its unit basis.
-"""
 volume(B::Blade) = B.volume
 
 reciprocal(B::Blade) =
@@ -442,13 +420,7 @@ end
 
 # --- Utility methods
 
-"""
-    convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
-
-Convert Blade to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, B::Blade) where {T<:AbstractFloat,
-                                    S<:AbstractMultivector{T}} =
+convert(::Type{T}, B::Blade) where {T<:AbstractFloat} =
     T == typeof(volume(B)) ? B : Blade{T}(B)
 
 #=

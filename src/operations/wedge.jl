@@ -27,15 +27,13 @@ export wedge, ∧
 
 # --- Method definitions
 
-# ------ Docstring methods (no-op)
-
 """
-    wedge(M, N)
-    M ∧ N
+    wedge(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    ∧(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-Compute the outer product of the multivector `M` with the multivector `N`.
+Compute the outer product of `M` and `N`.
 """
-wedge(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
+function wedge end
 
 # ------ Specializations involving an AbstractMultivector instance
 
