@@ -27,7 +27,7 @@ import Base.:(-), Base.reverse
 export inverse, dual
 
 # Comparison operations
-import Base.:(==), Base.isequal, Base.isapprox
+import Base.:(==), Base.isapprox
 import Base.iszero, Base.isone
 
 # Utility functions
@@ -43,9 +43,6 @@ Supertype for all multivector types.
 
 Interface
 =========
-
-Note: the return value of all methods should preserve the precision of its
-AbstractMultivector arguments (when possible).
 
 Attributes
 ----------
@@ -102,16 +99,23 @@ Binary Operations
 Comparison Functions
 --------------------
 
-    isequal(M::AbstractMultivector, N::AbstractMultivector)::Bool
     ==(M::AbstractMultivector, N::AbstractMultivector)::Bool
+    isequal(M::AbstractMultivector, N::AbstractMultivector)::Bool
 
-    isapprox(M::AbstractMultivector, N::AbstractMultivector)::Bool
     ≈(M::AbstractMultivector, N::AbstractMultivector)::Bool
+    isapprox(M::AbstractMultivector, N::AbstractMultivector)::Bool
 
 Utility Functions
 -----------------
 
     convert(::Type{T}, M::AbstractMultivector) where {T<:AbstractFloat}}
+
+Implementation
+==============
+
+* The return value of all methods should preserve the precision of its
+  AbstractMultivector arguments (when possible).
+
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
 
@@ -154,6 +158,9 @@ function norm end
 
 Return the `k`-vector component of `M`.
 
+Notes
+=====
+
 * When `M` is a blade, `M[k]` is a Vector containing `M` if the grade of `M`
   is equal to `k`; otherwise, `M[k]` is an empty vector.
 """
@@ -191,30 +198,6 @@ that `M` is an element of).
 function dual end
 
 # --- Comparison methods
-
-"""
-    isequal(M::AbstractMultivector, N::AbstractMultivector)::Bool
-    ==(M::AbstractMultivector, N::AbstractMultivector)::Bool
-
-Return true if `M` and `N` are equal; otherwise, return false.
-"""
-function isequal end
-
-"""
-    isequal(M::AbstractMultivector, N::AbstractMultivector)::Bool
-    ==(M::AbstractMultivector, N::AbstractMultivector)::Bool
-
-Return true if `M` and `N` are equal; otherwise, return false.
-"""
-==(M::AbstractMultivector, N::AbstractMultivector) = isequal(M, N)
-
-"""
-    isapprox(M::AbstractMultivector, N::AbstractMultivector)::Bool
-    ≈(M::AbstractMultivector, N::AbstractMultivector)::Bool
-
-Return true if `M` and `N` are approximately equal; otherwise, return false.
-"""
-function isapprox end
 
 # B::AbstractMultivector, x::Real
 # x::Real, B::AbstractMultivector

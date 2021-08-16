@@ -19,8 +19,8 @@ export Pseudoscalar
 """
     struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
 
-Pseudoscalar ((n-1)-blade) represented with the floating-point precision of
-type `T`. The `basis` for a Pseudoscalar is the standard basis for ``R^n``.
+Pseudoscalar (an ``(n-1)``-blade) represented with the floating-point precision
+of type `T`. The `basis` for a Pseudoscalar is the standard basis for ``R^n``.
 The norm and orientation of a Pseudoscalar are encoded in its `value`. The
 norm of a Pseudoscalar is equal to `abs(value)` and the orientation of a
 Pseudoscalar relative to the standard basis for ``R^n`` is equal to
@@ -82,7 +82,7 @@ Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
 """
     value(B::Pseudoscalar)::AbstractFloat
 
-Return the value of `B`.
+Return the value of `B` (with the same precision as `B`).
 """
 value(B::Pseudoscalar) = B.value
 

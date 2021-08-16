@@ -33,7 +33,7 @@ equal to `abs(volume)` and the orientation of a Blade relative to its `basis`
 is equal to `sign(volume)`.
 
 Notes
------
+=====
 * The grade of a Blade type is greater than 0 and less than the dimension of
   the space that the blade is embedded in
 """
@@ -70,8 +70,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
     otherwise, the basis of the new Blade is a reference to `basis`.
 
-    Note: this inner constructor intended primarily for internal use by
-    other inner constructors to enforce constraints.
+    Note: this inner constructor intended primarily for use by outer
+    constructors to enforce constraints.
     """
     function Blade{T}(dim::Int,
                       grade::Int,
@@ -167,9 +167,10 @@ is specified, `vectors` is only used to define the subspace (including
 orientation) represented by the blade.
 
 Notes
------
+=====
 
-### Orientation
+Orientation
+-----------
 
 * _`vectors` contains more than one vector_. When `volume` is positive, the
   orientation of the blade is the same as the orientation of the outer product
@@ -182,7 +183,8 @@ Notes
   is negative, the orientation of the blade is the opposite of the direction
   of `v`.
 
-### Precision
+Precision
+---------
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Blade.
@@ -305,7 +307,7 @@ Blade(vectors::Array{<:Integer};
           atol::Real=blade_atol(T),
           copy_basis=false) where {T<: AbstractFloat}
 
-Copy constructor. Construct a Blade representing the same space as `B` having
+Copy constructors. Construct a Blade representing the same space as `B` having
 a specified oriented volume relative to `B`. A Scalar representing zero is
 returned if the absolute value of `volume` is less than `atol`.
 

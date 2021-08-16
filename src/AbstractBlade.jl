@@ -24,9 +24,6 @@ export basis, grade, volume
 # Unary Operations
 export reciprocal
 
-# Binary Operations
-export reject
-
 # --- Type definitions
 
 """
@@ -34,14 +31,8 @@ export reject
 
 Supertype for all blade types.
 
-For the AbstractBlade type, the norm and orientation are encoded by the `volume`
-of the blade.
-
 Interface
 =========
-
-Note: the return value of all methods should preserve the precision of its
-AbstractBlade arguments (when possible).
 
 Attributes
 ----------
@@ -61,7 +52,15 @@ Operations
 
     reciprocal(B::AbstractBlade)::AbstractBlade
 
-    reject(vectors::Matrix, B::AbstractBlade, normalize::Bool=false)::Matrix
+Implementation
+==============
+
+* For the AbstractBlade type, the `volume` of a blade should encode both norm
+  and orientation information.
+
+* The return value of all methods should preserve the precision of its
+  AbstractBlade arguments (when possible).
+
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
@@ -82,9 +81,8 @@ function grade end
 
 Return an orthonormal basis for the subspace represented by `B`.
 
-* When `B` is an AbstractScalar, 1 is returned.
-
-* When `B` is a Pseudoscalar, LinearAlgebra.I is returned.
+When `B` is an AbstractScalar, 1 (at the precision of `B`) is returned. When
+`B` is a Pseudoscalar, LinearAlgebra.I is returned.
 """
 function basis end
 
@@ -93,8 +91,8 @@ function basis end
 
 Return the signed volume of `B`.
 
-* When `B` is a Blade, `volume(B)` is the signed norm of the blade _relative_
-  to its unit basis.
+When `B` is a Blade, `volume(B)` is the signed norm of the blade _relative_ to
+its unit basis.
 """
 function volume end
 
@@ -111,7 +109,8 @@ sign(B::AbstractBlade)::Int8 = sign(volume(B))
 Compute the dual `B` relative to the subspace represented by `C`.
 
 Notes
------
+=====
+
 * `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
   vector spaces of the same dimension and (2) the subspace represented by `B`
   is contained in subspace represented by `C`.

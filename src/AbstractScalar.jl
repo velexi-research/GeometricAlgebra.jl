@@ -48,7 +48,7 @@ abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 """
     value(B::AbstractScalar)::AbstractFloat
 
-Return value of `B` (with the same precision as `B`).
+Return the value of `B` (with the same precision as `B`).
 """
 function value end
 
@@ -56,7 +56,7 @@ function value end
 
 grade(B::AbstractScalar) = 0
 
-basis(B::AbstractScalar) = 1
+basis(B::AbstractScalar) = one(value(B))
 
 volume(B::AbstractScalar) = value(B)
 
@@ -71,8 +71,8 @@ reciprocal(B::AbstractScalar) = 1 / B
 
 Return 0.
 
-Implementation
-==============
+Notes
+=====
 
 * The convention that scalars have zero dimension is adopted because
   (1) scalars exist independently of all geometric algebras and (2) scalars
@@ -85,8 +85,13 @@ Base.reverse(B::AbstractScalar) = B
 """
     dual(B::AbstractScalar, dim::Integer)::Pseudoscalar
 
-Compute the dual of `B`. Note: an error is raised if the dimension of the
-embedding space is not explicitly specified.
+Compute the dual of `B`.
+
+Notes
+=====
+
+* An error is raised if the dimension of the embedding space is not explicitly
+  specified.
 """
 dual(B::AbstractScalar, dim::Integer) =
     mod(dim, 4) < 2 ?
