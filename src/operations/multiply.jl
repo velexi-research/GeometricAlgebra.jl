@@ -129,7 +129,7 @@ end
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
-*(B::Pseudoscalar, C::Pseudoscalar) = contractl(B, C)
+*(B::Pseudoscalar, C::Pseudoscalar) = contract_left(B, C)
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, C::Pseudoscalar

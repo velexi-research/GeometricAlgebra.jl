@@ -1,5 +1,5 @@
 """
-contractl.jl defines methods for the contractl(x, y) function
+contract_left.jl defines methods for the contract_left(x, y) function
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -11,18 +11,18 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-export contractl
+export contract_left
 import Base.:(<)
 
 # --- Operator aliases
 
-<(M::AbstractMultivector, N::AbstractMultivector) = contractl(M, N)
+<(M::AbstractMultivector, N::AbstractMultivector) = contract_left(M, N)
 
-<(M::AbstractMultivector, x::Real) = contractl(M, x)
-<(x::Real, M::AbstractMultivector) = contractl(x, M)
+<(M::AbstractMultivector, x::Real) = contract_left(M, x)
+<(x::Real, M::AbstractMultivector) = contract_left(x, M)
 
-<(M::AbstractMultivector, v::Vector{<:Real}) = contractl(M, v)
-<(v::Vector{<:Real}, M::AbstractMultivector) = contractl(v, M)
+<(M::AbstractMultivector, v::Vector{<:Real}) = contract_left(M, v)
+<(v::Vector{<:Real}, M::AbstractMultivector) = contract_left(v, M)
 
 # --- Method definitions
 
@@ -33,60 +33,60 @@ import Base.:(<)
 
 Compute the left contraction of `M` with `N`.
 """
-function contractl end
+function contract_left end
 
 # ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
-contractl(M::AbstractMultivector, B::AbstractBlade) =
-    Multivector(map(C -> contractl(C, B), blades(M)))
+contract_left(M::AbstractMultivector, B::AbstractBlade) =
+    Multivector(map(C -> contract_left(C, B), blades(M)))
 
-contractl(B::AbstractBlade, M::AbstractMultivector) =
-    Multivector(map(C -> contractl(B, C), blades(M)))
+contract_left(B::AbstractBlade, M::AbstractMultivector) =
+    Multivector(map(C -> contract_left(B, C), blades(M)))
 
 # M::AbstractMultivector, B::AbstractScalar
 # B::AbstractScalar, M::AbstractMultivector
-contractl(M::AbstractMultivector, B::AbstractScalar) =
+contract_left(M::AbstractMultivector, B::AbstractScalar) =
     length(M[0]) > 0 ?
         Scalar(value(M[0][1]) * B) :
         zero(Scalar{typeof(norm(M))})
 
-contractl(B::AbstractScalar, M::AbstractMultivector) = B * M
+contract_left(B::AbstractScalar, M::AbstractMultivector) = B * M
 
 # M::AbstractMultivector, B::Zero
 # B::Zero, M::AbstractMultivector
-contractl(B::Zero, M::AbstractMultivector) = zero(M)
-contractl(M::AbstractMultivector, B::Zero) = zero(M)
+contract_left(B::Zero, M::AbstractMultivector) = zero(M)
+contract_left(M::AbstractMultivector, B::Zero) = zero(M)
 
 # M::AbstractMultivector, x::Real
 # x::Real, M::AbstractMultivector
-contractl(M::AbstractMultivector, x::Real) =
+contract_left(M::AbstractMultivector, x::Real) =
     length(M[0]) > 0 ?
         Scalar(value(M[0][1]) * x) :
         zero(Scalar{typeof(norm(M))})
 
-contractl(x::Real, M::AbstractMultivector) = x * M
+contract_left(x::Real, M::AbstractMultivector) = x * M
 
 # ------ Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
-contractl(B::AbstractBlade, C::AbstractScalar) = zero(B)
+contract_left(B::AbstractBlade, C::AbstractScalar) = zero(B)
 
-contractl(B::AbstractScalar, C::AbstractBlade) =
+contract_left(B::AbstractScalar, C::AbstractBlade) =
     Blade(C, volume=value(B) * volume(C))
 
 # B::AbstractBlade, C::Zero
 # B::Zero, C::AbstractBlade
-contractl(B::AbstractBlade, C::Zero) = zero(B)
-contractl(B::Zero, C::Blade) = zero(B)
+contract_left(B::AbstractBlade, C::Zero) = zero(B)
+contract_left(B::Zero, C::Blade) = zero(B)
 
 
 # ------ Specializations involving a Blade instance
 
 # B::Blade, C::Blade
-function contractl(B::Blade, C::Blade)
+function contract_left(B::Blade, C::Blade)
     # --- Check arguments
 
     assert_dim_equal(B, C)
@@ -119,26 +119,26 @@ end
 
 # B::Blade, C::Pseudoscalar
 # B::Pseudoscalar, C::Blade
-function contractl(B::Blade, C::Pseudoscalar)
+function contract_left(B::Blade, C::Pseudoscalar)
     assert_dim_equal(B, C)
     mod(grade(C), 4) < 2 ?
         dual(B, C) * volume(C) :
        -dual(B, C) * volume(C)
 end
 
-function contractl(B::Pseudoscalar, C::Blade)
+function contract_left(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
     zero(B)
 end
 
 # B::Blade, v::Vector
 # v::Vector, B::Blade
-function contractl(B::Blade, v::Vector{<:Real})
+function contract_left(B::Blade, v::Vector{<:Real})
     assert_dim_equal(v, B)
     grade(B) > 1 ? zero(B) : Scalar(volume(B) * basis(B) ⋅ v)
 end
 
-function contractl(v::Vector{<:Real}, B::Blade)
+function contract_left(v::Vector{<:Real}, B::Blade)
     # --- Check arguments
 
     assert_dim_equal(v, B)
@@ -164,13 +164,13 @@ end
 
 # B::Blade, x::Real
 # x::Real, B::Blade
-contractl(B::Blade, x::Real) = zero(B)
-contractl(x::Real, B::Blade) = x * B
+contract_left(B::Blade, x::Real) = zero(B)
+contract_left(x::Real, B::Blade) = x * B
 
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
-function contractl(B::Pseudoscalar, C::Pseudoscalar)
+function contract_left(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
     mod(grade(B), 4) < 2 ?
         Scalar(value(B) * value(C)) :
@@ -179,23 +179,23 @@ end
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, B::Pseudoscalar
-contractl(B::Pseudoscalar, C::AbstractScalar) = zero(B)
-contractl(B::AbstractScalar, C::Pseudoscalar) =
+contract_left(B::Pseudoscalar, C::AbstractScalar) = zero(B)
+contract_left(B::AbstractScalar, C::Pseudoscalar) =
     Pseudoscalar(C, value=value(B) * value(C))
 
 # B::Pseudoscalar, C::Zero
 # B::Zero, C::Pseudoscalar
-contractl(B::Pseudoscalar, C::Zero) = zero(B)
-contractl(B::Zero, C::Pseudoscalar) = zero(B)
+contract_left(B::Pseudoscalar, C::Zero) = zero(B)
+contract_left(B::Zero, C::Pseudoscalar) = zero(B)
 
 # B::Pseudoscalar, v::Vector
 # v::Vector, B::Pseudoscalar
-function contractl(B::Pseudoscalar, v::Vector{<:Real})
+function contract_left(B::Pseudoscalar, v::Vector{<:Real})
     assert_dim_equal(B, v)
     zero(B)
 end
 
-function contractl(v::Vector{<:Real}, B::Pseudoscalar)
+function contract_left(v::Vector{<:Real}, B::Pseudoscalar)
     assert_dim_equal(B, v)
 
     mod(grade(B), 4) < 2 ?
@@ -207,40 +207,40 @@ end
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
-contractl(B::AbstractScalar, C::One) = B
-contractl(B::One, C::AbstractScalar) = C
+contract_left(B::AbstractScalar, C::One) = B
+contract_left(B::One, C::AbstractScalar) = C
 
 # B::AbstractScalar, C::Zero
 # B::Zero, C::AbstractScalar
-contractl(B::AbstractScalar, C::Zero) = C
-contractl(B::Zero, C::AbstractScalar) = B
+contract_left(B::AbstractScalar, C::Zero) = C
+contract_left(B::Zero, C::AbstractScalar) = B
 
 # B::AbstractScalar, x::Real
 # x::Real, B::AbstractScalar
-contractl(B::AbstractScalar, x::Real) = B * x
-contractl(x::Real, B::AbstractScalar) = x * B
+contract_left(B::AbstractScalar, x::Real) = B * x
+contract_left(x::Real, B::AbstractScalar) = x * B
 
 # B::AbstractScalar, v::Vector
 # v::Vector, B::AbstractScalar
-contractl(B::AbstractScalar, v::Vector{<:Real}) = Blade(value(B) * v)
-contractl(v::Vector{<:Real}, B::AbstractScalar) = zero(B)
+contract_left(B::AbstractScalar, v::Vector{<:Real}) = Blade(value(B) * v)
+contract_left(v::Vector{<:Real}, B::AbstractScalar) = zero(B)
 
 # ------ Specializations involving a Scalar instance
 
 # B::Scalar, C::Scalar
-contractl(B::Scalar, C::Scalar) = B * C
+contract_left(B::Scalar, C::Scalar) = B * C
 
 # ------ Specializations involving a One instance
 
 # B::One, C::One
-contractl(B::One, C::One) = B
+contract_left(B::One, C::One) = B
 
 # B::One, C::Zero
 # B::Zero, C::One
-contractl(B::One, C::Zero) = C
-contractl(B::Zero, C::One) = B
+contract_left(B::One, C::Zero) = C
+contract_left(B::Zero, C::One) = B
 
 # ------ Specializations involving a Zero instance
 
 # B::Zero, C::Zero
-contractl(B::Zero, C::Zero) = B
+contract_left(B::Zero, C::Zero) = B
