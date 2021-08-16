@@ -189,7 +189,7 @@ end
     for precision_type_converted in subtypes(AbstractFloat)
         for precision_type_src in subtypes(AbstractFloat)
             B = Zero{precision_type_src}()
-            B_converted = convert(AbstractScalar{precision_type_converted}, B)
+            B_converted = convert(precision_type_converted, B)
             @test B_converted isa Zero{precision_type_converted}
         end
     end
