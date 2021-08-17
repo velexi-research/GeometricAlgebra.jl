@@ -312,7 +312,7 @@ end
 
         # return_blade == true
         B_proj_C = project(B, C)
-        @test B_proj_C == B
+        @test B_proj_C === B
 
         # return_blade == false
         B_proj_C = project(B, C, return_blade=false)
@@ -492,8 +492,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test B_proj_C isa AbstractScalar
-    @test B_proj_C == test_value_1
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -623,7 +622,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test isone(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -637,7 +636,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test isone(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -741,7 +740,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test iszero(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -755,7 +754,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test iszero(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -769,7 +768,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test iszero(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)

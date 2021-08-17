@@ -387,9 +387,9 @@ end
     C = Scalar(test_value_2)
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C isa Scalar
     @test B_wedge_C == test_value_1 * test_value_2
-    @test B ∧ C == B_wedge_C
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::One)" begin
@@ -399,9 +399,8 @@ end
     C = One()
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C isa AbstractScalar
-    @test B_wedge_C == test_value
-    @test B ∧ C == B_wedge_C
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::Zero)" begin
@@ -473,30 +472,33 @@ end
 end
 =#
 
-@testset "wedge(B::One::, C::Scalar)" begin
+@testset "wedge(B::One, C::Scalar)" begin
     B = One()
 
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == test_value
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == test_value
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === C
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::One, C::One)" begin
     B = One()
     C = One()
-    @test isone(wedge(B, C))
-    @test isone(B ∧ C)
+    
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === C
+    @test (B ∧ C) == B_wedge_C
 end
 
 #=
@@ -557,22 +559,27 @@ end
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Zero, C::One)" begin
     B = Zero()
     C = One()
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 #=

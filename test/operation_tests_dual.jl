@@ -221,18 +221,36 @@ end
 @testset "dual(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
-    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
     test_value_2 = get_random_value(1)  # add 2 to keep value away from 0
 
     # --- Tests
 
-    # dim(B) == dim(C)
+    # dim(B) == dim(C), test_value_1 != 1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
     for test_dim in 10:13
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
         B_dual_C = dual(B, C)
-        @test B_dual_C isa AbstractScalar
+        @test B_dual_C isa Scalar
         @test B_dual_C == test_value_1
+
+        # Check dual(dual(B, C), C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+        if mod(grade(C), 4) < 2
+            @test dual(B_dual_C, C) == B
+        else
+            @test dual(B_dual_C, C) == -B
+        end
+    end
+
+    # dim(B) == dim(C), test_value_1 == 1
+    test_value_1 = 1
+
+    for test_dim in 10:13
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = Pseudoscalar(test_dim, test_value_2)
+        B_dual_C = dual(B, C)
+        @test B_dual_C isa One
 
         # Check dual(dual(B, C), C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
         if mod(grade(C), 4) < 2
@@ -330,36 +348,18 @@ end
 =#
 
 @testset "dual(B::Scalar, C::Scalar)" begin
-    # --- Preparations
-
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
 
-    # --- Tests
-
-    # B != 0, C != 0
     B = Scalar(test_value_1)
     C = Scalar(test_value_2)
 
     B_dual_C = dual(B, C)
-    @test B_dual_C isa AbstractScalar
+    @test B_dual_C isa Scalar
     @test B_dual_C == test_value_1
-
-    # B == 0
-    B = Scalar(0)
-    C = Scalar(test_value_2)
-    expected_error = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_error) dual(B, C)
-
-    # C == 0
-    B = Scalar(test_value_1)
-    C = Scalar(0)
-    expected_error = "The dual of anything relative to Zero is not well-defined"
-    @test_throws ErrorException(expected_error) dual(B, C)
 end
 
 @testset "dual(B::Scalar, C::One)" begin
-    # B != 0
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
@@ -367,12 +367,6 @@ end
 
     B_dual_C = dual(B, C)
     @test B_dual_C === B
-
-    # B == 0
-    B = Scalar(0)
-    C = One()
-    expected_error = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_error) dual(B, C)
 end
 #=
 
@@ -418,7 +412,6 @@ end
 =#
 
 @testset "dual(B::One, C::Scalar)" begin
-    # B != 0
     B = One()
 
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
@@ -426,12 +419,6 @@ end
 
     B_dual_C = dual(B, C)
     @test B_dual_C === B
-
-    # B == 0
-    B = One()
-    C = Scalar(0)
-    expected_error = "The dual of anything relative to Zero is not well-defined"
-    @test_throws ErrorException(expected_error) dual(B, C)
 end
 
 @testset "dual(B::One, C::One)" begin
