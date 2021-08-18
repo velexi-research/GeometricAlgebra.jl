@@ -384,28 +384,6 @@ end
     test_value = get_random_value()
     float64_or_bigfloat = (Float64, BigFloat)
 
-    # B::Scalar, C::Scalar
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            # ==(B, C)
-            B = Scalar(precision_type1(test_value))
-            C = Scalar(precision_type2(test_value))
-            if precision_type1 == precision_type2
-                @test B == C
-            elseif precision_type1 in float64_or_bigfloat &&
-                   precision_type2 in float64_or_bigfloat
-                @test B == C
-            else
-                @test B != C
-            end
-
-            # value(B) != value(C)
-            B = Scalar(precision_type1(test_value))
-            C = Scalar(precision_type2(2 * test_value))
-            @test B != C
-        end
-    end
-
     # B::Scalar, C::Real
     # B::Real, C::Scalar
     for precision_type in subtypes(AbstractFloat)
@@ -478,15 +456,6 @@ end
     # Preparations
 
     test_value = get_random_value()
-
-    # B::Scalar, C::Scalar
-    for precision_type1 in subtypes(AbstractFloat)
-        for precision_type2 in subtypes(AbstractFloat)
-            B = Scalar(precision_type1(test_value))
-            C = Scalar(precision_type2(test_value))
-            @test B ≈ C
-        end
-    end
 
     # B::Scalar, C::Real
     # B::Real, C::Scalar

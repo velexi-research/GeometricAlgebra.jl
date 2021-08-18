@@ -222,24 +222,6 @@ end
     end
 end
 
-@testset "!=(B::Scalar, C::One)" begin
-    test_value = 5
-    for precision_type in subtypes(AbstractFloat)
-        B = Scalar{precision_type}(test_value)
-        C = One{precision_type}()
-        @test B != C
-    end
-end
-
-@testset "!=(B::Scalar, C::Zero)" begin
-    test_value = 5
-    for precision_type in subtypes(AbstractFloat)
-        B = Scalar{precision_type}(test_value)
-        C = Zero{precision_type}()
-        @test B != C
-    end
-end
-
 @testset "!=(B::Scalar, C::Real)" begin
     test_value = 5
     for precision_type in subtypes(AbstractFloat)
@@ -284,23 +266,6 @@ end
     end
 end
 
-@testset "!=(B::One, C::Scalar)" begin
-    test_value = 5
-    for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        C = Scalar{precision_type}(test_value)
-        @test B != C
-    end
-end
-
-@testset "!=(B::One, C::Zero)" begin
-    for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        C = Zero{precision_type}()
-        @test B != C
-    end
-end
-
 @testset "!=(B::One, C::Real)" begin
     test_value = 5
     for precision_type in subtypes(AbstractFloat)
@@ -340,23 +305,6 @@ end
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
         C = Pseudoscalar{precision_type}(test_dim, test_value)
-        @test B != C
-    end
-end
-
-@testset "!=(B::Zero, C::Scalar)" begin
-    test_value = 5
-    for precision_type in subtypes(AbstractFloat)
-        B = Zero{precision_type}()
-        C = Scalar{precision_type}(test_value)
-        @test B != C
-    end
-end
-
-@testset "!=(B::Zero, C::One)" begin
-    for precision_type in subtypes(AbstractFloat)
-        B = Zero{precision_type}()
-        C = One{precision_type}()
         @test B != C
     end
 end

@@ -19,6 +19,11 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 #=
 # --- Tests
 
@@ -376,15 +381,13 @@ end
     @test_throws DimensionMismatch contractl(B, C)
     @test_throws DimensionMismatch (B < C)
 end
+=#
 
 @testset "contractl(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
 
     # --- Tests
 
@@ -399,7 +402,7 @@ end
             test_value_1 * test_value_2 :
            -test_value_1 * test_value_2
 
-        @test B_contractl_C isa AbstractScalar
+        @test B_contractl_C isa Scalar
         @test B_contractl_C == expected_result
         @test (B < C) == B_contractl_C
     end
@@ -412,6 +415,7 @@ end
     @test_throws DimensionMismatch B < C
 end
 
+#=
 @testset "contractl(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 11
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -543,46 +547,44 @@ end
     @test B_contractl_C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
     @test (B < C) == B_contractl_C
 end
+=#
 
 @testset "contractl(B::Scalar, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     B_contractl_C = contractl(B, C)
-    @test B_contractl_C isa AbstractScalar
+    @test B_contractl_C isa Scalar
     @test B_contractl_C == test_value_1 * test_value_2
     @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::Scalar, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = One()
 
     B_contractl_C = contractl(B, C)
-    @test B_contractl_C isa AbstractScalar
-    @test B_contractl_C == B
+    @test B_contractl_C === B
     @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::Scalar, C::Zero)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = Zero()
 
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C === C
+    @test (B < C) == B_contractl_C
 end
 
+#=
 @testset "contractl(B::Scalar, C::Real)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -655,34 +657,38 @@ end
     @test B_contractl_C == Pseudoscalar(test_dim, test_value)
     @test (B < C) == B_contractl_C
 end
+=#
 
 @testset "contractl(B::One, C::Scalar)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     B_contractl_C = contractl(B, C)
-    @test B_contractl_C isa AbstractScalar
-    @test B_contractl_C == test_value
+    @test B_contractl_C === C
     @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::One, C::One)" begin
     B = One()
     C = One()
-    @test isone(contractl(B, C))
-    @test isone(B < C)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C === B
+    @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C === C
+    @test (B < C) == B_contractl_C
 end
 
+#=
 @testset "contractl(B::One, C::Real)" begin
     B = One()
 
@@ -747,32 +753,38 @@ end
     @test iszero(contractl(B, C))
     @test iszero(B < C)
 end
+=#
 
 @testset "contractl(B::Zero, C::Scalar)" begin
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C === B
+    @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::Zero, C::One)" begin
     B = Zero()
     C = One()
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C === B
+    @test (B < C) == B_contractl_C
 end
 
 @testset "contractl(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-    @test iszero(contractl(B, C))
-    @test iszero(B < C)
+
+    B_contractl_C = contractl(B, C)
+    @test B_contractl_C === B
+    @test (B < C) == B_contractl_C
 end
 
+#=
 @testset "contractl(B::Zero, C::Real)" begin
     B = Zero()
 
