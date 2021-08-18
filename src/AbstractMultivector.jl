@@ -108,7 +108,7 @@ Comparison Functions
 Utility Functions
 -----------------
 
-    convert(::Type{T}, M::AbstractMultivector) where {T<:AbstractFloat}}
+    convert(::Type{T}, M::AbstractMultivector) where {T<:AbstractFloat}
 
 Implementation
 ==============

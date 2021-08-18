@@ -118,7 +118,8 @@ Notes
 * The volume of `C` is ignored.
 """
 dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade =
-    nothing  # no-op method to attach docstring to
+    nothing  # no-op method to attach docstring to because an empty generic function for
+             # `dual` already exists in AbstractMultivector.jl
 
 """
     reciprocal(B::AbstractBlade)::AbstractBlade

@@ -85,7 +85,7 @@ Base.reverse(B::AbstractScalar) = B
 """
     dual(B::AbstractScalar, dim::Integer)::Pseudoscalar
 
-Compute the dual of `B`.
+Compute the dual of `B` relative to a real vector space having dimension `dim`.
 
 Notes
 =====
