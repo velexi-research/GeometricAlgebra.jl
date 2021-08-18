@@ -19,6 +19,11 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 #=
 # --- Tests
 
@@ -289,15 +294,13 @@ end
     @test_throws DimensionMismatch project(B, C)
     @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
+=#
 
 @testset "project(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
 
     # --- Tests
 
@@ -309,7 +312,7 @@ end
 
         # return_blade == true
         B_proj_C = project(B, C)
-        @test B_proj_C == B
+        @test B_proj_C === B
 
         # return_blade == false
         B_proj_C = project(B, C, return_blade=false)
@@ -325,6 +328,7 @@ end
     end
 end
 
+#=
 @testset "project(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 10
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -477,20 +481,18 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
+=#
 
 @testset "project(B::Scalar, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test B_proj_C isa AbstractScalar
-    @test B_proj_C == test_value_1
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -499,8 +501,7 @@ end
 end
 
 @testset "project(B::Scalar, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = One()
@@ -515,8 +516,7 @@ end
 end
 
 @testset "project(B::Scalar, C::Zero)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = Zero()
@@ -531,6 +531,7 @@ end
     @test B_proj_C == 0
 end
 
+#=
 @testset "project(B::Scalar, C::Real)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -611,17 +612,17 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
+=#
 
 @testset "project(B::One, C::Scalar)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test isone(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -635,7 +636,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test isone(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -657,6 +658,7 @@ end
     @test B_proj_C == 0
 end
 
+#=
 @testset "project(B::One, C::Real)" begin
     B = One()
 
@@ -728,17 +730,17 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
+=#
 
 @testset "project(B::Zero, C::Scalar)" begin
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test iszero(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -752,7 +754,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test iszero(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -766,7 +768,7 @@ end
 
     # return_blade == true
     B_proj_C = project(B, C)
-    @test iszero(B_proj_C)
+    @test B_proj_C === B
 
     # return_blade == false
     B_proj_C = project(B, C, return_blade=false)
@@ -774,6 +776,7 @@ end
     @test B_proj_C == 0
 end
 
+#=
 @testset "project(B::Zero, C::Real)" begin
     B = Zero()
 

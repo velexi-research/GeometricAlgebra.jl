@@ -19,6 +19,11 @@ using Test
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
+# --- File inclusions
+
+# Test utilities
+include("test_utils.jl")
+
 #=
 # --- Tests
 
@@ -224,17 +229,15 @@ end
     @test_throws DimensionMismatch wedge(B, C)
     @test_throws DimensionMismatch B ∧ C
 end
+=#
 
 @testset "wedge(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
 
     test_dim = 10
 
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
-
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_1 = get_random_value(1)  # add 1 to keep value away from 0
+    test_value_2 = get_random_value(1)  # add 1 to keep value away from 0
 
     # --- Tests
 
@@ -252,6 +255,7 @@ end
     @test_throws DimensionMismatch B ∧ C
 end
 
+#=
 @testset "wedge(B::Pseudoscalar, C::Scalar)" begin
     # --- Preparations
 
@@ -373,38 +377,34 @@ end
     @test B_wedge_C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
     @test B ∧ C == B_wedge_C
 end
+=#
 
 @testset "wedge(B::Scalar, C::Scalar)" begin
-    test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value_1)
 
-    test_value_2 = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_2)
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C isa AbstractScalar
+    @test B_wedge_C isa Scalar
     @test B_wedge_C == test_value_1 * test_value_2
-    @test B ∧ C == B_wedge_C
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::One)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = One()
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C isa AbstractScalar
-    @test B_wedge_C == test_value
-    @test B ∧ C == B_wedge_C
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Scalar, C::Zero)" begin
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = Scalar(test_value)
 
     C = Zero()
@@ -413,6 +413,7 @@ end
     @test iszero(B ∧ C)
 end
 
+#=
 @testset "wedge(B::Scalar, C::Real)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -469,34 +470,38 @@ end
     @test B_wedge_C === C
     @test B ∧ C == B_wedge_C
 end
+=#
 
-@testset "wedge(B::One::, C::Scalar)" begin
+@testset "wedge(B::One, C::Scalar)" begin
     B = One()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test wedge(B, C) isa AbstractScalar
-    @test wedge(B, C) == test_value
-    @test B ∧ C isa AbstractScalar
-    @test B ∧ C == test_value
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === C
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::One, C::One)" begin
     B = One()
     C = One()
-    @test isone(wedge(B, C))
-    @test isone(B ∧ C)
+    
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::One, C::Zero)" begin
     B = One()
     C = Zero()
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === C
+    @test (B ∧ C) == B_wedge_C
 end
 
+#=
 @testset "wedge(B::One, C::Real)" begin
     B = One()
 
@@ -546,32 +551,38 @@ end
     @test iszero(wedge(B, C))
     @test iszero(B ∧ C)
 end
+=#
 
 @testset "wedge(B::Zero, C::Scalar)" begin
     B = Zero()
 
-    test_value = rand() + 2  # add 2 to keep value away from 0 and 1
-    test_value = rand() > 0.5 ? test_value : -test_value
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Zero, C::One)" begin
     B = Zero()
     C = One()
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
 @testset "wedge(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-    @test iszero(wedge(B, C))
-    @test iszero(B ∧ C)
+
+    B_wedge_C = wedge(B, C)
+    @test B_wedge_C === B
+    @test (B ∧ C) == B_wedge_C
 end
 
+#=
 @testset "wedge(B::Zero, C::Real)" begin
     B = Zero()
 
