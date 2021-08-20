@@ -516,7 +516,7 @@ end
         B = Scalar{precision_type}(test_value)
 
         for test_dim in 5:8
-            dual_B = dual(B, dim=test_dim)
+            dual_B = dual(B, test_dim)
 
             expected_result = mod(test_dim, 4) < 2 ?
                 Pseudoscalar{precision_type}(test_dim,
@@ -543,7 +543,7 @@ end
         for precision_type_src in subtypes(AbstractFloat)
             converted_test_value = precision_type_src(test_value)
             S = Scalar{precision_type_src}(converted_test_value)
-            S_converted = convert(AbstractScalar{precision_type_converted}, S)
+            S_converted = convert(precision_type_converted, S)
             @test S_converted isa Scalar{precision_type_converted}
             if precision_type_src == precision_type_converted
                 @test S_converted === S

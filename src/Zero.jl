@@ -19,7 +19,8 @@ export Zero
 """
     struct Zero{T<:AbstractFloat} <: AbstractScalar{T}
 
-Additive identity.
+Additive identity for a geometric algebra (extended from a real vector space of
+arbitrary dimension).
 """
 struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
 
@@ -32,11 +33,6 @@ Zero() = Zero{Float64}()
 
 # --- Method definitions for AbstractScalar interface functions
 
-"""
-    value(B::Zero)
-
-Return 0 (with the same precision of `B`).
-"""
 value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
 
 # --- Method definitions for AbstractMultivector interface functions

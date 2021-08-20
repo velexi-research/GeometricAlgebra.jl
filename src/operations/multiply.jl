@@ -15,15 +15,6 @@ import Base.:(*)
 
 # --- Method definitions
 
-# ------ Docstring methods (no-op)
-
-"""
-    M * N
-
-Compute the geometric product of multivectors `M` and `N`.
-"""
-*(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO
-
 # ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::AbstractBlade
@@ -138,7 +129,7 @@ end
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
-*(B::Pseudoscalar, C::Pseudoscalar) = contractl(B, C)
+*(B::Pseudoscalar, C::Pseudoscalar) = contract_left(B, C)
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, C::Pseudoscalar

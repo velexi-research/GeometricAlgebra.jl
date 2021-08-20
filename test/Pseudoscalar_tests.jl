@@ -438,9 +438,9 @@ end
 
             # Check dual(dual_B) = (-1)^(dim_B * (dim_B - 1) / 2) B
             if mod(dim(B), 4) < 2
-                @test dual(dual_B, dim=dim(B)) == B
+                @test dual(dual_B, dim(B)) == B
             else
-                @test dual(dual_B, dim=dim(B)) == -B
+                @test dual(dual_B, dim(B)) == -B
             end
         end
     end
@@ -460,7 +460,7 @@ end
             B = Pseudoscalar{precision_type_src}(test_dim, converted_test_value)
 
             # Exercise functionality and check results
-            B_converted = convert(Pseudoscalar{precision_type_converted}, B)
+            B_converted = convert(precision_type_converted, B)
 
             @test B_converted isa Pseudoscalar{precision_type_converted}
 

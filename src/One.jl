@@ -19,7 +19,8 @@ export One
 """
     struct One{T<:AbstractFloat} <: AbstractScalar{T}
 
-Multiplicative identity.
+Multiplicative identity for a geometric algebra (extended from a real vector
+space of arbitrary dimension).
 """
 struct One{T<:AbstractFloat} <: AbstractScalar{T} end
 
@@ -32,11 +33,6 @@ One() = One{Float64}()
 
 # --- Method definitions for AbstractScalar interface functions
 
-"""
-    value(B::One)
-
-Return 1 (with the same precision of `B`).
-"""
 value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 # --- Method definitions for AbstractBlade interface functions

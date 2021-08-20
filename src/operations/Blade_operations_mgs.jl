@@ -28,12 +28,12 @@ export dual_mgs
 using LinearAlgebra: norm
 
 """
-    wedge_mgs(B::Blade, C::Blade)
+    wedge_mgs(B::Blade, C::Blade)::AbstractBlade
 
 Return the outer product of `B` and `C`.
 
-Notes
------
+Implementation
+==============
 * The extension of the basis of `B` to a basis for span(B, C) is computed
   using modified Gram-Schmidt orthogonalization.
 """
@@ -74,12 +74,16 @@ end
 Return the dual `B` relative to `C`.
 
 Notes
------
+=====
+
 * `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
   vector spaces of the same dimension and (2) the subspace represented by `B`
   is contained in subspace represented by `C`.
 
 * The volume of `C` is ignored.
+
+Implementation
+==============
 
 * The extension of `basis(B)` to `basis(C)` is computed using modified
   Gram-Schmidt orthogonalization.

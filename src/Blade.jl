@@ -33,7 +33,7 @@ equal to `abs(volume)` and the orientation of a Blade relative to its `basis`
 is equal to `sign(volume)`.
 
 Notes
------
+=====
 * The grade of a Blade type is greater than 0 and less than the dimension of
   the space that the blade is embedded in
 """
@@ -70,8 +70,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
     otherwise, the basis of the new Blade is a reference to `basis`.
 
-    Note: this inner constructor intended primarily for internal use by
-    other inner constructors to enforce constraints.
+    Note: this inner constructor intended primarily for use by outer
+    constructors to enforce constraints.
     """
     function Blade{T}(dim::Int,
                       grade::Int,
@@ -167,9 +167,10 @@ is specified, `vectors` is only used to define the subspace (including
 orientation) represented by the blade.
 
 Notes
------
+=====
 
-### Orientation
+Orientation
+-----------
 
 * _`vectors` contains more than one vector_. When `volume` is positive, the
   orientation of the blade is the same as the orientation of the outer product
@@ -182,7 +183,8 @@ Notes
   is negative, the orientation of the blade is the opposite of the direction
   of `v`.
 
-### Precision
+Precision
+---------
 
 When the precision is not specified, the following rules are applied to set
 the precision of the Blade.
@@ -305,7 +307,7 @@ Blade(vectors::Array{<:Integer};
           atol::Real=blade_atol(T),
           copy_basis=false) where {T<: AbstractFloat}
 
-Copy constructor. Construct a Blade representing the same space as `B` having
+Copy constructors. Construct a Blade representing the same space as `B` having
 a specified oriented volume relative to `B`. A Scalar representing zero is
 returned if the absolute value of `volume` is less than `atol`.
 
@@ -338,11 +340,6 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 
 # --- Method definitions for AbstractMultivector interface functions
 
-"""
-    dim(B::AbstractBlade)::Integer
-
-Return dimension of space that `B` is embedded in.
-"""
 dim(B::Blade) = B.dim
 
 -(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
@@ -385,27 +382,10 @@ end
 
 # --- Method definitions for AbstractBlade interface functions
 
-"""
-    grade(B::AbstractBlade)::Integer
-
-Return the grade of the dimension of the space spanned by `B`.
-"""
 grade(B::Blade) = B.grade
 
-"""
-    basis(B::AbstractBlade)
-
-When `B` is a Blade, return an orthonormal basis for the space spanned by the
-blade.
-"""
 basis(B::Blade) = B.basis
 
-"""
-    volume(B::AbstractBlade)::Real
-
-Return the volume of `B`. For Blades, `volume(B)` is the signed norm of the
-blade relative to its unit basis.
-"""
 volume(B::Blade) = B.volume
 
 reciprocal(B::Blade) =
@@ -442,13 +422,7 @@ end
 
 # --- Utility methods
 
-"""
-    convert(::Type{S}, B::Blade) where {T<:AbstractFloat, S<:Blade{T}}
-
-Convert Blade to have the floating-point precision of type `T`.
-"""
-convert(::Type{S}, B::Blade) where {T<:AbstractFloat,
-                                    S<:AbstractMultivector{T}} =
+convert(::Type{T}, B::Blade) where {T<:AbstractFloat} =
     T == typeof(volume(B)) ? B : Blade{T}(B)
 
 #=
