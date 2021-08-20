@@ -111,16 +111,23 @@ end
 @testset "Zero: iszero(B)" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
-        B = Zero{precision_type}()
-        @test iszero(B)
+        # Pseudoscalar
+        B = Pseudoscalar{precision_type}(10, 3)
+        @test !iszero(B)
 
+        # Scalar
         B = Scalar{precision_type}(0)
         @test iszero(B)
 
-        B = One{precision_type}()
+        B = Scalar{precision_type}(3)
         @test !iszero(B)
 
-        B = Scalar{precision_type}(3)
+        # Zero
+        B = Zero{precision_type}()
+        @test iszero(B)
+
+        # One
+        B = One{precision_type}()
         @test !iszero(B)
     end
 end

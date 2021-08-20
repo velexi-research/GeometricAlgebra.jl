@@ -111,17 +111,24 @@ end
 @testset "One: isone(B)" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
-        B = One{precision_type}()
-        @test isone(B)
+        # Pseudoscalar
+        B = Pseudoscalar{precision_type}(10, 3)
+        @test !isone(B)
 
+        # Scalar
         B = Scalar{precision_type}(1)
         @test isone(B)
 
+        B = Scalar{precision_type}(3)
+        @test !isone(B)
+
+        # Zero
         B = Zero{precision_type}()
         @test !isone(B)
 
-        B = Scalar{precision_type}(3)
-        @test !isone(B)
+        # One
+        B = One{precision_type}()
+        @test isone(B)
     end
 end
 
