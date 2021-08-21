@@ -391,7 +391,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -424,7 +424,7 @@ end
 
 @testset "Pseudoscalar: dual(B)" begin
     # Preparations
-    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
@@ -450,7 +450,7 @@ end
     # Preparations
     test_dim = 10
 
-    test_value = get_random_value()
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     # Tests
     for precision_type_converted in subtypes(AbstractFloat)
@@ -478,7 +478,7 @@ end
 
 @testset "Pseudoscalar: reciprocal(B)" begin
     # Preparations
-    test_value = get_random_value(2)  # add 2 to avoid 0 and 1
+    test_value = get_random_value(1)  # add 1 to avoid 0
 
     # Tests
     for precision_type in subtypes(AbstractFloat)
