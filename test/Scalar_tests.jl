@@ -583,10 +583,10 @@ end
 
         # value = Inf
         B = Scalar(precision_type(Inf))
-        @test reciprocal(B) isa Zero{precision_type}()
+        @test reciprocal(B) isa Zero{precision_type}
 
         # value = -Inf
         B = Scalar(precision_type(-Inf))
-        @test reciprocal(B) isa Zero{precision_type}()
+        @test reciprocal(B) isa Zero{precision_type}
     end
 end
