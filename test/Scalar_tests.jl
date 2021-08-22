@@ -487,7 +487,7 @@ end
 @testset "Scalar: reverse(B)" begin
     # --- Preparations
 
-    test_value = get_random_value(1) # add 1 to avoid 0
+    test_value = get_random_value(2) # add 2 to avoid 0 and 1
 
     # --- Exercise functionality and check results
 
@@ -583,10 +583,10 @@ end
 
         # value = Inf
         B = Scalar(precision_type(Inf))
-        @test iszero(reciprocal(B))
+        @test reciprocal(B) isa Zero{precision_type}()
 
         # value = -Inf
         B = Scalar(precision_type(-Inf))
-        @test iszero(reciprocal(B))
+        @test reciprocal(B) isa Zero{precision_type}()
     end
 end

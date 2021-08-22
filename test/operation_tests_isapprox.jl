@@ -71,18 +71,31 @@ end
     # B::Scalar, C::Scalar
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
+            # B ≈ C
             B = Scalar(precision_type1(test_value))
             C = Scalar(precision_type2(test_value))
             @test B ≈ C
+
+            # B ≉ C
+            B = Scalar(precision_type1(test_value))
+            C = Scalar(precision_type2(test_value + 1))
+            @test B ≉ C
         end
     end
 end
 
 @testset "isapprox(B::Scalar, C::One)" begin
-    test_value = 5
+    test_value_2 = 5
     for precision_type in subtypes(AbstractFloat)
-        B = Scalar{precision_type}(test_value)
+        test_value_1 = 1 - (√eps(precision_type)) / 2
         C = One{precision_type}()
+
+        # B ≈ C
+        B = Scalar{precision_type}(test_value_1)
+        @test B ≈ C
+
+        # B ≉ C
+        B = Scalar{precision_type}(test_value_2)
         @test B ≉ C
     end
 end
@@ -93,16 +106,26 @@ end
         B = Scalar{precision_type}(test_value)
         C = Zero{precision_type}()
         @test B ≉ C
+
+        # B ≈ C is not being tested as isapprox between a Scalar and a
+        # Zero can never return true with the default atol and rtol value
     end
 end
 
 # ------ B::One
 
 @testset "isapprox(B::One, C::Scalar)" begin
-    test_value = 5
+    test_value_2 = 5
     for precision_type in subtypes(AbstractFloat)
+        test_value_1 = 1 - (√eps(precision_type)) / 2
         B = One{precision_type}()
-        C = Scalar{precision_type}(test_value)
+
+        # B ≈ C
+        C = Scalar{precision_type}(test_value_1)
+        @test B ≈ C
+
+        # B ≉ C
+        C = Scalar{precision_type}(test_value_2)
         @test B ≉ C
     end
 end
@@ -133,6 +156,9 @@ end
         B = Zero{precision_type}()
         C = Scalar{precision_type}(test_value)
         @test B ≉ C
+        
+        # B ≈ C is not being tested as isapprox between a Zero and a
+        # Scalar can never return true with the default atol and rtol value
     end
 end
 

@@ -187,9 +187,14 @@ end
 end
 
 @testset "Zero: dual(B)" begin
-    B = Zero()
-    expected_message = "The dual of Zero is not well-defined"
-    @test_throws ErrorException(expected_message) dual(B)
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        expected_message = "The dual of Zero is not well-defined"
+
+        tests_dim = 5
+        @test_throws ErrorException(expected_message) dual(B, test_dim)
+        @test_throws ErrorException(expected_message) dual(B)
+    end
 end
 
 @testset "Zero: convert(B)" begin
