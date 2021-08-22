@@ -39,7 +39,8 @@ value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
 
 -(B::Zero) = B
 
-dual(B::Zero; dim::Union{Integer, Nothing}=nothing) = dual_of_zero()
+dual(B::Zero, dim::Integer) = dual_of_zero()
+dual(B::Zero) = dual_of_zero()
 
 # --- Comparison methods
 
