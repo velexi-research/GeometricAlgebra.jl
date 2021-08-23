@@ -85,17 +85,17 @@ end
 end
 
 @testset "isapprox(B::Scalar, C::One)" begin
-    test_value_2 = 5
     for precision_type in subtypes(AbstractFloat)
-        test_value_1 = 1 - (√eps(precision_type)) / 2
         C = One{precision_type}()
 
         # B ≈ C
-        B = Scalar{precision_type}(test_value_1)
+        test_value = 1 - (√eps(precision_type)) / 2
+        B = Scalar{precision_type}(test_value)
         @test B ≈ C
 
         # B ≉ C
-        B = Scalar{precision_type}(test_value_2)
+        test_value = 5
+        B = Scalar{precision_type}(test_value)
         @test B ≉ C
     end
 end
@@ -115,17 +115,17 @@ end
 # ------ B::One
 
 @testset "isapprox(B::One, C::Scalar)" begin
-    test_value_2 = 5
     for precision_type in subtypes(AbstractFloat)
-        test_value_1 = 1 - (√eps(precision_type)) / 2
         B = One{precision_type}()
 
         # B ≈ C
-        C = Scalar{precision_type}(test_value_1)
+        test_value = 1 - (√eps(precision_type)) / 2
+        C = Scalar{precision_type}(test_value)
         @test B ≈ C
 
         # B ≉ C
-        C = Scalar{precision_type}(test_value_2)
+        test_value = 5
+        C = Scalar{precision_type}(test_value)
         @test B ≉ C
     end
 end
