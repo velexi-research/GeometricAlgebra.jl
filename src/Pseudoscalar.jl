@@ -117,6 +117,11 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 ==(B::Pseudoscalar, C::Pseudoscalar) =
     (dim(B) == dim(C)) && (value(B) == value(C))
 
+==(B::Pseudoscalar, C::Vector) = 
+    (dim(B) == 1) && (length(C) == 1) && (value(B) == C[1])
+
+==(B::Vector, C::Pseudoscalar) = (C == B)
+
 isapprox(B::Pseudoscalar{T1}, C::Pseudoscalar{T2};
   atol::Real=0,
   rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
