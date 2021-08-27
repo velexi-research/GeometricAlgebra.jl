@@ -1,5 +1,5 @@
 """
-Unit tests for isapprox(x, y) and !isapprox(x, y)
+Unit tests for isapprox(x, y) and isapprox(x, y)
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -61,7 +61,85 @@ include("test_utils.jl")
     end
 end
 
+@testset "isapprox(B::Pseudoscalar, C::Scalar)" begin
+    test_dim = 10
+    test_value = 5
+
+    for precision_type in subtypes(AbstractFloat)
+        B = Pseudoscalar{precision_type}(test_dim, test_value)
+        C = Scalar{precision_type}(test_value)
+        @test B ≉ C
+    end
+end
+
+@testset "isapprox(B::Pseudoscalar, C::One)" begin
+    test_dim = 10
+    test_value = 5
+
+    for precision_type in subtypes(AbstractFloat)
+        B = Pseudoscalar{precision_type}(test_dim, test_value)
+        C = One{precision_type}()
+        @test B ≉ C
+    end
+end
+
+@testset "isapprox(B::Pseudoscalar, C::Zero)" begin
+    test_dim = 10
+    test_value = 5
+
+    for precision_type in subtypes(AbstractFloat)
+        B = Pseudoscalar{precision_type}(test_dim, test_value)
+        C = Zero{precision_type}()
+        @test B ≉ C
+    end
+end
+
+@testset "isapprox(B::Pseudoscalar, C::Real)" begin
+    test_dim = 10
+    test_value = 5
+
+    for precision_type in subtypes(AbstractFloat)
+        B = Pseudoscalar{precision_type}(test_dim, test_value)
+        C = precision_type(test_value)
+        @test B ≉ C
+    end
+end
+
+@testset "isapprox(B::Pseudoscalar, C::Vector)" begin
+    test_value = 5
+
+    test_dim_1 = 3
+    test_vector_1 = [3; 4; 1]
+
+    test_dim_2 = 1
+    test_vector_2 = [test_value]
+
+    for precision_type1 in subtypes(AbstractFloat)
+        # B ≉ C
+        B = Pseudoscalar{precision_type1}(test_dim_1, test_value)
+        C = Vector{precision_type1}(test_vector_1)
+        @test B ≉ C
+
+        # B ≈ C
+        B = Pseudoscalar{precision_type1}(test_dim_2, test_value)
+        for precision_type2 in subtypes(AbstractFloat)
+            C = Vector{precision_type2}(test_vector_2)
+            @test B ≈ C
+        end
+    end
+end
+
 # ------ B::Scalar
+
+@testset "isapprox(B::Scalar, C::Pseudoscalar)" begin
+    test_value = 5
+    test_dim = 10
+    for precision_type in subtypes(AbstractFloat)
+        B = Scalar{precision_type}(test_value)
+        C = Pseudoscalar{precision_type}(test_dim, test_value)
+        @test B ≉ C
+    end
+end
 
 @testset "isapprox(B::Scalar, C::Scalar)" begin
     # Preparations
@@ -112,7 +190,44 @@ end
     end
 end
 
+@testset "isapprox(B::Scalar, C::Real)" begin
+    test_value = 5
+    for precision_type1 in subtypes(AbstractFloat)
+        B = Scalar{precision_type1}(test_value)
+
+        # B ≉ C
+        C = precision_type1(test_value + 1)
+        @test B ≉ C
+
+        # B ≈ C
+        for precision_type2 in subtypes(AbstractFloat)
+            C = precision_type2(test_value)
+            @test B ≈ C
+        end
+    end
+end
+
+@testset "isapprox(B::Scalar, C::Vector)" begin
+    test_value = 5
+    test_vector = [3; 4; 1]
+    for precision_type in subtypes(AbstractFloat)
+        B = Scalar{precision_type}(test_value)
+        C = Vector{precision_type}(test_vector)
+        @test B ≉ C
+    end
+end
+
 # ------ B::One
+
+@testset "isapprox(B::One, C::Pseudoscalar)" begin
+    test_dim = 10
+    test_value = 5
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+        C = Pseudoscalar{precision_type}(test_dim, test_value)
+        @test B ≉ C
+    end
+end
 
 @testset "isapprox(B::One, C::Scalar)" begin
     for precision_type in subtypes(AbstractFloat)
@@ -148,7 +263,44 @@ end
     end
 end
 
+@testset "isapprox(B::One, C::Real)" begin
+    test_value_1 = 5
+    test_value_2 = 1
+    for precision_type1 in subtypes(AbstractFloat)
+        B = One{precision_type1}()
+
+        # B ≉ C
+        C = precision_type1(test_value_1)
+        @test B ≉ C
+
+        # B ≈ C
+        for precision_type2 in subtypes(AbstractFloat)
+            C = precision_type2(test_value_2)
+            @test B ≈ C
+        end
+    end
+end
+
+@testset "isapprox(B::One, C::Vector)" begin
+    test_vector = [3; 4; 1]
+    for precision_type in subtypes(AbstractFloat)
+        B = One{precision_type}()
+        C = Vector{precision_type}(test_vector)
+        @test B ≉ C
+    end
+end
+
 # ------ B::Zero
+
+@testset "isapprox(B::Zero, C::Pseudoscalar)" begin
+    test_dim = 10
+    test_value = 5
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        C = Pseudoscalar{precision_type}(test_dim, test_value)
+        @test B ≉ C
+    end
+end
 
 @testset "isapprox(B::Zero, C::Scalar)" begin
     test_value = 5
@@ -177,5 +329,151 @@ end
             C = Zero{precision_type2}()
             @test B ≈ C
         end
+    end
+end
+
+@testset "isapprox(B::Zero, C::Real)" begin
+    test_value_1 = 5
+    test_value_2 = 0
+    for precision_type1 in subtypes(AbstractFloat)
+        B = Zero{precision_type1}()
+
+        # B ≉ C
+        C = precision_type1(test_value_1)
+        @test B ≉ C
+
+        # B ≈ C
+        for precision_type2 in subtypes(AbstractFloat)
+            C = precision_type2(test_value_2)
+            @test B ≈ C
+        end
+    end
+end
+
+@testset "isapprox(B::Zero, C::Vector)" begin
+    test_vector = [3; 4; 1]
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        C = Vector{precision_type}(test_vector)
+        @test B ≉ C
+    end
+end
+
+# ------ B::Real
+
+@testset "isapprox(B::Real, C::Pseudoscalar)" begin
+    test_value = 5
+    test_dim = 10
+    for precision_type in subtypes(AbstractFloat)
+        B = precision_type(test_value)
+        C = Pseudoscalar{precision_type}(test_dim, test_value)
+        @test B ≉ C
+    end
+end
+
+@testset "isapprox(B::Real, C::Scalar)" begin
+    test_value = 5
+    for precision_type1 in subtypes(AbstractFloat)
+        B = precision_type1(test_value)
+
+        # B ≉ C
+        C = Scalar{precision_type1}(test_value + 1)
+        @test B ≉ C
+
+        # B ≈ C
+        for precision_type2 in subtypes(AbstractFloat)
+            C = Scalar{precision_type2}(test_value)
+            @test B ≈ C
+        end
+    end
+end
+
+@testset "isapprox(B::Real, C::One)" begin
+    test_value_1 = 5
+    test_value_2 = 1
+    for precision_type1 in subtypes(AbstractFloat)
+        # B ≉ C
+        B = precision_type1(test_value_1)
+        C = One{precision_type1}()
+        @test B ≉ C
+
+        # B ≈ C
+        B = precision_type1(test_value_2)
+        for precision_type2 in subtypes(AbstractFloat)
+            C = One{precision_type2}()
+            @test B ≈ C
+        end
+    end
+end
+
+@testset "isapprox(B::Real, C::Zero)" begin
+    test_value_1 = 5
+    test_value_2 = 0
+    for precision_type1 in subtypes(AbstractFloat)
+        # B ≉ C
+        B = precision_type1(test_value_1)
+        C = Zero{precision_type1}()
+        @test B ≉ C
+
+        # B ≈ C
+        B = precision_type1(test_value_2)
+        for precision_type2 in subtypes(AbstractFloat)
+            C = Zero{precision_type2}()
+            @test B ≈ C
+        end
+    end
+end
+
+# ------ B::Vector
+
+@testset "!isapprox(B::Vector, C::Pseudoscalar)" begin
+    test_value = 5
+
+    test_dim_1 = 3
+    test_vector_1 = [3; 4; 1]
+
+    test_dim_2 = 1
+    test_vector_2 = [test_value]
+
+    for precision_type1 in subtypes(AbstractFloat)
+        # B ≉ C
+        B = Vector{precision_type1}(test_vector_1)
+        C = Pseudoscalar{precision_type1}(test_dim_1, test_value)
+        @test B ≉ C
+
+        # B ≈ C
+        B = Vector{precision_type1}(test_vector_2)
+        for precision_type2 in subtypes(AbstractFloat)
+            C = Pseudoscalar{precision_type2}(test_dim_2, test_value)
+            @test B ≈ C
+        end
+    end
+end
+
+@testset "!isapprox(B::Vector, C::Scalar)" begin
+    test_vector = [3; 4; 1]
+    test_value = 5
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Scalar{precision_type}(test_value)
+        @test B ≉ C
+    end
+end
+
+@testset "!isapprox(B::Vector, C::One)" begin
+    test_vector = [3; 4; 1]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = One{precision_type}()
+        @test B ≉ C
+    end
+end
+
+@testset "!isapprox(B::Vector, C::Zero)" begin
+    test_vector = [3; 4; 1]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test B ≉ C
     end
 end

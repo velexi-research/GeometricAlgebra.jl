@@ -128,6 +128,18 @@ isapprox(B::Pseudoscalar{T1}, C::Pseudoscalar{T2};
                                                           T2<:AbstractFloat} =
     (dim(B) == dim(C)) && isapprox(value(B), value(C), atol=atol, rtol=rtol)
 
+isapprox(B::Pseudoscalar{T1}, C::Vector{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    (dim(B) == 1) && (length(C) == 1) && isapprox(value(B), C[1], atol=atol, rtol=rtol)
+
+isapprox(B::Vector{T1}, C::Pseudoscalar{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat} =
+    isapprox(C, B, atol=atol, rtol=rtol)
+
 # --- Utility methods
 
 convert(::Type{T}, B::Pseudoscalar) where {T<:AbstractFloat} =

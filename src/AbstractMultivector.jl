@@ -199,6 +199,9 @@ function dual end
 
 # --- Comparison methods
 
+# B::AbstractMultivector, C::AbstractMultivector
+isapprox(B::AbstractMultivector, C::AbstractMultivector) = false
+
 # B::AbstractMultivector, x::Real
 # x::Real, B::AbstractMultivector
 isapprox(M::AbstractMultivector, x::Real) = false
