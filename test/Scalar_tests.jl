@@ -376,23 +376,6 @@ end
     end
 end
 
-# --- Test comparison operations
-
-@testset "Scalar: ≈(B, C)" begin
-    # Preparations
-
-    test_value = get_random_value()
-
-    # B::Scalar, C::Real
-    # B::Real, C::Scalar
-    for precision_type in subtypes(AbstractFloat)
-        converted_value = precision_type(test_value)
-        B = Scalar(converted_value)
-        @test B ≈ converted_value
-        @test converted_value ≈ B
-    end
-end
-
 # --- Tests for AbstractMultivector interface functions
 
 @testset "Scalar: -(B)" begin
