@@ -11,26 +11,21 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-# ------ Types
-
+# Types
 export AbstractMultivector
 
-# ------ Functions
-
-# Attributes
+# Properties
 import Base.getindex
 import LinearAlgebra.norm
 export dim, grades, blades, norm
 
-# Unary operations
+# Functions
 import Base.:(-), Base.reverse
 export inverse, dual
 
-# Comparison operations
 import Base.:(==), Base.isapprox
 import Base.iszero, Base.isone
 
-# Utility functions
 import Base.zero, Base.one
 import Base.convert
 
@@ -44,7 +39,7 @@ Supertype for all multivector types.
 Interface
 =========
 
-Attributes
+Properties
 ----------
 
     dim(M::AbstractMultivector)::Int

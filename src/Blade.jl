@@ -11,12 +11,10 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-# ------ Types
-
+# Types
 export Blade
 
-# ------ Utility functions
-
+# Functions
 export blade_atol
 
 # --- Type definitions

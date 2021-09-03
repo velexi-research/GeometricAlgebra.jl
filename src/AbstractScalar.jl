@@ -11,13 +11,10 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports types and interface methods
 
-# ------ Types
-
+# Types
 export AbstractScalar
 
-# ------ Functions
-
-# Attributes
+# Properties
 export value
 
 # --- Type definitions
@@ -33,7 +30,7 @@ Interface
 Note: the return value of all methods should preserve the precision of its
 AbstractScalar arguments (when possible).
 
-Attributes
+Properties
 ----------
 
     value(B::AbstractScalar{T})::T where {T<:AbstractFloat}

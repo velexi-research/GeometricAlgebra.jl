@@ -11,17 +11,14 @@ except according to the terms contained in the LICENSE file.
 """
 # --- Exports
 
-# ------ Types
-
+# Types
 export AbstractBlade
 
-# ------ Functions
-
-# Attributes
+# Properties
 import Base.sign
 export basis, grade, volume
 
-# Unary Operations
+# Functions
 export reciprocal
 
 # --- Type definitions
@@ -34,7 +31,7 @@ Supertype for all blade types.
 Interface
 =========
 
-Attributes
+Properties
 ----------
 
     grade(B::AbstractBlade)::Int
