@@ -43,9 +43,9 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
       * `grade`: the dimension of the space spanned by the blade
 
-      * `basis`: an orthonormal for the space spanned by the blade. Note that
-        the order of the columns in `basis` defines the orientation for the
-        unit blade represented by `basis`.
+      * `basis`: an orthonormal basis for the space spanned by the blade. Note
+        that the order of the columns in `basis` defines the orientation for
+        the unit blade represented by `basis`.
 
       * `volume`: the signed-norm (hypervolume) of the blade. The sign
          of `volume` indicates the orientation of the blade relative to the
