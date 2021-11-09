@@ -68,7 +68,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
     otherwise, the basis of the new Blade is a reference to `basis`.
 
-    Note: this inner constructor intended primarily for use by outer
+    Note: this inner constructor is intended primarily for use by outer
     constructors to enforce constraints.
     """
     function Blade{T}(dim::Int,
