@@ -111,6 +111,11 @@ end
 @testset "One: isone(B)" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
+        # Blade
+        vectors = [3 3; 4 4; 0 1; 0 1]
+        B = Blade{precision_type}(vectors)
+        @test !isone(B)
+
         # Pseudoscalar
         B = Pseudoscalar{precision_type}(10, 3)
         @test !isone(B)

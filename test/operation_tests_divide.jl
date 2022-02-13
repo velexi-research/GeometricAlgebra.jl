@@ -78,7 +78,11 @@ end
 end
 
 @testset "/(B::Blade, C::One)" begin
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+    C = One()
+
+    @test B / C === B
 end
 
 @testset "/(B::Blade, C::Zero)" begin

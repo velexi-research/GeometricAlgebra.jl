@@ -84,11 +84,19 @@ end
 end
 
 @testset "*(B::Blade, C::One)" begin
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+    C = One()
+
+    @test B * C === B
 end
 
 @testset "*(B::Blade, C::Zero)" begin
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+    C = Zero()
+
+    @test B * C === C
 end
 
 @testset "*(B::Blade, C::Real)" begin
@@ -377,7 +385,11 @@ end
 end
 
 @testset "*(B::One, C::Blade)" begin
-    @test_skip 1
+    B = One()
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test B * C === C
 end
 
 @testset "*(B::One, C::Pseudoscalar)" begin
@@ -458,7 +470,11 @@ end
 end
 
 @testset "*(B::Zero, C::Blade)" begin
-    @test_skip 1
+    B = Zero()
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test B * C === B
 end
 
 @testset "*(B::Zero, C::Pseudoscalar)" begin

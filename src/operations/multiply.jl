@@ -126,6 +126,16 @@ function *(v::Vector{<:Real}, B::Blade)
     Multivector([v_dot_B, v_wedge_B])
 end
 
+# B::Blade, C::One
+# B::One, C::Blade
+*(B::Blade, C::One) = B
+*(B::One, C::Blade) = C
+
+# B::Blade, C::Zero
+# B::Zero, C::Blade
+*(B::Blade, C::Zero) = C
+*(B::Zero, C::Blade) = B
+
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar

@@ -25,6 +25,71 @@ include("test_utils.jl")
 
 # --- Tests
 
+# ------ B::Blade
+
+@testset "==(B::Blade, C::Blade)" begin
+    # Preparations
+    vectors = [3 3; 4 4; 0 1]
+    B = Blade(vectors)
+
+    # dim(B) == dim(C), grade(B) == grade(C), volume(B) == volume(C)
+    # basis(B) == basis(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Blade(convert(Array{precision_type1}, vectors))
+            C = Blade(convert(Array{precision_type2}, vectors))
+            if precision_type1 == precision_type2
+                @test B == C
+            else
+                @test B != C
+            end
+        end
+    end
+
+    # dim(B) != dim(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 3; 4 4; 0 1; 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Blade(convert(Array{precision_type1}, vectors))
+            C = Blade(convert(Array{precision_type2}, vectors2))
+            @test B != C
+        end
+    end
+
+    # grade(B) != grade(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 3 3; 4 4 4; 0 1 0; 0 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Blade(convert(Array{precision_type1}, vectors))
+            C = Blade(convert(Array{precision_type2}, vectors2))
+            @test B != C
+        end
+    end
+
+    # volume(B) != volume(C)
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Blade(convert(Array{precision_type1}, vectors))
+            C = Blade(convert(Array{precision_type2}, vectors),
+                      volume=2*volume(B))
+            @test B != C
+        end
+    end
+
+    # basis(B) != basis(C)
+    test_volume = 5.0
+    for precision_type1 in subtypes(AbstractFloat)
+        vectors2 = [3 4; 4 5; 0 1]
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Blade(convert(Array{precision_type1}, vectors),
+                      volume=test_volume)
+            C = Blade(convert(Array{precision_type2}, vectors2),
+                      volume=test_volume)
+            @test B != C
+        end
+    end
+end
+
 # ------ B::Pseudoscalar
 
 @testset "==(B::Pseudoscalar, C::Pseudoscalar)" begin
