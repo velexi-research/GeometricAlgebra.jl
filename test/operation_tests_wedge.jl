@@ -24,7 +24,6 @@ using GeometricAlgebra
 # Test utilities
 include("test_utils.jl")
 
-#=
 # --- Tests
 
 # ------ M::Multivector
@@ -229,7 +228,6 @@ end
     @test_throws DimensionMismatch wedge(B, C)
     @test_throws DimensionMismatch B ∧ C
 end
-=#
 
 @testset "wedge(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
@@ -255,7 +253,6 @@ end
     @test_throws DimensionMismatch B ∧ C
 end
 
-#=
 @testset "wedge(B::Pseudoscalar, C::Scalar)" begin
     # --- Preparations
 
@@ -377,7 +374,6 @@ end
     @test B_wedge_C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
     @test B ∧ C == B_wedge_C
 end
-=#
 
 @testset "wedge(B::Scalar, C::Scalar)" begin
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
@@ -413,7 +409,6 @@ end
     @test iszero(B ∧ C)
 end
 
-#=
 @testset "wedge(B::Scalar, C::Real)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -470,7 +465,6 @@ end
     @test B_wedge_C === C
     @test B ∧ C == B_wedge_C
 end
-=#
 
 @testset "wedge(B::One, C::Scalar)" begin
     B = One()
@@ -501,7 +495,6 @@ end
     @test (B ∧ C) == B_wedge_C
 end
 
-#=
 @testset "wedge(B::One, C::Real)" begin
     B = One()
 
@@ -551,7 +544,6 @@ end
     @test iszero(wedge(B, C))
     @test iszero(B ∧ C)
 end
-=#
 
 @testset "wedge(B::Zero, C::Scalar)" begin
     B = Zero()
@@ -582,7 +574,6 @@ end
     @test (B ∧ C) == B_wedge_C
 end
 
-#=
 @testset "wedge(B::Zero, C::Real)" begin
     B = Zero()
 
@@ -783,4 +774,3 @@ end
     @test_throws DimensionMismatch wedge(B_vector, C_vector)
     @test_throws DimensionMismatch B_vector ∧ C_vector
 end
-=#

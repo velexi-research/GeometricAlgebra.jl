@@ -24,7 +24,6 @@ using GeometricAlgebra
 # Test utilities
 include("test_utils.jl")
 
-#=
 # --- Tests
 
 # ------ M::Multivector
@@ -381,7 +380,6 @@ end
     @test_throws DimensionMismatch contract_left(B, C)
     @test_throws DimensionMismatch (B < C)
 end
-=#
 
 @testset "contract_left(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
@@ -415,7 +413,6 @@ end
     @test_throws DimensionMismatch B < C
 end
 
-#=
 @testset "contract_left(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 11
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -547,7 +544,6 @@ end
     @test B_contract_left_C == Pseudoscalar(test_dim, test_value_1 * test_value_2)
     @test (B < C) == B_contract_left_C
 end
-=#
 
 @testset "contract_left(B::Scalar, C::Scalar)" begin
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
@@ -584,7 +580,6 @@ end
     @test (B < C) == B_contract_left_C
 end
 
-#=
 @testset "contract_left(B::Scalar, C::Real)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -657,7 +652,6 @@ end
     @test B_contract_left_C == Pseudoscalar(test_dim, test_value)
     @test (B < C) == B_contract_left_C
 end
-=#
 
 @testset "contract_left(B::One, C::Scalar)" begin
     B = One()
@@ -688,7 +682,6 @@ end
     @test (B < C) == B_contract_left_C
 end
 
-#=
 @testset "contract_left(B::One, C::Real)" begin
     B = One()
 
@@ -753,7 +746,6 @@ end
     @test iszero(contract_left(B, C))
     @test iszero(B < C)
 end
-=#
 
 @testset "contract_left(B::Zero, C::Scalar)" begin
     B = Zero()
@@ -784,7 +776,6 @@ end
     @test (B < C) == B_contract_left_C
 end
 
-#=
 @testset "contract_left(B::Zero, C::Real)" begin
     B = Zero()
 
@@ -997,4 +988,3 @@ end
     @test iszero(contract_left(B, C))
     @test iszero(B < C)
 end
-=#

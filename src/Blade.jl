@@ -406,7 +406,6 @@ function isapprox(B::Blade{T1}, C::Blade{T2};
     # Check dim, grade, and norm are equal
     if dim(B) != dim(C) || grade(B) != grade(C) ||
         !isapprox(norm(B), norm(C), atol=atol, rtol=rtol)
-        #!isequal(norm(B), norm(C))
 
         return false
     end
@@ -414,7 +413,6 @@ function isapprox(B::Blade{T1}, C::Blade{T2};
     # Check that B and C represent the same space
     projection = det(transpose(basis(B)) * basis(C))
     if ≉(abs(projection), 1, atol=atol, rtol=rtol)
-    #if isequal(abs(projection), 1)
         return false
     end
 
