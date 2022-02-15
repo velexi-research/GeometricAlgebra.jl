@@ -69,6 +69,40 @@ end
         @test B isa One{precision_type}
     end
 
+    # one(::Type{<:AbstractMultivector})
+    # --- Type{<:AbstractScalar}
+
+    B = one(AbstractScalar)
+    @test B isa One{Float64}
+
+    B = one(Zero)
+    @test B isa One{Float64}
+
+    B = one(One)
+    @test B isa One{Float64}
+
+    B = one(Scalar)
+    @test B isa One{Float64}
+
+    # --- Type{<:AbstractBlade}
+
+    B = one(AbstractBlade)
+    @test B isa One{Float64}
+
+    B = one(Blade)
+    @test B isa One{Float64}
+
+    B = one(Pseudoscalar)
+    @test B isa One{Float64}
+
+    # --- Type{<:AbstractMultivector}
+
+    B = one(AbstractMultivector)
+    @test B isa One{Float64}
+
+    B = one(Multivector)
+    @test B isa One{Float64}
+
     # one(::Type{<:AbstractMultivector{T}})
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}

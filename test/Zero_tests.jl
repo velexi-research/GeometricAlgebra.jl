@@ -69,6 +69,40 @@ end
         @test B isa Zero{precision_type}
     end
 
+    # zero(::Type{<:AbstractMultivector})
+    # --- Type{<:AbstractScalar}
+
+    B = zero(AbstractScalar)
+    @test B isa Zero{Float64}
+
+    B = zero(Zero)
+    @test B isa Zero{Float64}
+
+    B = zero(One)
+    @test B isa Zero{Float64}
+
+    B = zero(Scalar)
+    @test B isa Zero{Float64}
+
+    # --- Type{<:AbstractBlade}
+
+    B = zero(AbstractBlade)
+    @test B isa Zero{Float64}
+
+    B = zero(Blade)
+    @test B isa Zero{Float64}
+
+    B = zero(Pseudoscalar)
+    @test B isa Zero{Float64}
+
+    # --- Type{<:AbstractMultivector}
+
+    B = zero(AbstractMultivector)
+    @test B isa Zero{Float64}
+
+    B = zero(Multivector)
+    @test B isa Zero{Float64}
+
     # zero(::Type{<:AbstractMultivector{T}})
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
