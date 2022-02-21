@@ -25,9 +25,20 @@ Contents
 
 TODO
 
+* Supported precisions: Float16, Float32, Float64, BigFloat
+
+* GA type constructors
+  * Unsupported Real subtypes: Rational, Irrational
+  * Blade constructor currently does not support `vectors=Array{Precision}`
+
 ### 1.1. License
 
 See the LICENSE file for copyright and license information.
+
+### 1.2. Contributors
+
+* Kevin T. Chu
+* William Gvozdjak
 
 ------------------------------------------------------------------------------
 
