@@ -29,7 +29,7 @@ import Base.iszero, Base.isone
 import Base.zero, Base.one
 import Base.convert
 
-# --- Type definitions
+# --- Types
 
 """
     AbstractMultivector{<:AbstractFloat}
@@ -114,10 +114,7 @@ Implementation
 """
 abstract type AbstractMultivector{T<:AbstractFloat} end
 
-# --- Method definitions
-#
-# Note: the following method definitions are no-op place holders and intended
-#       to be extended.
+# --- Public functions/methods
 
 """
     dim(M::AbstractMultivector)::Int
@@ -192,7 +189,7 @@ that `M` is an element of).
 """
 function dual end
 
-# --- Comparison methods
+# ------ Comparison methods
 
 # B::AbstractMultivector, C::AbstractMultivector
 isapprox(B::AbstractMultivector, C::AbstractMultivector) = false
@@ -211,7 +208,7 @@ iszero(M::AbstractMultivector) = (M === zero(M))
 
 isone(M::AbstractMultivector) = (M === one(M))
 
-# --- Utility methods
+# ------ Utility methods
 
 zero(M::AbstractMultivector) = Zero{typeof(norm(M))}()
 zero(::Type{<:AbstractMultivector}) = Zero{Float64}()
@@ -228,7 +225,7 @@ Convert AbstractMultivector to have the floating-point precision of type `T`.
 """
 function convert end
 
-# --- Non-exported utility functions
+# --- Non-exported utility methods
 
 """
     assert_dim_equal(M::AbstractMultivector, N::AbstractMultivector)

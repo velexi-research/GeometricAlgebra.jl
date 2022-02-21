@@ -21,7 +21,7 @@ export basis, grade, volume
 # Functions
 export reciprocal
 
-# --- Type definitions
+# --- Types
 
 """
     AbstractBlade{<:AbstractFloat}
@@ -61,10 +61,7 @@ Implementation
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
-# --- Method definitions
-#
-# Note: the following method definitions are no-op place holders and intended
-#       to be extended.
+# --- Public functions/methods
 
 """
     grade(B::AbstractBlade)::Int
