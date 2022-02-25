@@ -58,6 +58,16 @@ import Base.:(*)
     Blade(B, volume=volume(B) * value(C), copy_basis=false)
 *(C::AbstractScalar, B::AbstractBlade) = B * C
 
+# B::AbstractBlade, C::One
+# B::One, C::AbstractBlade
+*(B::AbstractBlade, C::One) = B
+*(B::One, C::AbstractBlade) = C
+
+# B::AbstractBlade, C::Zero
+# B::Zero, C::AbstractBlade
+*(B::AbstractBlade, C::Zero) = C
+*(B::Zero, C::AbstractBlade) = B
+
 # B::AbstractBlade, x::Real
 # x::Real, B::AbstractBlade
 *(B::AbstractBlade, x::Real) = Blade(B, volume=volume(B) * x)
@@ -125,16 +135,6 @@ function *(v::Vector{<:Real}, B::Blade)
 
     Multivector([v_dot_B, v_wedge_B])
 end
-
-# B::Blade, C::One
-# B::One, C::Blade
-*(B::Blade, C::One) = B
-*(B::One, C::Blade) = C
-
-# B::Blade, C::Zero
-# B::Zero, C::Blade
-*(B::Blade, C::Zero) = C
-*(B::Zero, C::Blade) = B
 
 # ------ Specializations involving a Pseudoscalar instance
 
