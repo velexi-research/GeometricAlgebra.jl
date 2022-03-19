@@ -36,40 +36,65 @@ using GeometricAlgebra
 end
 
 @testset "Zero: zero()" begin
-    # zero(M::AbstractMultivector)
+    # --- zero(M::AbstractMultivector)
+
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
 
-        # M::Zero
         B = zero(Zero{precision_type}())
         @test B isa Zero{precision_type}
 
-        # M::One
         B = zero(One{precision_type}())
         @test B isa Zero{precision_type}
 
-        # M::Scalar
         B = zero(Scalar{precision_type}(5))
         @test B isa Zero{precision_type}
 
         # --- M::AbstractBlade
 
-        # M::Blade
         B = zero(Blade{precision_type}([1 2 3]))
         @test B isa Zero{precision_type}
 
-        # M::Pseudoscalar
         B = zero(Pseudoscalar{precision_type}(10, 5))
         @test B isa Zero{precision_type}
 
         # --- M::AbstractMultivector
 
-        # M::Multivector
         B = zero(Multivector{precision_type}([Scalar(3)]))
         @test B isa Zero{precision_type}
     end
 
-    # zero(::Type{<:AbstractMultivector{T}})
+    # --- zero(::Type{<:AbstractMultivector})
+
+    B = zero(AbstractScalar)
+    @test B isa Zero{Float64}
+
+    B = zero(Zero)
+    @test B isa Zero{Float64}
+
+    B = zero(One)
+    @test B isa Zero{Float64}
+
+    B = zero(Scalar)
+    @test B isa Zero{Float64}
+
+    B = zero(AbstractBlade)
+    @test B isa Zero{Float64}
+
+    B = zero(Blade)
+    @test B isa Zero{Float64}
+
+    B = zero(Pseudoscalar)
+    @test B isa Zero{Float64}
+
+    B = zero(AbstractMultivector)
+    @test B isa Zero{Float64}
+
+    B = zero(Multivector)
+    @test B isa Zero{Float64}
+
+    # --- zero(::Type{<:AbstractMultivector{T}})
+    
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 
@@ -111,6 +136,15 @@ end
 @testset "Zero: iszero(B)" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
+        # Blade
+        vectors = [3 3; 4 4; 0 1; 0 1]
+        B = Blade{precision_type}(vectors)
+        @test !iszero(B)
+
+        vectors = [1 2; 1 2; 0 0]
+        B = Blade{precision_type}(vectors)
+        @test iszero(B)
+
         # Pseudoscalar
         B = Pseudoscalar{precision_type}(10, 3)
         @test !iszero(B)

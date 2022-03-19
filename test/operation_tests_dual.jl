@@ -24,7 +24,6 @@ using GeometricAlgebra
 # Test utilities
 include("test_utils.jl")
 
-#=
 # --- Tests
 
 # ------ M::Multivector
@@ -216,7 +215,6 @@ end
     C = Blade(rand(test_dim, 3))
     @test_throws DimensionMismatch dual(B, C)
 end
-=#
 
 @testset "dual(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
@@ -267,7 +265,6 @@ end
     @test_throws DimensionMismatch dual(B, C)
 end
 
-#=
 @testset "dual(B::Pseudoscalar, C::Scalar)" begin
     # --- Preparations
 
@@ -345,7 +342,6 @@ end
         @test dual(B, C) == expected_result
     end
 end
-=#
 
 @testset "dual(B::Scalar, C::Scalar)" begin
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
@@ -368,7 +364,6 @@ end
     B_dual_C = dual(B, C)
     @test B_dual_C === B
 end
-#=
 
 # --- B::One
 
@@ -390,7 +385,7 @@ end
     end
 end
 
-@testset "dual(B::One::, C::Pseudoscalar)" begin
+@testset "dual(B::One, C::Pseudoscalar)" begin
     # --- Preparations
 
     test_value = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -409,7 +404,6 @@ end
         @test dual(B, C) == expected_result
     end
 end
-=#
 
 @testset "dual(B::One, C::Scalar)" begin
     B = One()
@@ -450,7 +444,6 @@ end
     C = Scalar(test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
 
-    #=
     # C::Blade
     C = Blade(randn(4, 3))
     @test_throws ErrorException(expected_error) dual(B, C)
@@ -462,7 +455,6 @@ end
     # C::Multivector
     # C = Multivector(5, test_value)
     @test_skip 1
-    =#
 end
 
 @testset "dual(B, C::Zero)" begin
@@ -488,7 +480,6 @@ end
     B = Scalar(test_value)
     @test_throws ErrorException(expected_error) dual(B, C)
 
-    #=
     # B::Blade
     B = Blade(randn(4, 3))
     @test_throws ErrorException(expected_error) dual(B, C)
@@ -500,5 +491,4 @@ end
     # C::Multivector
     # C = Multivector(5, test_value)
     @test_skip 1
-    =#
 end
