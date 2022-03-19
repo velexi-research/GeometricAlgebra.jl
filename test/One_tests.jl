@@ -36,7 +36,9 @@ using GeometricAlgebra
 end
 
 @testset "One: one()" begin
-    # one(M::AbstractMultivector)
+
+    # --- one(M::AbstractMultivector)
+
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
 
@@ -69,7 +71,37 @@ end
         @test B isa One{precision_type}
     end
 
-    # one(::Type{<:AbstractMultivector{T}})
+    # --- one(M::Type{<:AbstractMultivector})
+
+    B = one(AbstractScalar)
+    @test B isa One{Float64}
+
+    B = one(Zero)
+    @test B isa One{Float64}
+
+    B = one(One)
+    @test B isa One{Float64}
+
+    B = one(Scalar)
+    @test B isa One{Float64}
+
+    B = one(AbstractBlade)
+    @test B isa One{Float64}
+
+    B = one(Blade)
+    @test B isa One{Float64}
+
+    B = one(Pseudoscalar)
+    @test B isa One{Float64}
+
+    B = one(AbstractMultivector)
+    @test B isa One{Float64}
+
+    B = one(Multivector)
+    @test B isa One{Float64}
+
+    # --- one(::Type{<:AbstractMultivector{T}})
+
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 
@@ -111,6 +143,11 @@ end
 @testset "One: isone(B)" begin
     # Basic functions
     for precision_type in subtypes(AbstractFloat)
+        # Blade
+        vectors = [3 3; 4 4; 0 1; 0 1]
+        B = Blade{precision_type}(vectors)
+        @test !isone(B)
+
         # Pseudoscalar
         B = Pseudoscalar{precision_type}(10, 3)
         @test !isone(B)

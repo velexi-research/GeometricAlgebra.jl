@@ -24,7 +24,6 @@ using GeometricAlgebra
 # Test utilities
 include("test_utils.jl")
 
-#=
 # --- Tests
 
 # ------ M::Multivector
@@ -294,7 +293,6 @@ end
     @test_throws DimensionMismatch project(B, C)
     @test_throws DimensionMismatch project(B, C, return_blade=false)
 end
-=#
 
 @testset "project(B::Pseudoscalar, C::Pseudoscalar)" begin
     # --- Preparations
@@ -328,7 +326,6 @@ end
     end
 end
 
-#=
 @testset "project(B::Pseudoscalar, C::Scalar)" begin
     test_dim = 10
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
@@ -481,7 +478,6 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
-=#
 
 @testset "project(B::Scalar, C::Scalar)" begin
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
@@ -531,7 +527,6 @@ end
     @test B_proj_C == 0
 end
 
-#=
 @testset "project(B::Scalar, C::Real)" begin
     test_value_1 = rand() + 2  # add 2 to keep value away from 0 and 1
     test_value_1 = rand() > 0.5 ? test_value_1 : -test_value_1
@@ -612,7 +607,6 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
-=#
 
 @testset "project(B::One, C::Scalar)" begin
     B = One()
@@ -658,7 +652,6 @@ end
     @test B_proj_C == 0
 end
 
-#=
 @testset "project(B::One, C::Real)" begin
     B = One()
 
@@ -730,7 +723,6 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
-=#
 
 @testset "project(B::Zero, C::Scalar)" begin
     B = Zero()
@@ -776,7 +768,6 @@ end
     @test B_proj_C == 0
 end
 
-#=
 @testset "project(B::Zero, C::Real)" begin
     B = Zero()
 
@@ -1026,4 +1017,3 @@ end
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
-=#

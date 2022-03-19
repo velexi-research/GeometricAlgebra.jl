@@ -20,8 +20,8 @@ export wedge, ∧
 ∧(M::AbstractMultivector, x::Real) = wedge(M, x)
 ∧(x::Real, M::AbstractMultivector) = wedge(x, M)
 
-∧(M::AbstractMultivector, v::Vector{<:Real}) = wedge(M, Blade(v))
-∧(v::Vector{<:Real}, M::AbstractMultivector) = wedge(Blade(v), M)
+∧(M::AbstractMultivector, v::Vector{<:Real}) = wedge(M, v)
+∧(v::Vector{<:Real}, M::AbstractMultivector) = wedge(v, M)
 
 ∧(v::Vector{<:Real}, w::Vector{<:Real}) = wedge(v, w)
 
@@ -44,6 +44,14 @@ wedge(M::AbstractMultivector, B::AbstractBlade) =
 
 wedge(B::AbstractBlade, M::AbstractMultivector) =
     Multivector(map(C -> wedge(B, C), blades(M)))
+
+# M::AbstractMultivector, v::Vector
+# v::Vector, M::AbstractMultivector
+wedge(M::AbstractMultivector, v::Vector{<:Real}) = 
+    Multivector(map(C -> wedge(C, v), blades(M)))
+
+wedge(v::Vector{<:Real}, M::AbstractMultivector) = 
+    Multivector(map(C -> wedge(v, C), blades(M)))
 
 # M::AbstractMultivector, B::AbstractScalar
 # B::AbstractScalar, M::AbstractMultivector

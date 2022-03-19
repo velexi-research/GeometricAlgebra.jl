@@ -84,11 +84,19 @@ end
 end
 
 @testset "*(B::Blade, C::One)" begin
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+    C = One()
+
+    @test B * C === B
 end
 
 @testset "*(B::Blade, C::Zero)" begin
-    @test_skip 1
+    test_dim = 10
+    B = Blade(rand(test_dim, 3))
+    C = Zero()
+
+    @test B * C === C
 end
 
 @testset "*(B::Blade, C::Real)" begin
@@ -199,7 +207,7 @@ end
 
     C = Zero()
 
-    @test iszero(B * C)
+    @test B * C === C
 end
 
 @testset "*(B::Pseudoscalar, C::Real)" begin
@@ -313,7 +321,7 @@ end
 
     C = Zero()
 
-    @test iszero(B * C)
+    @test B * C === C
 end
 
 @testset "*(B::Scalar, C::Real)" begin
@@ -360,14 +368,19 @@ end
 end
 
 @testset "*(B::Scalar, C::Vector)" begin
-    B = rand(5)
-
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    C = Scalar(test_value)
+    B = Scalar(test_value)
+
+    # C is not zero
+    C = rand(5)
 
     B_times_C = B * C
     @test B_times_C isa Blade
-    @test B_times_C ≈ test_value * Blade(B)
+    @test B_times_C ≈ test_value * Blade(C)
+
+    # C is zero
+    C = [0; 0; 0; 0; 0]
+    @test iszero(B * C)
 end
 
 # ------ B::One
@@ -377,7 +390,11 @@ end
 end
 
 @testset "*(B::One, C::Blade)" begin
-    @test_skip 1
+    B = One()
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test B * C === C
 end
 
 @testset "*(B::One, C::Pseudoscalar)" begin
@@ -444,11 +461,17 @@ end
 end
 
 @testset "*(B::One, C::Vector)" begin
-    B = rand(5)
     C = One()
+
+    # B is not zero
+    B = rand(5)
     B_times_C = B * C
     @test B_times_C isa Blade
     @test B_times_C == Blade(B)
+
+    # B is zero
+    B = [0; 0; 0; 0; 0]
+    @test iszero(B * C)
 end
 
 # ------ B::Zero
@@ -458,7 +481,11 @@ end
 end
 
 @testset "*(B::Zero, C::Blade)" begin
-    @test_skip 1
+    B = Zero()
+    test_dim = 10
+    C = Blade(rand(test_dim, 3))
+
+    @test B * C === B
 end
 
 @testset "*(B::Zero, C::Pseudoscalar)" begin
@@ -468,7 +495,7 @@ end
     test_value = get_random_value(1)  # add 1 to keep value away from 0
     C = Pseudoscalar(test_dim, test_value)
 
-    @test iszero(B * C)
+    @test B * C === B
 end
 
 @testset "*(B::Zero, C::Scalar)" begin
@@ -477,7 +504,7 @@ end
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test iszero(B * C)
+    @test B * C === B
 end
 
 @testset "*(B::Zero, C::One)" begin
@@ -502,13 +529,19 @@ end
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
-    @test iszero(B * C)
+    @test B * C === B
 end
 
 @testset "*(B::Zero, C::Vector)" begin
     B = Zero()
+
+    # C is not zero
     C = rand(5)
-    @test iszero(B * C)
+    @test B * C === B
+
+    # C is zero
+    C = [0; 0; 0; 0; 0]
+    @test B * C === B
 end
 
 # ------ B::Real
@@ -651,25 +684,42 @@ end
 
 @testset "*(B::Vector, C::Scalar)" begin
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
-    B = Scalar(test_value)
+    C = Scalar(test_value)
 
-    C = rand(5)
+    # B is not zero
+    B = rand(5)
 
     B_times_C = B * C
     @test B_times_C isa Blade
-    @test B_times_C ≈ test_value * Blade(C)
+    @test B_times_C ≈ test_value * Blade(B)
+
+    # B is zero
+    B = [0; 0; 0; 0; 0]
+    @test iszero(B * C)
 end
 
 @testset "*(B::Vector, C::One)" begin
     B = One()
+
+    # C is not zero
     C = rand(5)
     B_times_C = B * C
     @test B_times_C isa Blade
     @test B_times_C == Blade(C)
+
+    # C is zero
+    C = [0; 0; 0; 0; 0]
+    @test iszero(B * C)
 end
 
 @testset "*(B::Vector, C::Zero)" begin
-    B = rand(5)
     C = Zero()
-    @test iszero(B * C)
+
+    # B is not zero
+    B = rand(5)
+    @test B * C === C
+
+    # B is zero
+    B = [0; 0; 0; 0; 0]
+    @test B * C === C
 end
