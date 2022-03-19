@@ -36,7 +36,8 @@ using GeometricAlgebra
 end
 
 @testset "One: one()" begin
-    # one(M::AbstractMultivector)
+
+    # --- one(M::AbstractMultivector)
 
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
@@ -70,9 +71,7 @@ end
         @test B isa One{precision_type}
     end
 
-    # --- one(::Type{<:AbstractMultivector})
-
-    # Type{<:AbstractScalar}
+    # --- one(M::Type{<:AbstractMultivector})
 
     B = one(AbstractScalar)
     @test B isa One{Float64}
@@ -86,8 +85,6 @@ end
     B = one(Scalar)
     @test B isa One{Float64}
 
-    # Type{<:AbstractBlade}
-
     B = one(AbstractBlade)
     @test B isa One{Float64}
 
@@ -96,8 +93,6 @@ end
 
     B = one(Pseudoscalar)
     @test B isa One{Float64}
-
-    # Type{<:AbstractMultivector}
 
     B = one(AbstractMultivector)
     @test B isa One{Float64}
