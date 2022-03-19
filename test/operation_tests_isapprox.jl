@@ -466,10 +466,19 @@ end
 end
 
 @testset "isapprox(B::Vector, C::Zero)" begin
+    # B ≉ C
     test_vector = [3; 4; 1]
     for precision_type in subtypes(AbstractFloat)
         B = Vector{precision_type}(test_vector)
         C = Zero{precision_type}()
         @test B ≉ C
+    end
+
+    # B ≈ C
+    test_vector = [0; 0; 0]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test B ≈ C
     end
 end

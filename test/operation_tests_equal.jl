@@ -577,10 +577,19 @@ end
 end
 
 @testset "==(B::Vector, C::Zero)" begin
+    # B != C
     test_vector = [1; 2; 3]
     for precision_type in subtypes(AbstractFloat)
         B = Vector{precision_type}(test_vector)
         C = Zero{precision_type}()
         @test B != C
+    end
+
+    # B == C
+    test_vector = [0; 0; 0]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test B == C
     end
 end
