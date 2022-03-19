@@ -1,8 +1,41 @@
 GeometricAlgebra.jl
 ===================
 
-![build](https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/build.yml/badge.svg)
-![build-dev](https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/build-dev.yml/badge.svg)
+[------------------------------------ BADGES: BEGIN ------------------------------------]: #
+
+<table>
+  <tr>
+    <td>Documentation</td>
+    <td>
+      <a href="https://velexi-corporation.github.io/GeometricAlgebra.jl/dev/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-dev-blue.svg"/></a>
+      <!--<a href="https://velexi-corporation.github.io/GeometricAlgebra.jl/stable/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-stable-blue.svg"/></a>
+      -->
+    </td>
+  </tr>
+
+  <tr>
+    <td>Build Status</td>
+    <td>
+      <a href="https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/CI.yml/badge.svg"/></a>
+      <!--
+      <a href="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl"><img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl/branch/main/graph/badge.svg?token=LW2DS0JUWF"/></a>
+      -->
+    </td>
+  </tr>
+
+  <!-- Miscellaneous Badges -->
+  <tr>
+    <td colspan=2 align="center">
+      <a href="https://github.com/velexi-corporation/GeometricAlgebra.jl/issues"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/></a>
+      <a href="https://github.com/invenia/BlueStyle"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/code%20style-blue-4495d1.svg"/></a>
+      <!--
+      <a href="http://hits.dwyl.com/velexi/GeometricAlgebra"><img style="vertical-align: bottom;" src="https://hits.dwyl.com/velexi/GeometricAlgebra.svg?style=flat-square&show=unique"/></a>
+      -->
+    </td>
+  </tr>
+</table>
+
+[------------------------------------- BADGES: END -------------------------------------]: #
 
 ------------------------------------------------------------------------------
 
