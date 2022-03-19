@@ -36,7 +36,8 @@ using GeometricAlgebra
 end
 
 @testset "Zero: zero()" begin
-    # zero(M::AbstractMultivector)
+    # --- zero(M::AbstractMultivector)
+
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
 
@@ -69,8 +70,9 @@ end
         @test B isa Zero{precision_type}
     end
 
-    # zero(::Type{<:AbstractMultivector})
-    # --- Type{<:AbstractScalar}
+    # --- zero(::Type{<:AbstractMultivector})
+
+    # Type{<:AbstractScalar}
 
     B = zero(AbstractScalar)
     @test B isa Zero{Float64}
@@ -84,7 +86,7 @@ end
     B = zero(Scalar)
     @test B isa Zero{Float64}
 
-    # --- Type{<:AbstractBlade}
+    # Type{<:AbstractBlade}
 
     B = zero(AbstractBlade)
     @test B isa Zero{Float64}
@@ -95,7 +97,7 @@ end
     B = zero(Pseudoscalar)
     @test B isa Zero{Float64}
 
-    # --- Type{<:AbstractMultivector}
+    # Type{<:AbstractMultivector}
 
     B = zero(AbstractMultivector)
     @test B isa Zero{Float64}
@@ -103,7 +105,8 @@ end
     B = zero(Multivector)
     @test B isa Zero{Float64}
 
-    # zero(::Type{<:AbstractMultivector{T}})
+    # --- zero(::Type{<:AbstractMultivector{T}})
+    
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 

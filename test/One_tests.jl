@@ -37,6 +37,7 @@ end
 
 @testset "One: one()" begin
     # one(M::AbstractMultivector)
+
     for precision_type in subtypes(AbstractFloat)
         # --- M::AbstractScalar
 
@@ -69,8 +70,9 @@ end
         @test B isa One{precision_type}
     end
 
-    # one(::Type{<:AbstractMultivector})
-    # --- Type{<:AbstractScalar}
+    # --- one(::Type{<:AbstractMultivector})
+
+    # Type{<:AbstractScalar}
 
     B = one(AbstractScalar)
     @test B isa One{Float64}
@@ -84,7 +86,7 @@ end
     B = one(Scalar)
     @test B isa One{Float64}
 
-    # --- Type{<:AbstractBlade}
+    # Type{<:AbstractBlade}
 
     B = one(AbstractBlade)
     @test B isa One{Float64}
@@ -95,7 +97,7 @@ end
     B = one(Pseudoscalar)
     @test B isa One{Float64}
 
-    # --- Type{<:AbstractMultivector}
+    # Type{<:AbstractMultivector}
 
     B = one(AbstractMultivector)
     @test B isa One{Float64}
@@ -103,7 +105,8 @@ end
     B = one(Multivector)
     @test B isa One{Float64}
 
-    # one(::Type{<:AbstractMultivector{T}})
+    # --- one(::Type{<:AbstractMultivector{T}})
+
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 
