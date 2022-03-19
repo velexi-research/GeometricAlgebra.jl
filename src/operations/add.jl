@@ -81,3 +81,8 @@ end
 
 # B::Zero, C::Zero
 @inline +(B::Zero, C::Zero) = B
+
+# B::Zero, v::Vector
+# v::Vector, B::Zero
+@inline +(B::Zero, v::Vector{<:Real}) = v
+@inline +(v::Vector{<:Real}, B::Zero) = v
