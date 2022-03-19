@@ -7,9 +7,14 @@ Manifest.toml
 *.jl.*.cov
 *.jl.*.mem
 
+# --- GitHub
+
+.github/secrets
+
 # --- Miscellaneous
 
 # direnv
+.direnv
 .envrc
 
 # vim
