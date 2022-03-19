@@ -787,30 +787,50 @@ end
 end
 
 @testset "/(B::Vector, C::Scalar)" begin
-    B = rand(5)
-
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
+
+    # B is not zero
+    B = rand(5)
 
     B_slash_C = B / C
     @test B_slash_C isa Blade
     @test B_slash_C == Blade(B) / test_value
+
+    # B is zero
+    B = [0; 0; 0; 0; 0]
+    @test iszero(B / C);
 end
 
 @testset "/(B::Vector, C::One)" begin
-    B = rand(5)
     C = One()
+
+    # B is not zero
+    B = rand(5)
 
     B_slash_C = B / C
     @test B_slash_C isa Blade
     @test B_slash_C == Blade(B)
+
+    # B is zero
+    B = [0; 0; 0; 0; 0]
+    @test iszero(B / C)
 end
 
 @testset "/(B::Vector, C::Zero)" begin
-    B = rand(5)
     C = Zero()
+
+    # B is not zero
+    B = rand(5)
 
     B_slash_C = B / C
     @test B_slash_C isa Blade
     @test B_slash_C == Blade(B) / 0
+
+    # B is zero
+    B = [0; 0; 0; 0; 0]
+    
+    B_slash_C = B / C
+    @test B_slash_C isa Scalar
+    @test isnan(B_slash_C.value)
 end
