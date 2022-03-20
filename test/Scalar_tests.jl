@@ -378,7 +378,7 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "Scalar: -(B)" begin
+@testset "Scalar: inverse(B)" begin
     # Preparations
 
     test_value = get_random_value(2) # add 2 to avoid 0 and 1
@@ -387,9 +387,10 @@ end
     for precision_type in subtypes(AbstractFloat)
         B = Scalar{precision_type}(test_value)
 
-        minus_B = -B
-        @test minus_B isa Scalar{precision_type}
-        @test minus_B == Scalar{precision_type}(-test_value)
+        inverse_B = inverse(B)
+        @test inverse_B isa Scalar{precision_type}
+        @test inverse_B == Scalar{precision_type}(-test_value)
+        @test -B == inverse_B
     end
 end
 

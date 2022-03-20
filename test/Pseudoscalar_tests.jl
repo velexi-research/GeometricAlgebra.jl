@@ -387,7 +387,7 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "Pseudoscalar: -(B)" begin
+@testset "Pseudoscalar: inverse(B)" begin
     # Preparations
     test_dim = 10
 
@@ -397,9 +397,10 @@ end
     for precision_type in subtypes(AbstractFloat)
         B = Pseudoscalar{precision_type}(test_dim, test_value)
 
-        minus_B = -B
-        @test minus_B isa Pseudoscalar{precision_type}
-        @test minus_B == Pseudoscalar{precision_type}(test_dim, -test_value)
+        inverse_B = inverse(B)
+        @test inverse_B isa Pseudoscalar{precision_type}
+        @test inverse_B == Pseudoscalar{precision_type}(test_dim, -test_value)
+        @test -B == inverse_B
     end
 end
 
