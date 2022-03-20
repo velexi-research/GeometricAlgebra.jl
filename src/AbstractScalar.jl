@@ -60,7 +60,7 @@ basis(B::AbstractScalar) = one(value(B))
 
 volume(B::AbstractScalar) = value(B)
 
--(B::AbstractScalar) = Scalar(-value(B))
+inverse(B::AbstractScalar) = Scalar(-value(B))
 
 reciprocal(B::AbstractScalar) = 1 / B
 
