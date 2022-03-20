@@ -58,3 +58,8 @@ import Base.:(-)
 
 # B::Zero, C::Zero
 -(B::Zero, C::Zero) = B
+
+# B::Zero, v::Vector
+# v::Vector, B::Zero
+-(B::Zero, v::Vector{<:Real}) = -v
+-(v::Vector{<:Real}, B::Zero) = v

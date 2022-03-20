@@ -525,11 +525,34 @@ end
 end
 
 @testset "isapprox(B::Zero, C::Vector)" begin
+    # B ≉ C
     test_vector = [3; 4; 1]
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
         C = Vector{precision_type}(test_vector)
         @test B ≉ C
+    end
+
+    test_vector = [0.001; 0.002; 0.003]
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        C = Vector{precision_type}(test_vector)
+        @test !isapprox(B, C, atol=0.001)
+    end
+
+    # B ≈ C
+    test_vector = [0; 0; 0]
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        C = Vector{precision_type}(test_vector)
+        @test B ≈ C
+    end 
+
+    test_vector = [0.001; 0.002; 0.003]
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        C = Vector{precision_type}(test_vector)
+        @test isapprox(B, C, atol=0.01)
     end
 end
 
@@ -662,10 +685,33 @@ end
 end
 
 @testset "isapprox(B::Vector, C::Zero)" begin
+    # B ≉ C
     test_vector = [3; 4; 1]
     for precision_type in subtypes(AbstractFloat)
         B = Vector{precision_type}(test_vector)
         C = Zero{precision_type}()
         @test B ≉ C
+    end
+
+    test_vector = [0.001; 0.002; 0.003]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test !isapprox(B, C, atol=0.001)
+    end
+
+    # B ≈ C
+    test_vector = [0; 0; 0]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test B ≈ C
+    end 
+
+    test_vector = [0.001; 0.002; 0.003]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test isapprox(B, C, atol=0.01)
     end
 end
