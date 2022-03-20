@@ -365,6 +365,13 @@ end
     end
 
     # B ≈ C
+    test_vector = [0; 0; 0]
+    for precision_type in subtypes(AbstractFloat)
+        B = Zero{precision_type}()
+        C = Vector{precision_type}(test_vector)
+        @test B ≈ C
+    end 
+
     test_vector = [0.001; 0.002; 0.003]
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
@@ -498,6 +505,13 @@ end
     end
 
     # B ≈ C
+    test_vector = [0; 0; 0]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Zero{precision_type}()
+        @test B ≈ C
+    end 
+
     test_vector = [0.001; 0.002; 0.003]
     for precision_type in subtypes(AbstractFloat)
         B = Vector{precision_type}(test_vector)
