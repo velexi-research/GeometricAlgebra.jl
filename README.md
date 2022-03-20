@@ -81,10 +81,6 @@ See the LICENSE file for copyright and license information.
 
 * Julia (>=1.6)
 
-#### Julia Packages ####
-
-See `[deps]` section of `Project.toml` files.
-
 ------------------------------------------------------------------------------
 
 [-----------------------------INTERNAL LINKS-----------------------------]: #
