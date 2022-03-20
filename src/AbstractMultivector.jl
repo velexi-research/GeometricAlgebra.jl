@@ -180,7 +180,7 @@ function inverse end
 
 Compute the additive inverse of `M`.
 """
--(M::AbstractMultivector) = inverse(M)
+@inline -(M::AbstractMultivector) = inverse(M)
 
 """
     reverse(M::AbstractMultivector)::AbstractMultivector
