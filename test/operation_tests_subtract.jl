@@ -83,12 +83,9 @@ end
 
 @testset "-(B::Blade, C::Zero)" begin
     test_dim = 10
-
     B = Blade(rand(test_dim, 3))
     C = Zero()
-
-    B_plus_C = B - C
-    @test B_plus_C === B
+    @test B - C === B
 end
 
 @testset "-(B::Blade, C::Real)" begin
@@ -145,9 +142,7 @@ end
 
     B = Pseudoscalar(test_dim, test_value)
     C = Zero()
-
-    B_plus_C = B - C
-    @test B_plus_C === B
+    @test B - C === B
 end
 
 @testset "-(B::Pseudoscalar, C::Real)" begin
@@ -338,12 +333,9 @@ end
 
 @testset "-(B::Zero, C::Blade)" begin
     test_dim = 10
-    
     B = Zero()
     C = Blade(rand(test_dim, 3))
-
-    B_plus_C = B - C
-    @test B_plus_C == -C
+    @test B - C == -C
 end
 
 @testset "-(B::Zero, C::Pseudoscalar)" begin
@@ -352,9 +344,7 @@ end
 
     B = Zero()
     C = Pseudoscalar(test_dim, test_value)
-    
-    B_plus_C = B - C
-    @test B_plus_C == -C
+    @test B - C == -C
 end
 
 @testset "-(B::Zero, C::Scalar)" begin
@@ -425,9 +415,7 @@ end
 @testset "-(B::Zero, C::Vector)" begin
     B = Zero()
     C = rand(5)
-
-    B_plus_C = B - C
-    @test B_plus_C == -C
+    @test B - C == -C
 end
 
 # ------ B::Real
@@ -550,7 +538,5 @@ end
 @testset "-(B::Vector, C::Zero)" begin
     B = rand(5)
     C = Zero()
-
-    B_plus_C = B - C
-    @test B_plus_C === B
+    @test B - C === B
 end
