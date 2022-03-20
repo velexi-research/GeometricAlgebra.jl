@@ -1,5 +1,5 @@
 """
-The GeometricAlgebra.jl module defines geometric algebra types and functions.
+Utility functions for unit tests.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
@@ -7,23 +7,17 @@ is subject to the license terms in the LICENSE file found in the top-level
 directory of this distribution. No part of the GeometricAlgebra.jl package,
 including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
-
 ------------------------------------------------------------------------------
 """
-module GeometricAlgebra
 
-# Types
-include("AbstractMultivector.jl")
-include("AbstractBlade.jl")
-include("AbstractScalar.jl")
-include("Zero.jl")
-include("One.jl")
-include("Scalar.jl")
-include("Blade.jl")
-include("Pseudoscalar.jl")
-include("Multivector.jl")
+"""
+    get_random_value(value_to_add=0)
 
-# Methods
-include("operations.jl")
-
-end  # End of GeometricAlgebra module
+Return a random value with absolute value in the range [`value_to_add`, `value_to_add` + 1).
+If `value_to_add` is not provided, 0 will be used.
+Value is either negative or positive with equal probability.
+"""
+function get_random_value(value_to_add=0)
+    random_number = rand() + value_to_add
+    return (rand() > 0.5) ? random_number : -random_number
+end

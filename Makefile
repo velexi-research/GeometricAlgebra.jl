@@ -3,31 +3,39 @@
 
 # --- Internal Parameters
 
+PKG_DIR=src
 
 # --- Targets
 
 # Default target
 all: test
 
-test check:
-	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Remove old coverage files
-	julia --color=yes -e 'import Pkg; Pkg.test(coverage=true)'
+# Testing
+test:
+	@echo Removing old coverage files
+	julia --color=yes --compile=min -O0 -e 'using Coverage; clean_folder(".");'
 	@echo
-	coverage.jl
+	@echo Running tests
+	julia --color=yes -e 'import Pkg; Pkg.test("TestTools"; coverage=true)'
+	@echo
+	@echo Generating code coverage report
+	@jlcoverage
+
+codestyle:
+	@echo Checking code style
+	@jlcodestyle -v $(PKG_DIR)
+
+docs:
+	cd docs; julia --compile=min -O0 make.jl
 
 # Maintenance
 clean:
-	find . -name "tmp.init-pkg.*" -exec rm -rf {} \;  # init-pkg.jl files
-	find . -name "*.jl.*.cov" -exec rm -f {} \;  # Coverage.jl files
-	find . -name "*.jl.*.mem" -exec rm -f {} \;  # Coverage.jl files
+	@echo Removing coverage files
+	julia --color=yes --compile=min -O0 -e 'using Coverage; clean_folder(".");'
 
-# Setup Julia
-setup:
-	julia --project=`pwd`/bin --startup-file=no \
-		-e 'import Pkg; Pkg.instantiate()'
-	julia --project=`pwd`/test --startup-file=no \
-		-e 'import Pkg; Pkg.instantiate()'
+spotless: clean
+	find . -name "Manifest.toml" -exec rm -rf {} \;  # Manifest.toml files
 
 # Phony Targets
-.PHONY: all clean setup \
-        test check
+.PHONY: all test docs \
+		clean spotless

@@ -1,4 +1,6 @@
-# =========== User-Specified Configuration Parameters =========== #
+# direnv configuration file
+
+# ================= User-Specified Configuration Parameters ================= #
 
 # --- Project-Specific Configuration Parameters
 
@@ -6,7 +8,7 @@
 # NOTE: paths should be specified relative to top-level of project directory.
 PATH_EXTRA=
 
-# ====================== DO NOT EDIT BELOW ====================== #
+# ============================ DO NOT EDIT BELOW ============================ #
 
 # --- Configure environment
 
@@ -24,3 +26,5 @@ done
 
 # Julia configuration
 export JULIA_PROJECT=@.
+export JULIA_LOAD_PATH=$TOP_DIR:  # Note the trailing ":" is necessary so that
+                                  # Julia includes the default LOAD_PATH
