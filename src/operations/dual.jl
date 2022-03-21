@@ -22,6 +22,15 @@ dual(B::AbstractScalar, C::AbstractBlade) =
         Blade(C, volume=value(B), copy_basis=false) :
         Blade(C, volume=-value(B), copy_basis=false)
 
+# B::AbstractBlade, C::Real
+# B::Real, C::AbstractBlade
+dual(B::AbstractBlade, C::Real) = grade(B) > 0 ? zero(B) : B
+
+dual(B::Real, C::AbstractBlade) =
+    mod(grade(C), 4) < 2 ?
+        Blade(C, volume=B, copy_basis=false) :
+        Blade(C, volume=-B, copy_basis=false)
+
 # ------ Specializations involving a Blade instance
 
 # B::Blade, C::Blade
@@ -99,6 +108,18 @@ function dual(B::Pseudoscalar, C::Blade)
     zero(B)
 end
 
+# B::Blade, C::Vector
+# B::Vector, C::Blade
+function dual(B::Blade, C::Vector)
+    C_blade = Blade(C)
+    return dual(B, C_blade)
+end
+
+function dual(B::Vector, C::Blade)
+    B_blade = Blade(B)
+    return dual(B_blade, C)
+end
+
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
@@ -116,6 +137,32 @@ dual(B::AbstractScalar, C::Pseudoscalar) =
         Pseudoscalar(C, value=value(B)) :
         Pseudoscalar(C, value=-value(B))
 
+# B::Pseudoscalar, C::Real
+# B::Real, C::Pseudoscalar
+dual(B::Pseudoscalar, C::Real) = zero(B)
+
+dual(B::Real, C::Pseudoscalar) =
+    mod(grade(C), 4) < 2 ?
+        Pseudoscalar(C, value=B) :
+        Pseudoscalar(C, value=-B)
+
+# B::Vector, C::Pseudoscalar
+# B::Pseudoscalar, C::Vector
+function dual(B::Vector, C::Pseudoscalar)
+    assert_dim_equal(B, C)
+    dual(Blade(B))
+end
+
+function dual(B::Pseudoscalar, C::Vector)
+    assert_dim_equal(B, C)
+
+    if length(C) == 1
+        return dual(B, Blade(C))
+    end
+
+    zero(B)
+end
+
 # ------ Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
@@ -131,6 +178,37 @@ function dual(B::AbstractScalar, C::AbstractScalar)
     B
 end
 
+# B::AbstractScalar, C::Real
+# B::Real, C::AbstractScalar
+function dual(B::AbstractScalar, C::Real)
+    if iszero(C)
+        dual_relative_to_zero()
+    end
+
+    if iszero(B)
+        dual_of_zero()
+    end
+
+    B
+end
+
+function dual(B::Real, C::AbstractScalar)
+    if iszero(C)
+        dual_relative_to_zero()
+    end
+
+    if iszero(B)
+        dual_of_zero()
+    end
+
+    Scalar(B)
+end
+
+# B::Vector, C::AbstractScalar
+# B::AbstractScalar, C::Vector
+dual(B::Vector, C::AbstractScalar) = zero(B)
+dual(B::AbstractScalar, C::Vector) = Blade(C, volume=value(B))
+
 # ------ Specializations involving a Zero instance
 
 # dual(B::Zero, C)
@@ -140,6 +218,8 @@ dual(B::Zero, C::Blade) = dual_of_zero()
 dual(B::Zero, C::Pseudoscalar) = dual_of_zero()
 dual(B::Zero, C::Scalar) = dual_of_zero()
 dual(B::Zero, C::One) = dual_of_zero()
+dual(B::Zero, C::Real) = dual_of_zero()
+dual(B::Zero, C::Vector) = dual_of_zero()
 
 # dual(B, C::Zero)
 @inline dual_relative_to_zero() =
@@ -151,3 +231,5 @@ dual(B::Pseudoscalar, C::Zero) = dual_relative_to_zero()
 dual(B::Scalar, C::Zero) = dual_relative_to_zero()
 dual(B::One, C::Zero) = dual_relative_to_zero()
 dual(B::Zero, C::Zero) = dual_relative_to_zero()
+dual(B::Real, C::Zero) = dual_relative_to_zero()
+dual(B::Vector, C::Zero) = dual_relative_to_zero()

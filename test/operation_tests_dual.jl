@@ -191,6 +191,46 @@ end
     end
 end
 
+@testset "dual(B::Blade, C::Vector)" begin
+    # --- Preparations
+
+    test_dim = 20
+    grade_C = 1
+
+    C = rand(test_dim, grade_C)[:, grade_C]
+
+    # --- Tests
+
+    # ------ dim(B) == dim(C), grade(B) == grade(C)
+
+    B_vectors = C * rand()
+    B = Blade(B_vectors)
+
+    relative_orientation =
+        sign(LinearAlgebra.det(transpose(basis(B)) * reshape(C, length(C), 1)))
+    expected_result = Scalar(relative_orientation * volume(B))
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C ≈ expected_result
+
+    # ------ dim(B) != dim(C)
+
+    B = Blade(rand(test_dim + 1, grade_C))
+    @test_throws DimensionMismatch dual(B, C)
+
+    # ------ B not contained in C
+
+    # grade(B) > grade(C)
+    B = Blade(rand(test_dim, grade_C + 1))
+    @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+
+    # grade(B) == grade(C), B not contained in C
+    B_basis = copy(C)
+    B_basis[1] += 1
+    B = Blade(B_basis)
+    @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+end
+
 # --- B::Pseudoscalar
 
 @testset "dual(B::Pseudoscalar, C::Blade)" begin
@@ -294,6 +334,33 @@ end
     end
 end
 
+@testset "dual(B::Pseudoscalar, C::Vector)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_value = get_random_value()
+
+    # --- Tests
+
+    # dim(B) == dim(C) > 1
+    B = Pseudoscalar(test_dim, test_value)
+    C = rand(test_dim, 1)[:, 1]
+    @test iszero(dual(B, C))
+
+    # dim(B) == dim(C) == 1
+    B = Pseudoscalar(1, test_value)
+    C = [rand()]
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C isa Scalar
+    @test dual(B, C) == Scalar(test_value)
+
+    # dim(B) != dim(C)
+    B = Pseudoscalar(test_dim + 1, test_value)
+    C = rand(test_dim, 1)[:, 1]
+    @test_throws DimensionMismatch dual(B, C)
+end
+
 # --- B::Scalar
 
 @testset "dual(B::Scalar, C::Blade)" begin
@@ -365,6 +432,36 @@ end
     @test B_dual_C === B
 end
 
+@testset "dual(B::Scalar, C::Real)" begin
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    B = Scalar(test_value_1)
+    C = test_value_2
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C isa Scalar
+    @test B_dual_C == test_value_1
+end
+
+@testset "dual(B::Scalar, C::Vector)" begin
+    # --- Preparations
+
+    test_dim = 15
+    test_value = get_random_value()
+
+    # --- Tests
+
+    B = Scalar(test_value)
+    C = randn(test_dim, 1)[:, 1]
+
+    B_dual_C = dual(B, C)
+    expected_result = Blade(C, volume=test_value)
+
+    @test B_dual_C isa Blade
+    @test B_dual_C == expected_result
+end
+
 # --- B::One
 
 @testset "dual(B::One, C::Blade)" begin
@@ -422,6 +519,28 @@ end
     @test B_dual_C === B
 end
 
+@testset "dual(B::One, C::Vector)" begin
+    # Preparations
+    test_dim = 12
+
+    B = One()
+    C = randn(test_dim, 1)[:, 1]
+
+    B_dual_C = dual(B, C)
+    expected_result = Blade(C, volume=1)
+
+    @test B_dual_C isa Blade
+    @test B_dual_C == expected_result
+end
+
+@testset "dual(B::One, C::Real)" begin
+    B = One()
+    C = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C === B
+end
+
 # --- B::Zero or C::Zero
 
 @testset "dual(B::Zero, C)" begin
@@ -435,6 +554,14 @@ end
     expected_error = "The dual of Zero is not well-defined"
 
     # --- Tests
+
+    # C::Real
+    C = test_value
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # C::Vector
+    C = rand(4, 1)[:, 1]
+    @test_throws ErrorException(expected_error) dual(B, C)
 
     # C::One
     C = One()
@@ -468,6 +595,14 @@ end
 
     # --- Tests
 
+    # B::Real
+    B = test_value
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Vector
+    B = rand(4, 1)[:, 1]
+    @test_throws ErrorException(expected_error) dual(B, C)
+
     # B::Zero
     B = Zero()
     @test_throws ErrorException(expected_error) dual(B, C)
@@ -491,4 +626,181 @@ end
     # C::Multivector
     # C = Multivector(5, test_value)
     @test_skip 1
+end
+
+# --- B::Real
+
+@testset "dual(B::Real, C::Blade)" begin
+    # --- Preparations
+
+    test_dim = 15
+    test_value = get_random_value()
+
+    # --- Tests
+
+    for test_grade in 5:8
+        B = test_value
+        C = Blade(randn(test_dim, test_grade))
+
+        B_dual_C = dual(B, C)
+        expected_result = mod(test_grade, 4) < 2 ?
+            Blade(C, volume=test_value) :
+            Blade(C, volume=-test_value)
+
+        @test B_dual_C isa Blade
+        @test B_dual_C == expected_result
+    end
+end
+
+@testset "dual(B::Real, C::Pseudoscalar)" begin
+    # --- Preparations
+
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    # --- Tests
+
+    for test_dim in 5:8
+        B = test_value_1
+        C = Pseudoscalar(test_dim, test_value_2)
+
+        expected_result = mod(test_dim, 4) < 2 ?
+            Pseudoscalar(test_dim, test_value_1) :
+            Pseudoscalar(test_dim, -test_value_1)
+
+        @test dual(B, C) == expected_result
+    end
+end
+
+@testset "dual(B::Real, C::Scalar)" begin
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    B = test_value_1
+    C = Scalar(test_value_2)
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C isa Scalar
+    @test B_dual_C == test_value_1
+end
+
+@testset "dual(B::Real, C::One)" begin
+    test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    B = test_value
+    C = One()
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C isa Scalar
+    @test B_dual_C == test_value
+end
+
+# --- B::Vector
+
+@testset "dual(B::Vector, C::Blade)" begin
+    # --- Preparations
+
+    test_dim = 20
+
+    C = Blade(rand(test_dim, 7))
+
+    # --- Tests
+
+    # ------ dim(B) == dim(C), grade(C) > 1
+
+    grade_B = 1
+    B = basis(C)[:, grade_B] * rand()
+
+    B_dual_C = dual(B, C)
+
+    # --- Check dim, grade, and norm
+
+    @test dim(B_dual_C) == test_dim
+    @test grade(B_dual_C) == grade(C) - grade_B
+    @test norm(B_dual_C) == norm(B)
+
+    # --- Check that B and dual(B) are orthogonal complements
+
+    @test LinearAlgebra.norm(transpose(basis(B_dual_C)) * reshape(B, length(B), 1)) <
+        10 * eps(Float64)
+
+    # --- Check sign(dual(B, C))
+
+    # Compute sign of I_C formed from basis(B) and basis(dual(B, C))
+    expected_sign = sign(LinearAlgebra.det(
+        transpose(hcat(B, basis(B_dual_C))) * basis(C)))
+
+    # Account for sign of I_C^{-1} relative to I_C
+    if mod(grade(C), 4) >= 2
+        expected_sign = -expected_sign
+    end
+
+    @test sign(B_dual_C) == expected_sign
+
+    # Check dual(dual(B, C), C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+    if mod(grade(C), 4) < 2
+        @test dual(B_dual_C, C) ≈ B
+    else
+        @test dual(B_dual_C, C) ≈ -B
+    end
+
+    # ------ dim(B) == dim(C), grade(C) == 1
+
+    C_grade_1 = Blade(rand(test_dim, grade_B))
+    coefficients = rand()
+    B = basis(C_grade_1)[:, grade_B] * coefficients
+
+    relative_orientation =
+        sign(LinearAlgebra.det(reshape(B, 1, length(B)) * basis(C_grade_1)))
+    expected_result = Scalar(relative_orientation * LinearAlgebra.norm(B))
+
+    @test dual(B, C_grade_1) ≈ expected_result
+
+    # ------ dim(B) != dim(C)
+
+    B = rand(test_dim + 1, grade_B)[:, grade_B]
+    @test_throws DimensionMismatch dual(B, C)
+
+    # ------ B not contained in C
+
+    # grade(B) <= grade(C), B not contained in C
+    B = rand(test_dim, grade_B)[:, grade_B]
+    while LinearAlgebra.norm(reject(reshape(B, length(B), 1), C)) < sqrt(eps(Float64))
+        B = rand(test_dim, grade_B)[:, grade_B]
+    end
+    @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+
+    # ------ B is a vector of 0s
+
+    B = fill(0, test_dim)
+    @test_throws ErrorException("The dual of Zero is not well-defined") dual(B, C)
+end
+
+@testset "dual(B::Vector, C::Pseudoscalar)" begin
+    # --- Preparations
+
+    test_dim = 10
+    test_value = get_random_value()
+
+    # --- Tests
+
+    # dim(B) == dim(C)
+    B = rand(test_dim, 1)[:, 1]
+    C = Pseudoscalar(test_dim, test_value)
+
+    B_dual_C = dual(B, C)
+    @test B_dual_C isa Blade
+    @test B_dual_C == dual(Blade(B))
+
+    # Check dual(dual(B, C), C) = (-1)^(grade(C) * (grade(C) - 1) / 2) B
+    if mod(grade(C), 4) < 2
+        @test dual(B_dual_C, C) ≈ B
+    else
+        @test dual(B_dual_C, C) ≈ -B
+    end
+
+    # dim(B) != dim(C)
+    B = rand(test_dim, 1)[:, 1]
+    C = Pseudoscalar(test_dim + 1, test_value)
+    @test_throws DimensionMismatch dual(B, C)
 end
