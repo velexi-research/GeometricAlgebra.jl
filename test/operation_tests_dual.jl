@@ -178,7 +178,7 @@ end
     for test_grade in 5:8
         B = Blade(randn(test_dim, test_grade))
         C = Scalar(test_value)
-        @test iszero(dual(B, C))
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
     end
 end
 
@@ -187,7 +187,18 @@ end
     for test_grade in 5:8
         B = Blade(randn(test_dim, test_grade))
         C = One()
-        @test iszero(dual(B, C))
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+    end
+end
+
+@testset "dual(B::Blade, C::Real)" begin
+    test_dim = 9
+    test_value = get_random_value()
+
+    for test_grade in 5:8
+        B = Blade(randn(test_dim, test_grade))
+        C = test_value
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
     end
 end
 
@@ -247,7 +258,7 @@ end
     for test_grade in 2:5
         B = Pseudoscalar(test_dim, test_value)
         C = Blade(rand(test_dim, test_grade))
-        @test iszero(dual(B, C))
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
     end
 
     # dim(B) != dim(C)
@@ -319,7 +330,7 @@ end
     for test_dim in 10:13
         B = Pseudoscalar(test_dim, test_value_1)
         C = Scalar(test_value_2)
-        @test iszero(dual(B, C))
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
     end
 end
 
@@ -330,7 +341,22 @@ end
     for test_dim in 10:13
         B = Pseudoscalar(test_dim, test_value)
         C = One()
-        @test iszero(dual(B, C))
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+    end
+end
+
+@testset "dual(B::Pseudoscalar, C::Real)" begin
+    # --- Preparations
+
+    test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+    test_value_2 = get_random_value(2)  # add 2 to keep value away from 0 and 1
+
+    # --- Tests
+
+    for test_dim in 10:13
+        B = Pseudoscalar(test_dim, test_value_1)
+        C = test_value_2
+        @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
     end
 end
 
@@ -345,7 +371,7 @@ end
     # dim(B) == dim(C) > 1
     B = Pseudoscalar(test_dim, test_value)
     C = rand(test_dim, 1)[:, 1]
-    @test iszero(dual(B, C))
+    @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
 
     # dim(B) == dim(C) == 1
     B = Pseudoscalar(1, test_value)
@@ -803,4 +829,16 @@ end
     B = rand(test_dim, 1)[:, 1]
     C = Pseudoscalar(test_dim + 1, test_value)
     @test_throws DimensionMismatch dual(B, C)
+end
+
+@testset "dual(B::Vector, C::Scalar)" begin
+    B = randn(9, 1)[:, 1]
+    C = Scalar(get_random_value())
+    @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+end
+
+@testset "dual(B::Vector, C::One)" begin
+    B = randn(10, 1)[:, 1]
+    C = One()
+    @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
 end

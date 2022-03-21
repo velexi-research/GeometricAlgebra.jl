@@ -15,7 +15,8 @@ except according to the terms contained in the LICENSE file.
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
-dual(B::AbstractBlade, C::AbstractScalar) = grade(B) > 0 ? zero(B) : B
+dual(B::AbstractBlade, C::AbstractScalar) = 
+    grade(B) > 0 ? throw(ArgumentError("`B` not contained in `C`")) : B
 
 dual(B::AbstractScalar, C::AbstractBlade) =
     mod(grade(C), 4) < 2 ?
@@ -24,7 +25,8 @@ dual(B::AbstractScalar, C::AbstractBlade) =
 
 # B::AbstractBlade, C::Real
 # B::Real, C::AbstractBlade
-dual(B::AbstractBlade, C::Real) = grade(B) > 0 ? zero(B) : B
+dual(B::AbstractBlade, C::Real) = 
+    grade(B) > 0 ? throw(ArgumentError("`B` not contained in `C`")) : B
 
 dual(B::Real, C::AbstractBlade) =
     mod(grade(C), 4) < 2 ?
@@ -105,19 +107,19 @@ end
 
 function dual(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
-    zero(B)
+    throw(ArgumentError("`B` not contained in `C`"))
 end
 
 # B::Blade, C::Vector
 # B::Vector, C::Blade
 function dual(B::Blade, C::Vector)
     C_blade = Blade(C)
-    return dual(B, C_blade)
+    dual(B, C_blade)
 end
 
 function dual(B::Vector, C::Blade)
     B_blade = Blade(B)
-    return dual(B_blade, C)
+    dual(B_blade, C)
 end
 
 # ------ Specializations involving a Pseudoscalar instance
@@ -130,7 +132,8 @@ end
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, C::Pseudoscalar
-dual(B::Pseudoscalar, C::AbstractScalar) = zero(B)
+dual(B::Pseudoscalar, C::AbstractScalar) = 
+    throw(ArgumentError("`B` not contained in `C`"))
 
 dual(B::AbstractScalar, C::Pseudoscalar) =
     mod(grade(C), 4) < 2 ?
@@ -139,7 +142,8 @@ dual(B::AbstractScalar, C::Pseudoscalar) =
 
 # B::Pseudoscalar, C::Real
 # B::Real, C::Pseudoscalar
-dual(B::Pseudoscalar, C::Real) = zero(B)
+dual(B::Pseudoscalar, C::Real) =
+    throw(ArgumentError("`B` not contained in `C`"))
 
 dual(B::Real, C::Pseudoscalar) =
     mod(grade(C), 4) < 2 ?
@@ -160,7 +164,7 @@ function dual(B::Pseudoscalar, C::Vector)
         return dual(B, Blade(C))
     end
 
-    zero(B)
+    throw(ArgumentError("`B` not contained in `C`"))
 end
 
 # ------ Specializations involving an AbstractScalar instance
@@ -206,7 +210,8 @@ end
 
 # B::Vector, C::AbstractScalar
 # B::AbstractScalar, C::Vector
-dual(B::Vector, C::AbstractScalar) = zero(B)
+dual(B::Vector, C::AbstractScalar) = 
+    throw(ArgumentError("`B` not contained in `C`"))
 dual(B::AbstractScalar, C::Vector) = Blade(C, volume=value(B))
 
 # ------ Specializations involving a Zero instance
