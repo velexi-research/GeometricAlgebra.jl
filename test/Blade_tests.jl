@@ -997,16 +997,15 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "Blade: -(B)" begin
+@testset "Blade: inverse(B)" begin
     # Preparations
     vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
 
     # B::Blade
-    negative_B = Blade(B, volume=-volume(B))
-    @test -B == negative_B
-
-    @test -negative_B == B
+    inverse_B = inverse(B)
+    @test inverse_B == Blade(B, volume=-volume(B))
+    @test -B == inverse_B
 end
 
 @testset "Blade: reverse(B)" begin

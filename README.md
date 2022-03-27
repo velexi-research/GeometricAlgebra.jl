@@ -17,9 +17,9 @@ GeometricAlgebra.jl
     <td>Build Status</td>
     <td>
       <a href="https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/CI.yml/badge.svg"/></a>
-      <!--
-      <a href="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl"><img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl/branch/main/graph/badge.svg?token=LW2DS0JUWF"/></a>
-      -->
+      <a href="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl">
+        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl/branch/main/graph/badge.svg?token=2PSLG9EGAK"/>
+      </a>
     </td>
   </tr>
 
@@ -28,9 +28,7 @@ GeometricAlgebra.jl
     <td colspan=2 align="center">
       <a href="https://github.com/velexi-corporation/GeometricAlgebra.jl/issues"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/></a>
       <a href="https://github.com/invenia/BlueStyle"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/code%20style-blue-4495d1.svg"/></a>
-      <!--
-      <a href="http://hits.dwyl.com/velexi/GeometricAlgebra"><img style="vertical-align: bottom;" src="https://hits.dwyl.com/velexi/GeometricAlgebra.svg?style=flat-square&show=unique"/></a>
-      -->
+      <a href="http://hits.dwyl.com/velexi-corporation/GeometricAlgebrajl"><img style="vertical-align: bottom;" src="https://hits.dwyl.com/velexi-corporation/GeometricAlgebrajl.svg?style=flat-square&show=unique"/></a>
     </td>
   </tr>
 </table>
@@ -80,18 +78,6 @@ See the LICENSE file for copyright and license information.
 ### 2.1. Software Dependencies
 
 #### Base Requirements
-
-* Julia (>=1.6)
-
-#### Julia Packages ####
-
-See `[deps]` section of `Project.toml` files.
-
-------------------------------------------------------------------------------
-
-## 3. Known Issues
-
-TODO
 
 ------------------------------------------------------------------------------
 

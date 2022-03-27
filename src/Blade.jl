@@ -340,7 +340,7 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 
 dim(B::Blade) = B.dim
 
--(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
+inverse(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
 
 Base.reverse(B::Blade) =
     mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
@@ -416,6 +416,21 @@ function isapprox(B::Blade{T1}, C::Blade{T2};
 
     # Check that B and C have the same orientation
     return sign(B) * sign(C) == sign(projection)
+end
+
+function isapprox(B::Blade{T1}, C::Vector{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat}
+    C_blade = Blade(C)
+    return isapprox(B, C_blade, atol=atol, rtol=rtol)
+end
+
+function isapprox(B::Vector{T1}, C::Blade{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat}
+    return isapprox(C, B, atol=atol, rtol=rtol)
 end
 
 # --- Utility methods

@@ -208,13 +208,14 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "One: -(B)" begin
+@testset "One: inverse(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
-        minus_B = -B
-        @test minus_B isa Scalar{precision_type}
-        @test minus_B == Scalar{precision_type}(-1)
+        inverse_B = inverse(B)
+        @test inverse_B isa Scalar{precision_type}
+        @test inverse_B == Scalar{precision_type}(-1)
+        @test -B == inverse_B
     end
 end
 
