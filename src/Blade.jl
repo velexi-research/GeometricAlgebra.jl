@@ -418,6 +418,21 @@ function isapprox(B::Blade{T1}, C::Blade{T2};
     return sign(B) * sign(C) == sign(projection)
 end
 
+function isapprox(B::Blade{T1}, C::Vector{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat}
+    C_blade = Blade(C)
+    return isapprox(B, C_blade, atol=atol, rtol=rtol)
+end
+
+function isapprox(B::Vector{T1}, C::Blade{T2};
+  atol::Real=0,
+  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
+                                                          T2<:AbstractFloat}
+    return isapprox(C, B, atol=atol, rtol=rtol)
+end
+
 # --- Utility methods
 
 convert(::Type{T}, B::Blade) where {T<:AbstractFloat} =

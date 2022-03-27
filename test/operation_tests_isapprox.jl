@@ -150,13 +150,33 @@ end
     end
 end
 
-@testset "!isapprox(B::Blade, C::Vector)" begin
-    test_vectors = [3 3; 4 4; 0 1]
+@testset "isapprox(B::Blade, C::Vector)" begin
+    # --- Preparations
+    
     test_vector = [3; 4; 1]
+
+    # B ≉ C
+    test_vectors = [3 3; 4 4; 0 1]
     for precision_type in subtypes(AbstractFloat)
         B = Blade{precision_type}(test_vectors)
         C = Vector{precision_type}(test_vector)
         @test B ≉ C
+    end
+
+    test_vectors = [3; 4; 10]
+    for precision_type in subtypes(AbstractFloat)
+        B = Blade{precision_type}(test_vectors)
+        C = Vector{precision_type}(test_vector)
+        @test B ≉ C
+    end
+
+    # B ≈ C
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Blade{precision_type1}(test_vector)
+            C = Vector{precision_type2}(test_vector)
+            @test B ≈ C
+        end
     end
 end
 
@@ -631,13 +651,33 @@ end
 
 # ------ B::Vector
 
-@testset "!isapprox(B::Vector, C::Blade)" begin
+@testset "isapprox(B::Vector, C::Blade)" begin
+    # --- Preparations
+
     test_vector = [3; 4; 1]
+
+    # B ≉ C
     test_vectors = [3 3; 4 4; 0 1]
     for precision_type in subtypes(AbstractFloat)
         B = Vector{precision_type}(test_vector)
         C = Blade{precision_type}(test_vectors)
         @test B ≉ C
+    end
+
+    test_vectors = [3; 4; 10]
+    for precision_type in subtypes(AbstractFloat)
+        B = Vector{precision_type}(test_vector)
+        C = Blade{precision_type}(test_vectors)
+        @test B ≉ C
+    end
+
+    # B ≈ C
+    for precision_type1 in subtypes(AbstractFloat)
+        for precision_type2 in subtypes(AbstractFloat)
+            B = Vector{precision_type1}(test_vector)
+            C = Blade{precision_type2}(test_vector)
+            @test B ≈ C
+        end
     end
 end
 
