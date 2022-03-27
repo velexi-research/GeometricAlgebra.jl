@@ -212,7 +212,7 @@ end
 
     # --- Tests
 
-    # ------ dim(B) == dim(C), grade(B) == grade(C)
+    # ------ dim(B) == dim(C), C is proportional to B
 
     B_vectors = C * rand()
     B = Blade(B_vectors)
@@ -625,8 +625,12 @@ end
     B = test_value
     @test_throws ErrorException(expected_error) dual(B, C)
 
-    # B::Vector
+    # B::Vector is not zero
     B = rand(4, 1)[:, 1]
+    @test_throws ErrorException(expected_error) dual(B, C)
+
+    # B::Vector is zero
+    B = [0; 0; 0]
     @test_throws ErrorException(expected_error) dual(B, C)
 
     # B::Zero
@@ -732,7 +736,7 @@ end
 
     # --- Tests
 
-    # ------ dim(B) == dim(C), grade(C) > 1
+    # ------ dim(B) == dim(C), grade(C) > 1, B is contained in C
 
     grade_B = 1
     B = basis(C)[:, grade_B] * rand()
@@ -770,7 +774,7 @@ end
         @test dual(B_dual_C, C) ≈ -B
     end
 
-    # ------ dim(B) == dim(C), grade(C) == 1
+    # ------ dim(B) == dim(C), grade(C) == 1, B is contained in C
 
     C_grade_1 = Blade(rand(test_dim, grade_B))
     coefficients = rand()
@@ -832,13 +836,25 @@ end
 end
 
 @testset "dual(B::Vector, C::Scalar)" begin
-    B = randn(9, 1)[:, 1]
     C = Scalar(get_random_value())
+
+    # B is not zero
+    B = randn(9, 1)[:, 1]
     @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+
+    # B is zero
+    B = [0; 0; 0]
+    @test_throws ErrorException("The dual of Zero is not well-defined") dual(B, C)
 end
 
 @testset "dual(B::Vector, C::One)" begin
-    B = randn(10, 1)[:, 1]
     C = One()
+
+    # B is not zero
+    B = randn(10, 1)[:, 1]
     @test_throws ArgumentError("`B` not contained in `C`") dual(B, C)
+
+    # B is zero
+    B = [0; 0; 0]
+    @test_throws ErrorException("The dual of Zero is not well-defined") dual(B, C)
 end

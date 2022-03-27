@@ -112,15 +112,8 @@ end
 
 # B::Blade, C::Vector
 # B::Vector, C::Blade
-function dual(B::Blade, C::Vector)
-    C_blade = Blade(C)
-    dual(B, C_blade)
-end
-
-function dual(B::Vector, C::Blade)
-    B_blade = Blade(B)
-    dual(B_blade, C)
-end
+@inline dual(B::Blade, C::Vector) = dual(B, Blade(C))
+@inline dual(B::Vector, C::Blade) = dual(Blade(B), C)
 
 # ------ Specializations involving a Pseudoscalar instance
 
@@ -160,7 +153,7 @@ end
 function dual(B::Pseudoscalar, C::Vector)
     assert_dim_equal(B, C)
 
-    if length(C) == 1
+    if dim(B) == 1
         return dual(B, Blade(C))
     end
 
@@ -211,7 +204,9 @@ end
 # B::Vector, C::AbstractScalar
 # B::AbstractScalar, C::Vector
 dual(B::Vector, C::AbstractScalar) = 
-    throw(ArgumentError("`B` not contained in `C`"))
+    iszero(B) ? 
+        dual_of_zero() : 
+        throw(ArgumentError("`B` not contained in `C`"))
 dual(B::AbstractScalar, C::Vector) = Blade(C, volume=value(B))
 
 # ------ Specializations involving a Zero instance
