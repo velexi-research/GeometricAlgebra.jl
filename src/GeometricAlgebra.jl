@@ -26,4 +26,4 @@ include("Multivector.jl")
 # Methods
 include("operations.jl")
 
-end  # End of GeometricAlgebra module
+end  # End GeometricAlgebra module

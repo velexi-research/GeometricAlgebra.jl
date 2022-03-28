@@ -96,26 +96,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Julia environment
-        uses: julia-actions/setup-julia@v1
+        uses: julia-actions/setup-julia@latest
         with:
-          version: '1'
+          version: '1.7'
 
-      - name: Build package
-        uses: julia-actions/julia-buildpkg@v1
+      - name: Install dependencies
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
-      - name: Deploy documentation
-        uses: julia-actions/julia-docdeploy@v1
+      - name: Build and deploy documentation
+        run: julia --project=docs/ --compile=min -O0 docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
-
-      - name: Build documentation
-        run: |
-          julia --project=docs -e '
-            using Documenter: DocMeta, doctest
-            using GeometricAlgebra
-            DocMeta.setdocmeta!(GeometricAlgebra,
-                                :DocTestSetup,
-                                :(using GeometricAlgebra);
-                                recursive=true)
-            doctest(GeometricAlgebra)'
