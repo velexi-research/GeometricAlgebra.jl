@@ -4,9 +4,6 @@
 using Documenter
 using GeometricAlgebra
 
-# Make sure that the Julia source code directory is on LOAD_PATH
-push!(LOAD_PATH, "../src/")
-
 # Set up DocMeta
 DocMeta.setdocmeta!(
     GeometricAlgebra, :DocTestSetup, :(using GeometricAlgebra); recursive=true
@@ -21,7 +18,7 @@ makedocs(;
     sitename="GeometricAlgebra",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://velexi-corporation.github.io/GeometricAlgebra.jl/stable",
+        canonical="https://velexi-corporation.github.io/GeometricAlgebra.jl",
         assets=String[],
     ),
     pages=[
