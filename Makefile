@@ -3,7 +3,11 @@
 
 # --- Internal Parameters
 
+# Package variables
 PKG_DIR=src
+
+# Julia environment
+export JULIA_PROJECT = @.
 
 # --- Targets
 
@@ -13,10 +17,10 @@ all: test
 # Testing
 test:
 	@echo Removing old coverage files
-	julia --color=yes --compile=min -O0 -e 'using Coverage; clean_folder(".");'
+	find . -name "*.jl.*.cov" -exec rm -f {} \;
 	@echo
 	@echo Running tests
-	julia --color=yes -e 'import Pkg; Pkg.test("TestTools"; coverage=true)'
+	julia --color=yes -e 'import Pkg; Pkg.test(; coverage=true)'
 	@echo
 	@echo Generating code coverage report
 	@jlcoverage
@@ -31,7 +35,7 @@ docs:
 # Maintenance
 clean:
 	@echo Removing coverage files
-	julia --color=yes --compile=min -O0 -e 'using Coverage; clean_folder(".");'
+	find . -name "*.jl.*.cov" -exec rm -f {} \;
 
 spotless: clean
 	find . -name "Manifest.toml" -exec rm -rf {} \;  # Manifest.toml files
