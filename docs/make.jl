@@ -18,7 +18,7 @@ makedocs(;
     sitename="GeometricAlgebra",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://velexi-corporation.github.io/GeometricAlgebra.jl",
+        canonical="https://velexi-corporation.github.io/GeometricAlgebra.jl/stable",
         assets=String[],
     ),
     pages=[
