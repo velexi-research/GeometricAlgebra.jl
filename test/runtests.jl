@@ -9,40 +9,17 @@ including this file, may be copied, modified, propagated, or distributed
 except according to the terms contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# TODO: replace local TestSetExtensions.jl with official package after pull request has
-#       been accepted
-
 # --- Imports
 
 # Standard library
 using Test
 
 # External packages
-using Documenter
-#using TestSetExtensions
-include("../src-external/TestSetExtensions.jl")
-ExtendedTestSet = TestSetExtensions.ExtendedTestSet
+using TestTools: jltest
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-# --- Preparations
+# --- Run tests
 
-ENABLE_FAIL_FAST = get(ENV, "JULIA_TEST_FAIL_FAST", "true")
-if ENABLE_FAIL_FAST == "true"
-    extended_test_set = ExtendedTestSet{Test.FallbackTestSet}
-else
-    extended_test_set = ExtendedTestSet
-end
-
-# --- Test sets
-
-#=
-@testset "Doctests" begin
-    doctest(GeometricAlgebra)
-end
-=#
-
-@testset extended_test_set "Unit tests" begin
-    @TestSetExtensions.includetests ARGS
-end
+jltest.run_tests(@__DIR__)
