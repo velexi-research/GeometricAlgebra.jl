@@ -27,7 +27,6 @@ test:
 
 fast-test: export JLTEST_FAIL_FAST=true
 fast-test: test
-	echo $(JLTEST_FAIL_FAST)
 
 # Code quality
 codestyle:
