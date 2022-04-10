@@ -34,37 +34,6 @@ export reciprocal
     AbstractBlade{<:AbstractFloat}
 
 Supertype for all blade types.
-
-Interface
-=========
-
-Properties
-----------
-
-    grade(B::AbstractBlade)::Int
-
-    basis(B::AbstractBlade)::Matrix
-
-    volume(B::AbstractBlade)::AbstractFloat
-
-    sign(B::AbstractBlade)::Int8
-
-Operations
-----------
-
-    dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
-
-    reciprocal(B::AbstractBlade)::AbstractBlade
-
-Implementation
-==============
-
-* For the AbstractBlade type, the `volume` of a blade should encode both norm
-  and orientation information.
-
-* The return value of all methods should preserve the precision of its
-  AbstractBlade arguments (when possible).
-
 """
 abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 
@@ -73,7 +42,7 @@ abstract type AbstractBlade{T<:AbstractFloat} <: AbstractMultivector{T} end
 """
     grade(B::AbstractBlade)::Int
 
-Return grade of `B`.
+Return the grade of `B`.
 """
 function grade end
 
@@ -82,8 +51,8 @@ function grade end
 
 Return an orthonormal basis for the subspace represented by `B`.
 
-When `B` is an AbstractScalar, 1 (at the precision of `B`) is returned. When
-`B` is a Pseudoscalar, LinearAlgebra.I is returned.
+When `B` is an `AbstractScalar`, 1 (at the precision of `B`) is returned. When
+`B` is a `Pseudoscalar`, `LinearAlgebra.I` is returned.
 """
 function basis end
 
@@ -92,8 +61,12 @@ function basis end
 
 Return the signed volume of `B`.
 
-When `B` is a Blade, `volume(B)` is the signed norm of the blade _relative_ to
-its unit basis.
+When `B` is a `Blade`, `volume(B)` is the signed norm of the blade _relative_ to its unit
+basis.
+
+!!! note
+
+    The `volume` of a blade encodes both norm and orientation information of a blade.
 """
 function volume end
 
@@ -109,14 +82,19 @@ sign(B::AbstractBlade)::Int8 = sign(volume(B))
 
 Compute the dual `B` relative to the subspace represented by `C`.
 
-Notes
-=====
+!!! note
 
-* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
-  vector spaces of the same dimension and (2) the subspace represented by `B`
-  is contained in subspace represented by `C`.
+    `dual(B, C)` is only defined if
 
-* The volume of `C` is ignored.
+    1. `B` and `C` are extended from real vector spaces of the same dimension and
+
+    2. the subspace represented by `B` is contained in subspace represented by `C`.
+
+    If either of these conditions is not satisfied, an error is thrown.
+
+!!! note
+
+    The volume of `C` is ignored when computing `dual(B, C)`.
 """
 dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade =
     nothing  # no-op method to attach docstring to because an empty generic function for
