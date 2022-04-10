@@ -51,8 +51,8 @@ function grade end
 
 Return an orthonormal basis for the subspace represented by `B`.
 
-When `B` is an `AbstractScalar`, 1 (at the precision of `B`) is returned. When
-`B` is a `Pseudoscalar`, `LinearAlgebra.I` is returned.
+When `B` is an `AbstractScalar`, 1 (at the precision of `B`) is returned. When `B` is a
+`Pseudoscalar`, `LinearAlgebra.I` is returned.
 """
 function basis end
 

@@ -57,8 +57,8 @@ function dim end
 """
     grades(M::AbstractMultivector; collect=true)::Vector{Int}
 
-Return the grades of the nonzero `k`-vector components of `M`. When `collect`
-is `false`, an iterator over the grades is returned.
+Return the grades of the nonzero `k`-vector components of `M`. When `collect` is `false`,
+an iterator over the grades is returned.
 """
 function grades end
 
@@ -109,8 +109,8 @@ function reverse end
 """
     dual(M::AbstractMultivector)::AbstractMultivector
 
-Compute the dual of `M` (relative to the unit pseudoscalar of the geometric algebra
-that `M` is an element of).
+Compute the dual of `M` (relative to the unit pseudoscalar of the geometric algebra that
+`M` is an element of).
 """
 function dual end
 
