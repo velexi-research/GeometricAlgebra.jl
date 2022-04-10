@@ -26,8 +26,8 @@ export One
 """
     struct One{T<:AbstractFloat} <: AbstractScalar{T}
 
-Multiplicative identity for a geometric algebra (extended from a real vector
-space of arbitrary dimension).
+Multiplicative identity for a geometric algebra (extended from a real vector space of
+arbitrary dimension).
 """
 struct One{T<:AbstractFloat} <: AbstractScalar{T} end
 
