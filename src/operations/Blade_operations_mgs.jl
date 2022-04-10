@@ -80,14 +80,15 @@ end
 
 Return the dual `B` relative to `C`.
 
-Notes
-=====
+!!! note
 
-* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
-  vector spaces of the same dimension and (2) the subspace represented by `B`
-  is contained in subspace represented by `C`.
+    `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+    vector spaces of the same dimension and (2) the subspace represented by `B`
+    is contained in subspace represented by `C`.
 
-* The volume of `C` is ignored.
+!!! note
+
+    The volume of `C` is ignored.
 
 Implementation
 ==============
