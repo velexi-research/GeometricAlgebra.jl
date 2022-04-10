@@ -37,7 +37,7 @@ using LinearAlgebra: norm
 """
     wedge_mgs(B::Blade, C::Blade)::AbstractBlade
 
-Return the outer product of `B` and `C`.
+Return the exterior product of `B` and `C`.
 
 Implementation
 ==============
@@ -65,7 +65,7 @@ function wedge_mgs(B::Blade, C::Blade)
         end
     end
 
-    # Construct the Blade representing the outer product
+    # Construct the Blade representing the exterior product
     B_wedge_C_basis = hcat(basis(B), rejections)
     Blade{typeof(B.volume)}(dim(B), grade(B) + grade(C),
                             B_wedge_C_basis, volume(B) * volume(C),

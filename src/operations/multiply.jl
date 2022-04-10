@@ -24,6 +24,14 @@ import Base.:(*)
 
 # ------ Specializations involving an AbstractMultivector instance
 
+# M::AbstractMultivector, N::AbstractMultivector
+"""
+    *(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
+Compute the geometric product of `M` and `N`.
+"""
+*(M::AbstractMultivector, N::AbstractMultivector) = nothing # TODO: implement this method
+
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
 *(M::AbstractMultivector, B::AbstractBlade) =

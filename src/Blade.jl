@@ -178,7 +178,7 @@ blade.
     follows.
 
     * When `volume` is positive, the orientation of the blade is the same as the
-      orientation of the outer product of the columns of `vectors` (taken in order).
+      orientation of the exterior product of the columns of `vectors` (taken in order).
 
     * When `volume` is negative, the orientation of the blade is the opposite of the
       orientation implied by the `vectors`.
