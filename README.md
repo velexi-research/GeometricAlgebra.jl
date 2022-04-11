@@ -240,3 +240,19 @@ pkg> add GeometricAlgebra  # Press ']' to enter the Pkg REPL mode.
   julia> (1 / u) * M ≈ v
   true
   ```
+
+## Related Packages
+
+There are several active geometric algebra packages in the Julia ecosystem. Most of the
+available packages are implemented using an _additive_ blade representation and emphasize
+_symbolic_ computations. To the best of our knowledge, GeometricAlgebra.jl is the only
+package currently uses a _multiplicative_ blade representation and focuses on _numerical_
+computations.
+
+* [Grassmann.jl](https://grassmann.crucialflow.com/)
+
+* [Multivectors.jl](https://github.com/digitaldomain/Multivectors.jl)
+
+* [Jollywatt/GeometricAlgebra.jl](https://github.com/Jollywatt/GeometricAlgebra.jl)
+
+* [serenity4/GeometricAlgebra.jl](https://github.com/serenity4/GeometricAlgebra.jl)
