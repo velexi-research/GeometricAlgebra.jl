@@ -26,7 +26,7 @@ makedocs(;
         "Examples" => "examples.md",
         "Types" => "types.md",
         "Operations" => "operations.md",
-        "Implementation Details" => "implementation-details.md",
+        "Implementation Details" => "implementation.md",
         "References" => "references.md",
         "Index" => "docs-index.md",
     ],

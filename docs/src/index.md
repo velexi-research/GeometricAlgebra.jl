@@ -1,7 +1,7 @@
 # GeometricAlgebra.jl
 
 [GeometricAlgebra.jl](https://github.com/velexi-corporation/GeometricAlgebra.jl)
-GeometricAlgebra defines a collection of basic types and operations that support numerical
+defines a collection of basic types and operations that support numerical
 geometric algebra computations. Our aim is to simplify the process of implementing
 numerical algorithms for geometric operations expressed algebraically in the language of
 geometric algebra.
@@ -72,7 +72,7 @@ GeometricAlgebra defines concrete types for the following hierarchy of mathemati
 
 * addition/subtraction: [`+`](@ref Base.:(+)), [`-`](@ref)
 * multiplication/division (geometric product): [`*`](@ref), [`/`](@ref)
-* exterior product: [`wedge`](@ref), [`\wedge`](@ref GeometricAlgebra.wedge)
+* exterior product: [`wedge`](@ref), [`∧`](@ref)
 * inner product (left contraction): [`contract_left`](@ref),
   [`<`](@ref GeometricAlgebra.contract_left), [`\cdot`](@ref GeometricAlgebra.contract_left)
 
@@ -86,3 +86,21 @@ All GeometricAlgebra types are parametrized by the numeric type used to represen
 numbers. Only subtypes of `AbstractFloat` are supported (i.e., `Float16`, `Float32`,
 `Float64`, `BigFloat`). Other subttypes of `Real` (e.g., `Rational`, `Irrational`) are not
 allowed as parameters to GeometricAlgebra types.
+
+## Related Packages
+
+There are several active geometric algebra packages in the Julia ecosystem. Most of the
+available packages are implemented using an _additive_ blade representation and emphasize
+_symbolic_ computations. To the best of our knowledge, GeometricAlgebra.jl is the only
+package currently uses a _multiplicative_ blade representation and focuses on _numerical_
+computations.
+
+* [Grassmann.jl](https://grassmann.crucialflow.com/)
+
+* [Multivectors.jl](https://github.com/digitaldomain/Multivectors.jl)
+
+* [Jollywatt/GeometricAlgebra.jl](https://github.com/Jollywatt/GeometricAlgebra.jl)
+
+* [serenity4/GeometricAlgebra.jl](https://github.com/serenity4/GeometricAlgebra.jl)
+
+* [GAlgebra.jl](https://github.com/pygae/GAlgebra.jl)
