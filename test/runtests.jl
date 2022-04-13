@@ -1,16 +1,20 @@
+#   Copyright (c) 2020-2022 Velexi Corporation
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 """
 Unit tests for GeometricAlgebra.jl package.
-
-------------------------------------------------------------------------------
-COPYRIGHT/LICENSE. This file is part of the GeometricAlgebra.jl package. It
-is subject to the license terms in the LICENSE file found in the top-level
-directory of this distribution. No part of the GeometricAlgebra.jl package,
-including this file, may be copied, modified, propagated, or distributed
-except according to the terms contained in the LICENSE file.
-------------------------------------------------------------------------------
 """
-# TODO: replace local TestSetExtensions.jl with official package after pull request has
-#       been accepted
 
 # --- Imports
 
@@ -18,31 +22,11 @@ except according to the terms contained in the LICENSE file.
 using Test
 
 # External packages
-using Documenter
-#using TestSetExtensions
-include("../src-external/TestSetExtensions.jl")
-ExtendedTestSet = TestSetExtensions.ExtendedTestSet
+using TestTools: jltest
 
 # GeometricAlgebra.jl
 using GeometricAlgebra
 
-# --- Preparations
+# --- Run tests
 
-ENABLE_FAIL_FAST = get(ENV, "JULIA_TEST_FAIL_FAST", "true")
-if ENABLE_FAIL_FAST == "true"
-    extended_test_set = ExtendedTestSet{Test.FallbackTestSet}
-else
-    extended_test_set = ExtendedTestSet
-end
-
-# --- Test sets
-
-#=
-@testset "Doctests" begin
-    doctest(GeometricAlgebra)
-end
-=#
-
-@testset extended_test_set "Unit tests" begin
-    @TestSetExtensions.includetests ARGS
-end
+jltest.run_tests(@__DIR__)
