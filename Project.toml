@@ -8,9 +8,10 @@ BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+TestTools = "a8cb73c1-6ac8-4a70-8c57-09fe1bc7c59b"
 
 [compat]
-julia = "1.6, 1.7"
 BenchmarkTools = "1"
 DataStructures = "0.18"
 Documenter = "0.27"
+julia = "1.6, 1.7"
