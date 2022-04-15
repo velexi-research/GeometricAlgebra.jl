@@ -112,7 +112,7 @@ volume(B::Pseudoscalar) = value(B)
 
 dim(B::Pseudoscalar) = B.dim
 
-inverse(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
+-(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
 
 Base.reverse(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
