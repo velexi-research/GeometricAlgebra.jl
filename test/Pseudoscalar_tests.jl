@@ -36,9 +36,9 @@ include("test_utils.jl")
 
 @testset "Pseudoscalar: inner constructor" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance
+        Notes
+        -----
+        * Test value of constructed instance
     =#
 
     # --- Pseudoscalar{T}(dim::Integer, value::AbstractFloat)
@@ -145,10 +145,10 @@ end
 
 @testset "Pseudoscalar: outer constructor - basic constructors" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
     =#
 
     # --- Preparations
@@ -233,12 +233,12 @@ end
 
 @testset "Pseudoscalar: outer constructor - copy constructor" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
 
-      * Test behavior of keyword arguments: `value`.
+        * Test behavior of keyword arguments: `value`.
     =#
 
     # --- Preparations
