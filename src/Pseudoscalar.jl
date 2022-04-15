@@ -34,11 +34,11 @@ to the standard basis is equal to `sign(value)`.
 """
 struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     #=
-      Fields
-      ------
-      * `dim`: the dimension of the space that the blade is embedded in
+        Fields
+        ------
+        * `dim`: the dimension of the space that the blade is embedded in
 
-      * `value`: the value of the pseudoscalar
+        * `value`: the value of the pseudoscalar
     =#
     dim::Int
     value::T

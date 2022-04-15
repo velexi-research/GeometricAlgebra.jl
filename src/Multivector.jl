@@ -33,13 +33,13 @@ Multivector represented with the floating-point precision of type `T`.
 """
 struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     #=
-      Fields
-      ------
-      * `dim`: the dimension of the space that the blade is embedded in
+        Fields
+        ------
+        * `dim`: the dimension of the space that the blade is embedded in
 
-      * `parts`: collection of k-vectors that sum to the multivector
+        * `parts`: collection of k-vectors that sum to the multivector
 
-      * `norm`: norm of the multivector
+        * `norm`: norm of the multivector
     =#
     dim::Int
     parts::SortedDict{Int, Vector{AbstractBlade}}
