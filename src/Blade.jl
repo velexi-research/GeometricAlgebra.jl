@@ -393,7 +393,7 @@ basis(B::Blade) = B.basis
 
 volume(B::Blade) = B.volume
 
-reciprocal(B::Blade) =
+inv(B::Blade) =
     mod(grade(B), 4) < 2 ?
         Blade(B, volume=1 / volume(B), copy_basis=false) :
         Blade(B, volume=-1 / volume(B), copy_basis=false)
