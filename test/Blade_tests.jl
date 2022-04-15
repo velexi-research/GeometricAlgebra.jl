@@ -30,9 +30,9 @@ using GeometricAlgebra
 
 @testset "Blade: inner constructor" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance
+        Notes
+        -----
+        * Test value of constructed instance
     =#
 
     # --- Preparations
@@ -192,11 +192,11 @@ end
 
 @testset "Blade: outer constructors - Blade{T}(vectors::Matrix)" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance.
+        Notes
+        -----
+        * Test value of constructed instance.
 
-      * Test behavior of keyword arguments: `volume`, `atol`
+        * Test behavior of keyword arguments: `volume`, `atol`
     =#
 
     # --- Preparations
@@ -395,11 +395,11 @@ end
 
 @testset "Blade: outer constructors - Blade{T}(v::Vector)" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance.
+        Notes
+        -----
+        * Test value of constructed instance.
 
-      * Test behavior of keyword arguments: `volume`, `atol`
+        * Test behavior of keyword arguments: `volume`, `atol`
     =#
     # --- Preparations
 
@@ -580,12 +580,12 @@ end
 
 @testset "Blade: outer constructors - Blade(vectors::Array)" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
 
-      * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+        * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
     =#
 
     # --- Preparations
@@ -828,12 +828,12 @@ end
 
 @testset "Blade: outer constructors - copy constructors" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
 
-      * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+        * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
     =#
 
     # --- Preparations
