@@ -432,7 +432,7 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "Scalar: reciprocal(B)" begin
+@testset "Scalar: inv(B)" begin
     # Preparations
 
     test_value = get_random_value(2) # add 2 to avoid 0 and 1
@@ -443,25 +443,25 @@ end
 
         # value > 0
         B = Scalar(abs(converted_value))
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B isa Scalar{precision_type}
-        @test reciprocal_B == Scalar(1 / abs(converted_value))
-        @test B * reciprocal_B ≈ 1
+        inverse_B = inv(B)
+        @test inverse_B isa Scalar{precision_type}
+        @test inverse_B == Scalar(1 / abs(converted_value))
+        @test B * inverse_B ≈ 1
 
         # value < 0
         negative_value = -(abs(converted_value))
         B = Scalar(negative_value)
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B isa Scalar{precision_type}
-        @test reciprocal_B == Scalar(1 / negative_value)
-        @test B * reciprocal_B ≈ 1
+        inverse_B = inv(B)
+        @test inverse_B isa Scalar{precision_type}
+        @test inverse_B == Scalar(1 / negative_value)
+        @test B * inverse_B ≈ 1
 
         # value = Inf
         B = Scalar(precision_type(Inf))
-        @test reciprocal(B) isa Zero{precision_type}
+        @test inv(B) isa Zero{precision_type}
 
         # value = -Inf
         B = Scalar(precision_type(-Inf))
-        @test reciprocal(B) isa Zero{precision_type}
+        @test inv(B) isa Zero{precision_type}
     end
 end
