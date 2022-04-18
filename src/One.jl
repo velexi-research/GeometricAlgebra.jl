@@ -44,4 +44,4 @@ value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 # --- Method definitions for AbstractBlade interface functions
 
-reciprocal(B::One) = B
+inv(B::One) = B

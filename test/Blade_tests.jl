@@ -1123,32 +1123,32 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "Blade: reciprocal(B)" begin
+@testset "Blade: inv(B)" begin
     # mod(grade, 4) == 1
     vectors = Vector([3; 4; 0; 0; 0])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 
     # mod(grade, 4) == 2
     vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=-1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=-1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 
     # mod(grade, 4) == 3
     vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=-1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=-1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 
     # mod(grade, 4) == 0
     vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 end

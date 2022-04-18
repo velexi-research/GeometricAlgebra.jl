@@ -151,7 +151,7 @@ end
 
     # B == 1 / C
     # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
-    # when computing the reciprocal of the value, which could result in the product
+    # when computing the inverse of the value, which could result in the product
     # being different from one
     test_value_1 = 2
 
@@ -291,7 +291,7 @@ end
 
     # C == 1 / B
     # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
-    # when computing the reciprocal of the value, which could result in the product
+    # when computing the inverse of the value, which could result in the product
     # being different from one
     test_value_1 = 2
     B = Scalar(test_value_1)
@@ -352,7 +352,7 @@ end
 
     # C == 1 / B
     # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
-    # when computing the reciprocal of the value, which could result in the product
+    # when computing the inverse of the value, which could result in the product
     # being different from one
     test_value_1 = 2
     B = Scalar(test_value_1)
@@ -616,7 +616,7 @@ end
 
     # B == 1 / C
     # hard-coded a value for test_value_1 to avoid floating-point arithmetic errors
-    # when computing the reciprocal of the value, which could result in the product
+    # when computing the inverse of the value, which could result in the product
     # being different from one
     test_value_1 = 2
     B = test_value_1

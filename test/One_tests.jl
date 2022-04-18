@@ -266,11 +266,11 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "One: reciprocal(B)" begin
+@testset "One: inv(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = One{precision_type}()
 
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B === B
+        inverse_B = inv(B)
+        @test inverse_B === B
     end
 end

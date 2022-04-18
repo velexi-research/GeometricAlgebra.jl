@@ -483,7 +483,7 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "Pseudoscalar: reciprocal(B)" begin
+@testset "Pseudoscalar: inv(B)" begin
     # Preparations
     test_value = get_random_value(1)  # add 1 to avoid 0
 
@@ -494,15 +494,15 @@ end
         for test_dim = 5:8
             B = Pseudoscalar(test_dim, converted_value)
 
-            reciprocal_B = reciprocal(B)
-            @test reciprocal_B isa Pseudoscalar{precision_type}
+            inverse_B = inv(B)
+            @test inverse_B isa Pseudoscalar{precision_type}
 
             expected_result = mod(test_dim, 4) < 2 ?
                 Pseudoscalar{precision_type}(test_dim, 1 / converted_value) :
                 Pseudoscalar{precision_type}(test_dim, -1 / converted_value)
-            @test reciprocal_B == expected_result
+            @test inverse_B == expected_result
 
-            @test B * reciprocal_B ≈ 1
+            @test B * inverse_B ≈ 1
         end
     end
 end

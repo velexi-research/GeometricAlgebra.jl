@@ -97,7 +97,7 @@ value(B::Pseudoscalar) = B.value
 
 import LinearAlgebra.I
 
-reciprocal(B::Pseudoscalar) =
+inv(B::Pseudoscalar) =
     mod(grade(B), 4) < 2 ?
         Pseudoscalar(B, value=1 / value(B)) :
         Pseudoscalar(B, value=-1 / value(B))
