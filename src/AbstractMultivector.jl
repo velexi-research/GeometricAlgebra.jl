@@ -165,13 +165,6 @@ Notes
 function getindex end
 
 """
-    -(M::AbstractMultivector)::AbstractMultivector
-
-Compute the additive inverse of `M`.
-"""
-function - end
-
-"""
     reverse(M::AbstractMultivector)::AbstractMultivector
 
 Compute the reverse of `M`.
