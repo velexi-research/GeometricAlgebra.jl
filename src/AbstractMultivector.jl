@@ -28,7 +28,7 @@ export dim, grades, blades, norm
 
 # Functions
 import Base.:(-), Base.reverse
-export inverse, dual
+export dual
 
 import Base.:(==), Base.isapprox
 import Base.iszero, Base.isone
@@ -62,7 +62,6 @@ Properties
 Unary Operations
 ----------------
 
-    inverse(M::AbstractMultivector)::AbstractMultivector
     -(M::AbstractMultivector)::AbstractMultivector
 
     reverse(M::AbstractMultivector)::AbstractMultivector
@@ -164,22 +163,6 @@ Notes
   is equal to `k`; otherwise, `M[k]` is an empty vector.
 """
 function getindex end
-
-"""
-    inverse(M::AbstractMultivector)::AbstractMultivector
-    -(M::AbstractMultivector)::AbstractMultivector
-
-Compute the additive inverse of `M`.
-"""
-function inverse end
-
-"""
-    inverse(M::AbstractMultivector)::AbstractMultivector
-    -(M::AbstractMultivector)::AbstractMultivector
-
-Compute the additive inverse of `M`.
-"""
-@inline -(M::AbstractMultivector) = inverse(M)
 
 """
     reverse(M::AbstractMultivector)::AbstractMultivector
