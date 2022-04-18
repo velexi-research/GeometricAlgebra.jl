@@ -47,7 +47,7 @@ struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
             return One{T}()
         end
 
-        new(T(value))
+        return new(T(value))
     end
 end
 
@@ -71,7 +71,9 @@ of the `Scalar`.
     * If `value` is an integer, the precision of the `Scalar` is set to to `Float64`.
 """
 Scalar(value::AbstractFloat) = Scalar{typeof(value)}(value)
+Scalar(value::AbstractIrrational) = Scalar(Float64(value))
 Scalar(value::Integer) = Scalar(Float64(value))
+Scalar(value::Rational) = Scalar(Float64(value))
 
 # --- Method definitions for AbstractScalar interface functions
 

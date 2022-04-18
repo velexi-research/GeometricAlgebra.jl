@@ -53,9 +53,9 @@ basis(B::AbstractScalar) = one(value(B))
 
 volume(B::AbstractScalar) = value(B)
 
-inverse(B::AbstractScalar) = Scalar(-value(B))
+-(B::AbstractScalar) = Scalar(-value(B))
 
-reciprocal(B::AbstractScalar) = 1 / B
+inv(B::AbstractScalar) = 1 / B
 
 # --- Method definitions for AbstractMultivector interface functions
 

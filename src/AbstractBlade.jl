@@ -26,7 +26,7 @@ import Base.sign
 export basis, grade, volume
 
 # Functions
-export reciprocal
+import Base.inv
 
 # --- Types
 
@@ -101,11 +101,11 @@ dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade =
              # `dual` already exists in AbstractMultivector.jl
 
 """
-    reciprocal(B::AbstractBlade)::AbstractBlade
+    inv(B::AbstractBlade)::AbstractBlade
 
 Compute the multiplicative inverse of blade `B`.
 """
-function reciprocal end
+function inv end
 
 # --- Method definitions for AbstractMultivector interface functions
 

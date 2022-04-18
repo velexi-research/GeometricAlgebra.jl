@@ -351,7 +351,7 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 
 dim(B::Blade) = B.dim
 
-inverse(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
+-(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
 
 Base.reverse(B::Blade) =
     mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
@@ -397,7 +397,7 @@ basis(B::Blade) = B.basis
 
 volume(B::Blade) = B.volume
 
-reciprocal(B::Blade) =
+inv(B::Blade) =
     mod(grade(B), 4) < 2 ?
         Blade(B, volume=1 / volume(B), copy_basis=false) :
         Blade(B, volume=-1 / volume(B), copy_basis=false)
