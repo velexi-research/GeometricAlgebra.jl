@@ -23,24 +23,23 @@ export wedge, ∧
 # --- Operator aliases
 
 """
-    ∧(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    ∧(M, N)::AbstractMultivector
 
-Alias for the `wedge()` function. Compute the exterior product of `M` and `N`.
+Alias for the [`wedge()`](@ref wedge) function. Compute the exterior product of `M` and `N`.
 """
-∧(M::AbstractMultivector, N::AbstractMultivector) = wedge(M, N)
-
-∧(M::AbstractMultivector, x::Real) = wedge(M, x)
-∧(x::Real, M::AbstractMultivector) = wedge(x, M)
-
-∧(M::AbstractMultivector, v::Vector{<:Real}) = wedge(M, v)
-∧(v::Vector{<:Real}, M::AbstractMultivector) = wedge(v, M)
-
-∧(v::Vector{<:Real}, w::Vector{<:Real}) = wedge(v, w)
+∧(M, N) = wedge(M, N)
 
 # --- Method definitions
 
 """
     wedge(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
+    wedge(M::AbstractMultivector, N::Vector{<:Real})::AbstractMultivector
+    wedge(M::Vector{<:Real}, N::AbstractMultivector)::AbstractMultivector
+    wedge(M::Vector{<:Real}, N::Vector{<:Real})::AbstractMultivector
+
+    wedge(M::AbstractMultivector, N::Real)::AbstractMultivector
+    wedge(M::Real, N::AbstractMultivector)::AbstractMultivector
 
 Compute the exterior product of `M` and `N`.
 """
@@ -58,10 +57,10 @@ wedge(B::AbstractBlade, M::AbstractMultivector) =
 
 # M::AbstractMultivector, v::Vector
 # v::Vector, M::AbstractMultivector
-wedge(M::AbstractMultivector, v::Vector{<:Real}) = 
+wedge(M::AbstractMultivector, v::Vector{<:Real}) =
     Multivector(map(C -> wedge(C, v), blades(M)))
 
-wedge(v::Vector{<:Real}, M::AbstractMultivector) = 
+wedge(v::Vector{<:Real}, M::AbstractMultivector) =
     Multivector(map(C -> wedge(v, C), blades(M)))
 
 # M::AbstractMultivector, B::AbstractScalar
