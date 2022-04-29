@@ -29,7 +29,7 @@ jobs:
         version: ['1.6', '1.7']
 
         exclude:
-          - os: macos-latest
+          - os: macOS-latest
             arch: x86
 
     runs-on: ${{ matrix.os }}
