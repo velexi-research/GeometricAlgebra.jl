@@ -95,7 +95,7 @@ sign
 
 ```@docs
 dual(B::AbstractBlade, C::AbstractBlade)
-reciprocal
+inv
 ```
 
 -------------------------------------------------------------------------------------------
@@ -117,6 +117,9 @@ value
 ## Concrete Types
 
 ### Multivector
+
+!!! warning
+    Support for the `Multivector` type is not fully implemented yet.
 
 ```@docs
 Multivector
@@ -149,10 +152,14 @@ Scalar(value::AbstractFloat)
 
 ```
 
+### One
+
 ```@docs
 One
 One()
 ```
+
+### Zero
 
 ```@docs
 Zero

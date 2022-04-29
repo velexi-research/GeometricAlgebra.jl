@@ -60,13 +60,16 @@
   julia> v = Blade([3, 4, 0, 0])
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 5.0)
 
-  julia> inverse(v)
+  julia> -v
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], -5.0)
 
-  julia> reciprocal(v)
+  julia> inv(v)
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
 
   julia> 1 / v
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+
+  julia> v^-1
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
   ```
 
@@ -139,20 +142,20 @@
    Blade{Float64}(3, 2, [1.0 0.0; 0.0 1.0; 0.0 0.0], 1.0)
   ```
 
-  Right multiplication of `M` by the reciprocal of `v` yields `u`.
+  Right multiplication of `M` by the multiplicative inverse of `v` yields `u`.
 
   ```julia
-  julia> M * reciprocal(v) ≈ u
+  julia> M * inv(v) ≈ u
   true
 
   julia> M * (1 / v) ≈ u
   true
   ```
 
-  Left multiplication of `M` by the reciprocal of `u` yields `v`.
+  Left multiplication of `M` by the multiplicative inverse of `u` yields `v`.
 
   ```julia
-  julia> reciprocal(u) * M ≈ v
+  julia> inv(u) * M ≈ v
   true
 
   julia> (1 / u) * M ≈ v
