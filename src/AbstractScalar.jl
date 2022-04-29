@@ -33,10 +33,7 @@ Supertype for all scalar types.
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
-# --- Method definitions
-#
-# Note: the following method definitions are no-op place holders and intended
-#       to be extended.
+# --- Public functions/methods
 
 """
     value(B::AbstractScalar)::AbstractFloat
