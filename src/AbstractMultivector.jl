@@ -84,6 +84,13 @@ Return the `k`-vector component of `M`.
 function getindex end
 
 """
+    -(M::AbstractMultivector)::AbstractMultivector
+
+Compute the additive inverse of `M`.
+"""
+function -(::AbstractMultivector) end
+
+"""
     reverse(M::AbstractMultivector)::AbstractMultivector
 
 Compute the reverse of `M`.
