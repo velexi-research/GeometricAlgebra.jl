@@ -63,8 +63,8 @@ GeometricAlgebra defines concrete types for the following hierarchy of mathemati
 
 ### Unary Operations
 
-* additive inverse: [`inverse`](@ref), [`-`](@ref GeometricAlgebra.inverse)
-* multiplicative inverse: [`reciprocal`](@ref)
+* additive inverse: [`-`](@ref -(::AbstractMultivector))
+* multiplicative inverse: [`inv`](@ref)
 * reverse: [`reverse`](@ref)
 * dual: [`dual`](@ref)
 
@@ -74,7 +74,9 @@ GeometricAlgebra defines concrete types for the following hierarchy of mathemati
 * multiplication/division (geometric product): [`*`](@ref), [`/`](@ref)
 * exterior product: [`wedge`](@ref), [`∧`](@ref)
 * inner product (left contraction): [`contract_left`](@ref),
-  [`<`](@ref GeometricAlgebra.contract_left), [`\cdot`](@ref GeometricAlgebra.contract_left)
+  [`<`](@ref GeometricAlgebra.contract_left),
+  [`dot`](@ref GeometricAlgebra.contract_left),
+  [`⋅`](@ref GeometricAlgebra.contract_left)
 
 ### Geometric Operations
 

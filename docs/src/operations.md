@@ -2,6 +2,14 @@
 CurrentModule = GeometricAlgebra
 ```
 
+# Unary Operations
+```@docs
+-(M::AbstractMultivector)
+inv
+reverse
+dual
+```
+
 # Binary Operations
 
 ```@docs
