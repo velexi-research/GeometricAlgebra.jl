@@ -74,11 +74,28 @@ to do _computational_ geometric algebra calculations.
 
 ## Getting Started
 
-Install the GeometricAlgebra package via the Pkg REPL. That's it!
+* Add the Velexi Julia package registry.
 
-```julia
-pkg> add GeometricAlgebra  # Press ']' to enter the Pkg REPL mode.
-```
+  ```julia
+  julia>  # Press ']' to enter the Pkg REPL mode.
+  pkg> registry add https://github.com/velexi-corporation/JuliaPackageRegistry.git
+  ```
+
+  __Notes__
+
+  * _Only needed once_. This step only needs to be performed once per Julia installation.
+
+  * _GeometricAlgebra is registered with a local Julia package registry_.
+    The Velexi registry needs to be added to your Julia installation because
+    GeometricAlgebra is currently registered with Velexi Julia package registry (not
+    the default Julia package registry).
+
+* Install the GeometricAlgebra package via the Pkg REPL. That's it!
+
+  ```julia
+  julia>  # Press ']' to enter the Pkg REPL mode.
+  pkg> add GeometricAlgebra
+  ```
 
 ## Examples
 
@@ -142,13 +159,16 @@ pkg> add GeometricAlgebra  # Press ']' to enter the Pkg REPL mode.
   julia> v = Blade([3, 4, 0, 0])
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 5.0)
 
-  julia> inverse(v)
+  julia> -v
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], -5.0)
 
-  julia> reciprocal(v)
+  julia> inv(v)
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
 
   julia> 1 / v
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+
+  julia> v^-1
   Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
   ```
 
@@ -221,20 +241,20 @@ pkg> add GeometricAlgebra  # Press ']' to enter the Pkg REPL mode.
    Blade{Float64}(3, 2, [1.0 0.0; 0.0 1.0; 0.0 0.0], 1.0)
   ```
 
-  Right multiplication of `M` by the reciprocal of `v` yields `u`.
+  Right multiplication of `M` by the multiplicative inverse of `v` yields `u`.
 
   ```julia
-  julia> M * reciprocal(v) ≈ u
+  julia> M * inv(v) ≈ u
   true
 
   julia> M * (1 / v) ≈ u
   true
   ```
 
-  Left multiplication of `M` by the reciprocal of `u` yields `v`.
+  Left multiplication of `M` by the multiplicative inverse of `u` yields `v`.
 
   ```julia
-  julia> reciprocal(u) * M ≈ v
+  julia> inv(u) * M ≈ v
   true
 
   julia> (1 / u) * M ≈ v
@@ -256,3 +276,5 @@ computations.
 * [Jollywatt/GeometricAlgebra.jl](https://github.com/Jollywatt/GeometricAlgebra.jl)
 
 * [serenity4/GeometricAlgebra.jl](https://github.com/serenity4/GeometricAlgebra.jl)
+
+* [GAlgebra.jl](https://github.com/pygae/GAlgebra.jl)
