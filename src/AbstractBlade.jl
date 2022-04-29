@@ -96,9 +96,11 @@ Compute the dual `B` relative to the subspace represented by `C`.
 
     The volume of `C` is ignored when computing `dual(B, C)`.
 """
-dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade =
-    nothing  # no-op method to attach docstring to because an empty generic function for
-             # `dual` already exists in AbstractMultivector.jl
+function dual(B::AbstractBlade, C::AbstractBlade)::AbstractBlade
+    # no-op method to attach docstring to because an empty generic function for `dual`
+    # already exists in AbstractMultivector.jl
+    return nothing
+end
 
 """
     inv(B::AbstractBlade)::AbstractBlade
