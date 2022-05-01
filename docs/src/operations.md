@@ -8,6 +8,7 @@ CurrentModule = GeometricAlgebra
 inv
 reverse
 dual
+dual(B::AbstractBlade, C::AbstractBlade)
 ```
 
 # Binary Operations
@@ -28,5 +29,4 @@ dot
 
 ```@docs
 project
-reject
 ```

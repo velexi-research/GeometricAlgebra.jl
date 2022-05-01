@@ -12,26 +12,25 @@ The GeometricAlgebra package features:
 
 * intuitive notation for operations on and between geometric algebra objects, and
 
-* behavior (including limitations) analogous to standard numerical linear algebra
-  libraries.
+* behavior that is consistent with expectations for numerical linear algebra libraries.
 
 ## Overview
 
 Geometric algebra extends classical linear algebra (of inner product spaces over the real
 numbers ``\mathbb{R}``) by including the higher-dimensional siblings of the vector (a
 1-dimensional object) and defining algebraic operations that augment the basic operations
-on inner product spaces (i.e., vector addition, scalar multiplication, and inner product).
-With these extensions, geometric algebra makes it possible to use simple algebraic
-expressions to represent geometric objects (e.g., subspaces) and operations (e.g.,
-projection, computing the orthogonal complement).
+on inner product spaces, such as the exterior product and geometric product. With these
+extensions, geometric algebra makes it possible to use simple algebraic expressions to
+represent geometric objects (e.g., subspaces) and operations (e.g., projection, computing
+the orthogonal complement).
 
 The key mathematical object introduced in geometric algebra is the _blade_. Geometrically,
-blades represent two concepts (1) subspaces of ``\mathbb{R}^n`` and (2) ``k``-dimensional
-hypervolumes (with dimension less than or equal to ``n`` and arbitrary shape). The
-_exterior product_ (``\wedge``), which combines lower-grade blades into higher-grade blades
-(or zero), is an example of an algebraic operation with geometric meaning. For instance,
-it enables any blade ``B`` to be expressed _algebraically_ in terms of a basis
-``b_1, \ldots b_k`` for the subspace represented by the blade:
+blades represent two concepts (1) ``k``-dimensional subspaces of ``\mathbb{R}^n`` and
+(2) ``k``-dimensional hypervolumes (of arbitrary shape). The _exterior product_
+(``\wedge``), which combines two blades and yields a blade, is an example of an algebraic
+operation with geometric meaning. For instance, it enables any blade ``B`` to be expressed
+_algebraically_ in terms of a basis ``b_1, \ldots b_k`` for the subspace represented by
+the blade:
 
 ```math
 B = b_1 \wedge \cdots \wedge b_k.
@@ -42,11 +41,29 @@ to do _computational_ geometric algebra calculations.
 
 ## Getting Started
 
-Install the GeometricAlgebra package via the Pkg REPL. That's it!
+* Add the Velexi Julia package registry.
 
-```julia
-pkg> add GeometricAlgebra  # Press ']' to enter the Pkg REPL mode.
-```
+  ```julia
+  julia>  # Press ']' to enter the Pkg REPL mode.
+  pkg> registry add https://github.com/velexi-corporation/JuliaRegistry.git
+  ```
+
+  !!! tip "Only needed once"
+
+      This step only needs to be performed once per Julia installation.
+
+  !!! note "GeometricAlgebra is registered with a local Julia package registry"
+
+      The Velexi registry needs to be added to your Julia installation because
+      GeometricAlgebra is currently registered with Velexi Julia package registry (not
+      the General Julia package registry).
+
+* Install the GeometricAlgebra package via the Pkg REPL. That's it!
+
+  ```julia
+  julia>  # Press ']' to enter the Pkg REPL mode.
+  pkg> add GeometricAlgebra
+  ```
 
 ## Summary of Types
 
@@ -72,11 +89,10 @@ GeometricAlgebra defines concrete types for the following hierarchy of mathemati
 
 * addition/subtraction: [`+`](@ref Base.:(+)), [`-`](@ref)
 * multiplication/division (geometric product): [`*`](@ref), [`/`](@ref)
-* exterior product: [`wedge`](@ref), [`∧`](@ref)
-* inner product (left contraction): [`contract_left`](@ref),
-  [`<`](@ref GeometricAlgebra.contract_left),
-  [`dot`](@ref GeometricAlgebra.contract_left),
-  [`⋅`](@ref GeometricAlgebra.contract_left)
+* exterior product: [`∧`](@ref) ([`wedge`](@ref))
+* inner product (left contraction):
+  [`<`](@ref GeometricAlgebra.contract_left) ([`contract_left`](@ref)),
+  [`⋅`](@ref GeometricAlgebra.contract_left) ([`dot`](@ref GeometricAlgebra.contract_left))
 
 ### Geometric Operations
 
@@ -86,7 +102,7 @@ GeometricAlgebra defines concrete types for the following hierarchy of mathemati
 
 All GeometricAlgebra types are parametrized by the numeric type used to represent the real
 numbers. Only subtypes of `AbstractFloat` are supported (i.e., `Float16`, `Float32`,
-`Float64`, `BigFloat`). Other subttypes of `Real` (e.g., `Rational`, `Irrational`) are not
+`Float64`, `BigFloat`). Other subtypes of `Real` (e.g., `Rational`, `Irrational`) are not
 allowed as parameters to GeometricAlgebra types.
 
 ## Related Packages

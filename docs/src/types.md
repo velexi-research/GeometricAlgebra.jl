@@ -17,8 +17,8 @@ between the mathematical objects they represent.
   GeometricAlgebra type that is a subtype of `AbstractBlade`.
 
 * `AbstractScalar` represents an arbitrary scalar value. Any mathematical objects that is
-  logically scalar (i.e., a scalar or a special scalar value) is represented by a concrete
-  GeometricAlgebra type that is a subtype of `AbstractScalar`.
+  logically a scalar (i.e., a scalar or a special scalar value) is represented by a
+  concrete GeometricAlgebra type that is a subtype of `AbstractScalar`.
 
 ```
 AbstractMultivector
@@ -53,14 +53,6 @@ norm
 getindex
 ```
 
-#### Operations
-
-```@docs
-inverse
-reverse
-dual
-```
-
 #### Utility Functions
 
 ```@docs
@@ -89,13 +81,6 @@ grade
 basis
 volume
 sign
-```
-
-#### Operations
-
-```@docs
-dual(B::AbstractBlade, C::AbstractBlade)
-inv
 ```
 
 -------------------------------------------------------------------------------------------

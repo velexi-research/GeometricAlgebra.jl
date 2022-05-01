@@ -78,7 +78,7 @@ to do _computational_ geometric algebra calculations.
 
   ```julia
   julia>  # Press ']' to enter the Pkg REPL mode.
-  pkg> registry add https://github.com/velexi-corporation/JuliaPackageRegistry.git
+  pkg> registry add https://github.com/velexi-corporation/JuliaRegistry.git
   ```
 
   __Notes__
@@ -88,7 +88,7 @@ to do _computational_ geometric algebra calculations.
   * _GeometricAlgebra is registered with a local Julia package registry_.
     The Velexi registry needs to be added to your Julia installation because
     GeometricAlgebra is currently registered with Velexi Julia package registry (not
-    the default Julia package registry).
+    the General Julia package registry).
 
 * Install the GeometricAlgebra package via the Pkg REPL. That's it!
 
@@ -210,7 +210,7 @@ to do _computational_ geometric algebra calculations.
   Pseudoscalar{Float64}(3, 25.0)
   ```
 
-  Note: we can confirm that is the dual of blade $B$ is the same as division by the unit
+  We can confirm that is the dual of blade $B$ is the same as division by the unit
   pseudoscalar for $\mathbb{G}^n$.
 
   ```julia
@@ -218,7 +218,7 @@ to do _computational_ geometric algebra calculations.
   true
   ```
 
-* Compute the geometric product of two vectors. __Note__: the geometric product of two
+* Compute the geometric product of two vectors. Note that the geometric product of two
   vectors is a _multivector_ (a linear combination of blades).
 
   ```julia

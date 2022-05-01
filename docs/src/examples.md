@@ -111,7 +111,7 @@
   Pseudoscalar{Float64}(3, 25.0)
   ```
 
-  Note: we can confirm that is the dual of blade $B$ is the same as division by the unit
+  We can confirm that is the dual of blade $B$ is the same as division by the unit
   pseudoscalar for $\mathbb{G}^n$.
 
   ```julia
@@ -119,7 +119,7 @@
   true
   ```
 
-* Compute the geometric product of two vectors. __Note__: the geometric product of two
+* Compute the geometric product of two vectors. Note that the geometric product of two
   vectors is a _multivector_ (a linear combination of blades).
 
   ```julia
