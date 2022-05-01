@@ -104,7 +104,8 @@ value
 ### Multivector
 
 !!! warning
-    Support for the `Multivector` type is not fully implemented yet.
+    Support for the `Multivector` type is not fully implemented yet. Full support for
+    the `AbstractMultivector` interface and all operations is expected in `v0.2.0`.
 
 ```@docs
 Multivector
