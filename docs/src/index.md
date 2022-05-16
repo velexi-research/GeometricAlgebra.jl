@@ -92,7 +92,7 @@ GeometricAlgebra defines concrete types for the following hierarchy of mathemati
 * exterior product: [`∧`](@ref) ([`wedge`](@ref))
 * inner product (left contraction):
   [`<`](@ref GeometricAlgebra.contract_left) ([`contract_left`](@ref)),
-  [`⋅`](@ref GeometricAlgebra.contract_left) ([`dot`](@ref GeometricAlgebra.contract_left))
+  [`dot`](@ref GeometricAlgebra.contract_left)
 
 ### Geometric Operations
 
