@@ -14,11 +14,11 @@ DocMeta.setdocmeta!(
 makedocs(;
     modules=[GeometricAlgebra],
     authors="Kevin Chu <kevin@velexi.com> and contributors",
-    repo="https://github.com/velexi-corporation/GeometricAlgebra.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/velexi-research/GeometricAlgebra.jl/blob/{commit}{path}#{line}",
     sitename="GeometricAlgebra",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://velexi-corporation.github.io/GeometricAlgebra.jl/stable",
+        canonical="https://velexi-research.github.io/GeometricAlgebra.jl/stable",
         assets=String[],
     ),
     pages=[
@@ -34,4 +34,4 @@ makedocs(;
 
 # --- Deploy documentation
 
-deploydocs(; repo="github.com/velexi-corporation/GeometricAlgebra.jl", devbranch="main")
+deploydocs(; repo="github.com/velexi-research/GeometricAlgebra.jl", devbranch="main")

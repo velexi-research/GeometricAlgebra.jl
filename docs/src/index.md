@@ -1,6 +1,6 @@
 # GeometricAlgebra.jl
 
-[GeometricAlgebra.jl](https://github.com/velexi-corporation/GeometricAlgebra.jl)
+[GeometricAlgebra.jl](https://github.com/velexi-research/GeometricAlgebra.jl)
 defines a collection of basic types and operations that support numerical
 geometric algebra computations. Our aim is to simplify the process of implementing
 numerical algorithms for geometric operations expressed algebraically in the language of
@@ -45,7 +45,7 @@ to do _computational_ geometric algebra calculations.
 
   ```julia
   julia>  # Press ']' to enter the Pkg REPL mode.
-  pkg> registry add https://github.com/velexi-corporation/JuliaRegistry.git
+  pkg> registry add https://github.com/velexi-research/JuliaRegistry.git
   ```
 
   !!! tip "Only needed once"
