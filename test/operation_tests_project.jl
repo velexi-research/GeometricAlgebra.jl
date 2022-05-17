@@ -251,10 +251,15 @@ end
     # grade(B) == 1, return_blade == true
     B = Blade(rand(test_dim, 1))
     projection_vectors = (C ⋅ basis(B)) * C
-    @test project(B, C) ≈ Blade(projection_vectors)
+    B_proj_C = project(B, C)
+    @test B_proj_C isa Blade
+    @test B_proj_C ≈ Blade(projection_vectors)
+    
 
     # grade(B) == 1, return_blade == false
-    @test project(B, C, return_blade=false) ≈ projection_vectors
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Vector
+    @test B_proj_C ≈ projection_vectors
 
     # dim(B) != length(C)
     B = Blade(rand(test_dim + 1, 3))
@@ -666,7 +671,7 @@ end
     test_value = rand() > 0.5 ? test_value : -test_value
     C = test_value
 
-    # return_blade == treu
+    # return_blade == true
     B_proj_C = project(B, C)
     @test isone(B_proj_C)
 
@@ -926,21 +931,29 @@ end
     # return_blade == true
     C = Blade(rand(test_dim, 5))
     projection_vectors = basis(C) * transpose(basis(C)) * B
-    @test project(B, C) ≈ Blade(projection_vectors)
+    B_proj_C = project(B, C)
+    @test B_proj_C isa Blade
+    @test B_proj_C ≈ Blade(projection_vectors)
 
     # return_blade == false
-    @test project(B, C, return_blade=false) ≈ projection_vectors
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Vector
+    @test B_proj_C ≈ projection_vectors
 
     # ------ grade(C) == 1
 
     # return_blade == true
     C = Blade(rand(test_dim, 1))
     projection_vectors = B ⋅ basis(C) * basis(C)
-    @test project(B, C) ≈ Blade(projection_vectors)
+    B_proj_C = project(B, C)
+    @test B_proj_C isa Blade
+    @test B_proj_C ≈ Blade(projection_vectors)
 
     # return_blade == false
     projection_vectors = (B ⋅ basis(C)) * basis(C)
-    @test project(B, C, return_blade=false) ≈ projection_vectors
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Vector
+    @test B_proj_C ≈ projection_vectors
 
     # ------ length(B) != dim(C)
 
@@ -964,10 +977,14 @@ end
     # ------ length(B) == dim(C)
 
     # return_blade == true
-    @test project(B, C) == Blade(B)
+    B_proj_C = project(B, C)
+    @test B_proj_C isa Blade
+    @test B_proj_C == Blade(B)
 
     # return_blade == false
-    @test project(B, C, return_blade=false) == B
+    B_proj_C = project(B, C, return_blade=false)
+    @test B_proj_C isa Vector
+    @test B_proj_C == B
 
     # ------ length(B) != dim(C)
 
