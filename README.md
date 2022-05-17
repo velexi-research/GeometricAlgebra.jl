@@ -6,17 +6,17 @@
   <tr>
     <td>Documentation</td>
     <td>
-      <a href="https://velexi-corporation.github.io/GeometricAlgebra.jl/dev/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-dev-blue.svg"/></a>
-      <a href="https://velexi-corporation.github.io/GeometricAlgebra.jl/stable/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-stable-blue.svg"/></a>
+      <a href="https://velexi-research.github.io/GeometricAlgebra.jl/dev/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-dev-blue.svg"/></a>
+      <a href="https://velexi-research.github.io/GeometricAlgebra.jl/stable/"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/docs-stable-blue.svg"/></a>
     </td>
   </tr>
 
   <tr>
     <td>Build Status</td>
     <td>
-      <a href="https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-corporation/GeometricAlgebra.jl/actions/workflows/CI.yml/badge.svg"/></a>
-      <a href="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl">
-        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-corporation/GeometricAlgebra.jl/branch/main/graph/badge.svg?token=2PSLG9EGAK"/>
+      <a href="https://github.com/velexi-research/GeometricAlgebra.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-research/GeometricAlgebra.jl/actions/workflows/CI.yml/badge.svg"/></a>
+      <a href="https://codecov.io/gh/velexi-research/GeometricAlgebra.jl">
+        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/GeometricAlgebra.jl/branch/main/graph/badge.svg?token=2PSLG9EGAK"/>
       </a>
     </td>
   </tr>
@@ -24,9 +24,9 @@
   <!-- Miscellaneous Badges -->
   <tr>
     <td colspan=2 align="center">
-      <a href="https://github.com/velexi-corporation/GeometricAlgebra.jl/issues"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/></a>
+      <a href="https://github.com/velexi-research/GeometricAlgebra.jl/issues"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"/></a>
       <a href="https://github.com/invenia/BlueStyle"><img style="vertical-align: bottom;" src="https://img.shields.io/badge/code%20style-blue-4495d1.svg"/></a>
-      <a href="http://hits.dwyl.com/velexi-corporation/GeometricAlgebrajl"><img style="vertical-align: bottom;" src="https://hits.dwyl.com/velexi-corporation/GeometricAlgebrajl.svg?style=flat-square&show=unique"/></a>
+      <a href="http://hits.dwyl.com/velexi-research/GeometricAlgebrajl"><img style="vertical-align: bottom;" src="https://hits.dwyl.com/velexi-research/GeometricAlgebrajl.svg?style=flat-square&show=unique"/></a>
     </td>
   </tr>
 </table>
@@ -78,7 +78,7 @@ to do _computational_ geometric algebra calculations.
 
   ```julia
   julia>  # Press ']' to enter the Pkg REPL mode.
-  pkg> registry add https://github.com/velexi-corporation/JuliaRegistry.git
+  pkg> registry add https://github.com/velexi-research/JuliaRegistry.git
   ```
 
   __Notes__
