@@ -135,7 +135,7 @@ function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
         basis(B) * LinearAlgebra.dot(v, basis(B)) :
         basis(B) * transpose(transpose(v) * basis(B))
 
-    return_blade ? Blade(projection) : projection
+    return_blade ? Blade(projection) : vec(projection)
 end
 
 # ------ Specializations involving a Pseudoscalar instance
