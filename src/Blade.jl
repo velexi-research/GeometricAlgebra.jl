@@ -32,33 +32,31 @@ using LinearAlgebra: det, diag, dot, qr
 """
     struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
-Blade represented with the floating-point precision of type `T`. The norm and
-orientation of a Blade are encoded by its `volume`. The norm of a Blade is
-equal to `abs(volume)` and the orientation of a Blade relative to its `basis`
-is equal to `sign(volume)`.
+Blade represented with the floating-point precision of type `T`. The norm and orientation
+of a `Blade` are encoded by its `volume`. The norm of a `Blade` is equal to `abs(volume)`
+and the orientation of a `Blade` relative to its `basis` is equal to `sign(volume)`.
 
-Notes
-=====
-* The grade of a Blade type is greater than 0 and less than the dimension of
-  the space that the blade is embedded in
+!!! note
+
+    The grade of a `Blade` type is always stricly greater than 0 and strictly less than the
+    dimension of the space that the blade is embedded in.
 """
 struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     #=
-     Fields
-      ------
-      * `dim`: the dimension of the space that the blade is embedded in
+        Fields
+        ------
+        * `dim`: the dimension of the space that the blade is embedded in
 
-      * `grade`: the dimension of the space spanned by the blade
+        * `grade`: the dimension of the space spanned by the blade
 
-      * `basis`: an orthonormal basis for the space spanned by the blade. Note
-        that the order of the columns in `basis` defines the orientation for
-        the unit blade represented by `basis`.
+        * `basis`: an orthonormal basis for the space spanned by the blade. Note that the
+          order of the columns in `basis` defines the orientation for the unit blade
+          represented by `basis`.
 
-      * `volume`: the signed-norm (hypervolume) of the blade. The sign
-         of `volume` indicates the orientation of the blade relative to the
-         unit blade represented by `basis`. It is positive when the blade has
-         the same orientation as `basis` and negative when the blade has the
-         opposite orientation.
+        * `volume`: the signed-norm (hypervolume) of the blade. The sign of `volume`
+          indicates the orientation of the blade relative to the unit blade represented by
+          `basis`. It is positive when the blade has the same orientation as `basis` and
+          negative when the blade has the opposite orientation.
     =#
     dim::Int
     grade::Int
@@ -66,17 +64,17 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     volume::T
 
     """
-    Construct a Blade for a geometric algebra in `dim` dimensions having the
-    specified data field values. If the absolute value of `volume` is less than
-    `atol`, a Scalar representing zero is returned. If the `dim` and `grade`
-    are equal, a Pseudoscalar is returned.
+    Construct a blade for a geometric algebra in `dim` dimensions having the specified data
+    field values. If the absolute value of `volume` is less than `atol`, a `Scalar`
+    representing zero is returned. If the `dim` and `grade` are equal, a `Pseudoscalar` is
+    returned.
 
-    When `enforce_constraints` is true, constraints are enforced. When
-    `copy_basis` is true, the basis of the new Blade is a copy of `basis`;
-    otherwise, the basis of the new Blade is a reference to `basis`.
+    When `enforce_constraints` is true, constraints are enforced. When `copy_basis` is true,
+    the basis of the new `Blade` is a copy of `basis`; otherwise, the basis of the new
+    `Blade` is a reference to `basis`.
 
-    Note: this inner constructor is intended primarily for use by outer
-    constructors to enforce constraints.
+    Note: this inner constructor is intended primarily for use by outer constructors to
+    enforce constraints.
     """
     function Blade{T}(dim::Int,
                       grade::Int,
@@ -100,14 +98,12 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             basis_size = size(basis)
 
             if dim != basis_size[1]
-                message = string("`dim` not equal to the number of ",
-                                 "rows in `basis`")
+                message = string("`dim` not equal to the number of rows in `basis`")
                 throw(DimensionMismatch(message))
             end
 
             if grade != basis_size[2]
-                message = string("`grade` not equal to the number of ",
-                                 "columns in `basis`")
+                message = string("`grade` not equal to the number of columns in `basis`")
                 throw(DimensionMismatch(message))
             end
 
@@ -133,8 +129,8 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
             return zero(Blade{T})
         end
 
-        # Return a Pseudoscalar if the grade of the blade is equal to the
-        # dimension of the embedding space.
+        # Return a Pseudoscalar if the grade of the blade is equal to the dimension of the
+        # embedding space.
         if grade == dim
             if det(basis) == 0
                 return zero(Blade{T})
@@ -146,13 +142,19 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         end
 
         # Return new Blade
-        copy_basis ?
-            new(dim, grade, copy(basis), volume) :
-            new(dim, grade, basis, volume)
+        copy_basis ? new(dim, grade, copy(basis), volume) : new(dim, grade, basis, volume)
     end
 end
 
 """
+    Blade{T}(vectors::Matrix{<:Real};
+             volume::Union{Real, Nothing}=nothing,
+             atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+
+    Blade{T}(v::Vector{<:Real};
+             volume::Union{Real, Nothing}=nothing,
+             atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+
     Blade(vectors::Array{T};
           volume::Union{Real, Nothing}=nothing,
           atol::Real=blade_atol(T)) where {T<:AbstractFloat}
@@ -161,44 +163,45 @@ end
           volume::Union{Real, Nothing}=nothing,
           atol::Real=blade_atol(Float64))
 
-Construct a Blade from a collection of vectors stored as (1) the columns of a
-matrix or (2) a single vector. If the norm of the blade is less than `atol`, a
-Scalar representing zero is returned. If the grade of the blade is equal to
-the dimension of the space that the blade is embedded in, a Pseudoscalar is
-returned.
+Construct a blade from a collection of vectors stored as (1) the columns of a matrix or
+(2) a single vector. If the norm of the blade is less than `atol`, a `Scalar` representing
+zero is returned. If the grade of the blade is equal to the dimension of the space that the
+blade is embedded in, a `Pseudoscalar` is returned.
 
-By default, `vectors` determines the volume of the blade. However, if `volume`
-is specified, `vectors` is only used to define the subspace (including
-orientation) represented by the blade.
+By default, `vectors` determines the volume of the blade. However, if `volume` is specified,
+`vectors` is only used to define the subspace (including orientation) represented by the
+blade.
 
-Notes
-=====
+!!! note "Orientation"
 
-Orientation
------------
+    If `vectors` contains more than one vector, the orientation of the blade is set as
+    follows.
 
-* _`vectors` contains more than one vector_. When `volume` is positive, the
-  orientation of the blade is the same as the orientation of the outer product
-  of the columns of `vectors` (taken in order). When `volume` is negative, the
-  orientation of the blade is the opposite of the orientation implied by the
-  `vectors`.
+    * When `volume` is positive, the orientation of the blade is the same as the
+      orientation of the exterior product of the columns of `vectors` (taken in order).
 
-* _`vectors` contains a single vector `v`_. When `volume` is positive, the
-  orientation of the blade is the same as the direction of `v`. When `volume`
-  is negative, the orientation of the blade is the opposite of the direction
-  of `v`.
+    * When `volume` is negative, the orientation of the blade is the opposite of the
+      orientation implied by the `vectors`.
 
-Precision
----------
+    If `vectors` contains a single vector `v`, the orientation of the blade is set as
+    follows.
 
-When the precision is not specified, the following rules are applied to set
-the precision of the Blade.
+    * When `volume` is positive, the orientation of the blade is the same as the direction
+      of `v`.
 
-* If `vectors` is an Array of floating-point values, the precision of the
-  Blade is inferred from the precision of the elements of `vector`.
+    * When `volume` is negative, the orientation of the blade is the opposite of the
+      direction of `v`.
 
-* If `vectors` is an Array of integers, the precision of the Blade
-  defaults to `Float64`.
+!!! note "Precision"
+
+    When the precision is not specified, the following rules are applied to set the
+    precision of the `Blade`.
+
+    * If `vectors` is an Array of floating-point values, the precision of the `Blade` is
+      inferred from the precision of the elements of `vector`.
+
+    * If `vectors` is an Array of integers, the precision of the `Blade` is set to
+      `Float64`.
 """
 function Blade{T}(vectors::Matrix{<:Real};
                   volume::Union{Real, Nothing}=nothing,
@@ -302,23 +305,23 @@ Blade(vectors::Array{<:Integer};
     Blade(convert(Array{Float64}, vectors), volume=volume, atol=atol)
 
 """
-    Blade(B::Blade;
-          volume::Real=volume(B),
-          atol::Real=blade_atol(typeof(volume(B))),
-          copy_basis=false)
-
     Blade{T}(B::Blade;
           volume::Real=volume(B),
           atol::Real=blade_atol(T),
           copy_basis=false) where {T<: AbstractFloat}
 
-Copy constructors. Construct a Blade representing the same space as `B` having
-a specified oriented volume relative to `B`. A Scalar representing zero is
-returned if the absolute value of `volume` is less than `atol`.
+    Blade(B::Blade;
+          volume::Real=volume(B),
+          atol::Real=blade_atol(typeof(volume(B))),
+          copy_basis=false)
 
-When `copy_basis` is true, the `basis` of the new Blade is a copy of the
-`basis` of the original Blade; otherwise, the `basis` of the new Blade is
-reference to the `basis` of the original Blade.
+Copy constructors. Construct a `Blade` representing the same space as `B` having a
+specified oriented volume relative to `B`. A `Scalar` representing zero is returned if the
+absolute value of `volume` is less than `atol`.
+
+When `copy_basis` is true, the `basis` of the new `Blade` is a copy of the `basis` of the
+original `Blade`; otherwise, the `basis` of the new `Blade` is reference to the `basis` of
+the original `Blade`.
 """
 Blade{T}(B::Blade;
          volume::Real=volume(B),
@@ -335,10 +338,11 @@ Blade(B::Blade;
     Blade{typeof(B.volume)}(B, volume=volume, atol=atol, copy_basis=copy_basis)
 
 """
-    Blade(x::Real)
-    Blade(x::Scalar)
+    Blade(x::Real)::Scalar
 
-Convenience constructors that return a Scalar with value `x`.
+    Blade(x::Scalar)::Scalar
+
+Convenience constructors that return a `Scalar` with value `x`.
 """
 Blade(x::Real) = Scalar(x)
 Blade(x::AbstractScalar) = Scalar(value(x))
@@ -347,7 +351,7 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 
 dim(B::Blade) = B.dim
 
-inverse(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
+-(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
 
 Base.reverse(B::Blade) =
     mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
@@ -393,7 +397,7 @@ basis(B::Blade) = B.basis
 
 volume(B::Blade) = B.volume
 
-reciprocal(B::Blade) =
+inv(B::Blade) =
     mod(grade(B), 4) < 2 ?
         Blade(B, volume=1 / volume(B), copy_basis=false) :
         Blade(B, volume=-1 / volume(B), copy_basis=false)
@@ -401,8 +405,10 @@ reciprocal(B::Blade) =
 # --- Comparison methods
 
 ==(B::AbstractBlade, C::AbstractBlade) =
-    dim(B) == dim(C) && grade(B) == grade(C) &&
-    volume(B) == volume(C) && basis(B) == basis(C)
+    dim(B) == dim(C) &&
+    grade(B) == grade(C) &&
+    volume(B) == volume(C) &&
+    basis(B) == basis(C)
 
 function isapprox(B::Blade{T1}, C::Blade{T2};
   atol::Real=0,
@@ -446,8 +452,8 @@ convert(::Type{T}, B::Blade) where {T<:AbstractFloat} =
     T == typeof(volume(B)) ? B : Blade{T}(B)
 
 #=
- TODO: review numerical error in factorizations to see if a different
-       tolerance would be better.
+    TODO: review numerical error in factorizations to see if a different
+          tolerance would be better.
 =#
 """
     blade_atol(::Type{T}) where {T<:AbstractFloat}

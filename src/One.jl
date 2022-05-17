@@ -26,8 +26,8 @@ export One
 """
     struct One{T<:AbstractFloat} <: AbstractScalar{T}
 
-Multiplicative identity for a geometric algebra (extended from a real vector
-space of arbitrary dimension).
+Multiplicative identity for a geometric algebra (extended from a real vector space of
+arbitrary dimension).
 """
 struct One{T<:AbstractFloat} <: AbstractScalar{T} end
 
@@ -44,4 +44,4 @@ value(B::One{T}) where {T<:AbstractFloat} = T(1)
 
 # --- Method definitions for AbstractBlade interface functions
 
-reciprocal(B::One) = B
+inv(B::One) = B

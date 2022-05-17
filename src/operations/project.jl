@@ -25,27 +25,25 @@ export project
 using LinearAlgebra: I
 
 """
-    project(M::AbstractMultivector, B::AbstractBlade)::AbstractMultivector
-
-Compute the projection of `M` onto the subspace represented by `B`.
-
-    project(B::AbstractBlade, C::AbstractBlade;
+    project(M::AbstractMultivector, B::AbstractBlade;
             return_blade=true)::Union{AbstractBlade, AbstractFloat,
                                       Vector, Matrix, LinearAlgebra.I}
 
-Compute the projection of `B` onto the subspace represented by `C`.
 
-When `return_blade` is true, the return value is an AbstractBlade. Otherwise,
-the return value is an AbstractFloat if the result is a scalar, a Vector if the
-result is a vector, a Matrix if the result is a blade with 1 < grade < `dim`,
-and a multiple of LinearAlgebra.I if the result is a pseudoscalar.
+Compute the projection of `M` onto the subspace represented by `B`.
+
+When `return_blade` is true, the return value is an `AbstractBlade`. Otherwise, the return
+value is an `AbstractFloat` if the result is a scalar, a `Vector` if the result is a vector,
+a `Matrix` if the result is a blade with 1 < grade < `dim`, and a multiple of
+`LinearAlgebra.I` if the result is a pseudoscalar.
 """
 function project end
 
 # ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::Zero
-project(M::AbstractMultivector, B::Zero) = B
+project(M::AbstractMultivector, B::Zero; return_blade::Bool=true) =
+    return_blade ? B : value(B)
 
 # ------ Specializations involving an AbstractBlade instance
 
@@ -135,7 +133,7 @@ function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
         basis(B) * LinearAlgebra.dot(v, basis(B)) :
         basis(B) * transpose(transpose(v) * basis(B))
 
-    return_blade ? Blade(projection) : projection
+    return_blade ? Blade(projection) : vec(projection)
 end
 
 # ------ Specializations involving a Pseudoscalar instance
@@ -196,13 +194,10 @@ project(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
 
 # B::Zero, x::Real
 # x::Real, B::Zero
-project(B::Zero, x::Real; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
-
-project(x::Real, B::Zero; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+project(B::Zero, x::Real; return_blade::Bool=true) = return_blade ? B : 0
+project(x::Real, B::Zero; return_blade::Bool=true) = return_blade ? B : 0
 
 # B::Zero, v::Vector
 # v::Vector, B::Zero
-project(B::Zero, v::Vector{<:Real}) = B
-project(v::Vector{<:Real}, B::Zero) = B
+project(B::Zero, v::Vector{<:Real}; return_blade::Bool=true) = return_blade ? B : 0
+project(v::Vector{<:Real}, B::Zero; return_blade::Bool=true) = return_blade ? B : 0

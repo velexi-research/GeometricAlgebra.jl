@@ -23,6 +23,11 @@ import Base.:(<)
 
 # --- Operator aliases
 
+"""
+    <(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
+Alias for the `contract_left()` function. Compute the left contraction of `M` with `N`.
+"""
 <(M::AbstractMultivector, N::AbstractMultivector) = contract_left(M, N)
 
 <(M::AbstractMultivector, x::Real) = contract_left(M, x)
@@ -34,9 +39,7 @@ import Base.:(<)
 # --- Method definitions
 
 """
-    contract_left(M::AbstractMultivector,
-                  N::AbstractMultivector)::AbstractMultivector
-    <(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+    contract_left(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
 Compute the left contraction of `M` with `N`.
 """

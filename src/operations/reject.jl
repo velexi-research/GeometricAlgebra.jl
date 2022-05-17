@@ -27,8 +27,8 @@ using LinearAlgebra: ⋅
 """
     reject(vectors::Matrix, B::AbstractBlade; normalize=false)::Matrix
 
-Compute rejections of `vectors` from `B`. When `normalize` is true, the
-rejection vectors are normalized.
+Compute the rejections of `vectors` from `B`. When `normalize` is true, the rejection
+vectors are normalized.
 """
 function reject end
 
@@ -51,8 +51,7 @@ function reject(vectors::Matrix, B::Blade; normalize::Bool=false)
     for idx_B in 1:grade(B)
         B_column = basis(B)[:, idx_B]
         for idx in 1:size(rejections, 2)
-            rejections[:, idx] -=
-                (rejections[:, idx] ⋅ B_column) * B_column
+            rejections[:, idx] -= (rejections[:, idx] ⋅ B_column) * B_column
         end
     end
 

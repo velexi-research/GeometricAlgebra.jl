@@ -26,8 +26,8 @@ export Zero
 """
     struct Zero{T<:AbstractFloat} <: AbstractScalar{T}
 
-Additive identity for a geometric algebra (extended from a real vector space of
-arbitrary dimension).
+Additive identity for a geometric algebra (extended from a real vector space of arbitrary
+dimension).
 """
 struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
 
@@ -44,7 +44,7 @@ value(B::Zero{T}) where {T<:AbstractFloat} = T(0)
 
 # --- Method definitions for AbstractMultivector interface functions
 
-inverse(B::Zero) = B
+-(B::Zero) = B
 
 dual(B::Zero, dim::Integer) = dual_of_zero()
 dual(B::Zero) = dual_of_zero()

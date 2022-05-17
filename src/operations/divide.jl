@@ -24,6 +24,14 @@ import Base.:(/)
 
 # ------ Specializations involving an AbstractMultivector instance
 
+# M::AbstractMultivector, N::AbstractMultivector
+"""
+    /(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
+Compute the geometric product of `M` with the inverse of `N`.
+"""
+/(M::AbstractMultivector, N::AbstractMultivector) = nothing  # TODO: implement this method
+
 # M::AbstractMultivector, B::One
 # B::One, M::AbstractMultivector
 /(M::AbstractMultivector, B::One) = M
@@ -36,12 +44,12 @@ import Base.:(/)
 
 # ------ Specializations involving an AbstractBlade instance
 
-/(B::AbstractBlade, C::AbstractBlade) = B * reciprocal(C)
+/(B::AbstractBlade, C::AbstractBlade) = B * inv(C)
 
 # B::AbstractBlade, C::One
 # B::One, C::AbstractBlade
 /(B::AbstractBlade, C::One) = B
-/(B::One, C::AbstractBlade) = reciprocal(B)
+/(B::One, C::AbstractBlade) = inv(B)
 
 # B::Zero, C::AbstractBlade
 /(B::Zero, C::AbstractBlade) = B
@@ -49,7 +57,7 @@ import Base.:(/)
 # B::AbstractBlade, x::Real
 # x::Real, B::AbstractBlade
 /(B::AbstractBlade, x::Real) = Blade(B, volume=volume(B) / x)
-/(x::Real, B::AbstractBlade) = x * reciprocal(B)
+/(x::Real, B::AbstractBlade) = x * inv(B)
 
 # ------ Specializations involving a Blade instance
 
@@ -64,7 +72,7 @@ import Base.:(/)
 # B::Blade, C::One
 # B::One, C::Blade
 /(B::Blade, C::One) = B
-/(B::One, C::Blade) = reciprocal(C::Blade)
+/(B::One, C::Blade) = inv(C::Blade)
 
 # B::Blade, C::Zero
 # B::Zero, C::Blade
@@ -87,7 +95,7 @@ end
 # B::Pseudoscalar, C::One
 # B::One, C::Pseudoscalar
 /(B::Pseudoscalar, C::One) = B
-/(B::One, C::Pseudoscalar) = reciprocal(C)
+/(B::One, C::Pseudoscalar) = inv(C)
 
 # B::Pseudoscalar, C::Zero
 # B::Zero, C::Pseudoscalar
@@ -107,7 +115,7 @@ end
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar
 /(B::AbstractScalar, C::One) = B
-/(B::One, C::AbstractScalar) = reciprocal(C)
+/(B::One, C::AbstractScalar) = inv(C)
 
 # B::AbstractScalar, C::Zero
 # B::Zero, C::AbstractScalar
@@ -139,7 +147,7 @@ end
 
 # B::One, C::Zero
 # B::Zero, C::One
-/(B::One, C::Zero) = reciprocal(C)
+/(B::One, C::Zero) = inv(C)
 /(B::Zero, C::One) = B
 
 # ------ Specializations involving a Zero instance

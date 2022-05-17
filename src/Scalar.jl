@@ -26,15 +26,14 @@ export Scalar
 """
     struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
 
-Scalar (0-blade) represented with the floating-point precision of type `T`. The
-`basis` and `volume` of a Scalar are `1` and the value of the Scalar,
-respectively.
+Scalar (a 0-blade) represented with the floating-point precision of type `T`. The `basis`
+and `volume` of a `Scalar` are `1` and the value of the `Scalar`, respectively.
 """
 struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
     #=
-      Fields
-      ------
-      * `value`: the value of the scalar
+        Fields
+        ------
+        * `value`: the value of the scalar
     =#
     value::T
 
@@ -48,25 +47,33 @@ struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
             return One{T}()
         end
 
-        new(T(value))
+        return new(T(value))
     end
 end
 
 """
-    Scalar(value::Real)
+    Scalar{T}(value::Real) where {T<:AbstractFloat}
 
-Construct a Scalar having the specified `value`.
+    Scalar(value::AbstractFloat)
 
-When the precision is not specified, the following rules are applied to set
-the precision of the Scalar.
+    Scalar(value::Integer)
 
-* If `value` is a floating-point value, the precision of the Scalar is inferred
-  from the precision of `value`.
+Construct a scalar having the specified `value`.
 
-* If `value` is an integer, the precision of the Scalar defaults to `Float64`.
+When the precision is not specified, the following rules are applied to set the precision
+of the `Scalar`.
+
+!!! note
+
+    * If `value` is a floating-point value, the precision of the `Scalar` is inferred from
+      the precision of `value`.
+
+    * If `value` is an integer, the precision of the `Scalar` is set to to `Float64`.
 """
 Scalar(value::AbstractFloat) = Scalar{typeof(value)}(value)
+Scalar(value::AbstractIrrational) = Scalar(Float64(value))
 Scalar(value::Integer) = Scalar(Float64(value))
+Scalar(value::Rational) = Scalar(Float64(value))
 
 # --- Method definitions for AbstractScalar interface functions
 

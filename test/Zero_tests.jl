@@ -212,11 +212,9 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "Zero: inverse(B)" begin
+@testset "Zero: -(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
-
-        @test inverse(B) === B
         @test -B === B
     end
 end
@@ -251,12 +249,12 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "Zero: reciprocal(B)" begin
+@testset "Zero: inverse(B)" begin
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
 
-        reciprocal_B = reciprocal(B)
-        @test reciprocal_B isa Scalar{precision_type}
-        @test reciprocal_B == Scalar{precision_type}(Inf)
+        inverse_B = inv(B)
+        @test inverse_B isa Scalar{precision_type}
+        @test inverse_B == Scalar{precision_type}(Inf)
     end
 end

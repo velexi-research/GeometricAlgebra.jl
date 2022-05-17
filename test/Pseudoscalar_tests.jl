@@ -36,9 +36,9 @@ include("test_utils.jl")
 
 @testset "Pseudoscalar: inner constructor" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance
+        Notes
+        -----
+        * Test value of constructed instance
     =#
 
     # --- Pseudoscalar{T}(dim::Integer, value::AbstractFloat)
@@ -145,10 +145,10 @@ end
 
 @testset "Pseudoscalar: outer constructor - basic constructors" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
     =#
 
     # --- Preparations
@@ -233,12 +233,12 @@ end
 
 @testset "Pseudoscalar: outer constructor - copy constructor" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
 
-      * Test behavior of keyword arguments: `value`.
+        * Test behavior of keyword arguments: `value`.
     =#
 
     # --- Preparations
@@ -394,7 +394,7 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "Pseudoscalar: inverse(B)" begin
+@testset "Pseudoscalar: -(B)" begin
     # Preparations
     test_dim = 10
 
@@ -404,10 +404,9 @@ end
     for precision_type in subtypes(AbstractFloat)
         B = Pseudoscalar{precision_type}(test_dim, test_value)
 
-        inverse_B = inverse(B)
-        @test inverse_B isa Pseudoscalar{precision_type}
-        @test inverse_B == Pseudoscalar{precision_type}(test_dim, -test_value)
-        @test -B == inverse_B
+        negative_B = -B
+        @test negative_B isa Pseudoscalar{precision_type}
+        @test negative_B == Pseudoscalar{precision_type}(test_dim, -test_value)
     end
 end
 
@@ -484,7 +483,7 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "Pseudoscalar: reciprocal(B)" begin
+@testset "Pseudoscalar: inv(B)" begin
     # Preparations
     test_value = get_random_value(1)  # add 1 to avoid 0
 
@@ -495,15 +494,15 @@ end
         for test_dim = 5:8
             B = Pseudoscalar(test_dim, converted_value)
 
-            reciprocal_B = reciprocal(B)
-            @test reciprocal_B isa Pseudoscalar{precision_type}
+            inverse_B = inv(B)
+            @test inverse_B isa Pseudoscalar{precision_type}
 
             expected_result = mod(test_dim, 4) < 2 ?
                 Pseudoscalar{precision_type}(test_dim, 1 / converted_value) :
                 Pseudoscalar{precision_type}(test_dim, -1 / converted_value)
-            @test reciprocal_B == expected_result
+            @test inverse_B == expected_result
 
-            @test B * reciprocal_B ≈ 1
+            @test B * inverse_B ≈ 1
         end
     end
 end

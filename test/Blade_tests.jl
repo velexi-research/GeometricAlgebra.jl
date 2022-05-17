@@ -30,9 +30,9 @@ using GeometricAlgebra
 
 @testset "Blade: inner constructor" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance
+        Notes
+        -----
+        * Test value of constructed instance
     =#
 
     # --- Preparations
@@ -192,11 +192,11 @@ end
 
 @testset "Blade: outer constructors - Blade{T}(vectors::Matrix)" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance.
+        Notes
+        -----
+        * Test value of constructed instance.
 
-      * Test behavior of keyword arguments: `volume`, `atol`
+        * Test behavior of keyword arguments: `volume`, `atol`
     =#
 
     # --- Preparations
@@ -395,11 +395,11 @@ end
 
 @testset "Blade: outer constructors - Blade{T}(v::Vector)" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance.
+        Notes
+        -----
+        * Test value of constructed instance.
 
-      * Test behavior of keyword arguments: `volume`, `atol`
+        * Test behavior of keyword arguments: `volume`, `atol`
     =#
     # --- Preparations
 
@@ -580,12 +580,12 @@ end
 
 @testset "Blade: outer constructors - Blade(vectors::Array)" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
 
-      * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+        * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
     =#
 
     # --- Preparations
@@ -828,12 +828,12 @@ end
 
 @testset "Blade: outer constructors - copy constructors" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
 
-      * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
+        * Test behavior of keyword arguments: `volume`, `atol`, `copy_basis`.
     =#
 
     # --- Preparations
@@ -1004,15 +1004,13 @@ end
 
 # --- Tests for AbstractMultivector interface functions
 
-@testset "Blade: inverse(B)" begin
+@testset "Blade: -(B)" begin
     # Preparations
     vectors = Matrix{Float16}([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
 
     # B::Blade
-    inverse_B = inverse(B)
-    @test inverse_B == Blade(B, volume=-volume(B))
-    @test -B == inverse_B
+    @test -B == Blade(B, volume=-volume(B))
 end
 
 @testset "Blade: reverse(B)" begin
@@ -1125,32 +1123,32 @@ end
 
 # --- Tests for AbstractBlade interface functions
 
-@testset "Blade: reciprocal(B)" begin
+@testset "Blade: inv(B)" begin
     # mod(grade, 4) == 1
     vectors = Vector([3; 4; 0; 0; 0])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 
     # mod(grade, 4) == 2
     vectors = Matrix([3 3; 4 4; 0 1; 0 0; 0 0])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=-1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=-1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 
     # mod(grade, 4) == 3
     vectors = Matrix([3 3 3; 4 4 4; 0 1 0; 0 0 1; 0 0 0])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=-1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=-1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 
     # mod(grade, 4) == 0
     vectors = Matrix([3 3 3 3; 4 4 4 4; 0 1 0 0; 0 0 1 0; 0 0 0 1])
     B = Blade(vectors)
-    expected_reciprocal = Blade(B, volume=1 / volume(B))
-    @test reciprocal(B) ≈ expected_reciprocal
-    @test B * reciprocal(B) ≈ 1
+    expected_inverse = Blade(B, volume=1 / volume(B))
+    @test inv(B) ≈ expected_inverse
+    @test B * inv(B) ≈ 1
 end
