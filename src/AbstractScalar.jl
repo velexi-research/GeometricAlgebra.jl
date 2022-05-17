@@ -30,24 +30,10 @@ export value
     AbstractScalar{<:AbstractFloat}
 
 Supertype for all scalar types.
-
-Interface
-=========
-
-Note: the return value of all methods should preserve the precision of its
-AbstractScalar arguments (when possible).
-
-Properties
-----------
-
-    value(B::AbstractScalar{T})::T where {T<:AbstractFloat}
 """
 abstract type AbstractScalar{T<:AbstractFloat} <: AbstractBlade{T} end
 
-# --- Method definitions
-#
-# Note: the following method definitions are no-op place holders and intended
-#       to be extended.
+# --- Public functions/methods
 
 """
     value(B::AbstractScalar)::AbstractFloat
@@ -75,12 +61,10 @@ inv(B::AbstractScalar) = 1 / B
 
 Return 0.
 
-Notes
-=====
+!!! note
 
-* The convention that scalars have zero dimension is adopted because
-  (1) scalars exist independently of all geometric algebras and (2) scalars
-  are 0-dimensional entities.
+    The convention that scalars have zero dimension is adopted because (1) scalars exist
+    independently of all geometric algebras and (2) scalars are 0-dimensional entities.
 """
 dim(B::AbstractScalar) = 0
 
@@ -91,11 +75,9 @@ Base.reverse(B::AbstractScalar) = B
 
 Compute the dual of `B` relative to a real vector space having dimension `dim`.
 
-Notes
-=====
+!!! note
 
-* An error is raised if the dimension of the embedding space is not explicitly
-  specified.
+    An error is raised if the dimension of the embedding space is not explicitly specified.
 """
 dual(B::AbstractScalar, dim::Integer) =
     mod(dim, 4) < 2 ?

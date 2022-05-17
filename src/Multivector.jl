@@ -33,20 +33,22 @@ Multivector represented with the floating-point precision of type `T`.
 """
 struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     #=
-      Fields
-      ------
-      * `parts`: collection of k-vectors that sum to the multivector
+        Fields
+        ------
+        * `dim`: the dimension of the space that the blade is embedded in
 
-      * `norm`: norm of the multivector
+        * `parts`: collection of k-vectors that sum to the multivector
+
+        * `norm`: norm of the multivector
     =#
     dim::Int
     parts::SortedDict{Int, Vector{AbstractBlade}}
     norm::T
 
     """
-    Construct a Multivector from a of vector of blades. For each grade ``k``,
-    the blades used to represent the ``k``-vector part of the multivector form
-    an orthogonal basis for the subspace of ``k``-vectors.
+    Construct a multivector from a of vector of blades. For each grade ``k``, the blades
+    used to represent the ``k``-vector part of the multivector form an orthogonal basis
+    for the subspace of ``k``-vectors.
     """
     function Multivector{T}(
             blades::Vector{<:AbstractBlade}) where {T<:AbstractFloat}
@@ -136,8 +138,8 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     end
 
     """
-    Type conversion constructor. Construct a copy of the Multivector converted
-    to the specified precision.
+    Type conversion constructor. Construct a copy of the `Multivector` converted to the
+    specified precision.
     """
     Multivector{T}(M::Multivector) where {T<:AbstractFloat} =
         T == typeof(norm(M)) ?
@@ -146,20 +148,35 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
 end
 
 """
+    Multivector{T}(blades::Vector{<:AbstractBlade}) where {T<:AbstractFloat}
+
     Multivector(blades::Vector{<:AbstractBlade})
 
-Construct a Multivector from a of vector of blades. For each grade ``k``, the
-blades used to represent the ``k``-vector part of the multivector form an
-orthogonal basis for the subspace of ``k``-vectors.
+Construct a multivector from a collection of blades. For each grade ``k``, the blades used
+to represent the ``k``-vector part of the multivector form an orthogonal basis for the
+subspace of ``k``-vectors.
 
-The precision of the Multivector is inferred from the precision of the first
-element of `blades`.
+!!! note
+
+    When the precision parameter `T` of the `Multivector` not explicitly specified, the
+    precision of the Multivector is inferred from the precision of the first element of
+    `blades`.
 """
 Multivector(blades::Vector{<:AbstractBlade}) =
     length(blades) > 0 ?
         Multivector{typeof(volume(blades[1]))}(blades) :
         Multivector{Float64}(blades)
 
+"""
+    Multivector(multivectors::Vector{<:AbstractMultivector})
+
+Construct a multivector from a collection of multivectors. For each grade ``k``, the blades
+used to represent the ``k``-vector part of the multivector form an orthogonal basis for
+the subspace of ``k``-vectors.
+
+The precision of the `Multivector` is inferred from the precision of the first element of
+`multivectors`.
+"""
 Multivector(multivectors::Vector{<:AbstractMultivector}) =
     length(multivectors) > 0 ?
         Multivector(reduce(vcat, map(blades, multivectors))) :
@@ -170,9 +187,7 @@ Multivector(multivectors::Vector{<:AbstractMultivector}) =
 dim(M::Multivector) = M.dim
 
 grades(M::Multivector; collect=true) =
-    collect ?
-        Base.collect(keys(M.parts)) :
-        keys(M.parts)
+    collect ?  Base.collect(keys(M.parts)) : keys(M.parts)
 
 blades(M::Multivector) = reduce(vcat, values(M.parts))
 

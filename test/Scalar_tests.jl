@@ -35,9 +35,9 @@ include("test_utils.jl")
 
 @testset "Scalar: inner constructor" begin
     #=
-      Notes
-      -----
-      * Test value of constructed instance
+        Notes
+        -----
+        * Test value of constructed instance
     =#
 
     # --- Scalar{T}(value::AbstractFloat)
@@ -118,10 +118,10 @@ end
 
 @testset "Scalar: outer constructor - basic constructors" begin
     #=
-      Notes
-      -----
-      * Test type of constructed instances. Correct construction of instances
-        is tested by the inner constructor tests.
+        Notes
+        -----
+        * Test type of constructed instances. Correct construction of instances
+          is tested by the inner constructor tests.
     =#
 
     # --- Scalar(value::AbstractFloat)

@@ -24,6 +24,17 @@ import Base.:(+)
 
 # ------ Specializations involving an AbstractMultivector instance
 
+# M::AbstractMultivector, N::AbstractMultivector
+"""
+    +(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
+Compute the sum of `M` and `N`.
+"""
+function +(M::AbstractMultivector, N::AbstractMultivector)
+    # TODO: implement this method
+    return nothing
+end
+
 # M::AbstractMultivector, B::One
 # B::One,M::AbstractMultivector
 @inline +(M::AbstractMultivector, B::One) = Multivector(vcat([B], blades(M)))

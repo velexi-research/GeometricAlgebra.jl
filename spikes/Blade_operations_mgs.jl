@@ -37,7 +37,7 @@ using LinearAlgebra: norm
 """
     wedge_mgs(B::Blade, C::Blade)::AbstractBlade
 
-Return the outer product of `B` and `C`.
+Return the exterior product of `B` and `C`.
 
 Implementation
 ==============
@@ -65,7 +65,7 @@ function wedge_mgs(B::Blade, C::Blade)
         end
     end
 
-    # Construct the Blade representing the outer product
+    # Construct the Blade representing the exterior product
     B_wedge_C_basis = hcat(basis(B), rejections)
     Blade{typeof(B.volume)}(dim(B), grade(B) + grade(C),
                             B_wedge_C_basis, volume(B) * volume(C),
@@ -80,14 +80,15 @@ end
 
 Return the dual `B` relative to `C`.
 
-Notes
-=====
+!!! note
 
-* `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
-  vector spaces of the same dimension and (2) the subspace represented by `B`
-  is contained in subspace represented by `C`.
+    `dual(B, C)` is only defined if (1) `B` and `C` are extended from real
+    vector spaces of the same dimension and (2) the subspace represented by `B`
+    is contained in subspace represented by `C`.
 
-* The volume of `C` is ignored.
+!!! note
+
+    The volume of `C` is ignored.
 
 Implementation
 ==============

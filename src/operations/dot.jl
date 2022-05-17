@@ -25,9 +25,8 @@ export dot
 
 """
     dot(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
-    ⋅(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
 
-Compute the dot product of `M` and `N`.
+Compute the inner product of `M` and `N`.
 """
 dot(M::AbstractMultivector, N::AbstractMultivector; left=true) =
     left ? contract_left(M, N) : nothing  # TODO

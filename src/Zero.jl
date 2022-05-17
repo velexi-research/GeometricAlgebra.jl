@@ -26,8 +26,8 @@ export Zero
 """
     struct Zero{T<:AbstractFloat} <: AbstractScalar{T}
 
-Additive identity for a geometric algebra (extended from a real vector space of
-arbitrary dimension).
+Additive identity for a geometric algebra (extended from a real vector space of arbitrary
+dimension).
 """
 struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
 

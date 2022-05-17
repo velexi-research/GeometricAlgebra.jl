@@ -26,27 +26,26 @@ export Pseudoscalar
 """
     struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
 
-Pseudoscalar (an ``(n-1)``-blade) represented with the floating-point precision
-of type `T`. The `basis` for a Pseudoscalar is the standard basis for ``R^n``.
-The norm and orientation of a Pseudoscalar are encoded in its `value`. The
-norm of a Pseudoscalar is equal to `abs(value)` and the orientation of a
-Pseudoscalar relative to the standard basis for ``R^n`` is equal to
-`sign(value)`.
+Pseudoscalar (an ``n``-blade) represented with the floating-point precision of type `T`.
+The `basis` for a `Pseudoscalar` is the standard basis for an ``n``-dimensional real vector
+space. The norm and orientation of a `Pseudoscalar` are encoded in its `value`. The norm of
+a `Pseudoscalar` is equal to `abs(value)` and the orientation of a `Pseudoscalar` relative
+to the standard basis is equal to `sign(value)`.
 """
 struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     #=
-      Fields
-      ------
-      * `dim`: the dimension of the space that the blade is embedded in
+        Fields
+        ------
+        * `dim`: the dimension of the space that the blade is embedded in
 
-      * `value`: the value of the pseudoscalar
+        * `value`: the value of the pseudoscalar
     =#
     dim::Int
     value::T
 
     """
-    Construct a Pseudoscalar for a geometric algebra in `dim` dimensions having
-    the specified `value`.
+    Construct a pseudoscalar for a geometric algebra in `dim` dimensions having the
+    specified `value`.
     """
     Pseudoscalar{T}(dim::Integer, value::Real) where {T<:AbstractFloat} =
         dim <= 0 ?
@@ -55,19 +54,22 @@ struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
 end
 
 """
+    Pseudoscalar{T}(dim::Integer, value::Real) where {T<:AbstractFloat}
+
     Pseudoscalar(dim::Integer, value::Real)
 
-Construct a Pseudoscalar for a geometric algebra in `dim` dimensions having the
-specified `value`.
+Construct a pseudoscalar for a geometric algebra in `dim` dimensions having the specified
+`value`.
 
-When the precision is not specified, the following rules are applied to set
-the precision of the Pseudoscalar.
+When the precision is not specified, the following rules are applied to set the precision
+of the `Pseudoscalar`.
 
-* If `value` is a floating-point value, the precision of the Pseudoscalar is
-  inferred from the precision of `value`.
+!!! note
 
-* If `value` is an integer, the precision of the Pseudoscalar defaults to
-  `Float64`.
+    * If `value` is a floating-point value, the precision of the `Pseudoscalar` is inferred
+      from the precision of `value`.
+
+    * If `value` is an integer, the precision of the Pseudoscalar is set to `Float64`.
 """
 Pseudoscalar(dim::Integer, value::AbstractFloat) =
     Pseudoscalar{typeof(value)}(dim, value)
@@ -78,8 +80,8 @@ Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
     Pseudoscalar(B::Pseudoscalar{T};
                  value::Real=value(B)) where {T<:AbstractFloat}
 
-Copy constructor. Construct a Pseudoscalar representing the same space as
-`B` having the specified `value`.
+Copy constructor. Construct a `Pseudoscalar` representing the same space as `B` having the
+specified `value`.
 """
 Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
     Pseudoscalar{typeof(B.value)}(dim(B), value)
@@ -121,11 +123,9 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 
 # --- Comparison methods
 
-==(B::Pseudoscalar, C::Pseudoscalar) =
-    (dim(B) == dim(C)) && (value(B) == value(C))
+==(B::Pseudoscalar, C::Pseudoscalar) = (dim(B) == dim(C)) && (value(B) == value(C))
 
-==(B::Pseudoscalar, C::Vector) = 
-    (dim(B) == 1) && (length(C) == 1) && (value(B) == C[1])
+==(B::Pseudoscalar, C::Vector) = (dim(B) == 1) && (length(C) == 1) && (value(B) == C[1])
 
 ==(B::Vector, C::Pseudoscalar) = (C == B)
 

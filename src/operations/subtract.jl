@@ -22,6 +22,12 @@ import Base.:(-)
 
 # --- Method definitions
 
+# M::AbstractMultivector, N::AbstractMultivector
+"""
+    -(M::AbstractMultivector, N::AbstractMultivector)::AbstractMultivector
+
+Compute the difference between `M` and `N`.
+"""
 -(M::AbstractMultivector, N::AbstractMultivector) = M + -N
 
 # ------ Specializations involving a Pseudoscalar instance
