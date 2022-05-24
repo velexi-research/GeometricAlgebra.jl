@@ -11,7 +11,7 @@ julia&gt; grade(B)
 2
 
 julia&gt; norm(B)
-5.0</code></pre></li><li><p>Compute the outer product between blades.</p><pre><code class="language-julia hljs">julia&gt; u = [3, -4, 0, 0];  # a vector is a 1-blade
+5.0</code></pre></li><li><p>Compute the outer product of vectors (1-blades).</p><pre><code class="language-julia hljs">julia&gt; u = [3, -4, 0, 0];  # a vector is a 1-blade
 
 julia&gt; v = [3, -4, 1, 0];  # a vector is a 1-blade
 
@@ -25,12 +25,14 @@ julia&gt; grade(Blade(v))
 1
 
 julia&gt; grade(B)
-2</code></pre><pre><code class="language-julia hljs">julia&gt; A = [0, 0, 0, 2];
+2</code></pre></li><li><p>Compute the outer product of blades.</p><pre><code class="language-julia hljs">julia&gt; A = Blade([0, 0, 0, 2]);
+
+julia&gt; B = Blade(Matrix([3 3; -4 -4; 0 1; 0 0]));
 
 julia&gt; C = A ∧ B
-Blade{Float64}(4, 3, [-0.6 0.0 0.0; 0.8 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 -1.0], -10.0)
+Blade{Float64}(4, 3, [0.0 0.6 0.0; 0.0 -0.8 0.0; 0.0 0.0 1.0; -1.0 0.0 0.0], -10.0)
 
-julia&gt; grade(Blade(A))
+julia&gt; grade(A)
 1
 
 julia&gt; grade(B)
@@ -38,19 +40,19 @@ julia&gt; grade(B)
 
 julia&gt; grade(C)
 3</code></pre></li><li><p>Compute the additive and multiplicative inverses of a vector (1-blade).</p><pre><code class="language-julia hljs">julia&gt; v = Blade([3, 4, 0, 0])
-Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 5.0)
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 5.0)
 
 julia&gt; -v
-Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], -5.0)
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], -5.0)
 
 julia&gt; inv(v)
-Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
 
 julia&gt; 1 / v
-Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
 
 julia&gt; v^-1
-Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)</code></pre></li><li><p>Create a pseudoscalar for <span>$\mathbb{G}^n$</span>.</p><pre><code class="language-julia hljs">julia&gt; n = 10;
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)</code></pre></li><li><p>Create a pseudoscalar for <span>$\mathbb{G}^n$</span>.</p><pre><code class="language-julia hljs">julia&gt; n = 10;
 julia&gt; value = -2;
 julia&gt; B = Pseudoscalar(n, value)
 Pseudoscalar{Float64}(10, -2.0)
@@ -67,7 +69,7 @@ julia&gt; volume(B)
 julia&gt; B = Blade(vectors);
 
 julia&gt; dual(B)
-Blade{Float64}(3, 1, [0.8; 0.6; 0.0;;], -5.0)
+Blade{Float64}(3, 1, [0.8; 0.6; 0.0;], -5.0)
 
 julia&gt; isapprox(dot(B.basis[:, 1], dual(B).basis), 0; atol=1e-15)
 true
@@ -101,4 +103,4 @@ true</code></pre><p>Left multiplication of <code>M</code> by the multiplicative 
 true
 
 julia&gt; (1 / u) * M ≈ v
-true</code></pre></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../types/">Types »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.17 on <span class="colophon-date" title="Tuesday 17 May 2022 16:56">Tuesday 17 May 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+true</code></pre></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../types/">Types »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.17 on <span class="colophon-date" title="Tuesday 24 May 2022 00:35">Tuesday 24 May 2022</span>. Using Julia version 1.7.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
