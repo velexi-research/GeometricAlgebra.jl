@@ -81,7 +81,7 @@ jobs:
 
         uses: codecov/codecov-action@v2
         with:
-          token: be26305d-22b5-4ef3-a0fc-1d2dcc0c1b88
+          token: 9d54a766-eb01-4827-825a-b5886b607bf2
           files: lcov.info
           fail_ci_if_error: true
           verbose: true
