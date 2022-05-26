@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · GeometricAlgebra</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://velexi-research.github.io/GeometricAlgebra.jl/stable/examples/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.044/juliamono.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">GeometricAlgebra</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Examples</a></li><li><a class="tocitem" href="../types/">Types</a></li><li><a class="tocitem" href="../operations/">Operations</a></li><li><a class="tocitem" href="../implementation/">Implementation Details</a></li><li><a class="tocitem" href="../references/">References</a></li><li><a class="tocitem" href="../docs-index/">Index</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/velexi-research/GeometricAlgebra.jl/blob/master/docs/src/examples.md#" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h1><ul><li><p>Create a blade.</p><pre><code class="language-julia hljs">julia&gt; vectors = Matrix([3 3; -4 -4; 0 1]);
+
+julia&gt; B = Blade(vectors)
+Blade{Float64}(3, 2, [-0.6 0.0; 0.8 0.0; 0.0 -1.0], 5.0)
+
+julia&gt; dim(B)
+3
+
+julia&gt; grade(B)
+2
+
+julia&gt; norm(B)
+5.0</code></pre></li><li><p>Compute the outer product of vectors (1-blades).</p><pre><code class="language-julia hljs">julia&gt; u = [3, -4, 0, 0];  # a vector is a 1-blade
+
+julia&gt; v = [3, -4, 1, 0];  # a vector is a 1-blade
+
+julia&gt; B = u ∧ v
+Blade{Float64}(3, 2, [-0.6 0.0; 0.8 0.0; 0.0 -1.0], 5.0)
+
+julia&gt; grade(Blade(u))
+1
+
+julia&gt; grade(Blade(v))
+1
+
+julia&gt; grade(B)
+2</code></pre></li><li><p>Compute the outer product of blades.</p><pre><code class="language-julia hljs">julia&gt; A = Blade([0, 0, 0, 2]);
+
+julia&gt; B = Blade(Matrix([3 3; -4 -4; 0 1; 0 0]));
+
+julia&gt; C = A ∧ B
+Blade{Float64}(4, 3, [0.0 0.6 0.0; 0.0 -0.8 0.0; 0.0 0.0 1.0; -1.0 0.0 0.0], -10.0)
+
+julia&gt; grade(A)
+1
+
+julia&gt; grade(B)
+2
+
+julia&gt; grade(C)
+3</code></pre></li><li><p>Compute the additive and multiplicative inverses of a vector (1-blade).</p><pre><code class="language-julia hljs">julia&gt; v = Blade([3, 4, 0, 0])
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 5.0)
+
+julia&gt; -v
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], -5.0)
+
+julia&gt; inv(v)
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
+
+julia&gt; 1 / v
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
+
+julia&gt; v^-1
+Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)</code></pre></li><li><p>Create a pseudoscalar for <span>$\mathbb{G}^n$</span>.</p><pre><code class="language-julia hljs">julia&gt; n = 10;
+julia&gt; value = -2;
+julia&gt; B = Pseudoscalar(n, value)
+Pseudoscalar{Float64}(10, -2.0)
+
+julia&gt; grade(B)
+10
+
+julia&gt; norm(B)
+2.0
+
+julia&gt; volume(B)
+-2.0</code></pre></li><li><p>Compute the dual of a blade.</p><pre><code class="language-julia hljs">julia&gt; vectors = Matrix([3 3; -4 -4; 0 1]);
+
+julia&gt; B = Blade(vectors);
+
+julia&gt; dual(B)
+Blade{Float64}(3, 1, [0.8; 0.6; 0.0;], -5.0)
+
+julia&gt; isapprox(dot(B.basis[:, 1], dual(B).basis), 0; atol=1e-15)
+true
+
+julia&gt; isapprox(dot(B.basis[:, 2], dual(B).basis), 0; atol=1e-15)
+true
+
+julia&gt; B ∧ dual(B)
+Pseudoscalar{Float64}(3, 25.0)</code></pre><p>We can confirm that is the dual of blade <span>$B$</span> is the same as division by the unit pseudoscalar for <span>$\mathbb{G}^n$</span>.</p><pre><code class="language-julia hljs">julia&gt; dual(B) ≈ B / Pseudoscalar(3, 1)
+true</code></pre></li><li><p>Compute the geometric product of two vectors. Note that the geometric product of two vectors is a <em>multivector</em> (a linear combination of blades).</p><pre><code class="language-julia hljs">julia&gt; u = Blade([1, 0, 0]);
+
+julia&gt; v = Blade([sqrt(3), 1, 0]);
+
+julia&gt; M = u * v
+Multivector{Float64}(3, DataStructures.SortedDict{Int64, Vector{AbstractBlade}, Base.Order.ForwardOrdering}(0 =&gt; [Scalar{Float64}(1.7320508075688776)], 2 =&gt; [Blade{Float64}(3, 2, [1.0 0.0; 0.0 1.0; 0.0 0.0], 1.0)]), 2.8284271247461903)
+
+julia&gt; M[0]
+1-element Vector{AbstractBlade}:
+ Scalar{Float64}(1.7320508075688776)
+
+julia&gt; M[1]
+AbstractBlade[]
+
+julia&gt; M[3]
+1-element Vector{AbstractBlade}:
+ Blade{Float64}(3, 2, [1.0 0.0; 0.0 1.0; 0.0 0.0], 1.0)</code></pre><p>Right multiplication of <code>M</code> by the multiplicative inverse of <code>v</code> yields <code>u</code>.</p><pre><code class="language-julia hljs">julia&gt; M * inv(v) ≈ u
+true
+
+julia&gt; M * (1 / v) ≈ u
+true</code></pre><p>Left multiplication of <code>M</code> by the multiplicative inverse of <code>u</code> yields <code>v</code>.</p><pre><code class="language-julia hljs">julia&gt; inv(u) * M ≈ v
+true
+
+julia&gt; (1 / u) * M ≈ v
+true</code></pre></li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../types/">Types »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.18 on <span class="colophon-date" title="Thursday 26 May 2022 19:12">Thursday 26 May 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
