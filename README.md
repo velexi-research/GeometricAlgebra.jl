@@ -117,7 +117,7 @@ to do _computational_ geometric algebra calculations.
   5.0
   ```
 
-* Compute the outer product between blades.
+* Compute the outer product of vectors (1-blades).
 
   ```julia
   julia> u = [3, -4, 0, 0];  # a vector is a 1-blade
@@ -137,13 +137,17 @@ to do _computational_ geometric algebra calculations.
   2
   ```
 
+* Compute the outer product of blades.
+
   ```julia
-  julia> A = [0, 0, 0, 2];
+  julia> A = Blade([0, 0, 0, 2]);
+
+  julia> B = Blade(Matrix([3 3; -4 -4; 0 1; 0 0]));
 
   julia> C = A ∧ B
-  Blade{Float64}(4, 3, [-0.6 0.0 0.0; 0.8 0.0 0.0; 0.0 1.0 0.0; 0.0 0.0 -1.0], -10.0)
+  Blade{Float64}(4, 3, [0.0 0.6 0.0; 0.0 -0.8 0.0; 0.0 0.0 1.0; -1.0 0.0 0.0], -10.0)
 
-  julia> grade(Blade(A))
+  julia> grade(A)
   1
 
   julia> grade(B)
@@ -157,19 +161,19 @@ to do _computational_ geometric algebra calculations.
 
   ```julia
   julia> v = Blade([3, 4, 0, 0])
-  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 5.0)
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 5.0)
 
   julia> -v
-  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], -5.0)
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], -5.0)
 
   julia> inv(v)
-  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
 
   julia> 1 / v
-  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
 
   julia> v^-1
-  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;;], 0.2)
+  Blade{Float64}(4, 1, [0.6; 0.8; 0.0; 0.0;], 0.2)
   ```
 
 * Create a pseudoscalar for $\mathbb{G}^n$.
@@ -198,7 +202,7 @@ to do _computational_ geometric algebra calculations.
   julia> B = Blade(vectors);
 
   julia> dual(B)
-  Blade{Float64}(3, 1, [0.8; 0.6; 0.0;;], -5.0)
+  Blade{Float64}(3, 1, [0.8; 0.6; 0.0;], -5.0)
 
   julia> isapprox(dot(B.basis[:, 1], dual(B).basis), 0; atol=1e-15)
   true
