@@ -65,9 +65,9 @@ _exterior product_ ($\wedge$), which combines lower-grade blades into higher-gra
 it enables any blade $B$ to be expressed _algebraically_ in terms of a basis
 $b_1, \ldots b_k$ for the subspace represented by the blade:
 
-\[
+$$
 B = b_1 \wedge \cdots \wedge b_k.
-\]
+$$
 
 The GeometricAlgebra package implements types and functions that make it straightforward
 to do _computational_ geometric algebra calculations.
