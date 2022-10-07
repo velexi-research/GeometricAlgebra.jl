@@ -51,7 +51,7 @@ jobs:
       - name: Set up Julia caches
         uses: julia-actions/cache@v1
         with:
-          cache-name: ${{ matrix.arch }}-${{ matrix.version }}--${{ hashFiles('.github/workflows/CI.yml') }}
+          cache-name: ${{ matrix.arch }}-${{ matrix.version }}-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
