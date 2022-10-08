@@ -87,6 +87,8 @@ jobs:
           verbose: true
 
   build-docs:
+    name: Build Documentation
+
     runs-on: ubuntu-latest
 
     steps:
