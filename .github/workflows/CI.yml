@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  test:
+  run-tests:
     name: Julia ${{ matrix.version }} (${{ matrix.os }}, ${{ matrix.arch }})
 
     strategy:
@@ -86,9 +86,7 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-  docs:
-    name: Documentation
-
+  build-docs:
     runs-on: ubuntu-latest
 
     steps:
