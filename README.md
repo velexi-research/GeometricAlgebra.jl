@@ -16,7 +16,7 @@
     <td>
       <a href="https://github.com/velexi-research/GeometricAlgebra.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/velexi-research/GeometricAlgebra.jl/actions/workflows/CI.yml/badge.svg"/></a>
       <a href="https://codecov.io/gh/velexi-research/GeometricAlgebra.jl">
-        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/GeometricAlgebra.jl/branch/main/graph/badge.svg?token=2PSLG9EGAK"/>
+        <img style="vertical-align: bottom;" src="https://codecov.io/gh/velexi-research/GeometricAlgebra.jl/branch/main/graph/badge.svg"/>
       </a>
     </td>
   </tr>
