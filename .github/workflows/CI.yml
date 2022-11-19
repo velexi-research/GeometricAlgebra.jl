@@ -17,26 +17,26 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+  run-tests:
+    name: Julia ${{ matrix.version }} (${{ matrix.os }}, ${{ matrix.arch }})
 
     strategy:
       fail-fast: false
 
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         arch: [x64, x86]
-        version: ['1.6', '1.7']
+        version: ['1.6', '1.7', '1.8']
 
         exclude:
-          - os: macOS-latest
+          - os: macos-latest
             arch: x86
 
     runs-on: ${{ matrix.os }}
 
     env:
         codecov-arch: x64
-        codecov-version: '1.7'
+        codecov-version: '1.8'
 
     steps:
       - name: Check out code
@@ -51,7 +51,7 @@ jobs:
       - name: Set up Julia caches
         uses: julia-actions/cache@v1
         with:
-          cache-name: ${{ matrix.arch }}-${{ matrix.version }}
+          cache-name: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
@@ -86,8 +86,8 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-  docs:
-    name: Documentation
+  build-docs:
+    name: Build Documentation
 
     runs-on: ubuntu-latest
 
@@ -98,7 +98,7 @@ jobs:
       - name: Set up Julia environment
         uses: julia-actions/setup-julia@latest
         with:
-          version: '1.7'
+          version: '1.8'
 
       - name: Install dependencies
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
