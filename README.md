@@ -1,4 +1,4 @@
-# GeometricAlgebra.jl
+# GeometricAlgebra
 
 [------------------------------------ BADGES: BEGIN ------------------------------------]: #
 

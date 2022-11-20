@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-Unit tests for GeometricAlgebra.jl package.
+Unit tests for GeometricAlgebra package.
 """
 
 # --- Imports

@@ -1,6 +1,6 @@
-# GeometricAlgebra.jl
+# GeometricAlgebra
 
-[GeometricAlgebra.jl](https://github.com/velexi-research/GeometricAlgebra.jl)
+[GeometricAlgebra](https://github.com/velexi-research/GeometricAlgebra.jl)
 defines a collection of basic types and operations that support numerical
 geometric algebra computations. Our aim is to simplify the process of implementing
 numerical algorithms for geometric operations expressed algebraically in the language of
@@ -109,8 +109,8 @@ allowed as parameters to GeometricAlgebra types.
 
 There are several active geometric algebra packages in the Julia ecosystem. Most of the
 available packages are implemented using an _additive_ blade representation and emphasize
-_symbolic_ computations. To the best of our knowledge, GeometricAlgebra.jl is the only
-package currently uses a _multiplicative_ blade representation and focuses on _numerical_
+_symbolic_ computations. To the best of our knowledge, GeometricAlgebra is the only package
+currently uses a _multiplicative_ blade representation and focuses on _numerical_
 computations.
 
 * [Grassmann.jl](https://grassmann.crucialflow.com/)

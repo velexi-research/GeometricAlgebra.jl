@@ -13,7 +13,7 @@
 #   limitations under the License.
 
 """
-The GeometricAlgebra.jl module defines geometric algebra types and functions.
+The GeometricAlgebra module defines geometric algebra types and functions.
 """
 module GeometricAlgebra
 

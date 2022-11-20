@@ -2,8 +2,8 @@
 
 ## Blade Representation
 
-In GeometricAlgebra.jl, blades are represented using a _multiplicative representation_
-where each blade is stored as
+In GeometricAlgebra, blades are represented using a _multiplicative representation_ where
+each blade is stored as
 
 * a matrix containing an orthonormal basis for the subspace represented by the blade and
 
