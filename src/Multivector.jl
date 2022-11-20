@@ -30,17 +30,17 @@ using DataStructures: SortedDict
     struct Multivector{T<:AbstractFloat} <: AbstractMultivector
 
 Multivector represented with the floating-point precision of type `T`.
+
+Fields
+------
+* `dim`: the dimension of the space that the blade is embedded in
+
+* `parts`: collection of k-vectors that sum to the multivector
+
+* `norm`: norm of the multivector
 """
 struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
-    #=
-        Fields
-        ------
-        * `dim`: the dimension of the space that the blade is embedded in
-
-        * `parts`: collection of k-vectors that sum to the multivector
-
-        * `norm`: norm of the multivector
-    =#
+    # Fields
     dim::Int
     parts::SortedDict{Int, Vector{AbstractBlade}}
     norm::T

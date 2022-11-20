@@ -28,13 +28,13 @@ export Scalar
 
 Scalar (a 0-blade) represented with the floating-point precision of type `T`. The `basis`
 and `volume` of a `Scalar` are `1` and the value of the `Scalar`, respectively.
+
+Fields
+------
+* `value`: the value of the scalar
 """
 struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
-    #=
-        Fields
-        ------
-        * `value`: the value of the scalar
-    =#
+    # Fields
     value::T
 
     """

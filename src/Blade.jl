@@ -38,26 +38,26 @@ and the orientation of a `Blade` relative to its `basis` is equal to `sign(volum
 
 !!! note
 
-    The grade of a `Blade` type is always stricly greater than 0 and strictly less than the
-    dimension of the space that the blade is embedded in.
+    The grade of a `Blade` type is always strictly greater than 0 and strictly less than
+    the dimension of the space that the blade is embedded in.
+
+Fields
+------
+* `dim`: the dimension of the space that the blade is embedded in
+
+* `grade`: the dimension of the space spanned by the blade
+
+* `basis`: an orthonormal basis for the space spanned by the blade. Note that the
+  order of the columns in `basis` defines the orientation for the unit blade
+  represented by `basis`.
+
+* `volume`: the signed-norm (hypervolume) of the blade. The sign of `volume`
+  indicates the orientation of the blade relative to the unit blade represented by
+  `basis`. It is positive when the blade has the same orientation as `basis` and
+  negative when the blade has the opposite orientation.
 """
 struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
-    #=
-        Fields
-        ------
-        * `dim`: the dimension of the space that the blade is embedded in
-
-        * `grade`: the dimension of the space spanned by the blade
-
-        * `basis`: an orthonormal basis for the space spanned by the blade. Note that the
-          order of the columns in `basis` defines the orientation for the unit blade
-          represented by `basis`.
-
-        * `volume`: the signed-norm (hypervolume) of the blade. The sign of `volume`
-          indicates the orientation of the blade relative to the unit blade represented by
-          `basis`. It is positive when the blade has the same orientation as `basis` and
-          negative when the blade has the opposite orientation.
-    =#
+    # Fields
     dim::Int
     grade::Int
     basis::Matrix{T}

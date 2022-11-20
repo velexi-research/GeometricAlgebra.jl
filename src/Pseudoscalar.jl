@@ -31,15 +31,15 @@ The `basis` for a `Pseudoscalar` is the standard basis for an ``n``-dimensional 
 space. The norm and orientation of a `Pseudoscalar` are encoded in its `value`. The norm of
 a `Pseudoscalar` is equal to `abs(value)` and the orientation of a `Pseudoscalar` relative
 to the standard basis is equal to `sign(value)`.
+
+Fields
+------
+* `dim`: the dimension of the space that the blade is embedded in
+
+* `value`: the value of the pseudoscalar
 """
 struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
-    #=
-        Fields
-        ------
-        * `dim`: the dimension of the space that the blade is embedded in
-
-        * `value`: the value of the pseudoscalar
-    =#
+    # Fields
     dim::Int
     value::T
 
