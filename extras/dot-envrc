@@ -1,0 +1,44 @@
+# direnv configuration file
+
+# ================= User-Specified Configuration Parameters ================= #
+
+# --- Project-Specific Configuration Parameters
+
+# Paths to add to PATH
+# NOTE: paths should be specified relative to the project root directory.
+PATH_EXTRA=
+
+# ============================ DO NOT EDIT BELOW ============================ #
+
+# --- Preparations
+
+# Find project root directory.
+#
+# Note: "builtin cd" is used to avoid conflicts with other packages (e.g., autoenv)
+PROJECT_ROOT_DIR=`builtin cd $(dirname "${BASH_SOURCE[0]}") && pwd`
+
+# --- Python configuration
+
+# Enable Python 3 layout
+layout_python3
+
+export PYTHONPATH=$PROJECT_ROOT_DIR
+PYTHONPATH_EXTRA="src $PYTHONPATH_EXTRA"
+for DIR in $PYTHONPATH_EXTRA; do
+    path_add PYTHONPATH $PROJECT_ROOT_DIR/$DIR
+done
+
+# --- Julia configuration
+
+export JULIA_PROJECT=@.
+export JULIA_LOAD_PATH=$PROJECT_ROOT_DIR:  # Note the trailing ":" is necessary so that
+                                           # Julia includes the default LOAD_PATH
+export JULIA_PKG_USE_CLI_GIT=true
+
+# --- Shell environment
+
+# Set PATH
+PATH_EXTRA="bin $PATH_EXTRA"
+for DIR in $PATH_EXTRA; do
+    PATH_add $PROJECT_ROOT_DIR/$DIR
+done
