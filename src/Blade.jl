@@ -26,7 +26,7 @@ export blade_atol
 
 # --- Type definitions
 
-import LinearAlgebra
+using LinearAlgebra: LinearAlgebra
 using LinearAlgebra: det, diag, dot, qr
 
 """
@@ -64,7 +64,7 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     volume::T
 
     """
-    Construct a blade for a geometric algebra in `dim` dimensions having the specified data
+    Construct a blade for a geometric algebra in `dim` dimensions having the specified
     field values. If the absolute value of `volume` is less than `atol`, a `Scalar`
     representing zero is returned. If the `dim` and `grade` are equal, a `Pseudoscalar` is
     returned.
@@ -76,13 +76,15 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     Note: this inner constructor is intended primarily for use by outer constructors to
     enforce constraints.
     """
-    function Blade{T}(dim::Int,
-                      grade::Int,
-                      basis::Matrix{T},
-                      volume::Real;
-                      atol::Real=blade_atol(T),
-                      enforce_constraints::Bool=true,
-                      copy_basis::Bool=true) where {T<:AbstractFloat}
+    function Blade{T}(
+        dim::Int,
+        grade::Int,
+        basis::Matrix{T},
+        volume::Real;
+        atol::Real=blade_atol(T),
+        enforce_constraints::Bool=true,
+        copy_basis::Bool=true,
+    ) where {T<:AbstractFloat}
 
         # --- Enforce constraints
 
@@ -142,7 +144,11 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
         end
 
         # Return new Blade
-        copy_basis ? new(dim, grade, copy(basis), volume) : new(dim, grade, basis, volume)
+        return if copy_basis
+            new(dim, grade, copy(basis), volume)
+        else
+            new(dim, grade, basis, volume)
+        end
     end
 end
 
@@ -203,9 +209,9 @@ blade.
     * If `vectors` is an Array of integers, the precision of the `Blade` is set to
       `Float64`.
 """
-function Blade{T}(vectors::Matrix{<:Real};
-                  volume::Union{Real, Nothing}=nothing,
-                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+function Blade{T}(
+    vectors::Matrix{<:Real}; volume::Union{Real,Nothing}=nothing, atol::Real=blade_atol(T)
+) where {T<:AbstractFloat}
 
     # --- Handle edge cases
 
@@ -252,13 +258,20 @@ function Blade{T}(vectors::Matrix{<:Real};
     volume = isnothing(volume) ? signed_norm : volume * sign(signed_norm)
 
     # Return new Blade
-    Blade{T}(dims[1], dims[2], basis, volume,
-             atol=atol, enforce_constraints=false, copy_basis=false)
+    return Blade{T}(
+        dims[1],
+        dims[2],
+        basis,
+        volume;
+        atol=atol,
+        enforce_constraints=false,
+        copy_basis=false,
+    )
 end
 
-function Blade{T}(v::Vector{<:Real};
-                  volume::Union{Real, Nothing}=nothing,
-                  atol::Real=blade_atol(T)) where {T<:AbstractFloat}
+function Blade{T}(
+    v::Vector{<:Real}; volume::Union{Real,Nothing}=nothing, atol::Real=blade_atol(T)
+) where {T<:AbstractFloat}
 
     # --- Handle edge cases
 
@@ -290,19 +303,24 @@ function Blade{T}(v::Vector{<:Real};
     volume = isnothing(volume) ? norm_v : volume
 
     # Return new Blade
-    Blade{T}(length(v), 1, basis, volume, atol=atol,
-             enforce_constraints=false, copy_basis=false)
+    return Blade{T}(
+        length(v), 1, basis, volume; atol=atol, enforce_constraints=false, copy_basis=false
+    )
 end
 
-Blade(vectors::Array{T};
-      volume::Union{Real, Nothing}=nothing,
-      atol::Real=blade_atol(T)) where {T<:AbstractFloat} =
-    Blade{T}(vectors, volume=volume, atol=atol)
+function Blade(
+    vectors::Array{T}; volume::Union{Real,Nothing}=nothing, atol::Real=blade_atol(T)
+) where {T<:AbstractFloat}
+    return Blade{T}(vectors; volume=volume, atol=atol)
+end
 
-Blade(vectors::Array{<:Integer};
-      volume::Union{Real, Nothing}=nothing,
-      atol::Real=blade_atol(Float64)) =
-    Blade(convert(Array{Float64}, vectors), volume=volume, atol=atol)
+function Blade(
+    vectors::Array{<:Integer};
+    volume::Union{Real,Nothing}=nothing,
+    atol::Real=blade_atol(Float64),
+)
+    return Blade(convert(Array{Float64}, vectors); volume=volume, atol=atol)
+end
 
 """
     Blade{T}(B::Blade;
@@ -323,19 +341,28 @@ When `copy_basis` is true, the `basis` of the new `Blade` is a copy of the `basi
 original `Blade`; otherwise, the `basis` of the new `Blade` is reference to the `basis` of
 the original `Blade`.
 """
-Blade{T}(B::Blade;
-         volume::Real=volume(B),
-         atol::Real=blade_atol(T),
-         copy_basis::Bool=false) where {T<:AbstractFloat} =
+function Blade{T}(
+    B::Blade; volume::Real=volume(B), atol::Real=blade_atol(T), copy_basis::Bool=false
+) where {T<:AbstractFloat}
+    return Blade{T}(
+        dim(B),
+        grade(B),
+        convert(Matrix{T}, basis(B)),
+        volume;
+        atol=atol,
+        enforce_constraints=false,
+        copy_basis=copy_basis,
+    )
+end
 
-    Blade{T}(dim(B), grade(B), convert(Matrix{T}, basis(B)), volume,
-             atol=atol, enforce_constraints=false, copy_basis=copy_basis)
-
-Blade(B::Blade;
-      volume::Real=B.volume,
-      atol::Real=blade_atol(typeof(B.volume)),
-      copy_basis=false) =
-    Blade{typeof(B.volume)}(B, volume=volume, atol=atol, copy_basis=copy_basis)
+function Blade(
+    B::Blade;
+    volume::Real=B.volume,
+    atol::Real=blade_atol(typeof(B.volume)),
+    copy_basis=false,
+)
+    return Blade{typeof(B.volume)}(B; volume=volume, atol=atol, copy_basis=copy_basis)
+end
 
 """
     Blade(x::Real)::Scalar
@@ -351,10 +378,11 @@ Blade(x::AbstractScalar) = Scalar(value(x))
 
 dim(B::Blade) = B.dim
 
--(B::Blade) = Blade(B, volume=-volume(B), copy_basis=false)
+-(B::Blade) = Blade(B; volume=-volume(B), copy_basis=false)
 
-Base.reverse(B::Blade) =
-    mod(grade(B), 4) < 2 ?  B : Blade(B, volume=-volume(B), copy_basis=false)
+function Base.reverse(B::Blade)
+    return mod(grade(B), 4) < 2 ? B : Blade(B; volume=-volume(B), copy_basis=false)
+end
 
 function dual(B::Blade)
     # --- Extend basis(B) to an orthonormal basis for entire space.
@@ -383,10 +411,14 @@ function dual(B::Blade)
         dual_volume = -dual_volume
     end
 
-    Blade{typeof(volume(B))}(dim(B), dim(B) - grade(B),
-                             F.Q[:, grade(B) + 1:end], dual_volume,
-                             enforce_constraints=false,
-                             copy_basis=false)
+    return Blade{typeof(volume(B))}(
+        dim(B),
+        dim(B) - grade(B),
+        F.Q[:, (grade(B) + 1):end],
+        dual_volume;
+        enforce_constraints=false,
+        copy_basis=false,
+    )
 end
 
 # --- Method definitions for AbstractBlade interface functions
@@ -397,33 +429,39 @@ basis(B::Blade) = B.basis
 
 volume(B::Blade) = B.volume
 
-inv(B::Blade) =
-    mod(grade(B), 4) < 2 ?
-        Blade(B, volume=1 / volume(B), copy_basis=false) :
-        Blade(B, volume=-1 / volume(B), copy_basis=false)
+function inv(B::Blade)
+    return if mod(grade(B), 4) < 2
+        Blade(B; volume=1 / volume(B), copy_basis=false)
+    else
+        Blade(B; volume=-1 / volume(B), copy_basis=false)
+    end
+end
 
 # --- Comparison methods
 
-==(B::AbstractBlade, C::AbstractBlade) =
-    dim(B) == dim(C) &&
-    grade(B) == grade(C) &&
-    volume(B) == volume(C) &&
-    basis(B) == basis(C)
+function ==(B::AbstractBlade, C::AbstractBlade)
+    return dim(B) == dim(C) &&
+           grade(B) == grade(C) &&
+           volume(B) == volume(C) &&
+           basis(B) == basis(C)
+end
 
-function isapprox(B::Blade{T1}, C::Blade{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat}
+function isapprox(
+    B::Blade{T1},
+    C::Blade{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
     # Check dim, grade, and norm are equal
-    if dim(B) != dim(C) || grade(B) != grade(C) ||
-        !isapprox(norm(B), norm(C), atol=atol, rtol=rtol)
-
+    if dim(B) != dim(C) ||
+        grade(B) != grade(C) ||
+        !isapprox(norm(B), norm(C); atol=atol, rtol=rtol)
         return false
     end
 
     # Check that B and C represent the same space
     projection = det(transpose(basis(B)) * basis(C))
-    if ≉(abs(projection), 1, atol=atol, rtol=rtol)
+    if ≉(abs(projection), 1; atol=atol, rtol=rtol)
         return false
     end
 
@@ -431,25 +469,30 @@ function isapprox(B::Blade{T1}, C::Blade{T2};
     return sign(B) * sign(C) == sign(projection)
 end
 
-function isapprox(B::Blade{T1}, C::Vector{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat}
+function isapprox(
+    B::Blade{T1},
+    C::Vector{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
     C_blade = Blade(C)
-    return isapprox(B, C_blade, atol=atol, rtol=rtol)
+    return isapprox(B, C_blade; atol=atol, rtol=rtol)
 end
 
-function isapprox(B::Vector{T1}, C::Blade{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat}
-    return isapprox(C, B, atol=atol, rtol=rtol)
+function isapprox(
+    B::Vector{T1},
+    C::Blade{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return isapprox(C, B; atol=atol, rtol=rtol)
 end
 
 # --- Utility methods
 
-convert(::Type{T}, B::Blade) where {T<:AbstractFloat} =
-    T == typeof(volume(B)) ? B : Blade{T}(B)
+function convert(::Type{T}, B::Blade) where {T<:AbstractFloat}
+    return T == typeof(volume(B)) ? B : Blade{T}(B)
+end
 
 #=
     TODO: review numerical error in factorizations to see if a different
@@ -460,4 +503,4 @@ convert(::Type{T}, B::Blade) where {T<:AbstractFloat} =
 
 Return the minimum value of a nonzero blade's norm.
 """
-blade_atol(::Type{T}) where {T<:AbstractFloat} = 100*eps(T)
+blade_atol(::Type{T}) where {T<:AbstractFloat} = 100 * eps(T)
