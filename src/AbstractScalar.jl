@@ -79,14 +79,13 @@ Compute the dual of `B` relative to a real vector space having dimension `dim`.
 
     An error is raised if the dimension of the embedding space is not explicitly specified.
 """
-dual(B::AbstractScalar, dim::Integer) =
-    mod(dim, 4) < 2 ?
-        Pseudoscalar(dim, value(B)) :
-        Pseudoscalar(dim, -value(B))
+function dual(B::AbstractScalar, dim::Integer)
+    return mod(dim, 4) < 2 ? Pseudoscalar(dim, value(B)) : Pseudoscalar(dim, -value(B))
+end
 
-dual(B::AbstractScalar) =
-    error("The dual of a scalar is not well-defined if `dim` is not " *
-          "specified")
+function dual(B::AbstractScalar)
+    return error("The dual of a scalar is not well-defined if `dim` is not specified")
+end
 
 # --- Comparison methods
 
@@ -103,23 +102,31 @@ dual(B::AbstractScalar) =
 # ------ isapprox(B, C)
 
 # B::AbstractScalar, C::AbstractScalar
-isapprox(B::AbstractScalar{T1}, C::AbstractScalar{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    isapprox(value(B), value(C), atol=atol, rtol=rtol)
+function isapprox(
+    B::AbstractScalar{T1},
+    C::AbstractScalar{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return isapprox(value(B), value(C); atol=atol, rtol=rtol)
+end
 
 # B::AbstractScalar, x::Real
 # x::Real, B::AbstractScalar
-isapprox(B::AbstractScalar{T}, x::Real;
-  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
-    isapprox(x, value(B), atol=atol, rtol=rtol)
+function isapprox(
+    B::AbstractScalar{T}, x::Real; atol::Real=0, rtol::Real=atol > 0 ? 0 : sqrt(eps(T))
+) where {T<:AbstractFloat}
+    return isapprox(x, value(B); atol=atol, rtol=rtol)
+end
 
-isapprox(x::Real, B::AbstractScalar{T};
-  atol::Real=0, rtol::Real=atol>0 ? 0 : sqrt(eps(T))) where {T<:AbstractFloat} =
-    isapprox(B, x, atol=atol, rtol=rtol)
+function isapprox(
+    x::Real, B::AbstractScalar{T}; atol::Real=0, rtol::Real=atol > 0 ? 0 : sqrt(eps(T))
+) where {T<:AbstractFloat}
+    return isapprox(B, x; atol=atol, rtol=rtol)
+end
 
 # --- Utility methods
 
-convert(::Type{T}, B::AbstractScalar) where {T<:AbstractFloat} =
-    T == typeof(value(B)) ? B : Scalar{T}(value(B))
+function convert(::Type{T}, B::AbstractScalar) where {T<:AbstractFloat}
+    return T == typeof(value(B)) ? B : Scalar{T}(value(B))
+end

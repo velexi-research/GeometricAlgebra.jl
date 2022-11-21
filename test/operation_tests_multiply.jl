@@ -87,7 +87,7 @@ end
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value)
 
-    @test B * C ≈ Blade(basis(B), volume=value(C) * volume(B))
+    @test B * C ≈ Blade(basis(B); volume=value(C) * volume(B))
 end
 
 @testset "*(B::Blade, C::One)" begin
@@ -113,7 +113,7 @@ end
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = test_value
 
-    @test B * C ≈ Blade(basis(B), volume=C * volume(B))
+    @test B * C ≈ Blade(basis(B); volume=C * volume(B))
 end
 
 @testset "*(B::Blade, C::Vector)" begin
@@ -141,9 +141,11 @@ end
         C = Pseudoscalar(test_dim, test_value_2)
 
         B_times_C = B * C
-        expected_result = mod(test_dim, 4) < 2 ?
-            test_value_1 * test_value_2 :
-           -test_value_1 * test_value_2
+        expected_result = if mod(test_dim, 4) < 2
+            test_value_1 * test_value_2
+        else
+            -test_value_1 * test_value_2
+        end
 
         @test B_times_C isa Scalar
         @test B_times_C.value == expected_result
@@ -156,10 +158,8 @@ end
     test_value_1 = 2
 
     for test_dim in 5:8
-        test_value_2 = mod(test_dim, 4) < 2 ?
-            1 / test_value_1 :
-            -1 / test_value_1
-        
+        test_value_2 = mod(test_dim, 4) < 2 ? 1 / test_value_1 : -1 / test_value_1
+
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
@@ -171,10 +171,8 @@ end
     test_value_1 = 0.7621865484887302
 
     for test_dim in 5:8
-        test_value_2 = mod(test_dim, 4) < 2 ?
-            1 / test_value_1 :
-            -1 / test_value_1
-        
+        test_value_2 = mod(test_dim, 4) < 2 ? 1 / test_value_1 : -1 / test_value_1
+
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
@@ -259,7 +257,7 @@ end
     test_dim = 10
     C = Blade(rand(test_dim, 3))
 
-    @test B * C ≈ Blade(basis(C), volume=value(B) * volume(C))
+    @test B * C ≈ Blade(basis(C); volume=value(B) * volume(C))
 end
 
 @testset "*(B::Scalar, C::Pseudoscalar)" begin
@@ -426,7 +424,7 @@ end
 @testset "*(B::One, C::One)" begin
     B = One()
     C = One()
-    
+
     B_times_C = B * C
     @test B_times_C === B
 end
@@ -441,7 +439,7 @@ end
 
 @testset "*(B::One, C::Real)" begin
     # --- Preparations
-    
+
     B = One()
 
     # --- Tests
@@ -564,7 +562,7 @@ end
     test_dim = 10
     C = Blade(rand(test_dim, 3))
 
-    @test B * C ≈ Blade(basis(C), volume=B * volume(C))
+    @test B * C ≈ Blade(basis(C); volume=B * volume(C))
 end
 
 @testset "*(B::Real, C::Pseudoscalar)" begin

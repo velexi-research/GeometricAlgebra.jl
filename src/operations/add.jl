@@ -61,14 +61,14 @@ end
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
-@inline +(B::Pseudoscalar, C::Pseudoscalar) =
-    Pseudoscalar(B, value=value(B) + value(C))
+@inline +(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B; value=value(B) + value(C))
 
 # ------ Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
-@inline +(B::AbstractScalar, C::AbstractScalar) =
-    Scalar{typeof(value(B))}(value(B) + value(C))
+@inline function +(B::AbstractScalar, C::AbstractScalar)
+    return Scalar{typeof(value(B))}(value(B) + value(C))
+end
 
 # B::AbstractScalar, C::One
 # B::One, C::AbstractScalar

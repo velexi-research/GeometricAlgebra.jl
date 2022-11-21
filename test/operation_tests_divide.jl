@@ -123,7 +123,7 @@ end
     B = Pseudoscalar(test_dim, test_value_1)
 
     # --- Tests
-    
+
     # B != C, C.value != Inf
     test_value_2 = abs(test_value_1) + rand() + 1
     test_value_2 = rand() > 0.5 ? test_value_2 : -test_value_2
@@ -180,7 +180,7 @@ end
 
     B_slash_C = B / C
     @test B_slash_C isa Zero
-    
+
     # B == Inf, C == Inf
     test_value = Inf
     B = Pseudoscalar(test_dim, test_value)
@@ -279,9 +279,11 @@ end
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_2)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, test_value_1 / test_value_2) :
+        expected_result = if mod(test_dim, 4) < 2
+            Pseudoscalar(test_dim, test_value_1 / test_value_2)
+        else
             Pseudoscalar(test_dim, -test_value_1 / test_value_2)
+        end
 
         B_slash_C = B / C
         @test B_slash_C isa Pseudoscalar
@@ -462,9 +464,11 @@ end
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_1)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, 1/ test_value_1) :
-            Pseudoscalar(test_dim, -1/ test_value_1)
+        expected_result = if mod(test_dim, 4) < 2
+            Pseudoscalar(test_dim, 1 / test_value_1)
+        else
+            Pseudoscalar(test_dim, -1 / test_value_1)
+        end
 
         B_slash_C = B / C
         @test B_slash_C isa Pseudoscalar
@@ -643,9 +647,11 @@ end
     for test_dim in 5:8
         C = Pseudoscalar(test_dim, test_value_2)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, test_value_1 / test_value_2) :
+        expected_result = if mod(test_dim, 4) < 2
+            Pseudoscalar(test_dim, test_value_1 / test_value_2)
+        else
             Pseudoscalar(test_dim, -test_value_1 / test_value_2)
+        end
 
         B_slash_C = B / C
         @test B_slash_C isa Pseudoscalar
@@ -733,7 +739,7 @@ end
     C = One()
 
     # --- Tests
-    
+
     # B != C, B != 0
     test_value = get_random_value(2)  # add 2 to keep value away from 0 and 1
     B = test_value
@@ -810,7 +816,7 @@ end
 
     # B is zero
     B = [0; 0; 0; 0; 0]
-    @test iszero(B / C);
+    @test iszero(B / C)
 end
 
 @testset "/(B::Vector, C::One)" begin
@@ -840,7 +846,7 @@ end
 
     # B is zero
     B = [0; 0; 0; 0; 0]
-    
+
     B_slash_C = B / C
     @test B_slash_C isa Scalar
     @test isnan(B_slash_C.value)

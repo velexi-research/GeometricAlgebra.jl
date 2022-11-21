@@ -101,7 +101,7 @@ end
     @test B isa Zero{Float64}
 
     # --- zero(::Type{<:AbstractMultivector{T}})
-    
+
     for precision_type in subtypes(AbstractFloat)
         # --- Type{<:AbstractScalar{T}}
 

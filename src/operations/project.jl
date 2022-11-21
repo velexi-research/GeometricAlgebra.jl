@@ -42,28 +42,28 @@ function project end
 # ------ Specializations involving an AbstractMultivector instance
 
 # M::AbstractMultivector, B::Zero
-project(M::AbstractMultivector, B::Zero; return_blade::Bool=true) =
-    return_blade ? B : value(B)
+function project(M::AbstractMultivector, B::Zero; return_blade::Bool=true)
+    return return_blade ? B : value(B)
+end
 
 # ------ Specializations involving an AbstractBlade instance
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
-project(B::AbstractScalar, C::AbstractBlade; return_blade::Bool=true) =
-    return_blade ? B : value(B)
-project(B::AbstractBlade, C::AbstractScalar; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+function project(B::AbstractScalar, C::AbstractBlade; return_blade::Bool=true)
+    return return_blade ? B : value(B)
+end
+function project(B::AbstractBlade, C::AbstractScalar; return_blade::Bool=true)
+    return return_blade ? zero(B) : 0
+end
 
 # B::AbstractBlade, C::Zero
-project(B::AbstractBlade, C::Zero; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+project(B::AbstractBlade, C::Zero; return_blade::Bool=true) = return_blade ? zero(B) : 0
 
 # B::AbstractBlade, C::Real
 # B::Real, C::AbstractBlade
-project(B::AbstractBlade, C::Real; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
-project(B::Real, C::AbstractBlade; return_blade::Bool=true) =
-    return_blade ? Scalar(B) : B
+project(B::AbstractBlade, C::Real; return_blade::Bool=true) = return_blade ? zero(B) : 0
+project(B::Real, C::AbstractBlade; return_blade::Bool=true) = return_blade ? Scalar(B) : B
 
 # ------ Specializations involving a Blade instance
 
@@ -83,14 +83,14 @@ function project(B::Blade, C::Blade; return_blade::Bool=true)
     # Compute the projections of basis(B) onto basis(C)
     projections = Matrix{typeof(volume(B))}(undef, dim(B), grade(B))
     for i in 1:grade(B)
-        projections[:, i] = project(basis(B)[:, i], C, return_blade=false)
+        projections[:, i] = project(basis(B)[:, i], C; return_blade=false)
     end
 
     # Incorporate volume(B) into the norm of the first projection vector
     projections[:, 1] *= volume(B)
 
     # Compute projection (using fact that projection is an outermorphism)
-    return_blade ? Blade(projections) : projections
+    return return_blade ? Blade(projections) : projections
 end
 
 # B::Blade, C::Pseudoscalar
@@ -108,7 +108,7 @@ end
 
 function project(B::Pseudoscalar, C::Blade; return_blade::Bool=true)
     assert_dim_equal(B, C)
-    return_blade ? zero(B) : 0
+    return return_blade ? zero(B) : 0
 end
 
 # B::Blade, v::Vector
@@ -118,10 +118,9 @@ function project(B::Blade, v::Vector{<:Real}; return_blade::Bool=true)
     assert_dim_equal(v, B)
 
     # Compute projection
-    projection = (grade(B) == 1) ?
-        v * LinearAlgebra.dot(v, basis(B)) : 0
+    projection = (grade(B) == 1) ? v * LinearAlgebra.dot(v, basis(B)) : 0
 
-    return_blade ? Blade(projection) : projection
+    return return_blade ? Blade(projection) : projection
 end
 
 function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
@@ -129,11 +128,13 @@ function project(v::Vector{<:Real}, B::Blade; return_blade::Bool=true)
     assert_dim_equal(v, B)
 
     # Compute projection
-    projection = (grade(B) == 1) ?
-        basis(B) * LinearAlgebra.dot(v, basis(B)) :
+    projection = if (grade(B) == 1)
+        basis(B) * LinearAlgebra.dot(v, basis(B))
+    else
         basis(B) * transpose(transpose(v) * basis(B))
+    end
 
-    return_blade ? Blade(projection) : vec(projection)
+    return return_blade ? Blade(projection) : vec(projection)
 end
 
 # ------ Specializations involving a Pseudoscalar instance
@@ -141,54 +142,56 @@ end
 # B::Pseudoscalar, C::Pseudoscalar
 function project(B::Pseudoscalar, C::Pseudoscalar; return_blade=true)
     assert_dim_equal(B, C)
-    return_blade ? B : value(B) * I
+    return return_blade ? B : value(B) * I
 end
 
 # B::Pseudoscalar, v::AbstractScalar
-project(B::Pseudoscalar, C::AbstractScalar; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+function project(B::Pseudoscalar, C::AbstractScalar; return_blade::Bool=true)
+    return return_blade ? zero(B) : 0
+end
 
 # B::Pseudoscalar, C::Zero
-project(B::Pseudoscalar, C::Zero; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+project(B::Pseudoscalar, C::Zero; return_blade::Bool=true) = return_blade ? zero(B) : 0
 
 # B::Pseudoscalar, v::Vector
 # v::Vector, B::Pseudoscalar
 function project(B::Pseudoscalar, v::Vector{<:Real}; return_blade::Bool=true)
     assert_dim_equal(v, B)
-    return_blade ? zero(B) : 0
+    return return_blade ? zero(B) : 0
 end
 
 function project(v::Vector{<:Real}, B::Pseudoscalar; return_blade::Bool=true)
     assert_dim_equal(v, B)
-    return_blade ? Blade(v) : v
+    return return_blade ? Blade(v) : v
 end
 
 # ------ Specializations involving an AbstractScalar instance
 
 # B::AbstractScalar, C::AbstractScalar
-project(B::AbstractScalar, C::AbstractScalar; return_blade::Bool=true) =
-    return_blade ? B : value(B)
+function project(B::AbstractScalar, C::AbstractScalar; return_blade::Bool=true)
+    return return_blade ? B : value(B)
+end
 
 # B::AbstractScalar, C::Zero
-project(B::AbstractScalar, C::Zero; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+project(B::AbstractScalar, C::Zero; return_blade::Bool=true) = return_blade ? zero(B) : 0
 
 # B::AbstractScalar, x::Real
 # x::Real, B::AbstractScalar
-project(B::AbstractScalar, x::Real; return_blade::Bool=true) =
-    return_blade ? B : value(B)
+project(B::AbstractScalar, x::Real; return_blade::Bool=true) = return_blade ? B : value(B)
 
-project(x::Real, B::AbstractScalar; return_blade::Bool=true) =
-    return_blade ? Scalar{typeof(value(B))}(x) : x
+function project(x::Real, B::AbstractScalar; return_blade::Bool=true)
+    return return_blade ? Scalar{typeof(value(B))}(x) : x
+end
 
 # B::AbstractScalar, v::Vector
 # v::Vector, B::AbstractScalar
-project(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true) =
-    return_blade ? B : value(B)
+function project(B::AbstractScalar, v::Vector{<:Real}; return_blade::Bool=true)
+    return return_blade ? B : value(B)
+end
 
-project(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true) =
-    return_blade ? zero(B) : 0
+function project(v::Vector{<:Real}, B::AbstractScalar; return_blade::Bool=true)
+    return return_blade ? zero(B) : 0
+end
 
 # ------ Specializations involving a Zero instance
 

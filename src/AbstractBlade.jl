@@ -117,5 +117,6 @@ blades(B::AbstractBlade) = Vector{AbstractBlade}([B])
 
 norm(B::AbstractBlade) = abs(volume(B))
 
-Base.getindex(B::AbstractBlade, k::Int) =
-    k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
+function Base.getindex(B::AbstractBlade, k::Int)
+    return k == grade(B) ? Vector{AbstractBlade}([B]) : Vector{AbstractBlade}()
+end

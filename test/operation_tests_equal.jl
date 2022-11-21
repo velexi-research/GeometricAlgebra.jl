@@ -77,8 +77,7 @@ include("test_utils.jl")
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             B = Blade(convert(Array{precision_type1}, vectors))
-            C = Blade(convert(Array{precision_type2}, vectors),
-                      volume=2*volume(B))
+            C = Blade(convert(Array{precision_type2}, vectors); volume=2 * volume(B))
             @test B != C
         end
     end
@@ -88,10 +87,8 @@ include("test_utils.jl")
     for precision_type1 in subtypes(AbstractFloat)
         vectors2 = [3 4; 4 5; 0 1]
         for precision_type2 in subtypes(AbstractFloat)
-            B = Blade(convert(Array{precision_type1}, vectors),
-                      volume=test_volume)
-            C = Blade(convert(Array{precision_type2}, vectors2),
-                      volume=test_volume)
+            B = Blade(convert(Array{precision_type1}, vectors); volume=test_volume)
+            C = Blade(convert(Array{precision_type2}, vectors2); volume=test_volume)
             @test B != C
         end
     end
@@ -194,7 +191,7 @@ end
             if precision_type1 == precision_type2
                 @test B == C
             elseif precision_type1 in float64_or_bigfloat &&
-                    precision_type2 in float64_or_bigfloat
+                precision_type2 in float64_or_bigfloat
                 @test B == C
             else
                 @test B != C
@@ -322,7 +319,7 @@ end
             if precision_type1 == precision_type2
                 @test B == C
             elseif precision_type1 in float64_or_bigfloat &&
-                   precision_type2 in float64_or_bigfloat
+                precision_type2 in float64_or_bigfloat
                 @test B == C
             else
                 @test B != C
@@ -371,7 +368,7 @@ end
             if precision_type == value_type
                 @test B == value_type(test_value)
             elseif precision_type in float64_or_bigfloat &&
-                   value_type in float64_or_bigfloat
+                value_type in float64_or_bigfloat
                 @test B == value_type(test_value)
             else
                 @test B != value_type(test_value)
@@ -636,7 +633,7 @@ end
             if precision_type == value_type
                 @test value_type(test_value) == C
             elseif precision_type in float64_or_bigfloat &&
-                   value_type in float64_or_bigfloat
+                value_type in float64_or_bigfloat
                 @test value_type(test_value) == C
             else
                 @test value_type(test_value) != C
@@ -688,7 +685,7 @@ end
     # B::Bool, C::One
     for precision_type in subtypes(AbstractFloat)
         C = One{precision_type}()
-        
+
         # B != C
         @test false != C
 

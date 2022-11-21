@@ -160,7 +160,6 @@ end
     @test_skip 1
 end
 
-
 @testset "dot(B::Scalar, C::Vector)" begin
     @test_skip 1
 end

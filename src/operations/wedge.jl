@@ -49,19 +49,23 @@ function wedge end
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
-wedge(M::AbstractMultivector, B::AbstractBlade) =
-    Multivector(map(C -> wedge(C, B), blades(M)))
+function wedge(M::AbstractMultivector, B::AbstractBlade)
+    return Multivector(map(C -> wedge(C, B), blades(M)))
+end
 
-wedge(B::AbstractBlade, M::AbstractMultivector) =
-    Multivector(map(C -> wedge(B, C), blades(M)))
+function wedge(B::AbstractBlade, M::AbstractMultivector)
+    return Multivector(map(C -> wedge(B, C), blades(M)))
+end
 
 # M::AbstractMultivector, v::Vector
 # v::Vector, M::AbstractMultivector
-wedge(M::AbstractMultivector, v::Vector{<:Real}) =
-    Multivector(map(C -> wedge(C, v), blades(M)))
+function wedge(M::AbstractMultivector, v::Vector{<:Real})
+    return Multivector(map(C -> wedge(C, v), blades(M)))
+end
 
-wedge(v::Vector{<:Real}, M::AbstractMultivector) =
-    Multivector(map(C -> wedge(v, C), blades(M)))
+function wedge(v::Vector{<:Real}, M::AbstractMultivector)
+    return Multivector(map(C -> wedge(v, C), blades(M)))
+end
 
 # M::AbstractMultivector, B::AbstractScalar
 # B::AbstractScalar, M::AbstractMultivector
@@ -119,14 +123,14 @@ function wedge(B::Blade, C::Blade)
 
     # --- Construct new blade
 
-    volume(B) * volume(C) * Blade(hcat(basis(B), basis(C)))
+    return volume(B) * volume(C) * Blade(hcat(basis(B), basis(C)))
 end
 
 # B::Blade, C::Pseudoscalar
 # B::Pseudoscalar, C::Blade
 function wedge(B::Blade, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    zero(B)
+    return zero(B)
 end
 
 wedge(B::Pseudoscalar, C::Blade) = wedge(C, B)
@@ -137,14 +141,14 @@ function wedge(B::Blade, v::Vector{<:Real})
     assert_dim_equal(B, v)
 
     # Note: volume(B) is incorporated into the norm of `v`
-    Blade(hcat(basis(B), volume(B) * v))
+    return Blade(hcat(basis(B), volume(B) * v))
 end
 
 function wedge(v::Vector{<:Real}, B::Blade)
     assert_dim_equal(v, B)
 
     # Note: volume(B) is incorporated into the norm of `v`
-    Blade(hcat(volume(B) * v, basis(B)))
+    return Blade(hcat(volume(B) * v, basis(B)))
 end
 
 # v::Vector, w::Vector
@@ -155,14 +159,14 @@ wedge(v::Vector{<:Real}, w::Vector{<:Real}) = Blade(hcat(v, w))
 # B::Pseudoscalar, C::Pseudoscalar
 function wedge(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    zero(B)
+    return zero(B)
 end
 
 # B::Pseudoscalar, v::Vector
 # v::Vector, B::Pseudoscalar
 function wedge(B::Pseudoscalar, v::Vector{<:Real})
     assert_dim_equal(B, v)
-    zero(B)
+    return zero(B)
 end
 
 wedge(v::Vector{<:Real}, B::Pseudoscalar) = B ∧ v

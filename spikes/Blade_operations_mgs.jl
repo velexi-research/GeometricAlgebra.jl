@@ -60,19 +60,22 @@ function wedge_mgs(B::Blade, C::Blade)
 
         column = rejections[:, j]
         for j_inner in (j + 1):size(rejections, 2)
-            rejections[:, j_inner] -=
-                (rejections[:, j_inner] ⋅ column) * column
+            rejections[:, j_inner] -= (rejections[:, j_inner] ⋅ column) * column
         end
     end
 
     # Construct the Blade representing the exterior product
     B_wedge_C_basis = hcat(basis(B), rejections)
-    Blade{typeof(B.volume)}(dim(B), grade(B) + grade(C),
-                            B_wedge_C_basis, volume(B) * volume(C),
-                            copy_basis=false)
+    return Blade{typeof(B.volume)}(
+        dim(B),
+        grade(B) + grade(C),
+        B_wedge_C_basis,
+        volume(B) * volume(C);
+        copy_basis=false,
+    )
 
-#    rejections = rejection(basis(C), B)
-#    Blade(hcat(basis(B), rejections), volume=volume(B) * volume(C))
+    #    rejections = rejection(basis(C), B)
+    #    Blade(hcat(basis(B), rejections), volume=volume(B) * volume(C))
 end
 
 """
@@ -119,7 +122,7 @@ function dual_mgs(B::Blade, C::Blade)
     # --- Compute dual using the basis vectors of `C` with the smallest
     #     projections (i.e., largest rejections) onto the basis of `B`.
 
-    permutation = sortperm(sum(abs.(projection_coefficients), dims=2)[:, 1])
-    dual_basis = rejection(basis(C)[:, permutation[1:grade(C) - grade(B)]], B)
-    Blade(dual_basis, volume=volume(B))
+    permutation = sortperm(sum(abs.(projection_coefficients); dims=2)[:, 1])
+    dual_basis = rejection(basis(C)[:, permutation[1:(grade(C) - grade(B))]], B)
+    return Blade(dual_basis; volume=volume(B))
 end

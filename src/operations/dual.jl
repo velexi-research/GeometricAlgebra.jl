@@ -22,23 +22,31 @@ dual.jl defines methods for the dual(x, y) function
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, C::AbstractBlade
-dual(B::AbstractBlade, C::AbstractScalar) = 
-    grade(B) > 0 ? throw(ArgumentError("`B` not contained in `C`")) : B
+function dual(B::AbstractBlade, C::AbstractScalar)
+    return grade(B) > 0 ? throw(ArgumentError("`B` not contained in `C`")) : B
+end
 
-dual(B::AbstractScalar, C::AbstractBlade) =
-    mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B), copy_basis=false) :
-        Blade(C, volume=-value(B), copy_basis=false)
+function dual(B::AbstractScalar, C::AbstractBlade)
+    return if mod(grade(C), 4) < 2
+        Blade(C; volume=value(B), copy_basis=false)
+    else
+        Blade(C; volume=-value(B), copy_basis=false)
+    end
+end
 
 # B::AbstractBlade, C::Real
 # B::Real, C::AbstractBlade
-dual(B::AbstractBlade, C::Real) = 
-    grade(B) > 0 ? throw(ArgumentError("`B` not contained in `C`")) : B
+function dual(B::AbstractBlade, C::Real)
+    return grade(B) > 0 ? throw(ArgumentError("`B` not contained in `C`")) : B
+end
 
-dual(B::Real, C::AbstractBlade) =
-    mod(grade(C), 4) < 2 ?
-        Blade(C, volume=B, copy_basis=false) :
-        Blade(C, volume=-B, copy_basis=false)
+function dual(B::Real, C::AbstractBlade)
+    return if mod(grade(C), 4) < 2
+        Blade(C; volume=B, copy_basis=false)
+    else
+        Blade(C; volume=-B, copy_basis=false)
+    end
+end
 
 # ------ Specializations involving a Blade instance
 
@@ -65,8 +73,11 @@ function dual(B::Blade, C::Blade)
     if grade(B) == grade(C)
         dual_sign = mod(grade(B), 4) < 2 ? 1 : -1
 
-        dual_volume = det(projection_coefficients) > 0 ?
-            dual_sign * volume(B) : -dual_sign * volume(B)
+        dual_volume = if det(projection_coefficients) > 0
+            dual_sign * volume(B)
+        else
+            -dual_sign * volume(B)
+        end
 
         return Scalar{typeof(volume(B))}(dual_volume)
     end
@@ -99,17 +110,21 @@ function dual(B::Blade, C::Blade)
 
     # --- Construct Blade in embedding space
 
-    Blade{typeof(volume(B))}(dim(B), grade(C) - grade(B),
-                             basis(C) * F.Q[:, grade(B) + 1:end], dual_volume,
-                             enforce_constraints=false,
-                             copy_basis=false)
+    return Blade{typeof(volume(B))}(
+        dim(B),
+        grade(C) - grade(B),
+        basis(C) * F.Q[:, (grade(B) + 1):end],
+        dual_volume;
+        enforce_constraints=false,
+        copy_basis=false,
+    )
 end
 
 # B::Blade, C::Pseudoscalar
 # B::Pseudoscalar, C::Blade
 function dual(B::Blade, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    dual(B)
+    return dual(B)
 end
 
 function dual(B::Pseudoscalar, C::Blade)
@@ -127,34 +142,34 @@ end
 # B::Pseudoscalar, C::Pseudoscalar
 function dual(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    Scalar{typeof(value(B))}(value(B))
+    return Scalar{typeof(value(B))}(value(B))
 end
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, C::Pseudoscalar
-dual(B::Pseudoscalar, C::AbstractScalar) = 
-    throw(ArgumentError("`B` not contained in `C`"))
+dual(B::Pseudoscalar, C::AbstractScalar) = throw(ArgumentError("`B` not contained in `C`"))
 
-dual(B::AbstractScalar, C::Pseudoscalar) =
-    mod(grade(C), 4) < 2 ?
-        Pseudoscalar(C, value=value(B)) :
-        Pseudoscalar(C, value=-value(B))
+function dual(B::AbstractScalar, C::Pseudoscalar)
+    return if mod(grade(C), 4) < 2
+        Pseudoscalar(C; value=value(B))
+    else
+        Pseudoscalar(C; value=-value(B))
+    end
+end
 
 # B::Pseudoscalar, C::Real
 # B::Real, C::Pseudoscalar
-dual(B::Pseudoscalar, C::Real) =
-    throw(ArgumentError("`B` not contained in `C`"))
+dual(B::Pseudoscalar, C::Real) = throw(ArgumentError("`B` not contained in `C`"))
 
-dual(B::Real, C::Pseudoscalar) =
-    mod(grade(C), 4) < 2 ?
-        Pseudoscalar(C, value=B) :
-        Pseudoscalar(C, value=-B)
+function dual(B::Real, C::Pseudoscalar)
+    return mod(grade(C), 4) < 2 ? Pseudoscalar(C; value=B) : Pseudoscalar(C; value=-B)
+end
 
 # B::Vector, C::Pseudoscalar
 # B::Pseudoscalar, C::Vector
 function dual(B::Vector, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    dual(Blade(B))
+    return dual(Blade(B))
 end
 
 function dual(B::Pseudoscalar, C::Vector)
@@ -179,7 +194,7 @@ function dual(B::AbstractScalar, C::AbstractScalar)
         dual_of_zero()
     end
 
-    B
+    return B
 end
 
 # B::AbstractScalar, C::Real
@@ -193,7 +208,7 @@ function dual(B::AbstractScalar, C::Real)
         dual_of_zero()
     end
 
-    B
+    return B
 end
 
 function dual(B::Real, C::AbstractScalar)
@@ -205,16 +220,15 @@ function dual(B::Real, C::AbstractScalar)
         dual_of_zero()
     end
 
-    Scalar(B)
+    return Scalar(B)
 end
 
 # B::Vector, C::AbstractScalar
 # B::AbstractScalar, C::Vector
-dual(B::Vector, C::AbstractScalar) = 
-    iszero(B) ? 
-        dual_of_zero() : 
-        throw(ArgumentError("`B` not contained in `C`"))
-dual(B::AbstractScalar, C::Vector) = Blade(C, volume=value(B))
+function dual(B::Vector, C::AbstractScalar)
+    return iszero(B) ? dual_of_zero() : throw(ArgumentError("`B` not contained in `C`"))
+end
+dual(B::AbstractScalar, C::Vector) = Blade(C; volume=value(B))
 
 # ------ Specializations involving a Zero instance
 
@@ -229,8 +243,9 @@ dual(B::Zero, C::Real) = dual_of_zero()
 dual(B::Zero, C::Vector) = dual_of_zero()
 
 # dual(B, C::Zero)
-@inline dual_relative_to_zero() =
-    error("The dual of anything relative to Zero is not well-defined")
+@inline function dual_relative_to_zero()
+    return error("The dual of anything relative to Zero is not well-defined")
+end
 
 dual(M::Multivector, C::Zero) = dual_relative_to_zero()
 dual(B::Blade, C::Zero) = dual_relative_to_zero()

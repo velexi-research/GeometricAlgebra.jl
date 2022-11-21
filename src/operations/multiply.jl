@@ -34,11 +34,9 @@ Compute the geometric product of `M` and `N`.
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
-*(M::AbstractMultivector, B::AbstractBlade) =
-    Multivector(map(C -> C * B, blades(M)))
+*(M::AbstractMultivector, B::AbstractBlade) = Multivector(map(C -> C * B, blades(M)))
 
-*(B::AbstractBlade, M::AbstractMultivector) =
-    Multivector(map(C -> B * C, blades(M)))
+*(B::AbstractBlade, M::AbstractMultivector) = Multivector(map(C -> B * C, blades(M)))
 
 # M::AbstractMultivector, B::AbstractScalar,
 # B::AbstractScalar, M::AbstractMultivector
@@ -69,8 +67,9 @@ Compute the geometric product of `M` and `N`.
 
 # B::AbstractBlade, C::AbstractScalar
 # B::AbstractScalar, B::AbstractBlade
-*(B::AbstractBlade, C::AbstractScalar) =
-    Blade(B, volume=volume(B) * value(C), copy_basis=false)
+function *(B::AbstractBlade, C::AbstractScalar)
+    return Blade(B; volume=volume(B) * value(C), copy_basis=false)
+end
 *(C::AbstractScalar, B::AbstractBlade) = B * C
 
 # B::AbstractBlade, C::One
@@ -85,7 +84,7 @@ Compute the geometric product of `M` and `N`.
 
 # B::AbstractBlade, x::Real
 # x::Real, B::AbstractBlade
-*(B::AbstractBlade, x::Real) = Blade(B, volume=volume(B) * x)
+*(B::AbstractBlade, x::Real) = Blade(B; volume=volume(B) * x)
 *(x::Real, B::AbstractBlade) = B * x
 
 # ------ Specializations involving a Blade instance
@@ -100,7 +99,7 @@ function *(B::Blade, C::Blade)
     for i in grade(B):-1:1
         M = basis(B)[:, i] * M
     end
-    M = volume(B) * M
+    return M = volume(B) * M
 end
 
 # B::Blade, C::Pseudoscalar
@@ -131,7 +130,7 @@ function *(B::Blade, v::Vector{<:Real})
         return B_dot_v
     end
 
-    Multivector([B_dot_v, B_wedge_v])
+    return Multivector([B_dot_v, B_wedge_v])
 end
 
 function *(v::Vector{<:Real}, B::Blade)
@@ -148,7 +147,7 @@ function *(v::Vector{<:Real}, B::Blade)
         return v_dot_B
     end
 
-    Multivector([v_dot_B, v_wedge_B])
+    return Multivector([v_dot_B, v_wedge_B])
 end
 
 # ------ Specializations involving a Pseudoscalar instance
@@ -158,8 +157,7 @@ end
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, C::Pseudoscalar
-*(B::Pseudoscalar, C::AbstractScalar) =
-    Pseudoscalar(B, value=value(B) * value(C))
+*(B::Pseudoscalar, C::AbstractScalar) = Pseudoscalar(B; value=value(B) * value(C))
 
 *(B::AbstractScalar, C::Pseudoscalar) = C * B
 
@@ -175,7 +173,7 @@ end
 
 # B::Pseudoscalar, x::Real
 # x::Real, B::Pseudoscalar
-*(B::Pseudoscalar, x::Real) = Pseudoscalar(B, value=x * value(B))
+*(B::Pseudoscalar, x::Real) = Pseudoscalar(B; value=x * value(B))
 *(x::Real, C::Pseudoscalar) = C * x
 
 # ------ Specializations involving an AbstractScalar instance

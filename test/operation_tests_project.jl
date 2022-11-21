@@ -90,8 +90,8 @@ end
     @test dim(B_proj_C) == dim(B)
 
     # Check norm
-    expected_norm_B_proj_C = norm(B) *
-        norm(Blade(basis(C) * transpose(basis(C)) * basis(B)))
+    expected_norm_B_proj_C =
+        norm(B) * norm(Blade(basis(C) * transpose(basis(C)) * basis(B)))
     @test norm(B_proj_C) ≈ expected_norm_B_proj_C
 
     # Check that project(B, C) is contained in C
@@ -100,7 +100,7 @@ end
 
     # ------ return_blade == false
 
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Matrix
     @test Blade(B_proj_C_matrix) == B_proj_C
 
@@ -113,7 +113,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Real
     @test B_proj_C_matrix == 0
 
@@ -147,7 +147,7 @@ end
     @test project(B, C) === B
 
     # return_blade == false
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Matrix
     @test Blade(B_proj_C_matrix) ≈ B
 
@@ -173,7 +173,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Real
     @test B_proj_C_matrix == 0
 end
@@ -189,7 +189,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Real
     @test B_proj_C_matrix == 0
 end
@@ -205,7 +205,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Real
     @test B_proj_C_matrix == 0
 end
@@ -224,7 +224,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C_matrix = project(B, C, return_blade=false)
+    B_proj_C_matrix = project(B, C; return_blade=false)
     @test B_proj_C_matrix isa Real
     @test B_proj_C_matrix == 0
 end
@@ -244,7 +244,7 @@ end
     @test iszero(B_proj_C)
 
     # grade(B) > 1, return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 
@@ -254,10 +254,9 @@ end
     B_proj_C = project(B, C)
     @test B_proj_C isa Blade
     @test B_proj_C ≈ Blade(projection_vectors)
-    
 
     # grade(B) == 1, return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Vector
     @test B_proj_C ≈ projection_vectors
 
@@ -294,7 +293,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 
@@ -325,7 +324,7 @@ end
         @test B_proj_C === B
 
         # return_blade == false
-        B_proj_C = project(B, C, return_blade=false)
+        B_proj_C = project(B, C; return_blade=false)
         @test B_proj_C isa UniformScaling
         @test B_proj_C == value(B) * I
 
@@ -353,7 +352,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -371,7 +370,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -389,7 +388,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -409,7 +408,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -434,7 +433,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 
@@ -465,7 +464,7 @@ end
     @test B_proj_C == test_value
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value
 end
@@ -486,7 +485,7 @@ end
     @test B_proj_C == test_value_1
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
@@ -503,7 +502,7 @@ end
     @test B_proj_C === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
@@ -518,7 +517,7 @@ end
     @test project(B, C) === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value
 end
@@ -534,7 +533,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -554,11 +553,10 @@ end
     @test B_proj_C == test_value_1
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
-
 
 @testset "project(B::Scalar, C::Vector)" begin
     # Preparations
@@ -575,7 +573,7 @@ end
     @test B_proj_C == test_value
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value
 end
@@ -597,7 +595,7 @@ end
     @test isone(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
@@ -615,7 +613,7 @@ end
     @test isone(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
@@ -631,7 +629,7 @@ end
     @test B_proj_C === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
@@ -645,7 +643,7 @@ end
     @test B_proj_C === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
@@ -659,7 +657,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -676,7 +674,7 @@ end
     @test isone(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
@@ -691,7 +689,7 @@ end
     @test isone(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 1
 end
@@ -713,7 +711,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -731,7 +729,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -747,7 +745,7 @@ end
     @test B_proj_C === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -761,7 +759,7 @@ end
     @test B_proj_C === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -775,7 +773,7 @@ end
     @test B_proj_C === B
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -792,7 +790,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -806,7 +804,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -831,7 +829,7 @@ end
     @test B_proj_C == test_value
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value
 end
@@ -852,7 +850,7 @@ end
     @test B_proj_C == test_value_1
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
@@ -872,7 +870,7 @@ end
     @test B_proj_C == test_value_1
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value_1
 end
@@ -890,7 +888,7 @@ end
     @test B_proj_C == test_value
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == test_value
 end
@@ -907,7 +905,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -936,7 +934,7 @@ end
     @test B_proj_C ≈ Blade(projection_vectors)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Vector
     @test B_proj_C ≈ projection_vectors
 
@@ -951,7 +949,7 @@ end
 
     # return_blade == false
     projection_vectors = (B ⋅ basis(C)) * basis(C)
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Vector
     @test B_proj_C ≈ projection_vectors
 
@@ -982,7 +980,7 @@ end
     @test B_proj_C == Blade(B)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Vector
     @test B_proj_C == B
 
@@ -1008,7 +1006,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -1023,7 +1021,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end
@@ -1037,7 +1035,7 @@ end
     @test iszero(B_proj_C)
 
     # return_blade == false
-    B_proj_C = project(B, C, return_blade=false)
+    B_proj_C = project(B, C; return_blade=false)
     @test B_proj_C isa Real
     @test B_proj_C == 0
 end

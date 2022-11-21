@@ -20,7 +20,7 @@ Unit tests for the dual(x, y) function
 
 # Standard library
 import InteractiveUtils.subtypes
-import LinearAlgebra
+using LinearAlgebra: LinearAlgebra
 using Test
 
 # GeometricAlgebra.jl
@@ -78,14 +78,14 @@ end
 
         # --- Check that B and dual(B) are orthogonal complements
 
-        @test LinearAlgebra.norm(transpose(basis(B_dual_C)) * basis(B)) <
-            10 * eps(Float64)
+        @test LinearAlgebra.norm(transpose(basis(B_dual_C)) * basis(B)) < 10 * eps(Float64)
 
         # --- Check sign(dual(B, C))
 
         # Compute sign of I_C formed from basis(B) and basis(dual(B, C))
-        sign_Q = sign(LinearAlgebra.det(
-            transpose(hcat(basis(B), basis(B_dual_C))) * basis(C)))
+        sign_Q = sign(
+            LinearAlgebra.det(transpose(hcat(basis(B), basis(B_dual_C))) * basis(C))
+        )
 
         # Compute expected_sign
         expected_sign = sign(B) * sign_Q
@@ -116,11 +116,12 @@ end
     B_vectors = basis(C) * coefficients
     B = Blade(B_vectors)
 
-    relative_orientation =
-        sign(LinearAlgebra.det(transpose(basis(B)) * basis(C)))
-    expected_result = mod(grade(B), 4) < 2 ?
-        Scalar(relative_orientation * volume(B)) :
+    relative_orientation = sign(LinearAlgebra.det(transpose(basis(B)) * basis(C)))
+    expected_result = if mod(grade(B), 4) < 2
+        Scalar(relative_orientation * volume(B))
+    else
         Scalar(-relative_orientation * volume(B))
+    end
 
     @test dual(B, C) ≈ expected_result
 
@@ -224,8 +225,9 @@ end
     B_vectors = C * rand()
     B = Blade(B_vectors)
 
-    relative_orientation =
-        sign(LinearAlgebra.det(transpose(basis(B)) * reshape(C, length(C), 1)))
+    relative_orientation = sign(
+        LinearAlgebra.det(transpose(basis(B)) * reshape(C, length(C), 1))
+    )
     expected_result = Scalar(relative_orientation * volume(B))
 
     B_dual_C = dual(B, C)
@@ -411,9 +413,11 @@ end
         C = Blade(randn(test_dim, test_grade))
 
         B_dual_C = dual(B, C)
-        expected_result = mod(test_grade, 4) < 2 ?
-            Blade(C, volume=test_value) :
-            Blade(C, volume=-test_value)
+        expected_result = if mod(test_grade, 4) < 2
+            Blade(C; volume=test_value)
+        else
+            Blade(C; volume=-test_value)
+        end
 
         @test B_dual_C isa Blade
         @test B_dual_C == expected_result
@@ -435,9 +439,11 @@ end
         B = Scalar(test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, test_value_1) :
+        expected_result = if mod(test_dim, 4) < 2
+            Pseudoscalar(test_dim, test_value_1)
+        else
             Pseudoscalar(test_dim, -test_value_1)
+        end
 
         @test dual(B, C) == expected_result
     end
@@ -489,7 +495,7 @@ end
     C = randn(test_dim, 1)[:, 1]
 
     B_dual_C = dual(B, C)
-    expected_result = Blade(C, volume=test_value)
+    expected_result = Blade(C; volume=test_value)
 
     @test B_dual_C isa Blade
     @test B_dual_C == expected_result
@@ -506,9 +512,11 @@ end
         C = Blade(randn(test_dim, test_grade))
 
         B_dual_C = dual(B, C)
-        expected_result = mod(test_grade, 4) < 2 ?
-            Blade(C, volume=1, copy_basis=false) :
-            Blade(C, volume=-1, copy_basis=false)
+        expected_result = if mod(test_grade, 4) < 2
+            Blade(C; volume=1, copy_basis=false)
+        else
+            Blade(C; volume=-1, copy_basis=false)
+        end
 
         @test B_dual_C isa Blade
         @test B_dual_C == expected_result
@@ -527,9 +535,8 @@ end
         B = One()
         C = Pseudoscalar(test_dim, test_value)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, 1) :
-            Pseudoscalar(test_dim, -1)
+        expected_result =
+            mod(test_dim, 4) < 2 ? Pseudoscalar(test_dim, 1) : Pseudoscalar(test_dim, -1)
 
         @test dual(B, C) == expected_result
     end
@@ -560,7 +567,7 @@ end
     C = randn(test_dim, 1)[:, 1]
 
     B_dual_C = dual(B, C)
-    expected_result = Blade(C, volume=1)
+    expected_result = Blade(C; volume=1)
 
     @test B_dual_C isa Blade
     @test B_dual_C == expected_result
@@ -680,9 +687,11 @@ end
         C = Blade(randn(test_dim, test_grade))
 
         B_dual_C = dual(B, C)
-        expected_result = mod(test_grade, 4) < 2 ?
-            Blade(C, volume=test_value) :
-            Blade(C, volume=-test_value)
+        expected_result = if mod(test_grade, 4) < 2
+            Blade(C; volume=test_value)
+        else
+            Blade(C; volume=-test_value)
+        end
 
         @test B_dual_C isa Blade
         @test B_dual_C == expected_result
@@ -701,9 +710,11 @@ end
         B = test_value_1
         C = Pseudoscalar(test_dim, test_value_2)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            Pseudoscalar(test_dim, test_value_1) :
+        expected_result = if mod(test_dim, 4) < 2
+            Pseudoscalar(test_dim, test_value_1)
+        else
             Pseudoscalar(test_dim, -test_value_1)
+        end
 
         @test dual(B, C) == expected_result
     end
@@ -764,8 +775,7 @@ end
     # --- Check sign(dual(B, C))
 
     # Compute sign of I_C formed from basis(B) and basis(dual(B, C))
-    expected_sign = sign(LinearAlgebra.det(
-        transpose(hcat(B, basis(B_dual_C))) * basis(C)))
+    expected_sign = sign(LinearAlgebra.det(transpose(hcat(B, basis(B_dual_C))) * basis(C)))
 
     # Account for sign of I_C^{-1} relative to I_C
     if mod(grade(C), 4) >= 2
@@ -787,8 +797,9 @@ end
     coefficients = rand()
     B = basis(C_grade_1)[:, grade_B] * coefficients
 
-    relative_orientation =
-        sign(LinearAlgebra.det(reshape(B, 1, length(B)) * basis(C_grade_1)))
+    relative_orientation = sign(
+        LinearAlgebra.det(reshape(B, 1, length(B)) * basis(C_grade_1))
+    )
     expected_result = Scalar(relative_orientation * LinearAlgebra.norm(B))
 
     @test dual(B, C_grade_1) ≈ expected_result

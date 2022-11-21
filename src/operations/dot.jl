@@ -28,17 +28,18 @@ export dot
 
 Compute the inner product of `M` and `N`.
 """
-dot(M::AbstractMultivector, N::AbstractMultivector; left=true) =
-    left ? contract_left(M, N) : nothing  # TODO
+function dot(M::AbstractMultivector, N::AbstractMultivector; left=true)
+    return left ? contract_left(M, N) : nothing
+end  # TODO
 
 # ------ Specializations involving an AbstractMultivector instance
 
-dot(M::AbstractMultivector, x::Real; left=true) =
-    left ? contract_left(M, x) : nothing  # TODO
-dot(x::Real, M::AbstractMultivector; left=true) =
-    left ? contract_left(x, M) : nothing  # TODO
+dot(M::AbstractMultivector, x::Real; left=true) = left ? contract_left(M, x) : nothing  # TODO
+dot(x::Real, M::AbstractMultivector; left=true) = left ? contract_left(x, M) : nothing  # TODO
 
-dot(M::AbstractMultivector, v::Vector{<:Real}; left=true) =
-    left ? contract_left(M, v) : nothing  # TODO
-dot(v::Vector{<:Real}, M::AbstractMultivector; left=true) =
-    left ? contract_left(v, M) : nothing  # TODO
+function dot(M::AbstractMultivector, v::Vector{<:Real}; left=true)
+    return left ? contract_left(M, v) : nothing
+end  # TODO
+function dot(v::Vector{<:Real}, M::AbstractMultivector; left=true)
+    return left ? contract_left(v, M) : nothing
+end  # TODO

@@ -197,7 +197,7 @@ end
 
     # C == B + 1
     C = Scalar(test_value_1 - 1)
-    
+
     B_minus_C = B - C
     @test B_minus_C isa One
 end
@@ -255,10 +255,10 @@ end
     @test iszero(B - C)
 
     # C == B - 1
-    C= test_value_1 - 1
+    C = test_value_1 - 1
 
     B_minus_C = B - C
-    @test B_minus_C isa One    
+    @test B_minus_C isa One
 end
 
 @testset "-(B::Scalar, C::Vector)" begin
@@ -387,7 +387,7 @@ end
 @testset "-(B::Zero, C::Zero)" begin
     B = Zero()
     C = Zero()
-    
+
     B_minus_C = B - C
     @test B_minus_C === B
 end
@@ -515,7 +515,7 @@ end
 
     # B == C + 1
     B = 1
-    
+
     B_minus_C = B - C
     @test B_minus_C isa One
 end

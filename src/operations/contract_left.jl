@@ -49,18 +49,19 @@ function contract_left end
 
 # M::AbstractMultivector, B::AbstractBlade
 # B::AbstractBlade, M::AbstractMultivector
-contract_left(M::AbstractMultivector, B::AbstractBlade) =
-    Multivector(map(C -> contract_left(C, B), blades(M)))
+function contract_left(M::AbstractMultivector, B::AbstractBlade)
+    return Multivector(map(C -> contract_left(C, B), blades(M)))
+end
 
-contract_left(B::AbstractBlade, M::AbstractMultivector) =
-    Multivector(map(C -> contract_left(B, C), blades(M)))
+function contract_left(B::AbstractBlade, M::AbstractMultivector)
+    return Multivector(map(C -> contract_left(B, C), blades(M)))
+end
 
 # M::AbstractMultivector, B::AbstractScalar
 # B::AbstractScalar, M::AbstractMultivector
-contract_left(M::AbstractMultivector, B::AbstractScalar) =
-    length(M[0]) > 0 ?
-        Scalar(value(M[0][1]) * B) :
-        zero(Scalar{typeof(norm(M))})
+function contract_left(M::AbstractMultivector, B::AbstractScalar)
+    return length(M[0]) > 0 ? Scalar(value(M[0][1]) * B) : zero(Scalar{typeof(norm(M))})
+end
 
 contract_left(B::AbstractScalar, M::AbstractMultivector) = B * M
 
@@ -71,10 +72,9 @@ contract_left(M::AbstractMultivector, B::Zero) = zero(M)
 
 # M::AbstractMultivector, x::Real
 # x::Real, M::AbstractMultivector
-contract_left(M::AbstractMultivector, x::Real) =
-    length(M[0]) > 0 ?
-        Scalar(value(M[0][1]) * x) :
-        zero(Scalar{typeof(norm(M))})
+function contract_left(M::AbstractMultivector, x::Real)
+    return length(M[0]) > 0 ? Scalar(value(M[0][1]) * x) : zero(Scalar{typeof(norm(M))})
+end
 
 contract_left(x::Real, M::AbstractMultivector) = x * M
 
@@ -84,14 +84,12 @@ contract_left(x::Real, M::AbstractMultivector) = x * M
 # B::AbstractScalar, C::AbstractBlade
 contract_left(B::AbstractBlade, C::AbstractScalar) = zero(B)
 
-contract_left(B::AbstractScalar, C::AbstractBlade) =
-    Blade(C, volume=value(B) * volume(C))
+contract_left(B::AbstractScalar, C::AbstractBlade) = Blade(C; volume=value(B) * volume(C))
 
 # B::AbstractBlade, C::Zero
 # B::Zero, C::AbstractBlade
 contract_left(B::AbstractBlade, C::Zero) = zero(B)
 contract_left(B::Zero, C::Blade) = zero(B)
-
 
 # ------ Specializations involving a Blade instance
 
@@ -122,30 +120,30 @@ function contract_left(B::Blade, C::Blade)
 
     # Compute
     #   (-1)^((grade(C) * grade(C) - 1) / 2) volume(C) dual(project(B, C), C)
-    mod(grade(C), 4) < 2 ?
-        volume(C) * dual(projection, C) :
-       -volume(C) * dual(projection, C)
+    return if mod(grade(C), 4) < 2
+        volume(C) * dual(projection, C)
+    else
+        -volume(C) * dual(projection, C)
+    end
 end
 
 # B::Blade, C::Pseudoscalar
 # B::Pseudoscalar, C::Blade
 function contract_left(B::Blade, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    mod(grade(C), 4) < 2 ?
-        dual(B, C) * volume(C) :
-       -dual(B, C) * volume(C)
+    return mod(grade(C), 4) < 2 ? dual(B, C) * volume(C) : -dual(B, C) * volume(C)
 end
 
 function contract_left(B::Pseudoscalar, C::Blade)
     assert_dim_equal(B, C)
-    zero(B)
+    return zero(B)
 end
 
 # B::Blade, v::Vector
 # v::Vector, B::Blade
 function contract_left(B::Blade, v::Vector{<:Real})
     assert_dim_equal(v, B)
-    grade(B) > 1 ? zero(B) : Scalar(volume(B) * basis(B) ⋅ v)
+    return grade(B) > 1 ? zero(B) : Scalar(volume(B) * basis(B) ⋅ v)
 end
 
 function contract_left(v::Vector{<:Real}, B::Blade)
@@ -167,9 +165,11 @@ function contract_left(v::Vector{<:Real}, B::Blade)
 
     # Compute
     #   (-1)^((grade(B) * grade(B) - 1) / 2) volume(B) dual(project(v, B), B)
-    mod(grade(B), 4) < 2 ?
-        volume(B) * dual(projection, B) :
-       -volume(B) * dual(projection, B)
+    return if mod(grade(B), 4) < 2
+        volume(B) * dual(projection, B)
+    else
+        -volume(B) * dual(projection, B)
+    end
 end
 
 # B::Blade, x::Real
@@ -182,16 +182,15 @@ contract_left(x::Real, B::Blade) = x * B
 # B::Pseudoscalar, C::Pseudoscalar
 function contract_left(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    mod(grade(B), 4) < 2 ?
-        Scalar(value(B) * value(C)) :
-        Scalar(-value(B) * value(C))
+    return mod(grade(B), 4) < 2 ? Scalar(value(B) * value(C)) : Scalar(-value(B) * value(C))
 end
 
 # B::Pseudoscalar, C::AbstractScalar
 # B::AbstractScalar, B::Pseudoscalar
 contract_left(B::Pseudoscalar, C::AbstractScalar) = zero(B)
-contract_left(B::AbstractScalar, C::Pseudoscalar) =
-    Pseudoscalar(C, value=value(B) * value(C))
+function contract_left(B::AbstractScalar, C::Pseudoscalar)
+    return Pseudoscalar(C; value=value(B) * value(C))
+end
 
 # B::Pseudoscalar, C::Zero
 # B::Zero, C::Pseudoscalar
@@ -202,15 +201,13 @@ contract_left(B::Zero, C::Pseudoscalar) = zero(B)
 # v::Vector, B::Pseudoscalar
 function contract_left(B::Pseudoscalar, v::Vector{<:Real})
     assert_dim_equal(B, v)
-    zero(B)
+    return zero(B)
 end
 
 function contract_left(v::Vector{<:Real}, B::Pseudoscalar)
     assert_dim_equal(B, v)
 
-    mod(grade(B), 4) < 2 ?
-        volume(B) * dual(Blade(v)) :
-       -volume(B) * dual(Blade(v))
+    return mod(grade(B), 4) < 2 ? volume(B) * dual(Blade(v)) : -volume(B) * dual(Blade(v))
 end
 
 # ------ Specializations involving an AbstractScalar instance

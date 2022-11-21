@@ -76,12 +76,10 @@ end
 @testset "wedge(B::Blade, C::Blade)" begin
     # --- Preparations
 
-    B_vectors = hcat([1; 1; 0; 0; 0],
-                     [0; 2; 0; 0; 0])
+    B_vectors = hcat([1; 1; 0; 0; 0], [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
 
-    C_vectors = hcat([0; 1; 3; 0; 0],
-                     [0; 0; 0; 4; 0])
+    C_vectors = hcat([0; 1; 3; 0; 0], [0; 0; 0; 4; 0])
     C = Blade(C_vectors)
 
     # --- Tests
@@ -94,10 +92,7 @@ end
     @test B ∧ C == B_wedge_C
 
     # grade(B) + grade(C) > dim(B)
-    C_vectors = hcat([1; 0; 0; 0; 0],
-                     [0; 1; 0; 0; 0],
-                     [0; 0; 1; 0; 0],
-                     [0; 0; 0; 1; 0])
+    C_vectors = hcat([1; 0; 0; 0; 0], [0; 1; 0; 0; 0], [0; 0; 1; 0; 0], [0; 0; 0; 1; 0])
     C = Blade(C_vectors)
     @test iszero(wedge(B, C))
     @test iszero(B ∧ C)
@@ -144,7 +139,7 @@ end
     C = Scalar(test_value)
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C ≈ Blade(basis(B), volume=value(C) * volume(B))
+    @test B_wedge_C ≈ Blade(basis(B); volume=value(C) * volume(B))
     @test B ∧ C == B_wedge_C
 end
 
@@ -178,15 +173,14 @@ end
     C = test_value
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C ≈ Blade(basis(B), volume=C * volume(B))
+    @test B_wedge_C ≈ Blade(basis(B); volume=C * volume(B))
     @test B ∧ C == B_wedge_C
 end
 
 @testset "wedge(B::Blade, C::Vector)" begin
     # --- Preparations
 
-    B_vectors = hcat([1; 0; 0; 0; 0],
-                     [0; 2; 0; 0; 0])
+    B_vectors = hcat([1; 0; 0; 0; 0], [0; 2; 0; 0; 0])
     B = Blade(B_vectors)
 
     C = [0; 1; 3; 0; 0]
@@ -361,7 +355,7 @@ end
     C = Blade(rand(test_dim, 3))
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C ≈ Blade(basis(C), volume=value(B) * volume(C))
+    @test B_wedge_C ≈ Blade(basis(C); volume=value(B) * volume(C))
     @test B ∧ C == B_wedge_C
 end
 
@@ -439,7 +433,7 @@ end
     C = Vector(rand(5))
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C ≈ Blade(C, volume=norm(C) * value(B))
+    @test B_wedge_C ≈ Blade(C; volume=norm(C) * value(B))
     @test B ∧ C == B_wedge_C
 end
 
@@ -487,7 +481,7 @@ end
 @testset "wedge(B::One, C::One)" begin
     B = One()
     C = One()
-    
+
     B_wedge_C = wedge(B, C)
     @test B_wedge_C === B
     @test (B ∧ C) == B_wedge_C
@@ -616,7 +610,7 @@ end
 
     # Exercise functionality and check results
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C ≈ Blade(basis(C), volume=B * volume(C))
+    @test B_wedge_C ≈ Blade(basis(C); volume=B * volume(C))
     @test B ∧ C == B_wedge_C
 end
 
@@ -687,8 +681,7 @@ end
 
     B = [0; 1; 3; 0; 0]
 
-    C_vectors = hcat([1; 0; 0; 0; 0],
-                     [0; 2; 0; 0; 0])
+    C_vectors = hcat([1; 0; 0; 0; 0], [0; 2; 0; 0; 0])
     C = Blade(C_vectors)
 
     # --- Tests
@@ -739,7 +732,7 @@ end
     C = Scalar(test_value)
 
     B_wedge_C = wedge(B, C)
-    @test B_wedge_C ≈ Blade(B, volume=norm(B) * value(C))
+    @test B_wedge_C ≈ Blade(B; volume=norm(B) * value(C))
     @test B ∧ C == B_wedge_C
 end
 

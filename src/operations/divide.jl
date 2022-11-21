@@ -56,18 +56,21 @@ Compute the geometric product of `M` with the inverse of `N`.
 
 # B::AbstractBlade, x::Real
 # x::Real, B::AbstractBlade
-/(B::AbstractBlade, x::Real) = Blade(B, volume=volume(B) / x)
+/(B::AbstractBlade, x::Real) = Blade(B; volume=volume(B) / x)
 /(x::Real, B::AbstractBlade) = x * inv(B)
 
 # ------ Specializations involving a Blade instance
 
 # B::Blade, C::AbstractScalar
 # B::AbstractScalar, C::Blade
-/(B::Blade, C::AbstractScalar) = Blade(B, volume=volume(B) / value(C))
-/(B::AbstractScalar, C::Blade) =
-    mod(grade(C), 4) < 2 ?
-        Blade(C, volume=value(B) / volume(C)) :
-        Blade(C, volume=-value(B) / volume(C))
+/(B::Blade, C::AbstractScalar) = Blade(B; volume=volume(B) / value(C))
+function /(B::AbstractScalar, C::Blade)
+    return if mod(grade(C), 4) < 2
+        Blade(C; volume=value(B) / volume(C))
+    else
+        Blade(C; volume=-value(B) / volume(C))
+    end
+end
 
 # B::Blade, C::One
 # B::One, C::Blade
@@ -76,7 +79,7 @@ Compute the geometric product of `M` with the inverse of `N`.
 
 # B::Blade, C::Zero
 # B::Zero, C::Blade
-/(B::Blade, C::Zero) = Blade(B, volume=sign(B) * Inf)
+/(B::Blade, C::Zero) = Blade(B; volume=sign(B) * Inf)
 /(B::Zero, C::Blade) = B
 
 # ------ Specializations involving a Pseudoscalar instance
@@ -84,7 +87,7 @@ Compute the geometric product of `M` with the inverse of `N`.
 # B::Pseudoscalar, C::Pseudoscalar
 function /(B::Pseudoscalar, C::Pseudoscalar)
     assert_dim_equal(B, C)
-    Scalar{typeof(value(B))}(value(B) / value(C))
+    return Scalar{typeof(value(B))}(value(B) / value(C))
 end
 
 # B::Pseudoscalar, C::AbstractScalar
@@ -99,16 +102,19 @@ end
 
 # B::Pseudoscalar, C::Zero
 # B::Zero, C::Pseudoscalar
-/(B::Pseudoscalar, C::Zero) = Pseudoscalar(B, value=sign(B) * Inf)
+/(B::Pseudoscalar, C::Zero) = Pseudoscalar(B; value=sign(B) * Inf)
 /(B::Zero, C::Pseudoscalar) = B
 
 # B::Pseudoscalar, x::Real
 # x::Real, B::Pseudoscalar
-/(B::Pseudoscalar, x::Real) = Pseudoscalar(B, value=value(B) / x)
-/(x::Real, B::Pseudoscalar) =
-    mod(dim(B), 4) < 2 ?
-        Pseudoscalar(B, value=x / value(B)) :
-        Pseudoscalar(B, value=-x / value(B))
+/(B::Pseudoscalar, x::Real) = Pseudoscalar(B; value=value(B) / x)
+function /(x::Real, B::Pseudoscalar)
+    return if mod(dim(B), 4) < 2
+        Pseudoscalar(B; value=x / value(B))
+    else
+        Pseudoscalar(B; value=-x / value(B))
+    end
+end
 
 # ------ Specializations involving an AbstractScalar instance
 
@@ -119,10 +125,9 @@ end
 
 # B::AbstractScalar, C::Zero
 # B::Zero, C::AbstractScalar
-/(B::AbstractScalar, C::Zero) =
-    sign(B) > 0 ?
-        Scalar{typeof(norm(B))}(Inf) :
-        Scalar{typeof(norm(B))}(-Inf)
+function /(B::AbstractScalar, C::Zero)
+    return sign(B) > 0 ? Scalar{typeof(norm(B))}(Inf) : Scalar{typeof(norm(B))}(-Inf)
+end
 
 /(B::Zero, C::AbstractScalar) = B
 

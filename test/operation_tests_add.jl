@@ -198,7 +198,7 @@ end
 
     # B == -C
     C = Scalar(-test_value_1)
-    
+
     B_plus_C = B + C
     @test B_plus_C isa Zero
 
@@ -449,7 +449,7 @@ end
 
 @testset "+(B::Real, C::Scalar)" begin
     # --- Preparation
-    
+
     test_value_1 = get_random_value(2)  # add 2 to keep value away from 0 and 1
     C = Scalar(test_value_1)
 

@@ -73,8 +73,7 @@ include("test_utils.jl")
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
             B = Blade(convert(Array{precision_type1}, vectors))
-            C = Blade(convert(Array{precision_type2}, vectors),
-                      volume=2*volume(B))
+            C = Blade(convert(Array{precision_type2}, vectors); volume=2 * volume(B))
             @test B ≉ C
         end
     end
@@ -84,10 +83,8 @@ include("test_utils.jl")
     for precision_type1 in subtypes(AbstractFloat)
         vectors2 = [3 4; 4 10; 0 1]
         for precision_type2 in subtypes(AbstractFloat)
-            B = Blade(convert(Array{precision_type1}, vectors),
-                      volume=test_volume)
-            C = Blade(convert(Array{precision_type2}, vectors2),
-                      volume=test_volume)
+            B = Blade(convert(Array{precision_type1}, vectors); volume=test_volume)
+            C = Blade(convert(Array{precision_type2}, vectors2); volume=test_volume)
             @test B ≉ C
         end
     end
@@ -96,10 +93,8 @@ include("test_utils.jl")
     test_volume = 5.0
     for precision_type1 in subtypes(AbstractFloat)
         for precision_type2 in subtypes(AbstractFloat)
-            B = Blade(convert(Array{precision_type1}, vectors),
-                      volume=test_volume)
-            C = Blade(convert(Array{precision_type2}, vectors),
-                      volume=-test_volume)
+            B = Blade(convert(Array{precision_type1}, vectors); volume=test_volume)
+            C = Blade(convert(Array{precision_type2}, vectors); volume=-test_volume)
             @test B ≉ C
         end
     end
@@ -159,7 +154,7 @@ end
 
 @testset "isapprox(B::Blade, C::Vector)" begin
     # --- Preparations
-    
+
     test_vector = [3; 4; 1]
 
     # B ≉ C
@@ -510,7 +505,7 @@ end
         B = Zero{precision_type}()
         C = Scalar{precision_type}(test_value)
         @test B ≉ C
-        
+
         # B ≈ C is not being tested as isapprox between a Zero and a
         # Scalar can never return true with the default atol and rtol value
     end
@@ -564,7 +559,7 @@ end
     for precision_type in subtypes(AbstractFloat)
         B = Zero{precision_type}()
         C = Vector{precision_type}(test_vector)
-        @test !isapprox(B, C, atol=0.001)
+        @test !isapprox(B, C; atol=0.001)
     end
 
     # B ≈ C
@@ -573,7 +568,7 @@ end
         B = Zero{precision_type}()
         C = Vector{precision_type}(test_vector)
         @test B ≈ C
-    end 
+    end
 
     test_vector = [0.001; 0.002; 0.003]
     for precision_type in subtypes(AbstractFloat)
@@ -744,7 +739,7 @@ end
     for precision_type in subtypes(AbstractFloat)
         B = Vector{precision_type}(test_vector)
         C = Zero{precision_type}()
-        @test !isapprox(B, C, atol=0.001)
+        @test !isapprox(B, C; atol=0.001)
     end
 
     # B ≈ C
@@ -753,7 +748,7 @@ end
         B = Vector{precision_type}(test_vector)
         C = Zero{precision_type}()
         @test B ≈ C
-    end 
+    end
 
     test_vector = [0.001; 0.002; 0.003]
     for precision_type in subtypes(AbstractFloat)

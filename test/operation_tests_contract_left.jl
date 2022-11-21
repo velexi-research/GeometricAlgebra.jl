@@ -109,9 +109,11 @@ end
         Q = Matrix(F.Q)
         projection = Blade(Q * transpose(Q) * test_vector_1)
         expected_volume_C = prod(diag(F.R))
-        expected_result = mod(grade(C), 4) < 2 ?
-            expected_volume_C * dual(projection, C) :
-           -expected_volume_C * dual(projection, C)
+        expected_result = if mod(grade(C), 4) < 2
+            expected_volume_C * dual(projection, C)
+        else
+            -expected_volume_C * dual(projection, C)
+        end
 
         B_contract_left_C = contract_left(B, C)
         @test B_contract_left_C ≈ expected_result
@@ -131,8 +133,8 @@ end
         C = Blade(rand(test_dim, test_grade))
 
         B_contract_left_C = contract_left(B, C)
-        @test B_contract_left_C ≈ volume(B) * volume(C) *
-                              det(transpose(basis(B)) * basis(C))
+        @test B_contract_left_C ≈
+            volume(B) * volume(C) * det(transpose(basis(B)) * basis(C))
 
         @test (B < C) == B_contract_left_C
     end
@@ -148,9 +150,11 @@ end
         Q = Matrix(F.Q)
         projection = Blade(Q * transpose(Q) * test_basis_1)
         expected_volume_C = prod(diag(F.R))
-        expected_result = mod(grade(C), 4) < 2 ?
-            expected_volume_C * dual(projection, C) :
-           -expected_volume_C * dual(projection, C)
+        expected_result = if mod(grade(C), 4) < 2
+            expected_volume_C * dual(projection, C)
+        else
+            -expected_volume_C * dual(projection, C)
+        end
 
         B_contract_left_C = contract_left(B, C)
         @test B_contract_left_C ≈ expected_result
@@ -187,9 +191,8 @@ end
 
         B_contract_left_C = contract_left(B, C)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            test_value * dual(B) :
-           -test_value * dual(B)
+        expected_result =
+            mod(test_dim, 4) < 2 ? test_value * dual(B) : -test_value * dual(B)
 
         @test B_contract_left_C ≈ expected_result
         @test (B < C) == B_contract_left_C
@@ -397,15 +400,17 @@ end
     # --- Tests
 
     # dim(B) == dim(C)
-    for test_dim = 5:8
+    for test_dim in 5:8
         B = Pseudoscalar(test_dim, test_value_1)
         C = Pseudoscalar(test_dim, test_value_2)
 
         B_contract_left_C = contract_left(B, C)
 
-        expected_result = mod(test_dim, 4) < 2 ?
-            test_value_1 * test_value_2 :
-           -test_value_1 * test_value_2
+        expected_result = if mod(test_dim, 4) < 2
+            test_value_1 * test_value_2
+        else
+            -test_value_1 * test_value_2
+        end
 
         @test B_contract_left_C isa Scalar
         @test B_contract_left_C == expected_result
@@ -524,7 +529,7 @@ end
     C = Blade(test_vector)
 
     B_contract_left_C = contract_left(B, C)
-    @test B_contract_left_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test B_contract_left_C ≈ Blade(basis(C); volume=test_value * volume(C))
     @test (B < C) == B_contract_left_C
 
     # grade(C) > 1
@@ -532,7 +537,7 @@ end
     C = Blade(test_basis)
 
     B_contract_left_C = contract_left(B, C)
-    @test B_contract_left_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test B_contract_left_C ≈ Blade(basis(C); volume=test_value * volume(C))
     @test (B < C) == B_contract_left_C
 end
 
@@ -610,7 +615,7 @@ end
     C = rand(5)
 
     B_contract_left_C = contract_left(B, C)
-    @test B_contract_left_C ≈ Blade(C, volume=norm(C) * test_value)
+    @test B_contract_left_C ≈ Blade(C; volume=norm(C) * test_value)
     @test (B < C) == B_contract_left_C
 end
 
@@ -707,7 +712,7 @@ end
     C = rand(5)
 
     B_contract_left_C = contract_left(B, C)
-    @test B_contract_left_C ≈ Blade(C, volume=norm(C))
+    @test B_contract_left_C ≈ Blade(C; volume=norm(C))
     @test (B < C) == B_contract_left_C
 end
 
@@ -829,7 +834,7 @@ end
     C = Blade(test_vector)
 
     B_contract_left_C = contract_left(B, C)
-    @test B_contract_left_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test B_contract_left_C ≈ Blade(basis(C); volume=test_value * volume(C))
     @test (B < C) == B_contract_left_C
 
     # grade(C) > 1
@@ -837,7 +842,7 @@ end
     C = Blade(test_basis)
 
     B_contract_left_C = contract_left(B, C)
-    @test B_contract_left_C ≈ Blade(basis(C), volume=test_value * volume(C))
+    @test B_contract_left_C ≈ Blade(basis(C); volume=test_value * volume(C))
     @test (B < C) == B_contract_left_C
 end
 
@@ -959,7 +964,7 @@ end
 
         B_contract_C = contract_left(B, C)
         @test B_contract_C ≈ contract_left(Blade(B), C)
-        @test (B< C) == B_contract_C
+        @test (B < C) == B_contract_C
     end
 
     # dim(B) != dim(C)

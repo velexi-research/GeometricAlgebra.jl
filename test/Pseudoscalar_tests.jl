@@ -20,7 +20,7 @@ Unit tests for the Pseudoscalar type.
 
 # Standard library
 import InteractiveUtils.subtypes
-import LinearAlgebra
+using LinearAlgebra: LinearAlgebra
 using Test
 import Random.rand
 
@@ -59,10 +59,10 @@ include("test_utils.jl")
             @test B.value == precision_type(converted_test_value)
         end
     end
-    
+
     # value == 0
     test_value = 0
-    
+
     for precision_type in subtypes(AbstractFloat)
         for value_type in subtypes(AbstractFloat)
             converted_test_value = value_type(test_value)
@@ -206,7 +206,7 @@ end
 
     B = Pseudoscalar(test_dim, false)
     @test B isa Zero{Float64}
-    
+
     # value == 0
     test_value = 0
 
@@ -262,7 +262,7 @@ end
 
         # Construct a Pseudoscalar representing the same space as `B` with a
         # different value.
-        B_copy = Pseudoscalar(B, value=converted_test_value + 1)
+        B_copy = Pseudoscalar(B; value=converted_test_value + 1)
         @test B_copy isa Pseudoscalar{precision_type}
         @test B.dim == test_dim
         @test value(B_copy) == converted_test_value + 1
@@ -282,8 +282,8 @@ end
         converted_test_value = precision_type(test_value)
 
         # value > 0
-        positive_test_value = converted_test_value > 0 ?
-            converted_test_value : -converted_test_value
+        positive_test_value =
+            converted_test_value > 0 ? converted_test_value : -converted_test_value
         B = Pseudoscalar(test_dim, positive_test_value)
         @test dim(B) == test_dim
         @test grades(B) == [test_dim]
@@ -296,8 +296,8 @@ end
         @test B[test_dim] == [B]
 
         # value < 0
-        negative_test_value = converted_test_value > 0 ?
-            -converted_test_value : converted_test_value
+        negative_test_value =
+            converted_test_value > 0 ? -converted_test_value : converted_test_value
         B = Pseudoscalar(test_dim, negative_test_value)
         @test norm(B) isa precision_type
         @test norm(B) == abs(negative_test_value)
@@ -325,8 +325,8 @@ end
         converted_test_value = precision_type(test_value)
 
         # value > 0
-        positive_test_value = converted_test_value > 0 ?
-            converted_test_value : -converted_test_value
+        positive_test_value =
+            converted_test_value > 0 ? converted_test_value : -converted_test_value
         B = Pseudoscalar(test_dim, positive_test_value)
         @test grade(B) == test_dim
         @test basis(B) == LinearAlgebra.I
@@ -335,8 +335,8 @@ end
         @test sign(B) == 1
 
         # value < 0
-        negative_test_value = converted_test_value > 0 ?
-            -converted_test_value : converted_test_value
+        negative_test_value =
+            converted_test_value > 0 ? -converted_test_value : converted_test_value
         B = Pseudoscalar(test_dim, negative_test_value)
         @test volume(B) isa precision_type
         @test volume(B) == negative_test_value
@@ -367,15 +367,15 @@ end
         converted_test_value = precision_type(test_value)
 
         # value > 0
-        positive_test_value = converted_test_value > 0 ?
-            converted_test_value : -converted_test_value
+        positive_test_value =
+            converted_test_value > 0 ? converted_test_value : -converted_test_value
         B = Pseudoscalar(test_dim, positive_test_value)
         @test value(B) isa precision_type
         @test value(B) == positive_test_value
 
         # value < 0
-        negative_test_value = converted_test_value > 0 ?
-            -converted_test_value : converted_test_value
+        negative_test_value =
+            converted_test_value > 0 ? -converted_test_value : converted_test_value
         B = Pseudoscalar(test_dim, negative_test_value)
         @test value(B) isa precision_type
         @test value(B) == negative_test_value
@@ -419,9 +419,11 @@ end
         for test_dim in 5:8
             B = Pseudoscalar(test_dim, test_value)
             reverse_B = reverse(B)
-            expected_result = mod(test_dim, 4) < 2 ?
-                Pseudoscalar(test_dim, test_value) :
+            expected_result = if mod(test_dim, 4) < 2
+                Pseudoscalar(test_dim, test_value)
+            else
                 Pseudoscalar(test_dim, -test_value)
+            end
             @test reverse(B) == expected_result
 
             @test B * reverse(B) ≈ norm(B)^2
@@ -491,15 +493,17 @@ end
     for precision_type in subtypes(AbstractFloat)
         converted_value = precision_type(test_value)
 
-        for test_dim = 5:8
+        for test_dim in 5:8
             B = Pseudoscalar(test_dim, converted_value)
 
             inverse_B = inv(B)
             @test inverse_B isa Pseudoscalar{precision_type}
 
-            expected_result = mod(test_dim, 4) < 2 ?
-                Pseudoscalar{precision_type}(test_dim, 1 / converted_value) :
+            expected_result = if mod(test_dim, 4) < 2
+                Pseudoscalar{precision_type}(test_dim, 1 / converted_value)
+            else
                 Pseudoscalar{precision_type}(test_dim, -1 / converted_value)
+            end
             @test inverse_B == expected_result
 
             @test B * inverse_B ≈ 1

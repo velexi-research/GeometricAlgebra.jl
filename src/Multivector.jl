@@ -42,7 +42,7 @@ Fields
 struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     # Fields
     dim::Int
-    parts::SortedDict{Int, Vector{AbstractBlade}}
+    parts::SortedDict{Int,Vector{AbstractBlade}}
     norm::T
 
     """
@@ -50,8 +50,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
     used to represent the ``k``-vector part of the multivector form an orthogonal basis
     for the subspace of ``k``-vectors.
     """
-    function Multivector{T}(
-            blades::Vector{<:AbstractBlade}) where {T<:AbstractFloat}
+    function Multivector{T}(blades::Vector{<:AbstractBlade}) where {T<:AbstractFloat}
 
         # --- Check arguments
 
@@ -63,8 +62,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
                     dim_ = dim(B)
                 else
                     if dim_ != dim(B)
-                        message = "Non-scalar blades in `blades` have " *
-                                  "differing dimensions."
+                        message = "Non-scalar blades in `blades` have differing dimensions."
                         throw(DimensionMismatch(message))
                     end
                 end
@@ -93,7 +91,7 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
         # --- Construct Multivector
 
         # Construct `parts`. Sort blades by grade.
-        parts = SortedDict{Int, Vector{AbstractBlade}}()
+        parts = SortedDict{Int,Vector{AbstractBlade}}()
         for B in blades
             # Ignore Scalar(0)
             if volume(B) == 0
@@ -134,17 +132,16 @@ struct Multivector{T<:AbstractFloat} <: AbstractMultivector{T}
         end
 
         # Return new Multivector
-        new(dim_, parts, norm_)
+        return new(dim_, parts, norm_)
     end
 
     """
     Type conversion constructor. Construct a copy of the `Multivector` converted to the
     specified precision.
     """
-    Multivector{T}(M::Multivector) where {T<:AbstractFloat} =
-        T == typeof(norm(M)) ?
-            M :
-            Multivector{T}(reduce(vcat, blades(M)))
+    function Multivector{T}(M::Multivector) where {T<:AbstractFloat}
+        return T == typeof(norm(M)) ? M : Multivector{T}(reduce(vcat, blades(M)))
+    end
 end
 
 """
@@ -162,10 +159,13 @@ subspace of ``k``-vectors.
     precision of the Multivector is inferred from the precision of the first element of
     `blades`.
 """
-Multivector(blades::Vector{<:AbstractBlade}) =
-    length(blades) > 0 ?
-        Multivector{typeof(volume(blades[1]))}(blades) :
+function Multivector(blades::Vector{<:AbstractBlade})
+    return if length(blades) > 0
+        Multivector{typeof(volume(blades[1]))}(blades)
+    else
         Multivector{Float64}(blades)
+    end
+end
 
 """
     Multivector(multivectors::Vector{<:AbstractMultivector})
@@ -177,26 +177,30 @@ the subspace of ``k``-vectors.
 The precision of the `Multivector` is inferred from the precision of the first element of
 `multivectors`.
 """
-Multivector(multivectors::Vector{<:AbstractMultivector}) =
-    length(multivectors) > 0 ?
-        Multivector(reduce(vcat, map(blades, multivectors))) :
+function Multivector(multivectors::Vector{<:AbstractMultivector})
+    return if length(multivectors) > 0
+        Multivector(reduce(vcat, map(blades, multivectors)))
+    else
         Multivector{Float64}(Vector{AbstractBlade}())
+    end
+end
 
 # --- Method definitions for AbstractMultivector interface functions
 
 dim(M::Multivector) = M.dim
 
-grades(M::Multivector; collect=true) =
-    collect ?  Base.collect(keys(M.parts)) : keys(M.parts)
+grades(M::Multivector; collect=true) = collect ? Base.collect(keys(M.parts)) : keys(M.parts)
 
 blades(M::Multivector) = reduce(vcat, values(M.parts))
 
 norm(M::Multivector) = M.norm
 
-Base.getindex(M::Multivector, k::Int) =
-    k in grades(M) ?  M.parts[k] : Vector{AbstractBlade}()
+function Base.getindex(M::Multivector, k::Int)
+    return k in grades(M) ? M.parts[k] : Vector{AbstractBlade}()
+end
 
 # --- Utility methods
 
-convert(::Type{T}, M::Multivector) where {T<:AbstractFloat} =
-    T == typeof(norm(M)) ? M : Multivector{T}(M)
+function convert(::Type{T}, M::Multivector) where {T<:AbstractFloat}
+    return T == typeof(norm(M)) ? M : Multivector{T}(M)
+end

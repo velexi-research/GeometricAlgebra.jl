@@ -33,7 +33,7 @@ Compute the difference between `M` and `N`.
 # ------ Specializations involving a Pseudoscalar instance
 
 # B::Pseudoscalar, C::Pseudoscalar
--(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B, value=value(B) - value(C))
+-(B::Pseudoscalar, C::Pseudoscalar) = Pseudoscalar(B; value=value(B) - value(C))
 
 # ------ Specializations involving an AbstractScalar instance
 

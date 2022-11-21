@@ -241,15 +241,16 @@ end
         for test_dim in 5:8
             dual_B = dual(B, test_dim)
 
-            expected_dual = mod(test_dim, 4) < 2 ?
-                Pseudoscalar{precision_type}(test_dim, 1) :
+            expected_dual = if mod(test_dim, 4) < 2
+                Pseudoscalar{precision_type}(test_dim, 1)
+            else
                 Pseudoscalar{precision_type}(test_dim, -1)
+            end
             @test dual_B isa Pseudoscalar{precision_type}
             @test dual_B == expected_dual
         end
 
-        expected_message = "The dual of a scalar is not well-defined if " *
-                           "`dim` is not specified"
+        expected_message = "The dual of a scalar is not well-defined if `dim` is not specified"
         @test_throws ErrorException(expected_message) dual(B)
     end
 end
