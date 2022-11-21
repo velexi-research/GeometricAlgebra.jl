@@ -69,9 +69,9 @@ struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
     representing zero is returned. If the `dim` and `grade` are equal, a `Pseudoscalar` is
     returned.
 
-    When `enforce_constraints` is true, constraints are enforced. When `copy_basis` is true,
-    the basis of the new `Blade` is a copy of `basis`; otherwise, the basis of the new
-    `Blade` is a reference to `basis`.
+    When `enforce_constraints` is `true`, constraints are enforced. When `copy_basis` is
+    `true`, the basis of the new `Blade` is a copy of `basis`; otherwise, the basis of the
+    new `Blade` is a reference to `basis`.
 
     Note: this inner constructor is intended primarily for use by outer constructors to
     enforce constraints.
@@ -337,7 +337,7 @@ Copy constructors. Construct a `Blade` representing the same space as `B` having
 specified oriented volume relative to `B`. A `Scalar` representing zero is returned if the
 absolute value of `volume` is less than `atol`.
 
-When `copy_basis` is true, the `basis` of the new `Blade` is a copy of the `basis` of the
+When `copy_basis` is `true`, the `basis` of the new `Blade` is a copy of the `basis` of the
 original `Blade`; otherwise, the `basis` of the new `Blade` is reference to the `basis` of
 the original `Blade`.
 """
