@@ -32,7 +32,7 @@ using LinearAlgebra: det, diag, dot, qr
 """
     struct Blade{T<:AbstractFloat} <: AbstractBlade{T}
 
-Blade represented with the floating-point precision of type `T`. The norm and orientation
+`Blade` represented with the floating-point precision of type `T`. The norm and orientation
 of a `Blade` are encoded by its `volume`. The norm of a `Blade` is equal to `abs(volume)`
 and the orientation of a `Blade` relative to its `basis` is equal to `sign(volume)`.
 
@@ -333,9 +333,9 @@ end
           atol::Real=blade_atol(typeof(volume(B))),
           copy_basis=false)
 
-Copy constructors. Construct a `Blade` representing the same space as `B` having a
-specified oriented volume relative to `B`. A `Scalar` representing zero is returned if the
-absolute value of `volume` is less than `atol`.
+Copy constructors. Construct a blade representing the same space as `B` having a specified
+oriented volume relative to `B`. A `Scalar` representing zero is returned if the absolute
+value of `volume` is less than `atol`.
 
 When `copy_basis` is `true`, the `basis` of the new `Blade` is a copy of the `basis` of the
 original `Blade`; otherwise, the `basis` of the new `Blade` is reference to the `basis` of

@@ -26,7 +26,7 @@ export Scalar
 """
     struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
 
-Scalar (a 0-blade) represented with the floating-point precision of type `T`. The `basis`
+`Scalar` (a 0-blade) represented with the floating-point precision of type `T`. The `basis`
 and `volume` of a `Scalar` are `1` and the value of the `Scalar`, respectively.
 
 Fields
@@ -38,7 +38,7 @@ struct Scalar{T<:AbstractFloat} <: AbstractScalar{T}
     value::T
 
     """
-    Construct a Scalar having the specified `value`.
+    Construct a scalar having the specified `value`.
     """
     function Scalar{T}(value::Real) where {T<:AbstractFloat}
         if value == 0

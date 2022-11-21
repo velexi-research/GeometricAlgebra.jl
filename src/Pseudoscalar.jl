@@ -26,7 +26,7 @@ export Pseudoscalar
 """
     struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade
 
-Pseudoscalar (an ``n``-blade) represented with the floating-point precision of type `T`.
+`Pseudoscalar` (an ``n``-blade) represented with the floating-point precision of type `T`.
 The `basis` for a `Pseudoscalar` is the standard basis for an ``n``-dimensional real vector
 space. The norm and orientation of a `Pseudoscalar` are encoded in its `value`. The norm of
 a `Pseudoscalar` is equal to `abs(value)` and the orientation of a `Pseudoscalar` relative
@@ -47,10 +47,15 @@ struct Pseudoscalar{T<:AbstractFloat} <: AbstractBlade{T}
     Construct a pseudoscalar for a geometric algebra in `dim` dimensions having the
     specified `value`.
     """
-    Pseudoscalar{T}(dim::Integer, value::Real) where {T<:AbstractFloat} =
-        dim <= 0 ?
-            throw(ArgumentError("`dim` must be positive")) :
-            value == 0 ? zero(Pseudoscalar{T}) : new(dim, T(value))
+    function Pseudoscalar{T}(dim::Integer, value::Real) where {T<:AbstractFloat}
+        return if dim <= 0
+            throw(ArgumentError("`dim` must be positive"))
+        elseif value == 0
+            zero(Pseudoscalar{T})
+        else
+            new(dim, T(value))
+        end
+    end
 end
 
 """
@@ -71,8 +76,7 @@ of the `Pseudoscalar`.
 
     * If `value` is an integer, the precision of the Pseudoscalar is set to `Float64`.
 """
-Pseudoscalar(dim::Integer, value::AbstractFloat) =
-    Pseudoscalar{typeof(value)}(dim, value)
+Pseudoscalar(dim::Integer, value::AbstractFloat) = Pseudoscalar{typeof(value)}(dim, value)
 
 Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
 
@@ -83,8 +87,9 @@ Pseudoscalar(dim::Integer, value::Integer) = Pseudoscalar(dim, Float64(value))
 Copy constructor. Construct a `Pseudoscalar` representing the same space as `B` having the
 specified `value`.
 """
-Pseudoscalar(B::Pseudoscalar; value::Real=value(B)) =
-    Pseudoscalar{typeof(B.value)}(dim(B), value)
+function Pseudoscalar(B::Pseudoscalar; value::Real=value(B))
+    return Pseudoscalar{typeof(B.value)}(dim(B), value)
+end
 
 # --- Method definitions
 
@@ -99,10 +104,13 @@ value(B::Pseudoscalar) = B.value
 
 import LinearAlgebra.I
 
-inv(B::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?
-        Pseudoscalar(B, value=1 / value(B)) :
-        Pseudoscalar(B, value=-1 / value(B))
+function inv(B::Pseudoscalar)
+    return if mod(grade(B), 4) < 2
+        Pseudoscalar(B; value=1 / value(B))
+    else
+        Pseudoscalar(B; value=-1 / value(B))
+    end
+end
 
 grade(B::Pseudoscalar) = B.dim
 
@@ -114,10 +122,9 @@ volume(B::Pseudoscalar) = value(B)
 
 dim(B::Pseudoscalar) = B.dim
 
--(B::Pseudoscalar) = Pseudoscalar(B, value=-value(B))
+-(B::Pseudoscalar) = Pseudoscalar(B; value=-value(B))
 
-Base.reverse(B::Pseudoscalar) =
-    mod(grade(B), 4) < 2 ?  B : Pseudoscalar(B, value=-value(B))
+Base.reverse(B::Pseudoscalar) = mod(grade(B), 4) < 2 ? B : Pseudoscalar(B; value=-value(B))
 
 dual(B::Pseudoscalar) = Scalar(value(B))
 
@@ -129,25 +136,37 @@ dual(B::Pseudoscalar) = Scalar(value(B))
 
 ==(B::Vector, C::Pseudoscalar) = (C == B)
 
-isapprox(B::Pseudoscalar{T1}, C::Pseudoscalar{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    (dim(B) == dim(C)) && isapprox(value(B), value(C), atol=atol, rtol=rtol)
+function isapprox(
+    B::Pseudoscalar{T1},
+    C::Pseudoscalar{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return (dim(B) == dim(C)) && isapprox(value(B), value(C); atol=atol, rtol=rtol)
+end
 
-isapprox(B::Pseudoscalar{T1}, C::Vector{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    (dim(B) == 1) && (length(C) == 1) && isapprox(value(B), C[1], atol=atol, rtol=rtol)
+function isapprox(
+    B::Pseudoscalar{T1},
+    C::Vector{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return (dim(B) == 1) &&
+           (length(C) == 1) &&
+           isapprox(value(B), C[1]; atol=atol, rtol=rtol)
+end
 
-isapprox(B::Vector{T1}, C::Pseudoscalar{T2};
-  atol::Real=0,
-  rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                          T2<:AbstractFloat} =
-    isapprox(C, B, atol=atol, rtol=rtol)
+function isapprox(
+    B::Vector{T1},
+    C::Pseudoscalar{T2};
+    atol::Real=0,
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return isapprox(C, B; atol=atol, rtol=rtol)
+end
 
 # --- Utility methods
 
-convert(::Type{T}, B::Pseudoscalar) where {T<:AbstractFloat} =
-    T == typeof(value(B)) ? B : Pseudoscalar{T}(dim(B), value(B))
+function convert(::Type{T}, B::Pseudoscalar) where {T<:AbstractFloat}
+    return T == typeof(value(B)) ? B : Pseudoscalar{T}(dim(B), value(B))
+end

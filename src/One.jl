@@ -34,7 +34,7 @@ struct One{T<:AbstractFloat} <: AbstractScalar{T} end
 """
     One()
 
-Alias for a One{Float64}().
+Alias for `One{Float64}()`.
 """
 One() = One{Float64}()
 

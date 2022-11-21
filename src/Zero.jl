@@ -34,7 +34,7 @@ struct Zero{T<:AbstractFloat} <: AbstractScalar{T} end
 """
     Zero()
 
-Alias for a Zero{Float64}().
+Alias for `Zero{Float64}()`.
 """
 Zero() = Zero{Float64}()
 
@@ -61,15 +61,21 @@ import LinearAlgebra: norm
 ==(v::Vector{<:Real}, B::Zero) = (norm(v) == 0)
 
 # B::Zero{T1}, v::Vector{T2}
-isapprox(B::Zero{T1}, v::Vector{T2};
+function isapprox(
+    B::Zero{T1},
+    v::Vector{T2};
     atol::Real=0,
-    rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                            T2<:AbstractFloat} =
-        isapprox(value(B), norm(v), atol=atol, rtol=rtol)
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return isapprox(value(B), norm(v); atol=atol, rtol=rtol)
+end
 
 # v::Vector{T1}, B::Zero{T2}
-@inline isapprox(v::Vector{T1}, B::Zero{T2};
+@inline function isapprox(
+    v::Vector{T1},
+    B::Zero{T2};
     atol::Real=0,
-    rtol::Real=atol>0 ? 0 : max(√eps(T1), √eps(T2))) where {T1<:AbstractFloat,
-                                                            T2<:AbstractFloat} =
-        isapprox(B, v, atol=atol, rtol=rtol)
+    rtol::Real=atol > 0 ? 0 : max(√eps(T1), √eps(T2)),
+) where {T1<:AbstractFloat,T2<:AbstractFloat}
+    return isapprox(B, v; atol=atol, rtol=rtol)
+end
