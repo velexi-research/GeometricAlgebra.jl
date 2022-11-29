@@ -24,9 +24,11 @@ test:
 	@echo Generating code coverage report
 	@jlcoverage
 
-## Run tests in fail-fast mode (i.e., stop at first failure)
+## Run tests in fail-fast mode (i.e., stop at first failure, coverage data collection
+## disabled)
 fast-test: export JLTEST_FAIL_FAST=true
-fast-test: test
+fast-test:
+	jltest test/runtests.jl
 
 # --- Code quality rules
 
