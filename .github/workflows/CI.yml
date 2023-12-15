@@ -10,6 +10,9 @@ on:
     branches:
       - main
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
 concurrency:
   # Skip intermediate builds: always.
   # Cancel intermediate builds: only if it is a pull request build.
@@ -26,7 +29,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         arch: [x64, x86]
-        version: ['1.6', '1.7', '1.8']
+        version: ['1.6', '1.7', '1.8', '1.9']
 
         exclude:
           - os: macos-latest
@@ -35,8 +38,9 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     env:
+        codecov-os: 'Linux'
         codecov-arch: x64
-        codecov-version: '1.8'
+        codecov-version: '1.9'
 
     steps:
       - name: Check out code
@@ -51,7 +55,7 @@ jobs:
       - name: Set up Julia caches
         uses: julia-actions/cache@v1
         with:
-          cache-name: ${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-${{ hashFiles('.github/workflows/CI.yml') }}
+          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
@@ -63,7 +67,7 @@ jobs:
         # Only run for 'main' branch running on 'Linux' with the latest version of Julia
         if: |
             github.ref_name == 'main' &&
-            runner.os == 'Linux' &&
+            runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
             matrix.version == env.codecov-version
 
@@ -75,11 +79,11 @@ jobs:
         # Only run for 'main' branch running on 'Linux' with the latest version of Julia
         if: |
             github.ref_name == 'main' &&
-            runner.os == 'Linux' &&
+            runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
             matrix.version == env.codecov-version
 
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: 9d54a766-eb01-4827-825a-b5886b607bf2
           files: lcov.info
@@ -98,13 +102,13 @@ jobs:
       - name: Set up Julia environment
         uses: julia-actions/setup-julia@latest
         with:
-          version: '1.8'
+          version: '1.9'
 
       - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: julia --project=docs --color=yes -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
       - name: Build and deploy documentation
-        run: julia --project=docs/ --compile=min -O0 docs/make.jl
+        run: julia --project=docs --color=yes --compile=min -O0 docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
