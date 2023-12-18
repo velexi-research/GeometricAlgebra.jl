@@ -55,7 +55,7 @@ jobs:
       - name: Set up Julia caches
         uses: julia-actions/cache@v1
         with:
-          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ runner.os }}-${{ runner.arch }}-${{ matrix.version }}-${{ hashFiles('.github/workflows/CI.yml') }}
+          cache-name: ${{ github.repository }}-${{ github.workflow }}-${{ github.job }}-julia-${{ hashFiles('.github/workflows/CI.yml') }}
 
       - name: Build package
         uses: julia-actions/julia-buildpkg@v1
